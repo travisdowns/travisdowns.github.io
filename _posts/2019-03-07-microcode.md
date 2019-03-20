@@ -2,7 +2,8 @@
 layout: post
 title:  "What has my microcode done for me lately?"
 date:   2019-03-19 12:00:00 -300
-categories: intel memory performance
+category: blog
+tags: intel memory performance
 ---
 
 # TLDR
