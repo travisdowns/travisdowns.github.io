@@ -89,7 +89,7 @@ Here's the old microcode:
 
 ![Interleaved Stores w/ Perf Counters (old microcode)]({{page.assets}}/skl/i-plus-counters-old.svg)
 
-... and the new microcode:
+... and with the new microcode (note the change in the y axis, it's about 3x slower for the L1 hit region):
 
 ![Interleaved Stores w/ Perf Counters (new microcode)]({{page.assets}}/skl/i-plus-counters-new.svg)
 
@@ -194,6 +194,14 @@ All this means that in this particular example you would face some tough tradeof
 
 You can solve this particular problem using software prefetching instructions. If you prefetch the lines you are going to store to, a totally different path is invoked: the same one that handles loads, and here the memory level parallelism will be available regardless of the the limitations of the store path. One complication is that, except for `prefetchw`[^prefetchw], such prefetches will be "shared OK" requests for the line, rather than an RFO (request for ownership). This means that the core might receive the line in the S MESI state, adn then When the store occurs, a _second_ request may be incurred to change the line from S state to M state. In my testing this didn't see to be a problem in practice, perhaps because the lines are not shared across cores so generally arrive in the E state, and the E->M transition is cheap.
 
+We don't even really have to **pre**-fetch: that is, we don't need to issue the prefetch instructions early (which would be hard in this case since we'd need to run ahead of the RNG) - we just issue the PF at the same spot we would have otherwise done the store. This transforms the nature of the request from a store to a load, which is the goal here - even though it doesn't make the request visible to the CPU any earlier than before.
+
+One question is which of the two regions to prefetch? The fixed region, the variable region or both? It turns out that "both" is a fine strategy and is often the sole fastest approach and is generally tied in the remaining cases. Here's a look at all three approaches against no prefetching at all on the new microcode (128 KiB fixed region size):
+
+![Interleaved Stores with Prefetching]({{page.assets}}/skl/i-prefetch-new.svg)
+
+A key observation is that if you had decided to only prefetch one _or_ the other of the two stores, you'd be slower than no prefetching at all over most of the range. It isn't exactly clear to me why this is the case: perhaps the prefetches compete for fill buffers or otherwise result in a worse allocation of fill buffers to requests.
+
 ### Avoiding Microcode Updates
 
 The simplest solution is to simply avoid the newest microcode updates. These updates seem drive by new spectre mitigations, so if you are not enabling that functionality (e.g., SSDB is disabled by default in Linux, so if you aren't explicitly enabling it, you won't get it), perhaps you can do without these updates.
@@ -269,4 +277,4 @@ Thanks to [Daniel Lemire](https://lemire.me/en/) who kindly provided additional 
 
 [^x86-memmodel]: The x86 has a relatively strong memory model: lets call it [x86-TSO](https://www.cl.cam.ac.uk/~pes20/weakmemory/cacm.pdf). In x86-TSO, stores from all CPUs appear in a global total order with stores from each CPU consistent with program order. If a given CPU makes stores A and B in that order, all other CPUs will observe not only a consistent order of stores A and B, but the *same* A-before-B order as the program order. All this store ordering complicates the pipeline. In weaker memory models like ARM and POWER, in the absence of fences, you can simply commit senior stores[^17] in whatever order is convenient. If some store locations are already present in L1, you can commit those, while making RFO requests for other store locations which aren't in L1. An x86 CPU has a to take more conservative strategy. The basic idea is that stores are only made globally observable _in program order_ as they reach the head of the store buffer. The CPU may still try to get parallelism by prefetching upcoming stores, as described for example in Intel's [US patent 7130965](https://patents.google.com/patent/US7130965/en)[^patent-note] - but care must be taken. For example, any snoop request that comes in for any of the lines in flight must get a consistent result: whether the lines are in a write-back buffer being evicted from L1, in a fill buffer making their way to L2, in a write-combining buffer[^wc-note] waiting to commit to L1, and so on.
 
-[^prefetchw]: The `prefetchw` has long been supported by AMD, but on Intel it is only supported on Broadwell and more recent micro-architectures. Earlier Intel chips didn't implement this functionality, but the `prefetchw` opcode was still accepted and executed as a no-op.
+[^prefetchw]: The `prefetchw` instruction has long been supported by AMD, but on Intel it is only supported since Broadwell. Earlier Intel chips didn't implement this functionality, but the `prefetchw` opcode was still accepted and executed as a no-op.
