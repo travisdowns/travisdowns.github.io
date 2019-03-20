@@ -91,7 +91,7 @@ Here's the old microcode:
 
 ... and the new microcode:
 
-![Interleaved Stores w/ Perf Counters (new microcode)](/assets/2019-03-07/skl/i-plus-counters-new.svg)
+![Interleaved Stores w/ Perf Counters (new microcode)]({{page.assets}}/skl/i-plus-counters-new.svg)
 
 Despite the large difference in performance, there is very little to no difference in the relevant performance counters. In both cases, the number of L1 misses (i.e., L2 references) approaches 0.75 as the second region size approaches zero as we'd expect (all L1 hits in the second region, and about 25% L1 hits in the 128 KiB fixed region as the L1D is 25% of the size of L2). On the right side, the number of L1 misses approaches something like 1.875, as the L1 hits in the 128 KiB region are cut in half by competition with with the other large region.
 
