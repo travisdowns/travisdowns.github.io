@@ -1,20 +1,26 @@
 ---
 layout: post
-title:  "What has my microcode done for me lately?"
+title:  "What has your microcode done for you lately?"
 date:   2019-03-19 12:00:00 -300
 category: blog
-tags: intel memory performance
+tags: [intel, memory, performance]
+assets: /assets/2019-03-19
 ---
 
-# TLDR
 
-Did you ever wonder what is *inside* those microcode updates that get silently applied to your CPU via Windows update, BIOS upgrades, and various microcode packages on Linux? Well, you are in the wrong place, because this blog post won't answer that question (you might like [this](https://www.emsec.ruhr-uni-bochum.de/media/emma/veroeffentlichungen/2017/08/16/usenix17-microcode.pdf) though). We will take a look at one thing that changes behavior after a recent microcode update.
+## Microcode Mystery 
 
-In particular, we will show that the most recent Intel microcode version can significantly slow down a store heavy workload when some stores hit in the L1 data cache, and some miss.
+Did you ever wonder what is *inside* those microcode updates that get silently applied to your CPU via Windows update, BIOS upgrades, and various microcode packages on Linux?
+
+Well, you are in the wrong place, because this blog post won't answer that question (you might like [this](https://www.emsec.ruhr-uni-bochum.de/media/emma/veroeffentlichungen/2017/08/16/usenix17-microcode.pdf) though).
+
+In fact, the overwhelming majority of this this post is about the performance of scattered writes, and not very much at all about the details of CPU microcode. Where the microcode comes in, and what might make this more interesting than usual, is that performance on a purely CPU-bound benchmark can vary dramatically _depending on microcode version_. In particular, we will show that the most recent Intel microcode version can significantly slow down a store heavy workload when some stores hit in the L1 data cache, and some miss.
+
+My results are intended to be reproducible and the benchmarking and data collection code is available as described [at the bottom](#the-source). 
 
 ## A series of random writes
 
-How fast can you perform a series of random writes? Because of the importance of caching, you might expect that it depends heavily on how big of a region the writes are bad, and you'd be right. For example, if we test a series of random writes to a region that fits entirely in L1, we'll find that random writes take almost exactly 1 cycle on modern Intel chips, matching the published limit of one write per cycle [^2].
+How fast can you perform a series of random writes? Because of the importance of caching, you might reasonably expect that it depends heavily on how big of a region the writes are scattered across, and you'd be right. For example, if we test a series of random writes to a region that fits entirely in L1, we find that random writes take almost exactly 1 cycle on modern Intel chips, matching the published limit of one write per cycle [^2].
 
 If we use larger regions, we expect performance to slow down as many of the writes miss to outer cache levels. In fact, I measure roughly the following performance whether for linear (64 byte stride) or random writes to various sized regions:
 
@@ -25,11 +31,13 @@ If we use larger regions, we expect performance to slow down as many of the writ
 | L3 | 5-6 | ~35 |
 | RAM | 15-20 | ~200 |
 
-I've also included a third column in the table above describing typical read latency figures, which give an indication of roughly how *far away* a cache level is from the core, based on the round-trip read time. Since all normal stores also involve a read (to get the cache line to write to into the L1 cache with its existing contents), the time to "complete" a single store should be at least that long[^4]. Since the observed time per write is much less, these tests must exhibit significant [memory level parallelism](https://en.wikipedia.org/wiki/Memory-level_parallelism) (MLP). We usually care about MLP when it comes to loads, but it is important also for a long stream of stores such as these benchmarks. The last line in above table implies that we may have requests for 10 or more stores in flight in the memory subsystem at once, in order to achieve average store time of 15-20 cycles with a memory latency of 200 cycles.
+I've also included a third column in the table above which records typical read latency figures for each cache level. This gives an indication of roughly how *far away* a cache is from the core, based on the round-trip read time. Since all normal stores[^normal-stores] also involve a read (to get the cache line to write to into the L1 cache with its existing contents), the time to "complete" a single store should be at least that long[^4]. As the observed time per write is much less, these tests must exhibit significant [memory level parallelism](https://en.wikipedia.org/wiki/Memory-level_parallelism) (MLP), i.e., several store misses are in-progress in the memory subsystem at once and their latencies overlap.  We usually care about MLP when it comes to loads, but it is important also for a long stream of stores such as these benchmarks. The last line in above table implies that we may have requests for 10 or more stores in flight in the memory subsystem at once, in order to achieve average store time of 15-20 cycles with a memory latency of 200 cycles.
+
+You can reproduce this table yourself using the `wrandom1-unroll` and `wlinear1` tests.
 
 ## Interleaved writes
 
-Let's move on to the case where we actually observe some interesting behavior. 
+Let's move on to the case where we actually observe some interesting behavior. Here we tackle the same scenario that I asked about in a [twitter poll](https://twitter.com/trav_downs/status/1103396480994422784).
 
 Consider the following loop, which writes randomly to _two_ character arrays.
 
@@ -45,55 +53,59 @@ int writes_inter(size_t iters, char* a1, size_t size1, char *a2, size_t size2) {
 }
 ```
 
-Let's say we fix the size of the first array, `size1`, to something like half the size of the L2 cache, and evaluate the performance for a range of `size2`. What type of performance do we expect? We already know the time it takes for a single write to regions of various size, so in principle one might expect the above loop to perform something like the sum of the time of one write to an L2-sized region (for `a1`) and one write to a `size2` sized region.
+Let's say we fix the size of the first array, `size1`, to something like half the size of the L2 cache, and evaluate the performance for a range of sizes for the second array, `size2`. What type of performance do we expect? We already know the time it takes for a single write to regions of various size, so in principle one might expect the above loop to perform something like the sum of the time of one write to an L2-sized region (the write to `a1`) and one write to a `size2` sized region (the write to `a2`).
 
 Let's try it! Here's a test of single stores vs interleaved stores (with one of the interleaved stores accessing a fixed 128 KiB region), varying the size of the other region, run on my Skylake i7-6700HQ.
 
-![Interleaved vs Single stores](/assets/2019-03-07/skl/i-vs-s-old.svg)
+![Interleaved vs Single stores]({{page.assets}}/skl/i-vs-s-old.svg)
 
-Overall we see that behavior is similar. Especially for large region sizes (the right size of the graph), the assumption that interleaved accesses are more or less additive with the same accesses by themselves mostly pans out: there is a gap of about 4 cycles between the single stream and the stream with interleaved accesses, which is just slightly more than the cost of an L2 access. For small region sizes, the correspondence is less exact. In particular, the single stream drops down to ~1 cycle accesses when the region fits in L1, but in the interleaved case this doesn't occur.
+Overall we see that behavior of the two benchmarks roughly track each other, with the interleaved version (twice as many stores) taking longer than the single store version, as expected.
+
+Especially for large region sizes (the right side of the graph), the assumption that interleaved accesses are more or less additive with the same accesses by themselves mostly pans out: there is a gap of about 4 cycles between the single stream and the stream with interleaved accesses, which is just slightly more than the cost of an L2 access. For small region sizes, the correspondence is less exact. In particular, the single stream drops down to ~1 cycle accesses when the region fits in L1, but in the interleaved case this doesn't occur.
 
 At least part of this behavior makes sense: the two streams of stores will interact in the caches, and the L1 contained region isn't really "L1 contained" in the interleaved case because the second stream of stores will be evicting lines from L1 constantly. So with a 16 KiB second region, the test really behaves as if a 16 + 128 = 144 KiB region was being accessed, i.e., L2 resident, but in a biased way (with the 16 KiB block being accessed much more frequently), so there is no sharp decrease in iteration time at the 32 KiB boundary[^5].
 
 ## The weirdness begins
 
-So far, so good and nothing too weird.
+So far, so good and nothing too weird. However, starting now, it _is_ about to get weird!
 
-It _does_ get weird though. Everything above is kind of a reduced version of a benchmark I was using to test some *real code*[^1], about a year ago. This code had a tight loop with a table lookup and then writes to two different arrays. When I benchmarked this code, performance was usually consistent with the findings above.
+Everything above is a reduced version of a benchmark I was using to test some *real code*[^1], about a year ago. This code had a tight loop with a table lookup and then writes to two different arrays. When I benchmarked this code, performance was usually consistent with the performance of "interleaved" benchmark plotted above.
 
-Recently I returned to the benchmark to check the performance on newer CPU architectures. First, I went back to check the results on the original hardware (the i7-6700HQ in my laptop). I failed to reproduce it -- I wasn't able to achieve the same performance, with the same test and on the same hardware as before: it was always running significantly slower (about half the original speed).
+Recently, I returned to the benchmark to check the performance on newer CPU architectures. First, I went back to check the results on the original hardware (the [Skylake i7-6700HQ](https://ark.intel.com/products/88967) in my laptop). I failed to reproduce it -- I wasn't able to achieve the same performance, with the same test and on the same hardware as before: it was always running significantly slower (about half the original speed).
 
-With some help from user Adrian on the [RWT forums](https://www.realworldtech.com/forum/?roomid=1) I was able to bisect the difference down to a CPU microcode update. In particular, with newest microcode version [^7], `0xc6` the interleaved stores scenarios runs _much_ slower. For example, the same benchmark as above now looks like this, every time you run it:
+With some help from user Adrian on the [RWT forums](https://www.realworldtech.com/forum/?roomid=1) I was able to bisect the difference down to a CPU microcode update. In particular, with newest microcode version [^7], `0xc6` the interleaved stores scenario runs _much_ slower. For example, the same benchmark as above now looks like this, every time you run it:
 
-![Interleaved vs Single Stores (New Microcode)](/assets/2019-03-07/skl/i-vs-s-new.svg)
+![Interleaved vs Single Stores (New Microcode)]({{page.assets}}/skl/i-vs-s-new.svg)
 
-The behavior of interleaved for small regions (left hand side of chart) is drastically different - the throughput is less than half of the old microcode. It is not obvious just by eyeballing it, but performance is also reduced, but by only a few cycles across the  I bisected microcode versions and found that only the most recent SKL microcode, revision `0xc6` and released in August 2018 exhibits the "always slow" behavior shown above. The preceding version (TODO: version) usually results in the fast mode. 
+The behavior of interleaved for small regions (left hand side of chart) is drastically different - the throughput is less than half of the old microcode. It is not obvious just by visual comparison it, but performance is actually reduced across the range of tested sizes for the interleaved case, albeit by only a few cycles as the region size becomes large. I tested various microcode versions and found that only the most recent SKL microcode, revision `0xc6` and released in August 2018 exhibits the "always slow" behavior shown above. The preceding version `0xc2` usually results in the fast behavior. 
 
 What's up with that?
+
+### Performance Counters
 
 We can check the performance counters to see if they reveal anything. We'll use the `l2_rqsts.references`, `l2_rqsts.all_rfo` and `l2_rqsts.rfo_miss` counters, which count the total number of accesses (`references`) and total accesses related to RFO requests (`all_rfo` aka _stores_) from the core as well as the number that miss (`rfo_miss`). Since we are only performing stores, we expect these counts to match and to correspond to the number of L1 store misses, since any store that misses in L1 ultimately contributes[^9] to an L2 access.
 
 Here's the old microcode:
 
-![Interleaved Stores w/ Perf Counters (old microcode)](/assets/2019-03-07/skl/i-plus-counters-old.svg)
+![Interleaved Stores w/ Perf Counters (old microcode)]({{page.assets}}/skl/i-plus-counters-old.svg)
 
 ... and the new microcode:
 
 ![Interleaved Stores w/ Perf Counters (new microcode)](/assets/2019-03-07/skl/i-plus-counters-new.svg)
 
-Despite the large difference in performance, there is very little difference in the relevant performance counters. In both cases, the number of L1 misses (i.e., L2 references) approaches 0.75 as the second region size approaches zero as we'd expect (all L1 hits in the second region, and about 25% L1 hits in the 128 KiB fixed region as the L1D is 25% of the size). On the right size, the number of L1 misses approaches something like 1.875, as the L1 hits in the 128 KiB region are cut in half by competition with with the other large region.
+Despite the large difference in performance, there is very little to no difference in the relevant performance counters. In both cases, the number of L1 misses (i.e., L2 references) approaches 0.75 as the second region size approaches zero as we'd expect (all L1 hits in the second region, and about 25% L1 hits in the 128 KiB fixed region as the L1D is 25% of the size of L2). On the right side, the number of L1 misses approaches something like 1.875, as the L1 hits in the 128 KiB region are cut in half by competition with with the other large region.
 
 So despite the much slower performance, for L1-sized second regions, the difference doesn't obviously originate in different cache hit behavior. Indeed, with the new microcode, performance goes _down_ as the L1 hit rate goes _up_.
 
-So it seems that the _presence of an L1 hit in the store buffer prevents overlapping of miss handling for stores on either side_, at least with the new microcode. That is, a series of contiguous stores can be handled in parallel only if none of them is an L1 hit. In this way L1 hits somehow act as a store fence with the new microcode. The performance is in line with each store going alone: roughly the L2 latency plus a few cycles. 
+So it seems that the likeliest explanation is that _the presence of an L1 hit in the store buffer prevents overlapping of miss handling for stores on either side_, at least with the new microcode, on SKL hardware. That is, a series of consecutive stores can be handled in parallel only if none of them is an L1 hit. In this way L1 store hits somehow act as a store fence with the new microcode. The performance is in line with each store going alone to the memory hierarchy: roughly the L2 latency plus a few cycles. 
 
-## Will the real sfence please stand up
+### Will the real sfence please stand up
 
-Let's test the "L1 hits act as a store fence" theory. In fact, there is already an instruction that acts as a store force in the x86 ISA: [`sfence`](https://www.felixcloutier.com/x86/sfence). Run back-to-back this instruction only takes a [few cycles](http://uops.info/html-instr/SFENCE-1063.html) but its most interesting effect occurs when stores are in the pipeline: this instruction blocks dispatch until all earlier stores have committed to the L1 cache. So it fences stores before and after and prevents them from overlapping.
+Let's test the "L1 hits act as a store fence" theory. In fact, there is already an instruction that acts as a store force in the x86 ISA: [`sfence`](https://www.felixcloutier.com/x86/sfence). Repeatedly executed back-to-back this instruction only takes a [few cycles](http://uops.info/html-instr/SFENCE-1063.html) but its most interesting effect occurs when stores are in the pipeline: this instruction blocks dispatch of subsequent stores until all earlier stores have committed to the L1 cache, implying that stores on different sides of the fence cannot overlap[^sfence-note].
 
-We'll look at two version of the interleaved loop with sfence: one with sfence inserted right after the store to the first region (fixed 128 KiB), and the other inserted after the store to the second region - we'll label them sfenceA and sfenceB respectively. Both have the same number of sfences (one per iteration, i.e., per pair of stores) and only differ in what store happens to be last in the store buffer when the sfence executes. Here's the result on the new microcode, the old microcode is [not surprising](/assets/skl/i-sfence-old.svg):
+We will look at two version of the interleaved loop with `sfence`: one with `sfence` inserted right after the store to the first region (fixed 128 KiB), and the other inserted after the store to the second region - let's call them sfenceA and sfenceB respectively. Both have the same number of fences (one per iteration, i.e., per pair of stores) and only differ in what store happens to be last in the store buffer when the `sfence` executes. Here's the result on the new microcode (the results on the old microcode are [over here]({{page.assets}}/skl/i-sfence-old.svg)):
 
-![Interleaved Stores w/ SFENCE](/assets/2019-03-07/skl/i-sfence-new.svg)
+![Interleaved Stores w/ SFENCE]({{page.assets}}/skl/i-sfence-new.svg)
 
 The right side of the grpah is fairly unremarkable: both versions with sfence perform roughly at the latency for the associated cache level because there is zero memory level parallelism (no, I don't know why one performs better than other or why the performance crosses over near 64 KiB). The left part is pretty amazing though: one of the sfence configurations is _faster than the same code without sfence_. That's right, adding a store serializing instruction like sfence, can speed up the code by several cycles. It doesn't come close to the fast performance of the old microcode versions, but the behavior is very surprising nonetheless.
 
@@ -105,11 +117,11 @@ To this point we've been we've been looking at the scenario where a write to a 1
 
 What's the behavior? Here's the old microcode:
 
-![Interleaved Stores w/ 2048 KiB Fixed Region](/assets/2019-03-07/skl/i-vs-s-2mib-old.svg)
+![Interleaved Stores w/ 2048 KiB Fixed Region]({{page.assets}}/skl/i-vs-s-2mib-old.svg)
 
 ... and the new:
 
-![Interleaved Stores w/ 2048 KiB Fixed Region](/assets/2019-03-07/skl/i-vs-s-2mib-new.svg)
+![Interleaved Stores w/ 2048 KiB Fixed Region]({{page.assets}}/skl/i-vs-s-2mib-new.svg)
 
 Again we see a large performance impact with the new microcode, and the results are consistent with the theory that L1 hits in the store stream prevent overlapping of store misses on either side. In particular we see that the region with L1 hits takes about 37 cycles, almost exactly the L3 latency on this CPU. In this scenario, it is _slower to have L1 hits mixed in to the stream of accesses than to replace those L1 hits with misses to DRAM_. That's a remarkable demonstration of the power of memory level parallelism and of the potential impact of this change.
 
@@ -162,7 +174,7 @@ do {
 
 Here's is the performance with a fixed array size of 2048 KiB (since the performance degradation is more dramatic with large fixed region sizes):
 
-![Interleaved Stores with Unrolling](/assets/2019-03-07/skl/i-unrolled-2mib-new.svg)
+![Interleaved Stores with Unrolling]({{page.assets}}/skl/i-unrolled-2mib-new.svg)
 
 For the region where L1 hits occur, the unroll by gives a 1.6x speedup, and the unroll by 4 a 2.5x speed. Even when unrolling by 4 we still see an impact from this issue (performance still improves once almost every store is an L1 miss) - but we are much closer to the expected the baseline performance before the microcode update.
 
@@ -196,18 +208,42 @@ This post is already longer than I wanted it to be. The idea is for posts to clo
 
  - The current test uses regions whose addresses whose bottom 12 bits are identically zero, but whose 13th bit varies. That is, the regions "4K alias" but do not "8K alias". Since the main loop uses the same random address for both regions (wrapped to region size by masking) in each iteration, this means that the stores alias as describe above. However, this is not the cause of the main effects reported here: you can remove the aliasing completely and the behavior is largely the same[^11].
  - You can go the other way too: if you increase the aliasing (you can try this by setting environment variable `ALLOW_ALIAS=1`) up to 64 KiB (bottom 16 bits of the _physical_ address), I found a strong effect where performance was slower with the _old_ microcode. This effect seems to have disappeared with the new microcode. Now 64 KiB aliasing (especially _physical_ aliasing) is probably a lot more rare than mixed L1 hits and L1 misses in the stream of stores, so I'd rather the old behavior than the new - but this is probably interesting enough to write about separately.
- - I do sometimes see the "slow mode" behavior with earlier microcode versions. Almost a year ago, when the last several version of the microcode didn't even exist, I experienced periodic slow mode behavior while benchmarking - the same type of performance in the L1 region as the current microcode shows all the time. On older microcode I can still reproduce this consistently: _if all CPUs are loaded when I start the `bench` process_. For example `./bench interleaved` consistently gives fast mode, but `stress -c 4 & ./bench interleaved` consistently gives slow timings ... _even when I kill the CPU using processes before the results roll in_. In that case, the tests keep running in slow mode even though it's the only thing running on the system.
-
-   This seems to explain why I randomly got slow mode in the past. For example, I noticed that something like `./bench interleaved > data; plot-csv.py data` would give fast mode results, but when I shortened it to `./bench interleaved | plot-csv.py` it would be in slow mode, because apparently launching the python interpreter in parallel on the RHS of the pipe used enough CPU to trigger the slow mode. I had a weird 10 minutes or so where I'd run `./bench` without piping it and look at the data, and then try to plot it and it would be totally different, back and forth.
+ - I do sometimes see the "slow mode" behavior with earlier microcode versions. Almost a year ago, when the last several version of the microcode didn't even exist, I experienced periodic slow mode behavior while benchmarking - the same type of performance in the L1 region as the current microcode shows all the time. On older microcode I can still reproduce this consistently: _if all CPUs are loaded when I start the `bench` process_. For example `./bench interleaved` consistently gives fast mode, but `stress -c 4 & ./bench interleaved` consistently gives slow timings ... _even when I kill the CPU using processes before the results roll in_. In that case, the tests keep running in slow mode even though it's the only thing running on the system.<br><br>This seems to explain why I randomly got slow mode in the past. For example, I noticed that something like `./bench interleaved > data; plot-csv.py data` would give fast mode results, but when I shortened it to `./bench interleaved | plot-csv.py` it would be in slow mode, because apparently launching the python interpreter in parallel on the RHS of the pipe used enough CPU to trigger the slow mode. I had a weird 10 minutes or so where I'd run `./bench` without piping it and look at the data, and then try to plot it and it would be totally different, back and forth.
   - I considered the idea that this bad behavior only shows up when the store buffer is full, e.g., because of some interaction that occurs when renaming is stalled on store buffer entries, but versions of the test which periodically drain the store buffer with `sfence` so it never becomes very full showed the same result.
  - I examined the values of a lot more performance counters than the few shown above, but none of them provided any smoking gun for the behavior: they were all consistent with L1 hits simply blocking overlap of L1 miss stores on either side.
 
 
+### Other platforms
+
+An obvious and immediate question is what happens on other micro-architectures, beyond my Skylake client core. 
+
+On Haswell, the behavior is _always slow_. That is, whether with old or new microcode, store misses mixed with L1 store hits were much slower than expected. So if you target Haswell or (perhaps) Broadwell era hardware, you might want to keep this in mind regardless of microcode version.
+
+On Skylake-X (Xeon W-2401), the behavior is _always fast_. That is, even with the newest microcode version I did not see the slow behavior. I also was not able to trigger the behavior by starting the test with loaded CPUs as I was with Skylake client with old microcode.
+
+On Cannonlake I did not observe the slow behavior. I don't know if I was using an "old" or "new" microcode as Intel does not publish microcode guidance for Cannonlake (and it isn't clear to me if any Cannonlake microcodes have been released at all as very few chips were ever shipped).
+
+You can look at the results for all the platforms I tested in the [assets directory]({{page.assets}}). The plots are the same as described above for Skylake plus some variants not show but which should be obvious from the title or filename.
+
+## The Source
+
+You can have fun reproducing all these results yourself as my code is available in the store-bench project [on GitHub](https://github.com/travisdowns/store-bench). Documentation is a bit lacking, but it shouldn't be to hard to figure out. Open an issue if anything is unclear or you find a bug, and pull requests gladly accepted.
+
+## Thanks
+
+Thanks to [Daniel Lemire](https://lemire.me/en/) who kindly provided additional hardware on which I was able to test these results. 
+
+
 ---
+---
+<br>
+
 
 [^1]: By *real code* I simply mean something that is not a benchmark, not necessarily anything actually useful.
 
-[^2]: Of course, to achieve one-write per cycle, your benchmark has to be otherwise quite efficient: among other things the process by which you generate random addresses needs to have a throughput of one per cycle too, so usually you'll want cheat a bit on the RNG side.
+[^2]: Of course, to achieve one-write per cycle, your benchmark has to be otherwise quite efficient: among other things the process by which you generate random addresses needs to have a throughput of one per cycle too, so usually you'll want cheat a bit on the RNG side. I wrote such a test and you can run it with `./bench wrandom1-unroll`. For buffer sizes that fit within L1, it achieves very close to 1 cycle per write (roughly 1.01 cycles per write for most buffer sizes).
+
+[^normal-stores]: Here "normal stores" basically means stores that are to write-back (WB) memory regions and which are not the special non-temporal stores that x86 offers. Almost every store you'll do from a typical program falls into this category.
 
 [^4]: In fact, we can test this - the `wlinear1-sfence` test is a linear write test like `wlinear1` except with an `sfence` instruction between every store. This flushes the store buffer, preventing any overlap in the stores and the observed time per store is in all cases a couple of cycles above the corresponding read latency (probably corresponding to `sfence` overhead).
 
@@ -216,6 +252,8 @@ This post is already longer than I wanted it to be. The idea is for posts to clo
 [^7]: See your microcode version on Linux using `cat /proc/cpuinfo | grep -m1 micro` or `dmesg | grep micro`. The latter option also helps you determine if the microcode was updated during boot by the Linux microcode driver.
 
 [^9]: I used the weasel word "contributes" here rather than "ultimately results in an L1 miss" to cover the case where two stores occur to the same line in short succession and that line is not in L1. In this case, both stores will miss, but there will generally only be one reference to L2 since the fill buffers operate on whole cache lines, so both stores will be satisfied by the same miss. The same effect occurs for loads and can be measured explicitly by the `mem_load_retired.fb_hit` event: those are loads that missed in L1, but subsequently hit the _fill buffer_ (aka miss status handling register) allocated for an earlier access to the same cache line that also missed. 
+
+[^sfence-note]: Actually, this doesn't seem to be strictly true. The results on some CPUs are too good to represent zero overlapping between stores. E.g., the [old microcode results]({{page.assets}}/skl/i-sfence-old.svg)) show the sfenceB results staying under 30 cycles even for main-memory sized regions (and quite close to the no sfence results), which is only possible with a lot of store overlapping. So something remains to be discovered about sfence behavior.
 
 [^11]: I did notice _some_ differences when removing the aliasing: for example, sfenceA and sfenceB converged and finally performed the same as the region size increased, rather than sfenceB crossing over and being several cycles faster than sfenceA.
 
