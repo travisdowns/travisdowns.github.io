@@ -239,7 +239,11 @@ You can have fun reproducing all these results yourself as my code is available 
 
 ## Thanks
 
-Thanks to [Daniel Lemire](https://lemire.me/en/) who kindly provided additional hardware on which I was able to test these results. 
+Thanks to [Daniel Lemire](https://lemire.me/en/) who kindly provided additional hardware on which I was able to test these results.
+
+## Comments
+
+I don't have a comment system, but I'll reply to stuff posted in the [Hacker News discussion](https://news.ycombinator.com/item?id=19445566), or [on Twitter](https://twitter.com/trav_downs/status/1108415599267450882).
 
 
 ---
