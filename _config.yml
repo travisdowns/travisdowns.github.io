@@ -12,7 +12,7 @@ email: travis.downs@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   A blog about low-level software and hardware performance.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://travisdowns.github.io"
 twitter_username: trav_downs
 github_username:  travisdowns
 permalink: /:categories/:year/:month/:day/:title:output_ext
