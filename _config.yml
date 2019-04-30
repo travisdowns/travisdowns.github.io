@@ -7,16 +7,25 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
+
+
+# blog info
 title: Performance Matters
-email: travis.downs@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   A blog about low-level software and hardware performance.
-baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://travisdowns.github.io"
-twitter_username: trav_downs
-github_username:  travisdowns
 permalink: /:categories/:year/:month/:day/:title:output_ext
 google_analytics: UA-136594956-1
+
+# me info
+email: &email travis.downs@gmail.com
+author:
+  name: Travis Downs
+  email: *email
+baseurl: "" # the subpath of your site, e.g. /blog
+twitter_username: trav_downs
+github_username:  travisdowns
+
 
 # Build settings
 markdown: kramdown
