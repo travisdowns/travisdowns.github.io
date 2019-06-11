@@ -64,7 +64,7 @@ for (size_t i = 0; i < len; i += 2) {
 
 This compiles to the following assembly:
 
-~~~
+~~~nasm
 top:
     mov    r8d,DWORD [rdi+rcx*4]          ; 1
     mov    edx,DWORD [rdi+rcx*4+0x4]      ; 2
@@ -129,7 +129,7 @@ uint32_t mul_by(const uint32_t *data, size_t len, uint32_t m) {
 
 The loop compiles to the following assembly. I've marked uop counts as before.
 
-~~~
+~~~nasm
 930:
     mov    r10d,DWORD [rdi+rcx*4+0x4] ;  1 y = data[i + 1]
     mov    r8d,r10d                   ;  2 setup up r8d to hold result of multiplies
@@ -231,7 +231,7 @@ do {
 
 This compiles to the following assembly:
 
-~~~
+~~~nasm
 88:                                       ; total fused uops
     mov    r8d,DWORD PTR [rsi+rdx*4-0x4]  ; 1
     add    ecx,DWORD PTR [rdi+r8*4]       ; 2
@@ -267,7 +267,7 @@ do {
 
 This compiles to:
 
-~~~
+~~~nasm
 98:                                        ; total fused uops
     mov    rcx,QWORD PTR [rsi+rdx*4-0x8]   ; 1
     mov    r9,rcx                          ; 2
@@ -281,7 +281,7 @@ This compiles to:
 
 We have 7 fused-domain uops rather than 5, yet this runs in 1.81 cycles, about 10% faster. The theoretical limit based on pipeline width is 7 / 4 = 1.75 cycles, so we are proably getting collisions on p6 between the `shr` and the taken branch (unrolling a bit more would help). Clang 5.0 manages to do better, by one uop:
 
-~~~
+~~~nasm
 70:
     mov    r8,QWORD PTR [rsi+rdx*4-0x8]
     mov    r9d,r8d
@@ -358,7 +358,7 @@ What happened? As it turns out, the `imul` instruction has a _latency_ of 3 cycl
 
 Note that we mostly care about _loop carried_ dependencies, which are dependency chains that cross loop iterations, i.e., where some output register in one iteration is used as an input register for the same chain in the next iteration. In the example, the carried chain involves only `eax`, but more complex chains are common in practice. In the earlier example, the four `imul` instructions _did_ form a chain:
 
-~~~
+~~~nasm
 930:
     mov    r10d,DWORD [rdi+rcx*4+0x4] ; load
     mov    r8d,r10d                   ;
@@ -489,14 +489,14 @@ At the assembly level, the main remedy is make sure that your stores use simple 
 
 That is, rather than this:
 
-~~~
+~~~nasm
 mov [rdi + rax*4], rdx
 add rax, 1
 ~~~
 
 You want this:
 
-~~~
+~~~nasm
 mov [rdi], rdx
 add rdi, 4
 ~~~
@@ -513,7 +513,7 @@ void sum(const int *a, const int *b, int *d, size_t len) {
 
 The loop compiles to the following assembly:
 
-~~~
+~~~nasm
 .L3:
     mov     r8d, DWORD PTR [rsi+rax*4]
     add     r8d, DWORD PTR [rdi+rax*4]
@@ -527,7 +527,7 @@ This loop will be limited by the complex adressing limitation to 1.5 cycles per 
 
 We could use separate pointers for each array and increment all of them, like:
 
-~~~
+~~~nasm
 .L3:
     mov     r8d, DWORD PTR [rsi]
     add     r8d, DWORD PTR [rdi]
@@ -543,7 +543,7 @@ Everything uses simple addressing, great! However, we've added two uops and so t
 
 The trick is to only use simple addressing for the store, and calculate the load addresses relative to the store address:
 
-~~~
+~~~nasm
 .L3:
     mov     eax, DWORD PTR [rdx+rsi] ; rsi and rdi have been adjusted so that
     add     eax, DWORD PTR [rdx+rdi] ; rsi+rdx points to a and rdi+rdx to b
@@ -590,7 +590,7 @@ All the discussion here refers to the _dynamic instruction stream_ - which is th
 
 For example, take the following nested loops, with inner and outer iteration counts of 2 and 4:
 
-~~~
+~~~nasm
     xor rdx, rdx
     mov rax, 2
 
@@ -608,7 +608,7 @@ inner:
 
 The static instruction stream is just want you see above, 8 instructoins in total. The dynamic instructon stream traces what happens at runtime, so the inner loop appears 8 times, for example:
 
-~~~
+~~~nasm
     xor rdx, rdx
     mov rax, 2
 
@@ -751,7 +751,7 @@ callee:
 
 With the following (which is essentially emulating the [JAL instruction](https://en.wikibooks.org/wiki/MIPS_Assembly/Control_Flow_Instructions#Jump_and_Link):
 
-~~~
+~~~nasm
 callee:
   ; function code goes here
   jmp [r15] ; return to address stashed in r15
