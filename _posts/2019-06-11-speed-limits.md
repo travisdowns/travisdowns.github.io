@@ -41,7 +41,7 @@ First, lets start with this list of very important caveats.
 **Intel:** Maximum 4 fused-uops[^ICL] per cycle<br>
 **AMD:** Maximum 5 fused-uops per cycle
 
-Every CPU can execute only a maximum number of operations per second. For many early CPUs, this was always less than one per cycle, but modern pipelined [supercalar](https://en.wikipedia.org/wiki/Superscalar_processor) processors can execute more, up to a limit. This underlying limit is not always be imposed in the same place, e.g., some CPUs may be limited by instruction encoding, others by register renaming or retirement - but there is always a limit (sometimes more than one limit depending on what you are counting).
+Every CPU can execute only a maximum number of operations per second. For many early CPUs, this was always less than one per cycle, but modern pipelined [superscalar](https://en.wikipedia.org/wiki/Superscalar_processor) processors can execute more, up to a limit. This underlying limit is not always be imposed in the same place, e.g., some CPUs may be limited by instruction encoding, others by register renaming or retirement - but there is always a limit (sometimes more than one limit depending on what you are counting).
 
 For modern Intel chips this limit is 4 *fused-domain*[^fused-domain] operations, and for modern AMD it is 5 macro-operations. So if your loop contains N fused-uops, it will never execute at more than 1 iteration per cycle.
 
@@ -107,7 +107,7 @@ In a way this is the simplest of the limits to understand: you simply can't exec
 Your only goal is to reduce the number of operations (in the fused domain), which usually means reducing the number of instructions. You can do that by:
 
  - Removing instructions, i.e., "classic" instruction-oriented optimization. Way too involved to cover in a bullet point, but briefly you can try to unroll loops (indeed, by unrolling the loop above, I cut execution time by ~15%), use different instructions that are more efficient, remove instructions (e.g., the `mov r11d,r8d` and `mov r9d,edx` are not necessary and could be removed with a slight reoganization), etc. If you are writing in a high level language you can't do this _directly_, but you can try to understand the assembly the compiler is generating and make changes to the code or compiler flags that get it to do what you want.
- - Vectorization. Try to do more work with one instruction. This is an obvious huge win for this method. If you compile the same code with `-O3` rather than `-O2`, gcc vectorizes it (and doesn't even do a great job[^gcc-notgreat]) and we get a 4.6x speedup, to 0.76 cycles per iteration (0.38 cycles per element). If you vectorized it by hand or massaged the autovectorization a bit more I think you could get to about 3x, down to roughly 0.125 cycles per element.
+ - Vectorization. Try to do more work with one instruction. This is an obvious huge win for this method. If you compile the same code with `-O3` rather than `-O2`, gcc vectorizes it (and doesn't even do a great job[^gcc-notgreat]) and we get a 4.6x speedup, to 0.76 cycles per iteration (0.38 cycles per element). If you vectorized it by hand or massaged the autovectorization a bit more I think you could get to an additional 3x speed, down to roughly 0.125 cycles per element.
  - Micro-fusion. Somewhat specific to x86, but you can look for opportunities to fold a load and an ALU operation together, since such micro-fused operations only count as one in the fused domain, compared to two for the separate instructions. This generally applies only for values loaded and used once, but *rarely* it may even be profitable to load the same value _twice_ from memory, in two different instructions, in order to eliminat a standalone `mov` from memory. This is more complicated than I make it sound because of the [complication of de-lamination](https://stackoverflow.com/q/26046634), which varies by model and is not fully described[^delamopt] in the optimization manual.
 
 ## Port/Execution Unit Limits
@@ -769,7 +769,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to RWT forums users Paul A. Clayton, Adrian and Peter E. Fry for corrections and suggestions.
+Thanks to RWT forums users Paul A. Clayton, Adrian and Peter E. Fry, and HN users nkurz and maztheman for corrections and suggestions.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
