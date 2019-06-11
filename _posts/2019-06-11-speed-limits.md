@@ -501,7 +501,7 @@ mov [rdi], rdx
 add rdi, 4
 ~~~
 
-Of course, that's often simpler said than one: indexed addressing modes are very useful for using a single loop counter to access multiple arrays, and also when the value of the loop counter is directly used in the loop (as opposed to simply being used for addressing). For example, consider the following loop which writes the element-wise sum of two arrays to a third array:
+Of course, that's often simpler said than done: indexed addressing modes are very useful for using a single loop counter to access multiple arrays, and also when the value of the loop counter is directly used in the loop (as opposed to simply being used for addressing). For example, consider the following loop which writes the element-wise sum of two arrays to a third array:
 
 ~~~c++
 void sum(const int *a, const int *b, int *d, size_t len) {
@@ -671,7 +671,7 @@ With that background out of the way, let's look at the various OoO limits next. 
 **Intel HSW:** 192 fused uops<br>
 **Intel BDW:** 192 fused uops<br>
 **Intel SKL:** 224 fused uops (including SKX)<br>
-**Intel SCL:** 352 (reported)<br>
+**Intel SNC:** 352 (reported)<br>
 **AMD Zen:** 192 mops<br>
 
 The reorder buffer holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest unretired instruction to the newest instruction that be issued.
@@ -766,7 +766,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to RWT forums users Paul A. Clayton and Adrian for corrections and suggestions.
+Thanks to RWT forums users Paul A. Clayton, Adrian and Peter E. Fry for corrections and suggestions.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 

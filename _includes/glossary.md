@@ -30,7 +30,7 @@
 *[BDW]: Intel's Broadwell architecture, aka 5th Generation Intel Core i3,i5,i7
 *[SKL]: Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7
 *[SKX]: Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W
-*[SCL]: Intel's Sunny Cove architecture, aka 10th Generation Intel Core i3,i5,i7
+*[SNC]: Intel's Sunny Cove architecture, aka 10th Generation Intel Core i3,i5,i7
 
 *[PRF]: Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.
 *[LSD]: Loop stream decoder: The so-called _loop buffer_ that can cache small loops of up to ~64 uops on recent Intel architectures. Not actaully a separate structure: the hardware justs locks the loop down in the IDQ.
