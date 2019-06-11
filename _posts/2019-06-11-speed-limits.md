@@ -773,6 +773,11 @@ Thanks to RWT forums users Paul A. Clayton, Adrian and Peter E. Fry for correcti
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
+## Comments
+
+I don't have a comments system[^comments] yet, so I'm basically just outsourcing discussion to HackerNews right now: [here is the thread](https://news.ycombinator.com/item?id=20157196) for this post.
+
+
 ---
 ---
 <br>
@@ -816,5 +821,7 @@ Thanks to Daniel Lemire for providing access to hardware on which I was able to 
 [^speedlemire]: I think this speed limit term came from [Daniel Lemire](https://lemire.me). I guess I liked it because I have used it a lot since then.
 
 [^thatsaid]: That said, I am quite sure you can reach or at least approach closely these limits as I've tested most of them myself. Sure, a lot of these are microbenchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can't - I'm interested to hear about it.
+
+[^comments]: If anyone has a recommendation for a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
 
 {% include glossary.md %}
