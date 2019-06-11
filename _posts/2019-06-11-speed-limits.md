@@ -673,6 +673,7 @@ With that background out of the way, let's look at the various OoO limits next. 
 **Intel SKL:** 224 fused uops (including SKX)<br>
 **Intel SNC:** 352 (reported)<br>
 **AMD Zen:** 192 mops<br>
+**AMD Zen2:** 224 mops<br>
 
 The reorder buffer holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest unretired instruction to the newest instruction that be issued.
 
@@ -692,6 +693,8 @@ In the specific case of load misses, software prefetching can help a lot: it ena
 **Intel IVB:** 160 integer, 144 vector<br>
 **Intel HSW:** 168 integer, 168 vector<br>
 **Intel SKL:** 180 integer, 168 vector<br>
+**AMD Zen:** 168 integer, 160 vector<br>
+**AMD Zen2:** 180 integer, 160 vector<br>
 
 Every instruction with a destination register requires a renamed physical register, which is only reclaimed when the instruction is retired. These registers come from the _physical regsiter file_ (PRF). So to fill the entire ROB with operations that require a destination register, you'll need a PRF as large as the ROB. In practice, there are two separate register files on Intel and AMD chips: the integer registers file used for scalar registers such as `rax` and the vector register file used for SIMD registers such as `xmm0`, `ymm0` and `zmm0`, and the sizes of these register files as shown above are somewhat smaller than the ROB size.
 
