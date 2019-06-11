@@ -107,7 +107,7 @@ In a way this is the simplest of the limits to understand: you simply can't exec
 Your only goal is to reduce the number of operations (in the fused domain), which usually means reducing the number of instructions. You can do that by:
 
  - Removing instructions, i.e., "classic" instruction-oriented optimization. Way too involved to cover in a bullet point, but briefly you can try to unroll loops (indeed, by unrolling the loop above, I cut execution time by ~15%), use different instructions that are more efficient, remove instructions (e.g., the `mov r11d,r8d` and `mov r9d,edx` are not necessary and could be removed with a slight reoganization), etc. If you are writing in a high level language you can't do this _directly_, but you can try to understand the assembly the compiler is generating and make changes to the code or compiler flags that get it to do what you want.
- - Vectorization. Try to do more work with one instruction. This is an obvious huge win for this method. If you compile the same code with `-O3` rather than `-O2`, gcc vectorizes it (and doens't even do a great job[^gcc-notgreat]) and we get a 4.6x speedup, to 0.76 cycles per iteration (0.38 cycles per element). If you vectorized it by hand or massaged the autovectorization a bit more I think you could get to about 3x, down to roughly 0.125 cycles per element.
+ - Vectorization. Try to do more work with one instruction. This is an obvious huge win for this method. If you compile the same code with `-O3` rather than `-O2`, gcc vectorizes it (and doesn't even do a great job[^gcc-notgreat]) and we get a 4.6x speedup, to 0.76 cycles per iteration (0.38 cycles per element). If you vectorized it by hand or massaged the autovectorization a bit more I think you could get to about 3x, down to roughly 0.125 cycles per element.
  - Micro-fusion. Somewhat specific to x86, but you can look for opportunities to fold a load and an ALU operation together, since such micro-fused operations only count as one in the fused domain, compared to two for the separate instructions. This generally applies only for values loaded and used once, but *rarely* it may even be profitable to load the same value _twice_ from memory, in two different instructions, in order to eliminat a standalone `mov` from memory. This is more complicated than I make it sound because of the [complication of de-lamination](https://stackoverflow.com/q/26046634), which varies by model and is not fully described[^delamopt] in the optimization manual.
 
 ## Port/Execution Unit Limits
@@ -144,7 +144,7 @@ The loop compiles to the following assembly. I've marked uop counts as before.
     jne    930                        ; 10
 ~~~
 
-Despite the soure containing two loads per iteration (`x = data[i]` and `y = data[i + 1]`), the compiler was clever enough to reduce that to one, since `y` in iteration `n` becomes `x` in iteration `n + 1`, so it saves the loaded value in a register acros iterations.
+Despite the soure containing two loads per iteration (`x = data[i]` and `y = data[i + 1]`), the compiler was clever enough to reduce that to one, since `y` in iteration `n` becomes `x` in iteration `n + 1`, so it saves the loaded value in a register across iterations.
 
 So we can just apply our pipeline width technique to this loop, right? We count 10 uops (again, the only trick is that `cmp; jne` are macro-fused). We can confirm it in uarch-bench:
 
@@ -178,15 +178,15 @@ In the example above it was easy to see the port pressure because the imul instr
 
 **Intel IACA**
 
-Tries to solve for port pressure (algorithm unclear) and displays it in a table. Has reached end of like but can still be downloaded [here](https://software.intel.com/en-us/articles/intel-architecture-code-analyzer).
+Tries to solve for port pressure (algorithm unclear) and displays it in a table. Has reached end of life but can still be downloaded [here](https://software.intel.com/en-us/articles/intel-architecture-code-analyzer).
 
 **RRZE-HPC OSACA**
 
-Essnentially an open-source version if IACA. Displays cumulative port pressure in a similar way to IACA, although it simply divides each instruction evently among the ports it can use and doens't look for a more ideal solution. On [github](https://github.com/RRZE-HPC/OSACA).
+Essnentially an open-source version if IACA. Displays cumulative port pressure in a similar way to IACA, although it simply divides each instruction evenly among the ports it can use and doens't look for a more ideal solution. On [github](https://github.com/RRZE-HPC/OSACA).
 
 **LLVM-MCA**
 
-Another tool similar to IACA and OSACA, shows port pressure in a similar way and attempts to solve for an ideal solution (algorithm unclear, but it's open source so someone could check). Comes with LLVM 7 or higher and documentation is [here](https://llvm.org/docs/CommandGuide/llvm-mca.html).
+Another tool similar to IACA and OSACA, shows port pressure in a similar way and attempts to find an ideal solution (algorithm unclear, but it's open source so someone could check). Comes with LLVM 7 or higher and documentation is [here](https://llvm.org/docs/CommandGuide/llvm-mca.html).
 
 ### Measuring It
 
@@ -207,7 +207,7 @@ While noting that that the column naming scheme is [really bad](https://github.c
 ### Remedies
 
  - Of course, any solution that removes instructions causing port pressure can help, so most of the same remedies that apply to the *pipeline width* limit also apply here.
- - Additionally, you might try replacing instructions which content for a high-pressure port with others that use different ports, even if the replacement results in more total instructions/uops. For example, sometimes p5 shuffle operations can be replaced with blend operations: you need more total blends but the resulting code can be faster since the blends execute on otherwise underused p0 and p1. Some 32 and 64-bit register-to-register broadcasts that use p5 don't use p5 at all if you instead use a memory source, an rare case where memory source can be *faster* than register source for the same operation.
+ - Additionally, you might try replacing instructions which content for a high-pressure port with others that use different ports, even if the replacement results in more total instructions/uops. For example, sometimes p5 shuffle operations can be replaced with blend operations: you need more total blends but the resulting code can be faster since the blends execute on otherwise underused p0 and p1. Some 32 and 64-bit register-to-register broadcasts that use p5 don't use p5 at all if you instead use a memory source, a rare case where memory source can be *faster* than register source for the same operation.
 
 ## Load Throughput Limit
 
@@ -296,7 +296,7 @@ It avoided the `mov r9,rcx` instruction by combining that and the zero extension
 
 This code is an obvious candidate for vectorization with gather, which could in principle approach 1.25 cycles per itration (8 gathered loads + 1 256-bit load from `offset` per 4 iterations) and newer clang versions even manage to do it, if you allow some inlining so they can see the size and alignment of the buffer. However, [the result](https://gist.github.com/travisdowns/b8294098c5082886f4a043ef8b6607bd) is not good: it was more than twice as slow as the scalar approach.
 
-## Memory and Cache Bandwith
+## Memory and Cache Bandwidth
 
 The load and store limits discuss the ideal scenario where loads and stores hit in L1 (or hit in L1 "on average" enough to not slow things down), but there are throughput limits for other levels of the cache. If your know your loads hit primarily in a particular level of the cache you can use these limits to get a speed limit.
 
@@ -311,7 +311,7 @@ The limits are listed in _cache lines per cycle_ and not in bytes, because that'
 
 The very poor figure of 0.1 cache lines per cycle (about 6-7 bytes a cycle) from L3 on SKX is at odds with Intel's manuals, but it's what I measured on a W-2104. For architectures earlier than Haswell I think the numbers will be similar back to Sandy Bridge.
 
-If your accesses go a mix of cache levels: you will probably get slightly worse bandwidth than what you'd get if the calculate the speed limit based on the assumption the cache levels can be accessed independently.
+If your accesses go to a mix of cache levels: you will probably get slightly worse bandwidth than what you'd get if you calculated the speed limit based on the assumption the cache levels can be accessed independently.
 
 Memory bandwidth is a bit more complicated. You can calculate your theoretical value based on your memory channel count (or look it up on ARK), but this is complicated by the fact that many chips cannot reach the maximum bandwidth from a single core since they cannot generate enough requests to saturate the DRAM bus, due to limited fill buffers. So you are better off just measuring it.
 
@@ -413,7 +413,7 @@ As fun as tracing out dependency chains by hand is, you'll eventually want a too
 
 The basic remedy is that you have to shorten or break up the dependency chains.
 
-For example, maybe you can use lower latency instructions like addition or shift instead of multiplication. A more generally applicable trick is to turn one long dependency chain into several parallel ones. In the example above, the associativity property of integer multiplication[^assoc] allows use to do the multiplications in any order. In particular, we could accumulate every third element into a separate product and multiply them all at the end, like so:
+For example, maybe you can use lower latency instructions like addition or shift instead of multiplication. A more generally applicable trick is to turn one long dependency chain into several parallel ones. In the example above, the associativity property of integer multiplication[^assoc] allows us to do the multiplications in any order. In particular, we could accumulate every third element into a separate product and multiply them all at the end, like so:
 
 ~~~c++
     uint32_t p1 = 1, p2 = 1, p3 = 1, p4 = 1;
@@ -447,11 +447,11 @@ First are simple absolute front-end limits to delivered uops/cycle depeneding on
 | >= Skylake | 4 | 5 | 6 |
 
 
-These might look like important imporant values. I even made a table, probably the only table in this whole post. They aren't very important though, because they are all equal to or larger than the pipeline limit of 4. In fact it is [hard](https://twitter.com/trav_downs/status/1106403269792788480) to even carefully design a microbenchmark which definitively shows the difference between the 5-wide decode on SKL and the 4-wide on Haswell and earlier. So you can mostly ignore these numbers.
+These might look like important values. I even made a table, one of only two in this whole post. They aren't very important though, because they are all equal to or larger than the pipeline limit of 4. In fact it is [hard](https://twitter.com/trav_downs/status/1106403269792788480) to even carefully design a microbenchmark which definitively shows the difference between the 5-wide decode on SKL and the 4-wide on Haswell and earlier. So you can mostly ignore these numbers.
 
 The more important limitations are specific to the individual sources. For example:
 
- - The legacy decoder (MITE) can only handle up to 16 instruction bytes per cycle, so any time instruction length averages more than four bytes decode throughput will necessarily be lower than four. Certain patterns will result have worse throughput than predicted by this formula, e.g., 7 instructions in a 16 byte block will decode in a 6-1-6-1 pattern.
+ - The legacy decoder (MITE) can only handle up to 16 instruction bytes per cycle, so any time instruction length averages more than four bytes decode throughput will necessarily be lower than four. Certain patterns will have worse throughput than predicted by this formula, e.g., 7 instructions in a 16 byte block will decode in a 6-1-6-1 pattern.
  - Only one of the 4 or 5 legacy decoders can handle instructions which generate more than one uop, so a series of instructions which generate 2 uops will only decode at 1 per cycle (2 uops per cycle).
  - Only one uop cache entry (with up to 6 uops) can be accessed per cycle. For larger loops this rarely a bottleneck, but it means that any loop that crosses a uop cache boundary (32 bytes up to and including Broadwell, 64 bytes in Skylake and beyond) will always take 2 cycles, since two uop cache entries are involved. It is not unusual to find small loops which normally take as little as 1 cycle split by such boundaries suddenly taking 2 cycles.
  - Instructions which use microcode, such as gather (pre-Skylake) have additional restrictions and throughput limitations.
@@ -463,13 +463,13 @@ The more important limitations are specific to the individual sources. For examp
 
 **1 store per cycle**
 
-Modern Intel and AMD CPUs can perform at most one store per cycle. No matter what, you won't exceed that. For many algorithms that make a predictable number of stores, this is a useful upper bound on a performance. For example, a 32-bit radix sort that makes 4 passes and does a store per element for each pass will never operate faster than 4/cycles per element (actual performance usually ends up much worse, so this isn't the dominant factor for most implementations).
+Modern Intel and AMD CPUs can perform at most one store per cycle. No matter what, you won't exceed that. For many algorithms that make a predictable number of stores, this is a useful upper bound on a performance. For example, a 32-bit radix sort that makes 4 passes and does a store per element for each pass will never operate faster than 4 cycles per element (in radix sort, actual performance usually ends up much worse so this isn't the dominant factor for most implementations).
 
 This limit applies also to vector scatter instructions, where each element counts as "one" against this limit. Like loads, a store that crosses a cache line counts as two, but other unaligned stores only count as on Intel. On AMD the situation is more complicated: the penalties for stores that cross a boundary is larger, and it's not just 64-byte boundaries that matter - more [details here](https://www.realworldtech.com/forum/?threadid=176780&curpostid=176849).
 
 ### Remedies
 
-Remove unecessary stores from your core loops. If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is differnet, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you wan to take advantaged of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a vectorized stores. If your stores are not contiguous, this will obviously be difficult or impossible.
+Remove unecessary stores from your core loops. If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is differnet, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you want to take advantage of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a single vectorized store. Of course, if your stores are not contiguous, this will be difficult or impossible.
 
 ## Complex Addressing Limit
 
@@ -566,7 +566,7 @@ void sum2(const int *a, const int *b, int *d, size_t len) {
 }
 ~~~
 
-This is UB all over the place if you pass in arbitrary arrays, because we subtract unrelated pointers (`a - d`) and use pointer arithmetic which outside of the bounds of the original array (`d + a_offset`) - but I'm not aware of any compiler that will take advantage of this (as a standalone function it seems unlikely that will ever be the case: because the arrays all _could_ be related, so the function isn't always UB). Still you should avoid stuff like this unless you have a _really_ good reason to push the boundaries. You could achieve the same effect with `uintptr_t` which isn't UB but only unpsecified, and that will work on every platform I'm aware of.
+This is UB all over the place if you pass in arbitrary arrays, because we subtract unrelated pointers (`a - d`) and use pointer arithmetic which outside of the bounds of the original array (`d + a_offset`) - but I'm not aware of any compiler that will take advantage of this (as a standalone function it seems unlikely that will ever be the case: because the arrays all _could_ be related, so the function isn't always UB). Still you should avoid stuff like this unless you have a _really_ good reason to push the boundaries. You could achieve the same effect with `uintptr_t` which isn't UB but only unspecified, and that will work on every platform I'm aware of.
 
 Another way to get simple addressing without adding too much overhead for separate loop pointers is to unroll the loop a little bit. The increment only needs to be done once per iteration, so every unroll reduces the cost.
 
@@ -582,9 +582,9 @@ So avoid many dense taken branches: organize the likely path instead as untaken.
 
 ## Out of Order Limits
 
-Here we will cover several limits which all effect the effective window over which the processor can reorder instructions. It is not a hard limit in itself: you can't use it to directly an upper bound on cycles per iterations or whatever (i.e., the units for these values aren't "per cycle") - but you can use it in concert with other analysis to refine the estimate.
+Here we will cover several limits which all effect the effective window over which the processor can reorder instructions. It is not a hard limit in itself: you can't use it to directly establish an upper bound on cycles per iterations or whatever (i.e., the units for these values aren't "per cycle") - but you can use it in concert with other analysis to refine the estimate.
 
-Until now, we have been implicitly assuming an _infinite_ out of order window. That's why we said, for example, that only loop carried dependencies matter when calculating dependency chains; the implicit assumption is that there is enough out-of-order magic to reorder different loop iterations to hide the effect of all the other chains. Of course, on real CPUs, there is a limit to the magic: if your loops have 1,000 instructions per iteration, the will CPU mostly not be able to overlap the iterations at all, because the different iterations are too far apart in instruction stream.
+Until now, we have been implicitly assuming an _infinite_ out of order window. That's why we said, for example, that only loop carried dependencies matter when calculating dependency chains; the implicit assumption is that there is enough out-of-order magic to reorder different loop iterations to hide the effect of all the other chains. Of course, on real CPUs, there is a limit to the magic: if your loops have 1,000 instructions per iteration, the will CPU will not be able to overlap the much of each iteration at all: the different iterations are too far apart in instruction stream for significant overlap.
 
 All the discussion here refers to the _dynamic instruction stream_ - which is the actual stream of instructions seen by the CPU. This is opposed to the static instruction stream, which is the series of instructions as they appear in the binary. Inside a basic block, static and dynamic instruction streams are the same: the difference is that the dynamic stream follows all jumps, so it is a trace of actual execution.
 
@@ -682,7 +682,7 @@ As an example, a load instruction takes a cache miss which means it cannot retir
 
 If you are hitting the ROB size limit, you should switch from optimizing the code for the usual metrics and instead try to reduce the number of uops. For example, a slower (longer latency, less throughput) instruction can be used to replace two instructions which would otherwise be faster. Similarly, micro-fusion helps because the ROB limit counts in the fused domain.
 
-Reorganizing the instruction stream can help too: if you hit the ROB limit after a specific long-latency instruction (usually a load miss) you may want to move expesnive instructions into the shadow of that instruction so they can execute while the long latency instruction executes. In this way, there will be less work to do when the instruction completes. Similarly, you may want to "jam" loads that miss together: rather than spreading them out where they would naturally occur, putting them close together allows more of the to fit in the ROB window.
+Reorganizing the instruction stream can help too: if you hit the ROB limit after a specific long-latency instruction (usually a load miss) you may want to move expensive instructions into the shadow of that instruction so they can execute while the long latency instruction executes. In this way, there will be less work to do when the instruction completes. Similarly, you may want to "jam" loads that miss together: rather than spreading them out where they would naturally occur, putting them close together allows more of the to fit in the ROB window.
 
 In the specific case of load misses, software prefetching can help a lot: it enables you to start a load early, but prefetches can retire before the load completes, so there is no stalling. For example, if you issue the prefetch 200 instructions before the demand load instruction, you have essentially broaded the ROB by 200 instructions as it applies to that load.
 
@@ -693,9 +693,9 @@ In the specific case of load misses, software prefetching can help a lot: it ena
 **Intel HSW:** 168 integer, 168 vector<br>
 **Intel SKL:** 180 integer, 168 vector<br>
 
-Every instruction with a destination register requires a renamed physical register, which is only reclaimed when the instruction is retired. These registers come from the _physical regsiter file_ (PRF). So to fill the entire ROB with operations that require a destination register, you'll need a PRF as large as the ROB. In practice, there are actaully two separate register files on Intel and AMD chips: the integer registers file used for scalar registers such as `rax` and the vector register file used for SIMD registers such as `xmm0`, `ymm0` and `zmm0`, and the sizes of these register files as shown above are somewhat smaller than the ROB size.
+Every instruction with a destination register requires a renamed physical register, which is only reclaimed when the instruction is retired. These registers come from the _physical regsiter file_ (PRF). So to fill the entire ROB with operations that require a destination register, you'll need a PRF as large as the ROB. In practice, there are two separate register files on Intel and AMD chips: the integer registers file used for scalar registers such as `rax` and the vector register file used for SIMD registers such as `xmm0`, `ymm0` and `zmm0`, and the sizes of these register files as shown above are somewhat smaller than the ROB size.
 
-Not all of the registers are actaully available for renaming: some are used to store the non-speculative values of the architectural registers, or for other purposes, so the available number of register is about 16 to 32 less than the values shown above. Henry Wong has a great description of observed available registers on the [article](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/) I linked earlier, including some non-ideal behaviors that I've glossed over here. You can calculate the number of available registers on new architectures using the [robsize tool](https://github.com/travisdowns/robsize).
+Not all of the registers are actually available for renaming: some are used to store the non-speculative values of the architectural registers, or for other purposes, so the available number of register is about 16 to 32 less than the values shown above. Henry Wong has a great description of observed available registers on the [article](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/) I linked earlier, including some non-ideal behaviors that I've glossed over here. You can calculate the number of available registers on new architectures using the [robsize tool](https://github.com/travisdowns/robsize).
 
 The upshot is that for given ROB sizes, there are only enough registers available in each file for about 75% of the entries.
 
@@ -723,7 +723,7 @@ _Branches_ here refers to both conditional jumps (`jcc` where `cc` is some condi
 
 Although you will rarely hit this limit, the solution is fewer branches. Try to move unecessary checks out of the hot path, or combine several checks into one. Try to organize multi-predictate conditions such that you can short-circuit the evaluation after the first check (so the subsequet checks don't appear in the dynamic instruction stream). Consider replacing N 2-way (true/false) conditional jumps with one indirect jump with N^2 targets as this counts as only "one" instead of N against the branch limit. Consider conditional moves or other branch-free techniques.
 
-Ensure that branches can retire as soon as possible, although in practice there probably isn't much to change wrt well-compiled code in this respect.
+Ensure that branches can retire as soon as possible, although in practice there often isn't much opportunity to do this when dealing with already well-compiled code.
 
 Note that many of these are the same things you might consider to reduce branch mispredictions, although they apply here even if there are no mispredictions.
 
@@ -731,7 +731,7 @@ Note that many of these are the same things you might consider to reduce branch 
 
 **Intel: 14-15**
 
-Only 14-15 to calls can be in-flight at once, exactly analagous to the limtiation on in-flight branches described above, except it applies to the `call` instruction rather than branches.
+Only 14-15 to calls can be in-flight at once, exactly analagous to the limtiation on in-flight branches described above, except it applies to the `call` instruction rather than branches. As with the branches in-flight restriction, this comes from [testing](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight) by Henry Wong, and in this case I am not aware of an earlier source.
 
 #### Remedies
 
@@ -759,12 +759,16 @@ callee:
 next:
 ~~~
 
-This pattern is hard to achieve in practice in a high level language, although you might have luck emaulting it gcc's [labels as values](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html) functionality.
+This pattern is hard to achieve in practice in a high level language, although you might have luck emulating it with gcc's [labels as values](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html) functionality.
 
 
 ## Bye
 
 That's it for now, if you made it this far I hope you found it useful.
+
+Thanks to RWT forums users Paul A. Clayton and Adrian for corrections and suggestions.
+
+Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
 ---
 ---
