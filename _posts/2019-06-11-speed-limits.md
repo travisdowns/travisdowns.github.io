@@ -428,7 +428,7 @@ For example, maybe you can use lower latency instructions like addition or shift
 
 This test runs at 1.00 cycles per iteration, so the latency chain speed limit has been removed. Well, it's still there: each iteration above takes at least 3 cycles because of the four carried dependency chains between each iteration, but since we are doing 4x as much work now, the p1 port limit becomes the dominant limit.
 
-Compilers can sometimes make this transformation for you, but not always. In particular, gcc is reluctant to unroll loops at any optimization level, and unrolling loops is often a prerequisite for this transforamtion, so often you are stuck doing it by hand.
+Compilers can sometimes make this transformation for you, but not always. In particular, gcc is reluctant to unroll loops at any optimization level, and unrolling loops is often a prerequisite for this transformation, so often you are stuck doing it by hand.
 
 ## Front End Effects
 
@@ -769,7 +769,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to RWT forums users Paul A. Clayton, Adrian and Peter E. Fry, and HN users nkurz and maztheman for corrections and suggestions.
+Thanks to RWT forums users Paul A. Clayton, Adrian and Peter E. Fry, and HN users nkurz, maztheman and hyperpape for corrections and suggestions.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
