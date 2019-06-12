@@ -584,15 +584,19 @@ Note that even if stores have non-complex addressing, it may not be possible to 
 
 **Intel: 1 per 2 cycles (see exception below)**
 
-If you believe the instruction tables, one taken branch can be taken per cycle, but experiments show that this is true only for very small loops with a single backwards branch. For larger loops or any forward branches, the limit is 1 per 2 cycles.
+If you believe the instruction tables, one taken branch can be executed per cycle, but experiments show that this is true only for very small loops with a single backwards branch. For larger loops or any forward branches, the limit is 1 per 2 cycles.
 
 So avoid many dense taken branches: organize the likely path instead as untaken. This is something you want to do anyways for front-end throughput and code density.
 
 ## Out of Order Limits
 
-Here we will cover several limits which all effect the effective window over which the processor can reorder instructions. It is not a hard limit in itself: you can't use it to directly establish an upper bound on cycles per iterations or whatever (i.e., the units for these values aren't "per cycle") - but you can use it in concert with other analysis to refine the estimate.
+Here we will cover several limits which all effect the effective window over which the processor can reorder instructions. These limits all have the same pattern: in order to execute instructions out of order, the CPU needs to track in-flight operations in certain structures. If any of these structures becomes full, the effect is the same: no more operations are issued until space in that structure is freed. Already issued instructions can still execute, but no more operations else will enter the pool of waiting ops. In general, we talk about the _out-of-order window_ which is roughly the number of instructions/operations that can be in progress, counting from the oldest in-progress instruction to the newest. The limits in this section put an effective limit on this window.
 
-Until now, we have been implicitly assuming an _infinite_ out of order window. That's why we said, for example, that only loop carried dependencies matter when calculating dependency chains; the implicit assumption is that there is enough out-of-order magic to reorder different loop iterations to hide the effect of all the other chains. Of course, on real CPUs, there is a limit to the magic: if your loops have 1,000 instructions per iteration, the will CPU will not be able to overlap the much of each iteration at all: the different iterations are too far apart in instruction stream for significant overlap.
+While the effect is the same for each limit, the size of the structures and which operations that are tracked in them vary, so we focus on describing that.
+
+Note that the size of the window is not a hard performance limit in itself: you can't use it to directly establish an upper bound on cycles per iterations or whatever (i.e., the units for the window aren't "per cycle") - but you can use it in concert with other analysis to refine the estimate.
+
+Until now, we have been implicitly assuming an _infinite_ out of order window. That's why we said, for example, that only loop carried dependencies matter when calculating dependency chains; the implicit assumption is that there is enough out-of-order magic to reorder different loop iterations to hide the effect of all the other chains. Of course, on real CPUs, there is a limit to the magic: if your loops have 1,000 instructions per iteration, and the out-of-order window is only 100 instructions, the CPU will not be able to overlap the much of each iteration at all: the different iterations are too far apart in instruction stream for significant overlap.
 
 All the discussion here refers to the _dynamic instruction stream_ - which is the actual stream of instructions seen by the CPU. This is opposed to the static instruction stream, which is the series of instructions as they appear in the binary. Inside a basic block, static and dynamic instruction streams are the same: the difference is that the dynamic stream follows all jumps, so it is a trace of actual execution.
 
@@ -667,23 +671,28 @@ The static instruction stream is just want you see above, 8 instructions in tota
     ; done!
 ~~~
 
-All that to say that when you are thinking about out of order window, you have to think about the dynamic instruction/uop stream, not the static one. For a loop body with no jumps or calls, you can ignore this distinction.
+All that to say that when you are thinking about out of order window, you have to think about the dynamic instruction/uop stream, not the static one. For a loop body with no jumps or calls, you can ignore this distinction. We also talk about _older_, _oldest_, _youngest_, etc instructions - this simply refers to the relative position of instructions or operations in the dynamic stream: the first encountered instructions are the oldest (in the stream above, `xor rdx, rdx` is the oldest) and the most recently encountered instructions are the youngest.
 
 With that background out of the way, let's look at the various OoO limits next. Most of these limits have the same *effect* which is to limit the available out-of-order window, stalling issue until a resource becomes available. They differ mostly in *what* they count, and how many of that thing can be buffered.
+
+First, here's a big table of all the resource sizes we'll talk about the following sections.
+
+|-        |
+| Vendor  | Uarch | ROB Size  | Load Buffer  | Store Buffer  | Integer PRF  | Vector PRF  | Branches  | Calls  |
+| -       |
+| Intel   | Sandy Bridge  | 168       | 64           | 36            | 160          | 144         | 48        | 15     |
+| Intel   | Ivy Bridge    | 168       | 64           | 36            | 160          | 144         | 48        | 15     |
+| Intel   | Haswell       | 192       | 72           | 42            | 168          | 168         | 48        | 14     |
+| Intel   | Broadwell     | 192       | 72           | 42            | 168          | 168         | 48        | 14     |
+| Intel   | Skylake-S Skylake-X | 224       | 72           | 42            | 180          | 168         | 48        | 14?    |
+| Intel   | Sunny Cove    | 352       | 128          | 72            | ?            | ?           | 48        | ?      |
+| AMD     | Zen                 | 192       | 72           | 44            | 168          | 160         | ?         | ?      |
+| AMD     | Zen2                | 224       | ?            | 48            | 180          | 160         | ?         | ?      | 
 
 
 ### Reorder Buffer Size
 
-**Intel SNB:** 168 fused uops<br>
-**Intel IVB:** 168 fused uops<br>
-**Intel HSW:** 192 fused uops<br>
-**Intel BDW:** 192 fused uops<br>
-**Intel SKL:** 224 fused uops (including SKX)<br>
-**Intel SNC:** 352 (reported)<br>
-**AMD Zen:** 192 mops<br>
-**AMD Zen2:** 224 mops<br>
-
-The reorder buffer holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest un-retired instruction to the newest instruction that be issued.
+The ROB is the largest and most general out of order buffer: all uops, even those that don't execute such as `nop` or zeroing idioms, take a slot in the ROB. This structure holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest un-retired instruction to the youngest instruction that can be issued. On Intel, the ROB holds micro-fused ops, so the size is measured in the fused-domain.
 
 As an example, a load instruction takes a cache miss which means it cannot retire until the miss is complete. On an Haswell machine with a ROB size of 192, _at most_ 191 additional instructions can execute while waiting for the load: at that point the ROB window is exhausted and the core stalls. This puts an upper bound on the maximum IPC of the region of 192 / 300 = 0.64. It also puts a bound on the maximum MLP achievable, since only loads that appear in the next 191 instructions can (potentially) execute in parallel with the original miss. In fact, this behavior is used by Henry Wong's [robsize tool](https://github.com/travisdowns/robsize) to measure the ROB size and other OoO buffer sizes, using a missed load followed by a series of filler instructions and finally another load miss. By varying the number of filler instructions and checking whether the loads executed in parallel or serially, the ROB size can be [determined experimentally](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/).
 
@@ -695,14 +704,43 @@ Reorganizing the instruction stream can help too: if you hit the ROB limit after
 
 In the specific case of load misses, software prefetching can help a lot: it enables you to start a load early, but prefetches can retire before the load completes, so there is no stalling. For example, if you issue the prefetch 200 instructions before the demand load instruction, you have essentially broadened the ROB by 200 instructions as it applies to that load.
 
-### Register File Size Limit
+### Load Buffer
 
-**Intel SNB:** 160 integer, 144 vector<br>
-**Intel IVB:** 160 integer, 144 vector<br>
-**Intel HSW:** 168 integer, 168 vector<br>
-**Intel SKL:** 180 integer, 168 vector<br>
-**AMD Zen:** 168 integer, 160 vector<br>
-**AMD Zen2:** 180 integer, 160 vector<br>
+Every load operation, needs a load buffer entry. This means the total OoO window is limited by the number loads appearing in the window. Typical load buffer sizes (72 on SKL) seem to be about one third of the ROB size, so if more than about one out of three operations is a load, you are more likely to be limited by the load buffer than the ROB.
+
+Gathers need as many entries as there are loaded elements to load in the gather. Sometimes loads are hidden - remember that things like `pop` involve a load: in general anything that executes an op on `p2` or `p3` which is not a store (i.e., does not execute anything on `p4`) needs an entry in the load buffer.
+
+#### Remedies
+
+First, you should evaluate whether getting under this limit will be helpful: it may be that you will almost immediately hit another OoO limit, and it also may be that increasing the OoO window isn't that useful if the extra included instructions can't execute or aren't a bottleneck.
+
+In any case, the remedy is to use fewer loads, or in some cases to reorganize loads relative to other instructs so that the window implied by the full load buffer contains the most useful instructions (in particular, contains long latency instructions like load misses). You can try to combine narrower loads into wider ones. You can ensure you keep values in registers as much as possible, and inline functions that would otherwise pass arguments through memory (e.g., certain structures) to avoid pointless loads. If you need to spill some registers, consider spilling registers to `xmm` or `ymm` vector registers rather than the stack.
+
+### Store Buffer
+
+Similarly to the load buffer, the store buffer is required for every operation that involves a store. In fact, filling up the store buffer is pretty much the only way stores can bottleneck performance. Unlike loads, nobody is waiting for a store to complete, except in the case of store-to-load forwarding - but there, by definition, the value is sitting inside the store queue ready to use, so there is no equivalent of the long load miss which blocks dependent operations. You can have long store misses, but they happen after the store has already retired and is sitting in the store buffer (or write-combining buffer). So stores primarily cause a problem if there are enough of them such that the store buffer fill up.
+
+Store buffers are usually smaller than load buffers, about two thirds the size, typically. This reflects the fact that most programs have more loads than stores.
+
+#### Remedies
+
+Similar to the load buffer, you want less stores. Ensure you aren't doing unnecessary spilling to the stack, that you merge stores where possible, that you aren't doing dead stores (e.g., zeroing a structure before immediately overwriting it anyways) and so on. On some platform giving the compiler more information about array of structure alignment helps it merge stores.
+
+Vectorization of loops with consecutive stores helps a lot since it can turn (for example) 8 32-bit stores into a single 256-bit store, which only takes one entry in the store buffer.
+
+Scatter operations available in AVX-512 don't really help: they take one store buffer entry per element stored.
+
+### Scheduler
+
+After an op is issued, it sits in the reservation station (scheduler) until it is able to execute. This structure is generally much smaller than the ROB, about 40-90 entries on modern chips. If this structure fills up, no more operations can issue, even if the other structures have plenty of room. This will occur if there are too many instructions dependent on earlier instructions which haven't completed yet. A typical example is a load which misses in the cache, followed by many instructions which depend on that load. Those instructions won't leave the scheduler until the load completes, and if they are enough to fill the structure no further instructions will be evaluated.
+
+#### Remedies
+
+Organize your code so that there are some independent instructions to execute following long latency operations, which don't depend on the result of those operations.
+
+Consider replacing data dependencies (e.g., conditional moves or other arithmetic) with control dependencies, since the latter are predicted and don't cause a dependency. This also has the advantage of executing many more instructions in parallel, but may lead to branch mispredictions.
+
+### Register File Size Limit
 
 Every instruction with a destination register requires a renamed physical register, which is only reclaimed when the instruction is retired. These registers come from the _physical regsiter file_ (PRF). So to fill the entire ROB with operations that require a destination register, you'll need a PRF as large as the ROB. In practice, there are two separate register files on Intel and AMD chips: the integer registers file used for scalar registers such as `rax` and the vector register file used for SIMD registers such as `xmm0`, `ymm0` and `zmm0`, and the sizes of these register files as shown above are somewhat smaller than the ROB size.
 
@@ -748,7 +786,7 @@ Only 14-15 to calls can be in-flight at once, exactly analogous to the limitatio
 
 Reduce the number of call instructions you make. Consider ensuring the calls can be inlined, or partial inlining (a fast path that can be inlined combined with a slow path that isn't). In extreme cases you might want to replace `call` + `ret` pairs with unconditional `jmp`, saving the return address in a register, plus indirect branch to return to the saved address. I.e. replace the following:
 
-~~~
+~~~nasm
 callee:
     ; function code goes here
     ret
@@ -784,7 +822,6 @@ Thanks to Daniel Lemire for providing access to hardware on which I was able to 
 ## Comments
 
 I don't have a comments system[^comments] yet, so I'm basically just outsourcing discussion to HackerNews right now: [here is the thread](https://news.ycombinator.com/item?id=20157196) for this post.
-
 
 ---
 ---
