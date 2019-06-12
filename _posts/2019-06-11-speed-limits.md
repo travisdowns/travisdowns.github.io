@@ -777,7 +777,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to RWT forums users Paul A. Clayton, Adrian, Peter E. Fry and anon, as well as HN users nkurz, maztheman and hyperpape, and Twitter user Arseny Kapoulkine for corrections and other feedback.
+Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman and hyperpape, Arseny Kapoulkine and Thomas Applencourt for corrections and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
