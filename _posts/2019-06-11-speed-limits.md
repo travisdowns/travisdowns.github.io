@@ -694,7 +694,7 @@ First, here's a big table of all the resource sizes we'll talk about the followi
 
 The ROB is the largest and most general out of order buffer: all uops, even those that don't execute such as `nop` or zeroing idioms, take a slot in the ROB. This structure holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest un-retired instruction to the youngest instruction that can be issued. On Intel, the ROB holds micro-fused ops, so the size is measured in the fused-domain.
 
-As an example, a load instruction takes a cache miss which means it cannot retire until the miss is complete. On an Haswell machine with a ROB size of 192, _at most_ 191 additional instructions can execute while waiting for the load: at that point the ROB window is exhausted and the core stalls. This puts an upper bound on the maximum IPC of the region of 192 / 300 = 0.64. It also puts a bound on the maximum MLP achievable, since only loads that appear in the next 191 instructions can (potentially) execute in parallel with the original miss. In fact, this behavior is used by Henry Wong's [robsize tool](https://github.com/travisdowns/robsize) to measure the ROB size and other OoO buffer sizes, using a missed load followed by a series of filler instructions and finally another load miss. By varying the number of filler instructions and checking whether the loads executed in parallel or serially, the ROB size can be [determined experimentally](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/).
+As an example, a load instruction takes a cache miss which means it cannot retire until the miss is complete. Let's say the load takes 300 cycles to finish, which is a typical latency. Then, on an Haswell machine with a ROB size of 192, _at most_ 191 additional instructions can execute while waiting for the load: at that point the ROB window is exhausted and the core stalls. This puts an upper bound on the maximum IPC of the region of 192 / 300 = 0.64. It also puts a bound on the maximum MLP achievable, since only loads that appear in the next 191 instructions can (potentially) execute in parallel with the original miss. In fact, this behavior is used by Henry Wong's [robsize tool](https://github.com/travisdowns/robsize) to measure the ROB size and other OoO buffer sizes, using a missed load followed by a series of filler instructions and finally another load miss. By varying the number of filler instructions and checking whether the loads executed in parallel or serially, the ROB size can be [determined experimentally](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/).
 
 #### Remedies
 
@@ -815,7 +815,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman and hyperpape, Arseny Kapoulkine and Thomas Applencourt for corrections and other feedback.
+Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt and haberman for corrections and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 

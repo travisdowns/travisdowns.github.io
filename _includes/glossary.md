@@ -39,4 +39,5 @@
 *[IDQ]: Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).
 *[MITE]: Intel's name for the "legacy" decoder, i.e., the decoder that usually decodes instructions when they are not found in the MSROM.
 *[MSROM]: Intel's name for the microcode engine: a component handles complex instructions which require more than 4 uops using microcode which feeds uops directly into the IDQ.
-*[HN] HackerNews
+*[HN]: HackerNews
+*[ROB]: Re-order buffer: An ordered buffer which stores in-progress instructions on an out-of-order processor.
