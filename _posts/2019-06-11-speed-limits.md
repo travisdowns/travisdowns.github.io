@@ -463,7 +463,7 @@ The more important limitations are specific to the individual sources. For examp
  - Only one of the 4 or 5 legacy decoders can handle instructions which generate more than one uop, so a series of instructions which generate 2 uops will only decode at 1 per cycle (2 uops per cycle).
  - Only one uop cache entry (with up to 6 uops) can be accessed per cycle. For larger loops this rarely a bottleneck, but it means that any loop that crosses a uop cache boundary (32 bytes up to and including Broadwell, 64 bytes in Skylake and beyond) will always take 2 cycles, since two uop cache entries are involved. It is not unusual to find small loops which normally take as little as 1 cycle split by such boundaries suddenly taking 2 cycles.
  - Instructions which use microcode, such as gather (pre-Skylake) have additional restrictions and throughput limitations.
- - The LSD suffers from reduced throughput at the boundary between one iteration and the next, although hardware unrolling reduces the impact of the effect. Full details [are on StackOverflow](https://stackoverflow.com/a/39940932). Note that the LSD is disabled on most recent CPUs due to a bug. It is re-enabled on some of the most recent chips (CNL and maybe Cascade Lake).
+ - The LSD suffers from reduced throughput at the boundary between one iteration and the next, although hardware unrolling reduces the impact of the effect. Full details [are on Stack Overflow](https://stackoverflow.com/a/39940932). Note that the LSD is disabled on most recent CPUs due to a bug. It is re-enabled on some of the most recent chips (CNL and maybe Cascade Lake).
 
  Again, this is only scratching the surface - see Agner for a comprehensive treatment.
 
