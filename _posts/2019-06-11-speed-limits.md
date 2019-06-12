@@ -168,7 +168,7 @@ Right, 10 uops. So this should take 10 / 4 = 2.5 cycles per iteration on modern 
 
 What gives? As it turns out, the limitation is the `imul` instructions. Although up to four `imul` instructions can be _issued[^issued]_ every cycle, there is only a single scalar multiplication unit on the CPU, and so only one multiplication can begin execution every cycle. Since there are four multiplications in the loop, it takes at least four cycles to execute it, and in fact that's exactly what we find.
 
-On modern chips all operations execute only through a limited number of ports[^ports] and for multiplications that is always only p1. You can get this information from Agner's [instruction tables]((https://www.agner.org/optimize/#manual_instr_tab):
+On modern chips all operations execute only through a limited number of ports[^ports] and for multiplications that is always only p1. You can get this information from Agner's [instruction tables](https://www.agner.org/optimize/#manual_instr_tab):
 
 ![Agner's port usage info]({{page.assets}}/agner-imul.png)
 
