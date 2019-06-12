@@ -16,6 +16,13 @@ Well this post is about that determing that _speed limit_[^speedlemire]. It's no
 ![Speed Limit](/assets/speed-limit-50-ns.svg){:width="300px"}
 {: refdef}
 
+## Table of Contents
+
+This post is intended to be read from top to bottom, but if it's not your first time here or you just want to skip to a part you find interesting, here you go:
+
+* This will become a table of contents (this text will be scraped).
+{:toc}
+
 ## The Limits
 
 There are many possible limits that apply to code executing on a CPU, and in principle the achieved speed will simply be determined by the lowest of all the limits that apply to the code in question. That is, the code will execute *only as fast as its narrowest bottleneck*.
@@ -35,6 +42,7 @@ First, lets start with this list of very important caveats.
  - There are certainly also unknown limits or not well understood limits not discussed here.
  - More caveats are mentioned in the individual sections.
  - I simply ignore branch prediciton for now: this post just got too long (it's a problem I have). It also deserves a whole post to itself.
+ - This methodolgy is unsuitable for analyzing entire applications - it works best for a small hotspot of say 1 to 50 lines of code, which hopefully produce less than about 50 assembly instructions. Trying to apply it to larger stuff may lead to madness. I highly recommend [Intel's Top-Down](https://software.intel.com/en-us/vtune-amplifier-cookbook-top-down-microarchitecture-analysis-method) analysis method for more complex tasks. It always starts with performance counter measurements and tries to identify the problems from there. A free implementation is available in Andi Kleen's [pmu-tools](https://github.com/andikleen/pmu-tools) for Linux. On Windows, free licenses of VTune are available though the 90-day community license for System Studio.
 
 ## Pipeline Width
 
@@ -168,7 +176,7 @@ On modern chips all operations execute only through a limited number of ports[^p
 
 ![uops-info port usage info]({{page.assets}}/uops-info-imul.png)
 
-On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise (`or`, `and`, `xor`) and test (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations complete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` excecute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
+On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise operation (`or`, `and`, `xor`) and flag setting tests (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations complete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` excecute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
 
 One of the most common cases of port contention is with vector operations. There are only three vector ports, so the best case is three vector operations per cycle, and for AVX-512 there are only two ports so the best case is two per cycle. Furthermore, only a few operations can use all three ports (mostly simple integer arithmetic and bitwise operations and 32 and 64-bit immediate blends) - many are restricted to one or two ports. In particular, shuffles run only on p5 and can be a bottleneck for shuffle heavy algorithm.
 
