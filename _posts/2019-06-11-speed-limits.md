@@ -10,7 +10,7 @@ assets: /assets/speed-limits
 
 Sometimes you just want to know how fast you code *can* go, without benchmarking it. Sometimes you have benchmarked it and want to know how close you are to the maximum speed. Often you just need to know what the current limiting factor is, to guide your optimization decisions.
 
-Well this post is about that determing that _speed limit_[^speedlemire]. It's not a comprehensive performance evaluation methodology, but for many *small* pieces of code it will work very well.
+Well this post is about that determining that _speed limit_[^speedlemire]. It's not a comprehensive performance evaluation methodology, but for many *small* pieces of code it will work very well.
 
 {:refdef: style="text-align: center;"}
 ![Speed Limit](/assets/speed-limit-50-ns.svg){:width="300px"}
@@ -27,7 +27,7 @@ This post is intended to be read from top to bottom, but if it's not your first 
 
 There are many possible limits that apply to code executing on a CPU, and in principle the achieved speed will simply be determined by the lowest of all the limits that apply to the code in question. That is, the code will execute *only as fast as its narrowest bottleneck*.
 
-So I'll just list some of the known bottlenecks here, starting with common factors first, down through some fairly obscure and rarely discussed ones. The real-world numbers come mostly from Intel x86 CPUs, because that's what I know off of top of my head, but the concepts mostly apply in general as well, although often differnet limit values.
+So I'll just list some of the known bottlenecks here, starting with common factors first, down through some fairly obscure and rarely discussed ones. The real-world numbers come mostly from Intel x86 CPUs, because that's what I know off of top of my head, but the concepts mostly apply in general as well, although often different limit values.
 
 Where possible I've included specific figures for _modern_ Intel chips and sometimes AMD CPUs. I'm happy to add numbers for other non-x86 CPUs if anyone out there is interested in providing them.
 
@@ -37,12 +37,12 @@ First, lets start with this list of very important caveats.
 
  - The limits discussed below generally apply to loops of any size, and also straight line or branchy code with no loops in sight. Unfortunately, it is only really possible to apply the simple analyses described to loops, since a steady state will be reached and the limit values will apply. For most straight line code, however, no steady state is reached and the actual behavior depends on many details of the architecture such as various internal buffer and queue sizes. Analyzing such code sections basically requires a detailed simulation, not a back-of-napkin estimate as we attempt here.
  - Similarly, even large loops may not reach a steady state, if the loop is big enough that iterations don't completely overlap. This is discussed a bit more in the [Out of Order Limits](#out-of-order-limits) section.
- - The limits below are all _upper bounds_, i.e., the CPU will never go faster than this (in a steady state) - but it doesn't mean you can achieve these limtis in every case. For each limit, I have found code that you gets you to the limit - but you can't expect that to be the case every time. There may be inefficiencies in the implementation, or unmodeled effects that make the actual limit lower in practice. Don't call Intel and complain that you aren't achieving your two loads per cycle! It's a speed _limit_, not a guaranteed maximum[^thatsaid].
+ - The limits below are all _upper bounds_, i.e., the CPU will never go faster than this (in a steady state) - but it doesn't mean you can achieve these limits in every case. For each limit, I have found code that you gets you to the limit - but you can't expect that to be the case every time. There may be inefficiencies in the implementation, or unmodeled effects that make the actual limit lower in practice. Don't call Intel and complain that you aren't achieving your two loads per cycle! It's a speed _limit_, not a guaranteed maximum[^thatsaid].
  - There are known limits not discussed below, such as instruction throughput for not-fully-pipelined instructions.
  - There are certainly also unknown limits or not well understood limits not discussed here.
  - More caveats are mentioned in the individual sections.
- - I simply ignore branch prediciton for now: this post just got too long (it's a problem I have). It also deserves a whole post to itself.
- - This methodolgy is unsuitable for analyzing entire applications - it works best for a small hotspot of say 1 to 50 lines of code, which hopefully produce less than about 50 assembly instructions. Trying to apply it to larger stuff may lead to madness. I highly recommend [Intel's Top-Down](https://software.intel.com/en-us/vtune-amplifier-cookbook-top-down-microarchitecture-analysis-method) analysis method for more complex tasks. It always starts with performance counter measurements and tries to identify the problems from there. A free implementation is available in Andi Kleen's [pmu-tools](https://github.com/andikleen/pmu-tools) for Linux. On Windows, free licenses of VTune are available though the 90-day community license for System Studio.
+ - I simply ignore branch prediction for now: this post just got too long (it's a problem I have). It also deserves a whole post to itself.
+ - This methodology is unsuitable for analyzing entire applications - it works best for a small hotspot of say 1 to 50 lines of code, which hopefully produce less than about 50 assembly instructions. Trying to apply it to larger stuff may lead to madness. I highly recommend [Intel's Top-Down](https://software.intel.com/en-us/vtune-amplifier-cookbook-top-down-microarchitecture-analysis-method) analysis method for more complex tasks. It always starts with performance counter measurements and tries to identify the problems from there. A free implementation is available in Andi Kleen's [pmu-tools](https://github.com/andikleen/pmu-tools) for Linux. On Windows, free licenses of VTune are available though the 90-day community license for System Studio.
 
 ## Pipeline Width
 
@@ -115,8 +115,8 @@ In a way this is the simplest of the limits to understand: you simply can't exec
 Your only goal is to reduce the number of operations (in the fused domain), which usually means reducing the number of instructions. You can do that by:
 
  - Removing instructions, i.e., "classic" instruction-oriented optimization. Way too involved to cover in a bullet point, but briefly you can try to unroll loops (indeed, by unrolling the loop above, I cut execution time by ~15%), use different instructions that are more efficient, remove instructions (e.g., the `mov r11d,r8d` and `mov r9d,edx` are not necessary and could be removed with a slight reoganization), etc. If you are writing in a high level language you can't do this _directly_, but you can try to understand the assembly the compiler is generating and make changes to the code or compiler flags that get it to do what you want.
- - Vectorization. Try to do more work with one instruction. This is an obvious huge win for this method. If you compile the same code with `-O3` rather than `-O2`, gcc vectorizes it (and doesn't even do a great job[^gcc-notgreat]) and we get a 4.6x speedup, to 0.76 cycles per iteration (0.38 cycles per element). If you vectorized it by hand or massaged the autovectorization a bit more I think you could get to an additional 3x speed, down to roughly 0.125 cycles per element.
- - Micro-fusion. Somewhat specific to x86, but you can look for opportunities to fold a load and an ALU operation together, since such micro-fused operations only count as one in the fused domain, compared to two for the separate instructions. This generally applies only for values loaded and used once, but *rarely* it may even be profitable to load the same value _twice_ from memory, in two different instructions, in order to eliminat a standalone `mov` from memory. This is more complicated than I make it sound because of the [complication of de-lamination](https://stackoverflow.com/q/26046634), which varies by model and is not fully described[^delamopt] in the optimization manual.
+ - Vectorization. Try to do more work with one instruction. This is an obvious huge win for this method. If you compile the same code with `-O3` rather than `-O2`, gcc vectorizes it (and doesn't even do a great job[^gcc-notgreat]) and we get a 4.6x speedup, to 0.76 cycles per iteration (0.38 cycles per element). If you vectorized it by hand or massaged the auto-vectorization a bit more I think you could get to an additional 3x speed, down to roughly 0.125 cycles per element.
+ - Micro-fusion. Somewhat specific to x86, but you can look for opportunities to fold a load and an ALU operation together, since such micro-fused operations only count as one in the fused domain, compared to two for the separate instructions. This generally applies only for values loaded and used once, but *rarely* it may even be profitable to load the same value _twice_ from memory, in two different instructions, in order to eliminate a standalone `mov` from memory. This is more complicated than I make it sound because of the [complication of de-lamination](https://stackoverflow.com/q/26046634), which varies by model and is not fully described[^delamopt] in the optimization manual.
 
 ## Port/Execution Unit Limits
 
@@ -152,7 +152,7 @@ The loop compiles to the following assembly. I've marked uop counts as before.
     jne    930                        ; 10
 ~~~
 
-Despite the soure containing two loads per iteration (`x = data[i]` and `y = data[i + 1]`), the compiler was clever enough to reduce that to one, since `y` in iteration `n` becomes `x` in iteration `n + 1`, so it saves the loaded value in a register across iterations.
+Despite the source containing two loads per iteration (`x = data[i]` and `y = data[i + 1]`), the compiler was clever enough to reduce that to one, since `y` in iteration `n` becomes `x` in iteration `n + 1`, so it saves the loaded value in a register across iterations.
 
 So we can just apply our pipeline width technique to this loop, right? We count 10 uops (again, the only trick is that `cmp; jne` are macro-fused). We can confirm it in uarch-bench:
 
@@ -176,13 +176,13 @@ On modern chips all operations execute only through a limited number of ports[^p
 
 ![uops-info port usage info]({{page.assets}}/uops-info-imul.png)
 
-On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise operation (`or`, `and`, `xor`) and flag setting tests (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations complete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` excecute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
+On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise operation (`or`, `and`, `xor`) and flag setting tests (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations complete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` execute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
 
 One of the most common cases of port contention is with vector operations. There are only three vector ports, so the best case is three vector operations per cycle, and for AVX-512 there are only two ports so the best case is two per cycle. Furthermore, only a few operations can use all three ports (mostly simple integer arithmetic and bitwise operations and 32 and 64-bit immediate blends) - many are restricted to one or two ports. In particular, shuffles run only on p5 and can be a bottleneck for shuffle heavy algorithm.
 
 ### Tools
 
-In the example above it was easy to see the port pressure because the imul instructions go to only a single port, and the remainder of the instructions are mostly simple instructions that can go to any of four ports, so a 4 cycle _solution_ to the port assignment problem is easy to find. In mode complex cases, with many instructions that go to many ports, it is less clear what the ideal solution is (and even less clear what the CPU will actually do without testing it), so you can use one of a few tools:
+In the example above it was easy to see the port pressure because the `imul` instructions go to only a single port, and the remainder of the instructions are mostly simple instructions that can go to any of four ports, so a 4 cycle _solution_ to the port assignment problem is easy to find. In mode complex cases, with many instructions that go to many ports, it is less clear what the ideal solution is (and even less clear what the CPU will actually do without testing it), so you can use one of a few tools:
 
 **Intel IACA**
 
@@ -190,7 +190,7 @@ Tries to solve for port pressure (algorithm unclear) and displays it in a table.
 
 **RRZE-HPC OSACA**
 
-Essnentially an open-source version if IACA. Displays cumulative port pressure in a similar way to IACA, although it simply divides each instruction evenly among the ports it can use and doens't look for a more ideal solution. On [github](https://github.com/RRZE-HPC/OSACA).
+Essnentially an open-source version if IACA. Displays cumulative port pressure in a similar way to IACA, although it simply divides each instruction evenly among the ports it can use and doesn't look for a more ideal solution. On [github](https://github.com/RRZE-HPC/OSACA).
 
 **LLVM-MCA**
 
@@ -223,7 +223,7 @@ While noting that that the column naming scheme is [really bad](https://github.c
 
 Modern Intel and AMD chips (and many others) have a limit of two loads per cycle, which you can achieve if both loads hit in L1. You could just consider this the same as the "port pressure" limit, since there only two load ports - but the limit is interested enough to call out on its own.
 
-Of course, like all limits this is a best case scenario: you might achieve much less than two loads if you are not hitting in L1. Still, it is intersting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed.
+Of course, like all limits this is a best case scenario: you might achieve much less than two loads if you are not hitting in L1. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed.
 
 It's not all that common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.
 
@@ -287,7 +287,7 @@ This compiles to:
     jne    98                              ; 7
 ~~~
 
-We have 7 fused-domain uops rather than 5, yet this runs in 1.81 cycles, about 10% faster. The theoretical limit based on pipeline width is 7 / 4 = 1.75 cycles, so we are proably getting collisions on p6 between the `shr` and the taken branch (unrolling a bit more would help). Clang 5.0 manages to do better, by one uop:
+We have 7 fused-domain uops rather than 5, yet this runs in 1.81 cycles, about 10% faster. The theoretical limit based on pipeline width is 7 / 4 = 1.75 cycles, so we are probably getting collisions on p6 between the `shr` and the taken branch (unrolling a bit more would help). Clang 5.0 manages to do better, by one uop:
 
 ~~~nasm
 70:
@@ -302,7 +302,7 @@ We have 7 fused-domain uops rather than 5, yet this runs in 1.81 cycles, about 1
 
 It avoided the `mov r9,rcx` instruction by combining that and the zero extension (which is effectively the `& 0xFFFFFFFF`) into a single `mov r9d,rd8`. It runs at 1.67 cycles per iteration, saving 20% over the 4-load version, but still slower than the 1.5 limit implied by the 4-wide fused-domain limit.
 
-This code is an obvious candidate for vectorization with gather, which could in principle approach 1.25 cycles per itration (8 gathered loads + 1 256-bit load from `offset` per 4 iterations) and newer clang versions even manage to do it, if you allow some inlining so they can see the size and alignment of the buffer. However, [the result](https://gist.github.com/travisdowns/b8294098c5082886f4a043ef8b6607bd) is not good: it was more than twice as slow as the scalar approach.
+This code is an obvious candidate for vectorization with gather, which could in principle approach 1.25 cycles per iteration (8 gathered loads + 1 256-bit load from `offset` per 4 iterations) and newer clang versions even manage to do it, if you allow some inlining so they can see the size and alignment of the buffer. However, [the result](https://gist.github.com/travisdowns/b8294098c5082886f4a043ef8b6607bd) is not good: it was more than twice as slow as the scalar approach.
 
 ## Memory and Cache Bandwidth
 
@@ -333,7 +333,7 @@ The usual remedies to improve caching performance apply: pack your structures mo
 
 Everything discussed so far is a limited based on _throughput_ - the machine can only do so many things per cycle, and we count the number of things and apply those limits to determine the speed limit. We don't care about how long each instruction takes to finish (as long as we can _start_ one per cycle), or from where it gets its inputs. In practice, that can matter a lot.
 
-Let's consider, for exmaple, a modified version of the multiply loop above, one that's a lot simpler:
+Let's consider, for example, a modified version of the multiply loop above, one that's a lot simpler:
 
 ~~~c++
 for (size_t i = 0; i < len; i++) {
@@ -396,7 +396,7 @@ iteration 3       load -> imul1 -> imul -> imul -> imul -> add
 etc ...                                                    ...
 ~~~
 
-So yes, there is a dependent chain there, and the `imul` instructions are _connected_ to that chain, but they don't particpate in the carried part. Only the single-cycle latency `add` instruction participates in the carried dependency chain, so the implied speed limit is 1 cycle/iteration. In fact, all of our examples so far have had carried dependency chains, but they have all been small enough never to be the dominating factor. You may also have _multiple_ carried dependency chains in a loop: the speed limit is set by the longest.
+So yes, there is a dependent chain there, and the `imul` instructions are _connected_ to that chain, but they don't participate in the carried part. Only the single-cycle latency `add` instruction participates in the carried dependency chain, so the implied speed limit is 1 cycle/iteration. In fact, all of our examples so far have had carried dependency chains, but they have all been small enough never to be the dominating factor. You may also have _multiple_ carried dependency chains in a loop: the speed limit is set by the longest.
 
 I've only touched on this topic and won't go much further here: for a deeper look check out Fabian Giesen's [A whirlwind introduction to dataflow graphs](https://fgiesen.wordpress.com/2018/03/05/a-whirlwind-introduction-to-dataflow-graphs/).
 
@@ -411,11 +411,11 @@ uint32_t mul_chain(const uint32_t *data, size_t len, uint32_t m) {
       // ...
 ~~~
 
-Note the `product = 1` - that's a new chain. So some small amount of overlap is possible near the end of each loop, which shaves about 80-90 cycles off the loop time (i.e., somethign like ~30 multiplications get to overlap). The size of the overlap is limited by the out-of-order buffer structures in the CPU, in particular the [re-order buffer](https://en.wikipedia.org/wiki/Re-order_buffer) and [scheduler](https://en.wikipedia.org/wiki/Reservation_station).
+Note the `product = 1` - that's a new chain. So some small amount of overlap is possible near the end of each loop, which shaves about 80-90 cycles off the loop time (i.e., something like ~30 multiplications get to overlap). The size of the overlap is limited by the out-of-order buffer structures in the CPU, in particular the [re-order buffer](https://en.wikipedia.org/wiki/Re-order_buffer) and [scheduler](https://en.wikipedia.org/wiki/Reservation_station).
 
 ### Tools
 
-As fun as tracing out dependency chains by hand is, you'll eventually want a tool to do this for you. All of IACA, OSACA and llvm-mca can do this type of latency analysis and identity loop carried dependencies implicity. For example, llvm-mca [correctly identifies](https://godbolt.org/z/tD6dd-) that this loop will take 3 cycles/iteration.
+As fun as tracing out dependency chains by hand is, you'll eventually want a tool to do this for you. All of IACA, OSACA and llvm-mca can do this type of latency analysis and identity loop carried dependencies implicitly. For example, llvm-mca [correctly identifies](https://godbolt.org/z/tD6dd-) that this loop will take 3 cycles/iteration.
 
 ### Remedies
 
@@ -440,11 +440,11 @@ Compilers can sometimes make this transformation for you, but not always. In par
 
 ## Front End Effects
 
-I'm going to largely gloss over this one. It really deserves a whole blog post, but in recent Intel and AMD architecturs the prevalence of front-end effects being the limiting factor in loops has dropped a lot. The introduction of the uop cache and better decoders means that it is not as common as it used to be. For a complete[^sklfe] treatment see Agner's [microarchitecture guide](https://www.agner.org/optimize/#manual_microarch), starting with section 9.1 through 9.7 for Sandy Bridge (and then the corresponding sections for each later uarch you are interested in).
+I'm going to largely gloss over this one. It really deserves a whole blog post, but in recent Intel and AMD architectures the prevalence of front-end effects being the limiting factor in loops has dropped a lot. The introduction of the uop cache and better decoders means that it is not as common as it used to be. For a complete[^sklfe] treatment see Agner's [microarchitecture guide](https://www.agner.org/optimize/#manual_microarch), starting with section 9.1 through 9.7 for Sandy Bridge (and then the corresponding sections for each later uarch you are interested in).
 
 If you see an effect that depends on code alignment, especially in a cyclic pattern with a period 16, 32 or 64 bytes, it is very likely to be a front-end effect. There are [hacks you can use to test this](https://twitter.com/trav_downs/status/1124152129294409729).
 
-First are simple absolute front-end limits to delivered uops/cycle depeneding on where the uops are coming from[^lsdno]:
+First are simple absolute front-end limits to delivered uops/cycle depending on where the uops are coming from[^lsdno]:
 
 **Table 1: Uops delivered per cycle**
 
@@ -455,7 +455,7 @@ First are simple absolute front-end limits to delivered uops/cycle depeneding on
 | >= Skylake | 4 | 5 | 6 |
 
 
-These might look like important values. I even made a table, one of only two in this whole post. They aren't very important though, because they are all equal to or larger than the pipeline limit of 4. In fact it is [hard](https://twitter.com/trav_downs/status/1106403269792788480) to even carefully design a microbenchmark which definitively shows the difference between the 5-wide decode on SKL and the 4-wide on Haswell and earlier. So you can mostly ignore these numbers.
+These might look like important values. I even made a table, one of only two in this whole post. They aren't very important though, because they are all equal to or larger than the pipeline limit of 4. In fact it is [hard](https://twitter.com/trav_downs/status/1106403269792788480) to even carefully design a micro-benchmark which definitively shows the difference between the 5-wide decode on SKL and the 4-wide on Haswell and earlier. So you can mostly ignore these numbers.
 
 The more important limitations are specific to the individual sources. For example:
 
@@ -463,7 +463,7 @@ The more important limitations are specific to the individual sources. For examp
  - Only one of the 4 or 5 legacy decoders can handle instructions which generate more than one uop, so a series of instructions which generate 2 uops will only decode at 1 per cycle (2 uops per cycle).
  - Only one uop cache entry (with up to 6 uops) can be accessed per cycle. For larger loops this rarely a bottleneck, but it means that any loop that crosses a uop cache boundary (32 bytes up to and including Broadwell, 64 bytes in Skylake and beyond) will always take 2 cycles, since two uop cache entries are involved. It is not unusual to find small loops which normally take as little as 1 cycle split by such boundaries suddenly taking 2 cycles.
  - Instructions which use microcode, such as gather (pre-Skylake) have additional restrictions and throughput limitations.
- - The LSD suffers from reduced throughput at the boundary between one iteration and the next, although hardware unrolling reduces the impact of the effect. Full details [are on StackOveflow](https://stackoverflow.com/a/39940932). Note that the LSD is disabled on most recent CPUs due to a bug. It is re-enabled on some of the most recent chips (CNL and maybe Cascade Lake).
+ - The LSD suffers from reduced throughput at the boundary between one iteration and the next, although hardware unrolling reduces the impact of the effect. Full details [are on StackOverflow](https://stackoverflow.com/a/39940932). Note that the LSD is disabled on most recent CPUs due to a bug. It is re-enabled on some of the most recent chips (CNL and maybe Cascade Lake).
 
  Again, this is only scratching the surface - see Agner for a comprehensive treatment.
 
@@ -477,7 +477,7 @@ This limit applies also to vector scatter instructions, where each element count
 
 ### Remedies
 
-Remove unecessary stores from your core loops. If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is differnet, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you want to take advantage of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a single vectorized store. Of course, if your stores are not contiguous, this will be difficult or impossible.
+Remove unnecessary stores from your core loops. If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is different, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you want to take advantage of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a single vectorized store. Of course, if your stores are not contiguous, this will be difficult or impossible.
 
 ## Complex Addressing Limit
 
@@ -485,11 +485,11 @@ Remove unecessary stores from your core loops. If you are often storing the same
 
 _This limit is Intel specific._
 
-The load and store limits above are written as if they are independnet. That is, they imply that you can do 2 loads **and** 1 store per cycle. Sometimes that is true, but it depends on the addressing modes used.
+The load and store limits above are written as if they are independent. That is, they imply that you can do 2 loads **and** 1 store per cycle. Sometimes that is true, but it depends on the addressing modes used.
 
 Each load and store operation needs an _address generation_ which happens in an AGU. There are three AGUs on modern Intel chips: p2, p3 and p7. However, p7 is restricted: it can _only_ be used by stores, and it can only be used if the store addressing mode is simple. [Simple addressing](https://stackoverflow.com/a/51664696) is anything that is of the form `[base_reg + offset]` where `offset` is in `[0, 2047]`. So `[rax + 1024]` is simple addressing, but all of `[rax + 4096]`, `[rax + rcx * 2]` and `[rax * 2]` are not.
 
-To apply this limit, count *all* load and any stores with complex adressing: these operations cannot execute at more than 2 per cycle.
+To apply this limit, count *all* load and any stores with complex addressing: these operations cannot execute at more than 2 per cycle.
 
 ### Remedies
 
@@ -531,7 +531,7 @@ The loop compiles to the following assembly:
     jne     .L3
 ~~~
 
-This loop will be limited by the complex adressing limitation to 1.5 cycles per iteration, since there are 1 store that uses complex addressing, plus one load.
+This loop will be limited by the complex addressing limitation to 1.5 cycles per iteration, since there are 1 store that uses complex addressing, plus one load.
 
 We could use separate pointers for each array and increment all of them, like:
 
@@ -561,7 +561,7 @@ The trick is to only use simple addressing for the store, and calculate the load
     ja      .L3
 ~~~
 
-When working in a higher level language, you may not always be able to convince the compiler to generate the code we want as it might simply see through our transfomations. In this case, however, [we can convince](https://godbolt.org/z/PPutUu) gcc to generate the code we want by writing out the transformation outselves:
+When working in a higher level language, you may not always be able to convince the compiler to generate the code we want as it might simply see through our transformations. In this case, however, [we can convince](https://godbolt.org/z/PPutUu) gcc to generate the code we want by writing out the transformation ourselves:
 
 ~~~c++
 void sum2(const int *a, const int *b, int *d, size_t len) {
@@ -614,7 +614,7 @@ inner:
     jnz outer
 ~~~
 
-The static instruction stream is just want you see above, 8 instructoins in total. The dynamic instructon stream traces what happens at runtime, so the inner loop appears 8 times, for example:
+The static instruction stream is just want you see above, 8 instructions in total. The dynamic instruction stream traces what happens at runtime, so the inner loop appears 8 times, for example:
 
 ~~~nasm
     xor rdx, rdx
@@ -683,7 +683,7 @@ With that background out of the way, let's look at the various OoO limits next. 
 **AMD Zen:** 192 mops<br>
 **AMD Zen2:** 224 mops<br>
 
-The reorder buffer holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest unretired instruction to the newest instruction that be issued.
+The reorder buffer holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest un-retired instruction to the newest instruction that be issued.
 
 As an example, a load instruction takes a cache miss which means it cannot retire until the miss is complete. On an Haswell machine with a ROB size of 192, _at most_ 191 additional instructions can execute while waiting for the load: at that point the ROB window is exhausted and the core stalls. This puts an upper bound on the maximum IPC of the region of 192 / 300 = 0.64. It also puts a bound on the maximum MLP achievable, since only loads that appear in the next 191 instructions can (potentially) execute in parallel with the original miss. In fact, this behavior is used by Henry Wong's [robsize tool](https://github.com/travisdowns/robsize) to measure the ROB size and other OoO buffer sizes, using a missed load followed by a series of filler instructions and finally another load miss. My varying the number of filler instructions and checking whether the loads executed in parallel or serially, the ROB size can be [determined experimentally](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/).
 
@@ -693,7 +693,7 @@ If you are hitting the ROB size limit, you should switch from optimizing the cod
 
 Reorganizing the instruction stream can help too: if you hit the ROB limit after a specific long-latency instruction (usually a load miss) you may want to move expensive instructions into the shadow of that instruction so they can execute while the long latency instruction executes. In this way, there will be less work to do when the instruction completes. Similarly, you may want to "jam" loads that miss together: rather than spreading them out where they would naturally occur, putting them close together allows more of the to fit in the ROB window.
 
-In the specific case of load misses, software prefetching can help a lot: it enables you to start a load early, but prefetches can retire before the load completes, so there is no stalling. For example, if you issue the prefetch 200 instructions before the demand load instruction, you have essentially broaded the ROB by 200 instructions as it applies to that load.
+In the specific case of load misses, software prefetching can help a lot: it enables you to start a load early, but prefetches can retire before the load completes, so there is no stalling. For example, if you issue the prefetch 200 instructions before the demand load instruction, you have essentially broadened the ROB by 200 instructions as it applies to that load.
 
 ### Register File Size Limit
 
@@ -728,11 +728,11 @@ Modern Intel chips seem to have a limit of branches _in flight_, where _in fligh
 
 The effects of exceeding the branch order buffer limit are the same as for the ROB limit.
 
-_Branches_ here refers to both conditional jumps (`jcc` where `cc` is some conditioanl code) and indirect jumps (things like `jmp [rax]`).
+_Branches_ here refers to both conditional jumps (`jcc` where `cc` is some conditional code) and indirect jumps (things like `jmp [rax]`).
 
 #### Remedies
 
-Although you will rarely hit this limit, the solution is fewer branches. Try to move unecessary checks out of the hot path, or combine several checks into one. Try to organize multi-predictate conditions such that you can short-circuit the evaluation after the first check (so the subsequet checks don't appear in the dynamic instruction stream). Consider replacing N 2-way (true/false) conditional jumps with one indirect jump with N^2 targets as this counts as only "one" instead of N against the branch limit. Consider conditional moves or other branch-free techniques.
+Although you will rarely hit this limit, the solution is fewer branches. Try to move unnecessary checks out of the hot path, or combine several checks into one. Try to organize multi-predictate conditions such that you can short-circuit the evaluation after the first check (so the subsequent checks don't appear in the dynamic instruction stream). Consider replacing N 2-way (true/false) conditional jumps with one indirect jump with N^2 targets as this counts as only "one" instead of N against the branch limit. Consider conditional moves or other branch-free techniques.
 
 Ensure that branches can retire as soon as possible, although in practice there often isn't much opportunity to do this when dealing with already well-compiled code.
 
@@ -742,11 +742,11 @@ Note that many of these are the same things you might consider to reduce branch 
 
 **Intel: 14-15**
 
-Only 14-15 to calls can be in-flight at once, exactly analagous to the limtiation on in-flight branches described above, except it applies to the `call` instruction rather than branches. As with the branches in-flight restriction, this comes from [testing](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight) by Henry Wong, and in this case I am not aware of an earlier source.
+Only 14-15 to calls can be in-flight at once, exactly analogous to the limitation on in-flight branches described above, except it applies to the `call` instruction rather than branches. As with the branches in-flight restriction, this comes from [testing](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight) by Henry Wong, and in this case I am not aware of an earlier source.
 
 #### Remedies
 
-Reduce the number of call instructions you make. Consider ensuring the calls can be inlined, or partial inlining (a fast path that can be inlined combined with a slow path that isn't). In extreme cases you might want to replace `call` + `ret` pairs with uncontional `jmp`, saving the return address in a register, plus indirect branch to return to the saved address. I.e. replace the following:
+Reduce the number of call instructions you make. Consider ensuring the calls can be inlined, or partial inlining (a fast path that can be inlined combined with a slow path that isn't). In extreme cases you might want to replace `call` + `ret` pairs with unconditional `jmp`, saving the return address in a register, plus indirect branch to return to the saved address. I.e. replace the following:
 
 ~~~
 callee:
@@ -796,15 +796,15 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 
 [^sum-halves]: You can this benchmark from [uarch-bench](https://github.com/travisdowns/uarch-bench):  `./uarch-bench.sh --test-name=cpp/sum-halves`
 
-[^extra-3]: Well it's not exactly 14, it's 14.03 - the extra 0.03 mostly comes from the fact that we call the benchmark repeatedly using an outer loop. Every time the sum loop termiantes (it iterates over an array of 1024 elements), we suffer a branch misprediction and the CPU has gone ahead and executed an extra (falsely speculated) iteration or so of the loop, which is wasted work. You can see this by comparing with `uops_retired.retire_slots` which is also issued uops, but only counting ones which actually retired and not those which were on wrongly speculated path: this reads 14.01, so 2 out of 3 extra uops came from the misprediction. The other uop is just the outer loop overhead.
+[^extra-3]: Well it's not exactly 14, it's 14.03 - the extra 0.03 mostly comes from the fact that we call the benchmark repeatedly using an outer loop. Every time the sum loop terminates (it iterates over an array of 1024 elements), we suffer a branch misprediction and the CPU has gone ahead and executed an extra (falsely speculated) iteration or so of the loop, which is wasted work. You can see this by comparing with `uops_retired.retire_slots` which is also issued uops, but only counting ones which actually retired and not those which were on wrongly speculated path: this reads 14.01, so 2 out of 3 extra uops came from the misprediction. The other uop is just the outer loop overhead.
 
-[^gcc-notgreat]: It puts in a ton of [unecessary shuffles](https://gist.github.com/travisdowns/9216bffba33876ee578aa0bb74b3c8f2) probably to try reproduce the exact structure of the unrolled-by-two loop (removing the unroll is likely to help). In gcc's defense, clang 5 does even worse, running almost twice as slow as gcc.
+[^gcc-notgreat]: It puts in a ton of [unnecessary shuffles](https://gist.github.com/travisdowns/9216bffba33876ee578aa0bb74b3c8f2) probably to try reproduce the exact structure of the unrolled-by-two loop (removing the unroll is likely to help). In gcc's defense, clang 5 does even worse, running almost twice as slow as gcc.
 
 [^delamopt]: Not _fully described_ is basically a ephemism for (partly) _wrong_. The manual describes a test you can use to determine if delamination will occur, but it gives the wrong result for many instructions.
 
 [^issued]: Here I'm using _issued_ as Intel uses it, indicating the moment an operation is renamed and send to the reservation station (RS) awaiting execution (which can happen after all its operands are ready). At the moment the operation leaves the reservation station to execute it is said to be dispatched. This terminology is exactly reversed from that used by some other CPU documentation and most academic literature: the terms _issue_ and _dispatch_ are also used but with meanings flipped.
 
-[^ports]: We are going to mostly gloss over the difference between ports and execution units here. In practice, operations are not dispatched directly to an execution unit, but rather pass though a numbered port, and we treat the port as the constrained resource. The relationship between ports and execution units is normally 1:N (i.e., each port gates access a private group of EUs), but other arrangements are posssible.
+[^ports]: We are going to mostly gloss over the difference between ports and execution units here. In practice, operations are not dispatched directly to an execution unit, but rather pass though a numbered port, and we treat the port as the constrained resource. The relationship between ports and execution units is normally 1:N (i.e., each port gates access a private group of EUs), but other arrangements are possible.
 
 [^written-weirdly]: Yes, it's written kind of weirdly because this generates better assembly than say a forwards for loop. In particular, we want the final check to be for `i != 0`, since that comes for free on x86 (the result of the `i -= 2` will set the zero flag), which ends up dictating the rest of the loop. Another possibility is to adjust the `data` pointer which lets you use `i` and `i + 1` as the indices into the array.
 
@@ -818,7 +818,7 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 
 [^srcdest]: Note that in `imul eax,DWORD PTR [rdi]` register `eax` is use both as one of the arguments for the multiply, and as the result register, in the same way as `y *= x` means `y = y * x`. Such "two operand" instructions where the destination is the same as one of the operands forms are common in x86, especially in scalar code where they are usually the only option - although new SIMD instructions using the AVX and subsequent instruction sets use three argument forms, like `vpaddb xmm0, xmm1, xmm2` where the destination is distinct from the sources. Most other extant ISAs, usually RISC or RISC-influenced, have always used the three operand form.
 
-[^assoc]: I mention _integer_ multiplication for a reason: this property does not apply to floating point multiplication as performed by CPUs, and the same is true for most of the usual mathematic properties of operators when applied to floating point. For this reason, compilers will often cannot perform transformations that they could for integer math, because it might change the result, even if only slightly. The result won't necessarily be _worse_ - just differnet than if the operations had occurred in source order. You can loosen these chains that hold the compiler back with `-ffast-math`.
+[^assoc]: I mention _integer_ multiplication for a reason: this property does not apply to floating point multiplication as performed by CPUs, and the same is true for most of the usual mathematic properties of operators when applied to floating point. For this reason, compilers will often cannot perform transformations that they could for integer math, because it might change the result, even if only slightly. The result won't necessarily be _worse_ - just different than if the operations had occurred in source order. You can loosen these chains that hold the compiler back with `-ffast-math`.
 
 [^rmwnote]: Possibly also including RMW and compare-with-memory instructions, but it depends on the flags implementation. Current Intel chips seem to include flag register bits attached to each integer PRF entry, so an instruction that produces flags consumes a PRF entry even if it does not also produce an integer result.
 
@@ -828,7 +828,7 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 
 [^speedlemire]: I think this speed limit term came from [Daniel Lemire](https://lemire.me). I guess I liked it because I have used it a lot since then.
 
-[^thatsaid]: That said, I am quite sure you can reach or at least approach closely these limits as I've tested most of them myself. Sure, a lot of these are microbenchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can't - I'm interested to hear about it.
+[^thatsaid]: That said, I am quite sure you can reach or at least approach closely these limits as I've tested most of them myself. Sure, a lot of these are micro-benchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can't - I'm interested to hear about it.
 
 [^comments]: If anyone has a recommendation for a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
 

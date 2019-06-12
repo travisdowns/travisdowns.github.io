@@ -19,9 +19,9 @@
 
 
 *[OoO]: Out-of-order execution allows CPUs to execute instructions out of order with respect to the source
-*[UPC]: Uops per cycle: The number of a uops executed per cycle, often closely releated to IPC
+*[UPC]: Uops per cycle: The number of a uops executed per cycle, often closely related to IPC
 *[IPC]: Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles
-*[MLP]: Memory level parallelsim: having multiple misses to memory oustanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
+*[MLP]: Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
 *[demand load]: A true load that appears in the source code or assembly, as opposed to loads initiated by software or hardware prefetch.
 
 *[SNB]: Intel's Sandy Bridge architecture, aka 2nd Generation Intel Core i3,i5,i7
@@ -33,7 +33,7 @@
 *[SNC]: Intel's Sunny Cove architecture, aka 10th Generation Intel Core i3,i5,i7
 
 *[PRF]: Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.
-*[LSD]: Loop stream decoder: The so-called _loop buffer_ that can cache small loops of up to ~64 uops on recent Intel architectures. Not actaully a separate structure: the hardware justs locks the loop down in the IDQ.
+*[LSD]: Loop stream decoder: The so-called _loop buffer_ that can cache small loops of up to ~64 uops on recent Intel architectures. Not actually a separate structure: the hardware justs locks the loop down in the IDQ.
 *[IDQ]: Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).
 *[MITE]: Intel's name for the _legacy_ decoder, i.e., the decoder that usually decodes instructions when they are not found in the MSROM.
-*[MSROM]: Intel's name for the microcode engine: a component handles complex instructions which require more than 4 uops using microcode which feeds uops directy into the IDQ.
+*[MSROM]: Intel's name for the microcode engine: a component handles complex instructions which require more than 4 uops using microcode which feeds uops directly into the IDQ.
