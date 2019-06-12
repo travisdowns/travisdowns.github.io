@@ -815,7 +815,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman and caf for corrections and other feedback.
+Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf and Nick Craver for corrections and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
