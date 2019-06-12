@@ -590,7 +590,7 @@ So avoid many dense taken branches: organize the likely path instead as untaken.
 
 ## Out of Order Limits
 
-Here we will cover several limits which all effect the effective window over which the processor can reorder instructions. These limits all have the same pattern: in order to execute instructions out of order, the CPU needs to track in-flight operations in certain structures. If any of these structures becomes full, the effect is the same: no more operations are issued until space in that structure is freed. Already issued instructions can still execute, but no more operations else will enter the pool of waiting ops. In general, we talk about the _out-of-order window_ which is roughly the number of instructions/operations that can be in progress, counting from the oldest in-progress instruction to the newest. The limits in this section put an effective limit on this window.
+Here we will cover several limits which all affect the effective window over which the processor can reorder instructions. These limits all have the same pattern: in order to execute instructions out of order, the CPU needs to track in-flight operations in certain structures. If any of these structures becomes full, the effect is the same: no more operations are issued until space in that structure is freed. Already issued instructions can still execute, but no more operations else will enter the pool of waiting ops. In general, we talk about the _out-of-order window_ which is roughly the number of instructions/operations that can be in progress, counting from the oldest in-progress instruction to the newest. The limits in this section put an effective limit on this window.
 
 While the effect is the same for each limit, the size of the structures and which operations that are tracked in them vary, so we focus on describing that.
 
@@ -780,7 +780,7 @@ Note that many of these are the same things you might consider to reduce branch 
 
 **Intel: 14-15**
 
-Only 14-15 to calls can be in-flight at once, exactly analogous to the limitation on in-flight branches described above, except it applies to the `call` instruction rather than branches. As with the branches in-flight restriction, this comes from [testing](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight) by Henry Wong, and in this case I am not aware of an earlier source.
+Only 14-15 calls can be in-flight at once, exactly analogous to the limitation on in-flight branches described above, except it applies to the `call` instruction rather than branches. As with the branches in-flight restriction, this comes from [testing](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight) by Henry Wong, and in this case I am not aware of an earlier source.
 
 #### Remedies
 
@@ -815,7 +815,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt and haberman for corrections and other feedback.
+Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman and caf for corrections and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
@@ -855,13 +855,13 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 
 [^srcdest]: Note that in `imul eax,DWORD PTR [rdi]` register `eax` is use both as one of the arguments for the multiply, and as the result register, in the same way as `y *= x` means `y = y * x`. Such "two operand" instructions where the destination is the same as one of the operands forms are common in x86, especially in scalar code where they are usually the only option - although new SIMD instructions using the AVX and subsequent instruction sets use three argument forms, like `vpaddb xmm0, xmm1, xmm2` where the destination is distinct from the sources. Most other extant ISAs, usually RISC or RISC-influenced, have always used the three operand form.
 
-[^assoc]: I mention _integer_ multiplication for a reason: this property does not apply to floating point multiplication as performed by CPUs, and the same is true for most of the usual mathematic properties of operators when applied to floating point. For this reason, compilers will often cannot perform transformations that they could for integer math, because it might change the result, even if only slightly. The result won't necessarily be _worse_ - just different than if the operations had occurred in source order. You can loosen these chains that hold the compiler back with `-ffast-math`.
+[^assoc]: I mention _integer_ multiplication for a reason: this property does not apply to floating point multiplication as performed by CPUs, and the same is true for most of the usual mathematic properties of operators when applied to floating point. For this reason, compilers often cannot perform transformations that they could for integer math, because it might change the result, even if only slightly. The result won't necessarily be _worse_ - just different than if the operations had occurred in source order. You can loosen these chains that hold the compiler back with `-ffast-math`.
 
 [^rmwnote]: Possibly also including RMW and compare-with-memory instructions, but it depends on the flags implementation. Current Intel chips seem to include flag register bits attached to each integer PRF entry, so an instruction that produces flags consumes a PRF entry even if it does not also produce an integer result.
 
 [^sklfe]: Complete up until Broadwell more or less. The guide does not reflect some newer changes such as the uop cache granularity being 64 bytes rather than 32 bytes on Skylake.
 
-[^lsdno]: Node that LSD doesn't appear here, because there the measurement doesn't make sense - these numbers represent the rate at which each decoding-type component can deliver uops to the IDQ, but the LSD is *inside* the IDQ: when active the renamer repeatedly accesses the uops in the IDQ without consuming them. So there is no delivery rate to the IDQ because no uops are delivered.
+[^lsdno]: Note that LSD doesn't appear here, because there the measurement doesn't make sense - these numbers represent the rate at which each decoding-type component can deliver uops to the IDQ, but the LSD is *inside* the IDQ: when active the renamer repeatedly accesses the uops in the IDQ without consuming them. So there is no delivery rate to the IDQ because no uops are delivered.
 
 [^speedlemire]: I think this speed limit term came from [Daniel Lemire](https://lemire.me). I guess I liked it because I have used it a lot since then.
 
