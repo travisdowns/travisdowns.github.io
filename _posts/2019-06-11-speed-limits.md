@@ -249,7 +249,7 @@ This compiles to the following assembly:
     jne    88                             ; 5
 ~~~
 
-There are only 5 fused-uops[^delam2] here, so maybe this executes in 1.25 cycles? Not so fast - it takes 4 cycles because there are 4 loads and we have a speed limit of 2 loads per cycle[^add-indirect].
+There are only 5 fused-uops[^delam2] here, so maybe this executes in 1.25 cycles? Not so fast - it takes 2 cycles because there are 4 loads and we have a speed limit of 2 loads per cycle[^add-indirect].
 
 Note that gather instructions count "one" against this limit for *each* element they they load. `vpgatherdd ymm0, ...` for example, counts as 8 against this limit since it loads eight elements.
 
@@ -773,11 +773,11 @@ next:
 This pattern is hard to achieve in practice in a high level language, although you might have luck emulating it with gcc's [labels as values](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html) functionality.
 
 
-## Bye
+## Thank You
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to RWT forums users Paul A. Clayton, Adrian and Peter E. Fry, and HN users nkurz, maztheman and hyperpape for corrections and suggestions.
+Thanks to RWT forums users Paul A. Clayton, Adrian, Peter E. Fry and anon, as well as HN users nkurz, maztheman and hyperpape for corrections and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
