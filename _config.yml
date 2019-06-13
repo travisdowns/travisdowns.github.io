@@ -26,6 +26,10 @@ baseurl: "" # the subpath of your site, e.g. /blog
 twitter_username: trav_downs
 github_username:  travisdowns
 
+# jekyll-seo-tag
+# wants different format from minima
+twitter:
+  username: trav_downs
 
 # Build settings
 markdown: kramdown
