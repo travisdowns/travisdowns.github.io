@@ -176,13 +176,13 @@ On modern chips all operations execute only through a limited number of ports[^p
 
 ![uops-info port usage info]({{page.assets}}/uops-info-imul.png)
 
-On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise operation (`or`, `and`, `xor`) and flag setting tests (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations complete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` execute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
+On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise operation (`or`, `and`, `xor`) and flag setting tests (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations compete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` execute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
 
 One of the most common cases of port contention is with vector operations. There are only three vector ports, so the best case is three vector operations per cycle, and for AVX-512 there are only two ports so the best case is two per cycle. Furthermore, only a few operations can use all three ports (mostly simple integer arithmetic and bitwise operations and 32 and 64-bit immediate blends) - many are restricted to one or two ports. In particular, shuffles run only on p5 and can be a bottleneck for shuffle heavy algorithm.
 
 ### Tools
 
-In the example above it was easy to see the port pressure because the `imul` instructions go to only a single port, and the remainder of the instructions are mostly simple instructions that can go to any of four ports, so a 4 cycle _solution_ to the port assignment problem is easy to find. In mode complex cases, with many instructions that go to many ports, it is less clear what the ideal solution is (and even less clear what the CPU will actually do without testing it), so you can use one of a few tools:
+In the example above it was easy to see the port pressure because the `imul` instructions go to only a single port, and the remainder of the instructions are mostly simple instructions that can go to any of four ports, so a 4 cycle _solution_ to the port assignment problem is easy to find. In more complex cases, with many instructions that go to many ports, it is less clear what the ideal solution is (and even less clear what the CPU will actually do without testing it), so you can use one of a few tools:
 
 **Intel IACA**
 
@@ -700,7 +700,7 @@ As an example, a load instruction takes a cache miss which means it cannot retir
 
 If you are hitting the ROB size limit, you should switch from optimizing the code for the usual metrics and instead try to reduce the number of uops. For example, a slower (longer latency, less throughput) instruction can be used to replace two instructions which would otherwise be faster. Similarly, micro-fusion helps because the ROB limit counts in the fused domain.
 
-Reorganizing the instruction stream can help too: if you hit the ROB limit after a specific long-latency instruction (usually a load miss) you may want to move expensive instructions into the shadow of that instruction so they can execute while the long latency instruction executes. In this way, there will be less work to do when the instruction completes. Similarly, you may want to "jam" loads that miss together: rather than spreading them out where they would naturally occur, putting them close together allows more of the to fit in the ROB window.
+Reorganizing the instruction stream can help too: if you hit the ROB limit after a specific long-latency instruction (usually a load miss) you may want to move expensive instructions into the shadow of that instruction so they can execute while the long latency instruction executes. In this way, there will be less work to do when the instruction completes. Similarly, you may want to "jam" loads that miss together: rather than spreading them out where they would naturally occur, putting them close together allows more of them to fit in the ROB window.
 
 In the specific case of load misses, software prefetching can help a lot: it enables you to start a load early, but prefetches can retire before the load completes, so there is no stalling. For example, if you issue the prefetch 200 instructions before the demand load instruction, you have essentially broadened the ROB by 200 instructions as it applies to that load.
 
@@ -815,7 +815,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf, Nick Craver and o11c for corrections and other feedback.
+Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf, Nick Craver, pczarn and Bruce Dawson for pointing out errors and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
@@ -867,6 +867,6 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 
 [^thatsaid]: That said, I am quite sure you can reach or at least approach closely these limits as I've tested most of them myself. Sure, a lot of these are micro-benchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can't - I'm interested to hear about it.
 
-[^comments]: If anyone has a recommendation for a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
+[^comments]: If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
 
 {% include glossary.md %}
