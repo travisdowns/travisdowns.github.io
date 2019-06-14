@@ -4,7 +4,7 @@ title:  "Performance speed limits"
 category: blog
 tags: [performance, benchmarking]
 assets: /assets/speed-limits
-image:  /assets/speed-limit-50-ns.png
+image:  /assets/speed-limits/speed-limit-50-ns.png
 twitter:
   card: summary
 ---
