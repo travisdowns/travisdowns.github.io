@@ -4,7 +4,7 @@ title:  "Performance speed limits"
 category: blog
 tags: [performance, benchmarking]
 assets: /assets/speed-limits
-image: /assets/speed-limit-50-ns.png
+image:  /assets/speed-limit-50-ns.png
 twitter:
   card: summary
 ---
@@ -16,7 +16,7 @@ Sometimes you just want to know how fast you code *can* go, without benchmarking
 Well this post is about that determining that _speed limit_[^speedlemire]. It's not a comprehensive performance evaluation methodology, but for many *small* pieces of code it will work very well.
 
 {:refdef: style="text-align: center;"}
-![Speed Limit](/assets/speed-limit-50-ns.svg){:width="300px"}
+![Speed Limit]({{ page.assets }}/speed-limit-50-ns.svg){:width="300px"}
 {: refdef}
 
 ## Table of Contents
