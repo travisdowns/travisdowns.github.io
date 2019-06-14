@@ -224,9 +224,9 @@ While noting that that the column naming scheme is [really bad](https://github.c
 
 **Intel, AMD:** 2 loads per cycle
 
-Modern Intel and AMD chips (and many others) have a limit of two loads per cycle, which you can achieve if both loads hit in L1. You could just consider this the same as the "port pressure" limit, since there only two load ports - but the limit is interested enough to call out on its own.
+Modern Intel and AMD chips (and many others) have a limit of two loads per cycle, which you can achieve if both loads hit in L1. You could just consider this the same as the "port pressure" limit, since there only two load ports - but the limit is interesting enough to call out on its own.
 
-Of course, like all limits this is a best case scenario: you might achieve much less than two loads if you are not hitting in L1. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed.
+Of course, like all limits this is a best case scenario: you might achieve much less than two loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts[^bankconf]. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed. In a throughput sense, loads that hit in cache are not all that expensive even compared to simple ALU ops.
 
 It's not all that common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.
 
@@ -258,7 +258,9 @@ Note that gather instructions count "one" against this limit for *each* element 
 
 ### Split Cache Lines
 
-For the purposes of this speed limit, all loads that hit in the L1 cache count as one, except loads that split a cache line. That is, loads of two bytes or more which cross a 64-byte boundary. Such loads count as two. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
+For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one (assuming no bank conflicts[^bankconf]), except loads that split a cache line, which count as two. A split cache line load is of two bytes and crosses a 64-byte boundary. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
+
+On AMD Zen1 loads suffer a penalty when crossing any 32-byte boundary - such loads also count as two against the load limit. 32-byte (AVX) loads also count as two on Zen1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halve will cross a 32-byte boundary.
 
 ### Remedies
 
@@ -477,6 +479,12 @@ The more important limitations are specific to the individual sources. For examp
 Modern Intel and AMD CPUs can perform at most one store per cycle. No matter what, you won't exceed that. For many algorithms that make a predictable number of stores, this is a useful upper bound on a performance. For example, a 32-bit radix sort that makes 4 passes and does a store per element for each pass will never operate faster than 4 cycles per element (in radix sort, actual performance usually ends up much worse so this isn't the dominant factor for most implementations).
 
 This limit applies also to vector scatter instructions, where each element counts as "one" against this limit. Like loads, a store that crosses a cache line counts as two, but other unaligned stores only count as one on Intel. On AMD the situation is more complicated: the penalties for stores that cross a boundary is larger, and it's not just 64-byte boundaries that matter - more [details here](https://www.realworldtech.com/forum/?threadid=176780&curpostid=176849).
+
+### Split Cache Lines
+
+On Intel, loads that cross a cache line boundary (64 bytes) count as two, but other loads of any other alignment suffer no penalty.
+
+On AMD Zen, any load which crosses a 16 byte boundary suffers a significant penalty: such loads can only execute one per five cycles, so may count as "five" for the purposes of this limit. However, it is possible that this penalty isn't cumulative with other loads but just represents a long latency operation, so 5 aligned loads + 1 misaligned one might not count as 10 but rather 6 or 7. More testing needed on that one. Suffice it to say you should avoid boundary-crossing loads if you can.
 
 ### Remedies
 
@@ -818,7 +826,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf, Nick Craver, pczarn and Bruce Dawson for pointing out errors and other feedback.
+Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf, Nick Craver, pczarn, Bruce Dawson and Fabian Giesen for pointing out errors and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
@@ -871,5 +879,7 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 [^thatsaid]: That said, I am quite sure you can reach or at least approach closely these limits as I've tested most of them myself. Sure, a lot of these are micro-benchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can't - I'm interested to hear about it.
 
 [^comments]: If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
+
+[^bankconf]: Bank conflicts occur in a banked cache design when two loads try to access the same bank. [Per Fabian](https://twitter.com/rygorous/status/1138934828198326272) Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips use have 16 banks per line (bank selected by bits `[5:2]` of the address), while Zen1 has 8 banks per line (bits `[5:3]` used). A load uses any bank it overlaps.
 
 {% include glossary.md %}
