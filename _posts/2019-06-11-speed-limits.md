@@ -472,7 +472,7 @@ The more important limitations are specific to the individual sources. For examp
 
  Again, this is only scratching the surface - see Agner for a comprehensive treatment.
 
-## Stores
+## Stores Throughput Limit
 
 **1 store per cycle**
 
@@ -482,9 +482,9 @@ This limit applies also to vector scatter instructions, where each element count
 
 ### Split Cache Lines
 
-On Intel, loads that cross a cache line boundary (64 bytes) count as two, but other loads of any other alignment suffer no penalty.
+On Intel, stores that cross a cache line boundary (64 bytes) count as two, but stores of any other alignment suffer no penalty.
 
-On AMD Zen, any load which crosses a 16 byte boundary suffers a significant penalty: such loads can only execute one per five cycles, so may count as "five" for the purposes of this limit. However, it is possible that this penalty isn't cumulative with other loads but just represents a long latency operation, so 5 aligned loads + 1 misaligned one might not count as 10 but rather 6 or 7. More testing needed on that one. Suffice it to say you should avoid boundary-crossing loads if you can.
+On AMD Zen, any store which crosses a 16 byte boundary suffers a significant penalty: such stores can only execute one per _five_ cycles, so maybe you should count these as five for the purposes of this limit. However, it is possible that this penalty isn't cumulative with other stores but just represents worst case where many such stores occur back-to-back but the performance when mixed with non-crossing stores is better than this worst case. For example 5 non-crossing store + 1 crossing one might not count as 10 but rather 6 or 7. More testing needed on that one. Suffice it to say you should avoid boundary-crossing stores if you can.
 
 ### Remedies
 
@@ -826,7 +826,7 @@ This pattern is hard to achieve in practice in a high level language, although y
 
 That's it for now, if you made it this far I hope you found it useful.
 
-Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf, Nick Craver, pczarn, Bruce Dawson and Fabian Giesen for pointing out errors and other feedback.
+Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf, Nick Craver, pczarn, Bruce Dawson, Fabian Giesen and glaebhoerl for pointing out errors and other feedback.
 
 Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.
 
