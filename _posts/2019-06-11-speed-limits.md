@@ -472,7 +472,7 @@ The more important limitations are specific to the individual sources. For examp
 
  Again, this is only scratching the surface - see Agner for a comprehensive treatment.
 
-## Stores Throughput Limit
+## Store Throughput Limit
 
 **1 store per cycle**
 
