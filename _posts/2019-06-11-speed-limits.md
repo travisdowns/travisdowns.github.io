@@ -11,7 +11,7 @@ twitter:
 
 ## How fast can it go?
 
-Sometimes you just want to know how fast you code *can* go, without benchmarking it. Sometimes you have benchmarked it and want to know how close you are to the maximum speed. Often you just need to know what the current limiting factor is, to guide your optimization decisions.
+Sometimes you just want to know how fast your code *can* go, without benchmarking it. Sometimes you have benchmarked it and want to know how close you are to the maximum speed. Often you just need to know what the current limiting factor is, to guide your optimization decisions.
 
 Well this post is about that determining that _speed limit_[^speedlemire]. It's not a comprehensive performance evaluation methodology, but for many *small* pieces of code it will work very well.
 
@@ -218,7 +218,7 @@ While noting that that the column naming scheme is [really bad](https://github.c
 ### Remedies
 
  - Of course, any solution that removes instructions causing port pressure can help, so most of the same remedies that apply to the *pipeline width* limit also apply here.
- - Additionally, you might try replacing instructions which content for a high-pressure port with others that use different ports, even if the replacement results in more total instructions/uops. For example, sometimes p5 shuffle operations can be replaced with blend operations: you need more total blends but the resulting code can be faster since the blends execute on otherwise underused p0 and p1. Some 32 and 64-bit register-to-register broadcasts that use p5 don't use p5 at all if you instead use a memory source, a rare case where memory source can be *faster* than register source for the same operation.
+ - Additionally, you might try replacing instructions which contend for a high-pressure port with others that use different ports, even if the replacement results in more total instructions/uops. For example, sometimes p5 shuffle operations can be replaced with blend operations: you need more total blends but the resulting code can be faster since the blends execute on otherwise underused p0 and p1. Some 32 and 64-bit register-to-register broadcasts that use p5 don't use p5 at all if you instead use a memory source, a rare case where memory source can be *faster* than register source for the same operation.
 
 ## Load Throughput Limit
 
@@ -258,7 +258,7 @@ Note that gather instructions count "one" against this limit for *each* element 
 
 ### Split Cache Lines
 
-For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one (assuming no bank conflicts[^bankconf]), except loads that split a cache line, which count as two. A split cache line load is of two bytes and crosses a 64-byte boundary. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
+For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one (assuming no bank conflicts[^bankconf]), except loads that split a cache line, which count as two. A split cache line load is of at least two bytes and crosses a 64-byte boundary. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
 
 On AMD Zen1 loads suffer a penalty when crossing any 32-byte boundary - such loads also count as two against the load limit. 32-byte (AVX) loads also count as two on Zen1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halve will cross a 32-byte boundary.
 
@@ -405,9 +405,9 @@ So yes, there is a dependent chain there, and the `imul` instructions are _conne
 
 I've only touched on this topic and won't go much further here: for a deeper look check out Fabian Giesen's [A whirlwind introduction to dataflow graphs](https://fgiesen.wordpress.com/2018/03/05/a-whirlwind-introduction-to-dataflow-graphs/).
 
-Finally, you may have noticed something interesting about the benchmark result of 2.98 cycles. In every other case, the measured time was equal or slightly _more_ than the speed limit, due to test overhead. How were we able to break the speed limit in this case and come _under_ 3.00 cycles, albeit by less than 1%? Maybe it's just measurement error - the clocks aren't precise enough time this more precisely?
+Finally, you may have noticed something interesting about the benchmark result of 2.98 cycles. In every other case, the measured time was equal or slightly _more_ than the speed limit, due to test overhead. How were we able to break the speed limit in this case and come _under_ 3.00 cycles, albeit by less than 1%? Maybe it's just measurement error - the clocks aren't precise enough to time this more precisely?
 
-Nope. The effect is real and is due to the structure of the test. We run the multiplication code shown above on a buffer of 4096 elements, so the there are 4096 iterations. The benchmark loop that calls that function, _itself_ runs 1000 iterations, each one calling the 4096-iteration inner loop. What happens to get the 2.98 is that in between each call of the inner loop, the multiplication chains _can_ be overlapped. Each chain is 4096-elements long, but the start each function starts a new chain:
+Nope. The effect is real and is due to the structure of the test. We run the multiplication code shown above on a buffer of 4096 elements, so there are 4096 iterations. The benchmark loop that calls that function, _itself_ runs 1000 iterations, each one calling the 4096-iteration inner loop. What happens to get the 2.98 is that in between each call of the inner loop, the multiplication chains _can_ be overlapped. Each chain is 4096-elements long, but the start of each function starts a new chain:
 
 ~~~c++
 uint32_t mul_chain(const uint32_t *data, size_t len, uint32_t m) {
@@ -466,7 +466,7 @@ The more important limitations are specific to the individual sources. For examp
 
  - The legacy decoder (MITE) can only handle up to 16 instruction bytes per cycle, so any time instruction length averages more than four bytes decode throughput will necessarily be lower than four. Certain patterns will have worse throughput than predicted by this formula, e.g., 7 instructions in a 16 byte block will decode in a 6-1-6-1 pattern.
  - Only one of the 4 or 5 legacy decoders can handle instructions which generate more than one uop, so a series of instructions which generate 2 uops will only decode at 1 per cycle (2 uops per cycle).
- - Only one uop cache entry (with up to 6 uops) can be accessed per cycle. For larger loops this rarely a bottleneck, but it means that any loop that crosses a uop cache boundary (32 bytes up to and including Broadwell, 64 bytes in Skylake and beyond) will always take 2 cycles, since two uop cache entries are involved. It is not unusual to find small loops which normally take as little as 1 cycle split by such boundaries suddenly taking 2 cycles.
+ - Only one uop cache entry (with up to 6 uops) can be accessed per cycle. For larger loops this is rarely a bottleneck, but it means that any loop that crosses a uop cache boundary (32 bytes up to and including Broadwell, 64 bytes in Skylake and beyond) will always take 2 cycles, since two uop cache entries are involved. It is not unusual to find small loops which normally take as little as 1 cycle split by such boundaries suddenly taking 2 cycles.
  - Instructions which use microcode, such as gather (pre-Skylake) have additional restrictions and throughput limitations.
  - The LSD suffers from reduced throughput at the boundary between one iteration and the next, although hardware unrolling reduces the impact of the effect. Full details [are on Stack Overflow](https://stackoverflow.com/a/39940932). Note that the LSD is disabled on most recent CPUs due to a bug. It is re-enabled on some of the most recent chips (CNL and maybe Cascade Lake).
 
@@ -725,7 +725,7 @@ Gathers need as many entries as there are loaded elements to load in the gather.
 
 First, you should evaluate whether getting under this limit will be helpful: it may be that you will almost immediately hit another OoO limit, and it also may be that increasing the OoO window isn't that useful if the extra included instructions can't execute or aren't a bottleneck.
 
-In any case, the remedy is to use fewer loads, or in some cases to reorganize loads relative to other instructs so that the window implied by the full load buffer contains the most useful instructions (in particular, contains long latency instructions like load misses). You can try to combine narrower loads into wider ones. You can ensure you keep values in registers as much as possible, and inline functions that would otherwise pass arguments through memory (e.g., certain structures) to avoid pointless loads. If you need to spill some registers, consider spilling registers to `xmm` or `ymm` vector registers rather than the stack.
+In any case, the remedy is to use fewer loads, or in some cases to reorganize loads relative to other instructions so that the window implied by the full load buffer contains the most useful instructions (in particular, contains long latency instructions like load misses). You can try to combine narrower loads into wider ones. You can ensure you keep values in registers as much as possible, and inline functions that would otherwise pass arguments through memory (e.g., certain structures) to avoid pointless loads. If you need to spill some registers, consider spilling registers to `xmm` or `ymm` vector registers rather than the stack.
 
 ### Store Buffer
 
@@ -781,7 +781,7 @@ _Branches_ here refers to both conditional jumps (`jcc` where `cc` is some condi
 
 #### Remedies
 
-Although you will rarely hit this limit, the solution is fewer branches. Try to move unnecessary checks out of the hot path, or combine several checks into one. Try to organize multi-predictate conditions such that you can short-circuit the evaluation after the first check (so the subsequent checks don't appear in the dynamic instruction stream). Consider replacing N 2-way (true/false) conditional jumps with one indirect jump with N^2 targets as this counts as only "one" instead of N against the branch limit. Consider conditional moves or other branch-free techniques.
+Although you will rarely hit this limit, the solution is fewer branches. Try to move unnecessary checks out of the hot path, or combine several checks into one. Try to organize multi-predicate conditions such that you can short-circuit the evaluation after the first check (so the subsequent checks don't appear in the dynamic instruction stream). Consider replacing N 2-way (true/false) conditional jumps with one indirect jump with N^2 targets as this counts as only "one" instead of N against the branch limit. Consider conditional moves or other branch-free techniques.
 
 Ensure that branches can retire as soon as possible, although in practice there often isn't much opportunity to do this when dealing with already well-compiled code.
 
@@ -880,6 +880,6 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 
 [^comments]: If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
 
-[^bankconf]: Bank conflicts occur in a banked cache design when two loads try to access the same bank. [Per Fabian](https://twitter.com/rygorous/status/1138934828198326272) Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips use have 16 banks per line (bank selected by bits `[5:2]` of the address), while Zen1 has 8 banks per line (bits `[5:3]` used). A load uses any bank it overlaps.
+[^bankconf]: Bank conflicts occur in a banked cache design when two loads try to access the same bank. [Per Fabian](https://twitter.com/rygorous/status/1138934828198326272) Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips have 16 banks per line (bank selected by bits `[5:2]` of the address), while Zen1 has 8 banks per line (bits `[5:3]` used). A load uses any bank it overlaps.
 
 {% include glossary.md %}
