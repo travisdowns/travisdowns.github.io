@@ -19,9 +19,11 @@
 *[basic block]: a straight-line code sequence with no branches in except to the entry and no branches out except at the exit (Wikipedia).
 *[uop]: Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.
 *[RFO]: Request for ownership: when a request for a cache line originates from a store, or a type of prefetch that predicts the location is likely to be the target of a store, an RFO is performed which gets the line in an exclusive MESI state.
+*[IP]: Instruction pointer
 
-
-*[OoO]: Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.
+{% assign ooo_def = 'Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.' %}
+*[OoO]: {{ ooo_def }}
+*[OOO]: {{ ooo_def }}
 *[UPC]: Uops per cycle: The number of a uops executed per cycle, often closely related to IPC.
 *[IPC]: Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.
 *[MLP]: Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
