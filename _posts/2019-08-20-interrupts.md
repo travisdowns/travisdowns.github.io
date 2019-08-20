@@ -457,6 +457,11 @@ Of course, this sounds way harder than the usual way of measuring latency: a lon
  - Check `mfence` and friends
  - Check the execution effect of atomic instructions (e.g., blocking load ports)
 
+### Comments
+
+Feedback of any type is welcome. I don't have a comments system[^comments] yet, so as usual I'll outsource discussion to [this HackerNews thread](https://news.ycombinator.com/item?id=20751186).
+
+
 **Attribution**
 
 [Intel 8259 image](https://commons.wikimedia.org/wiki/File:Intel_8259.svg) by Wikipedia user German under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0).
@@ -494,5 +499,7 @@ Of course, this sounds way harder than the usual way of measuring latency: a lon
 [^execretire]: That's the simple way of looking at it: reality is more complex as usual. Locked instructions may execute some of their instructions before they are ready to retire: e.g., loading the the required value and the ALU operation. However, the key "unlock" operation which verifies the result of the earlier operations and commits the results, in an atomic way, happens at retire and this is responsible for the majority of the cost of this instruction. 
 
 [^uneven]: The uneven pattern among the `vpmulld` instructions is because the `lock add` instruction eats the retire cycles of the first `vpmulld` that occur after (they can retire quickly because they are already complete), so only the later ones have a full allocation.
+
+[^comments]: If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
 
 {% include glossary.md %}
