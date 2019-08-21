@@ -264,21 +264,41 @@ The results:
 </div>
 
 The `add` instruction is on the critical path: it increases the execution time of the block from 4 cycles to 6 cycles[^4to6], yet it is never selected. The retirement pattern looks like:
-
+<a name="lookhere"></a>
 ~~~nasm
-                       /- eligible
-                       |  /- actual
-    mov  rax, [rax]  ; 0  0                 
-    nop              ; 0  0
-    nop              ; 0  0  
-    nop              ; 0  0  
-    nop              ; 1  1  
-    nop              ; 0  1  
-    add  rax, 0      ; 1  1
-    mov  rax, [rax]  ; 6  6          
+                        /- scheduled
+                       |  /- ready
+                       |  |  /- complete
+                       |  |  |  /- retired
+    mov  rax, [rax]  ; 0  0  5  5 <-- selected
+    nop              ; 0  0  0  5 <-- sample
+    nop              ; 0  0  0  5 
+    nop              ; 0  0  0  5 
+    nop              ; 1  1  1  6 <-- selected
+    nop              ; 1  1  1  6 <-- sampled
+    add  rax, 0      ; 1  5  6  6
+    mov  rax, [rax]  ; 1  6 11 11 <-- selected
+    nop              ; 2  2  2 11 <-- sampled
+    nop              ; 2  2  2 11 
+    nop              ; 2  2  2 11 
+    nop              ; 2  2  2 12 <-- selected
+    nop              ; 3  3  3 12 <-- sampled 
+    add  rax, 0      ; 3 11 12 1
+    mov  rax, [rax]  ; 3 12 17 17 <-- selected
+    nop              ; 3  3  3 17 <-- sampled 
 ~~~
 
-Here, the _eligible_ column indicates when the instruction is eligible for retirement in the sense that it has finished executing. `nop` instructions have no dependencies hence basically execute instantly (in fact, no not execute at all) and hence are eligible on cycle 0. The other instructions come eligible as defined by their position in the `mov -> add -> ...` dependency chain. The _actual_ column shows when the instruction actually retires. You can build it by basically scanning down the eligible column and retiring up to 4 uops if their eligible cycle is less than or equal to the current cycle.
+On the right hand side, I've annotated each instruction with several key cycle values, described below.
+
+The _scheduled_ column indicates when the instruction enters the scheduler and hence could execute if all its dependencies were met. This column is very simple: we assume that there are no front-end bottlenecks and hence we schedule (aka "allocate") 4 instructions every cycle. This part is in-order: instructions enter the scheduler in program order.
+
+The _ready_ column indicates when all dependencies of a scheduled instruction have executed and hence the instruction is ready to execute. In this simple model, an instruction always begins executing when it is ready. A more complicated model would also need to model contention for execution ports, but here we don't have any such contention. Instruction readiness occurs _out of order_: you can see that many instructions become ready before older instructions (e.g., the `nop` instructions are generally ready before the preceding `mov` or `add` instructions). To calculate this column take the maximum of the _ready_ column for this instruction and the _completed_ column for all previous instructions whose outputs are inputs to this instruction.
+
+The _complete_ column indicates when an instruction finishes execution. In this model it simply takes the value of the _ready_ column plus the instruction latency, which is 0 for the `nop` instructions (they don't execute at all, so they have 0 effective latency), 1 for the `add` instruction and 5 for the `mov`. Like the _ready_ column this happens out of order.
+
+Finally, the _retired_ column, what we're really after, shows when the instruction retires.  The rule is fairly simple: an instruction cannot retire until it is complete, and the instruction before it must be retired or retiring on this cycle. No more than 4 instructions can retire in a cycle. As a consequence of the "previous instruction must retired" part, this column is only increasing and so like the first column, retirement is _in order_.
+
+Once we have the _retired_ column filled out, we can identify the `<-- selected` instructions: they are the ones where the retirement cycle increases. In this case, selected instructions are always either the `mov` instruction (because of its long latency, it holds up retirement), or the fourth `nop` after the `mov` (because of the "only retire 4 per cycle" rule, this `nop` is at the head of the group that retires in the cycle after the `mov` retires). Finally, the _sampled_ instructions which are those will actually show up in the interrupt report are simply the instruction following each selected instruction.
 
 Here, the `add` is never selected because it executes in the cycle after the `mov`, so it is eligible for retirement in the next cycle and hence doesn't slow down retirement and so doesn't behave much differently than a `nop` for the purposes of retirement. We can change the position of the `add` slightly, so it falls in the same 4-instruction retirement window as the `mov`, [like this](https://github.com/travisdowns/interrupt-test/blob/master/load-add3.asm):
 
@@ -327,13 +347,15 @@ The retirement pattern is now:
     nop              ; 0  0
     nop              ; 0  0  
     add  rax, 0      ; 1  1
-    nop              ; 0  1  
+    nop              ; 1  1  
     nop              ; 1  1  
     nop              ; 0  1  
     mov  rax, [rax]  ; 6  6          
 ~~~
 
 Now might be a good time to note that we also care about the actual sample counts, and not just their presence or absence. Here, the samples associated with the `mov` are more frequent than the samples associated with the `add`. In fact, there are about 4.9 samples for `mov` for every sample for `add` (calculated over the full results). That lines up almost exactly with the `mov` having a latency of 5 and the `add` a latency of 1: the `mov` will be the oldest unretired instruction 5 times as often as the `add`. So the sample counts are very meaningful in this case.
+
+Going back to the cycle charts, we know the _selected_ instructions are those where the retirement cycle increases. To that we add that the _size_ of the increase determines their _selection weight_: the `mov` instruction has a weight of 5, since it jumps (for example) from 6 to 11 so it is the oldest unretired instruction for 5 cycles, while the `nop` instructions have a weight of 1.
 
 This lets you measure _in-situ_ the latency of various instructions, as long as you have accounted for the retirement behavior. For example, measuring the following block (`rdx` is zero at runtime):
 
@@ -462,7 +484,9 @@ Of course, this sounds way harder than the usual way of measuring latency: a lon
 Feedback of any type is welcome. I don't have a comments system[^comments] yet, so as usual I'll outsource discussion to [this HackerNews thread](https://news.ycombinator.com/item?id=20751186).
 
 
-**Attribution**
+### Thanks and Attribution
+
+Thanks to HN user rrss for pointing out errors in my cycle chart.
 
 [Intel 8259 image](https://commons.wikimedia.org/wiki/File:Intel_8259.svg) by Wikipedia user German under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0).
 
