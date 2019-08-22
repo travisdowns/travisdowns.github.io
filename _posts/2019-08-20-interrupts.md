@@ -127,7 +127,7 @@ Here's the interrupt distribution:
        0 : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       add    rax,0x1</span>
 <span style="color:green;">      44</span> : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       add    rax,0x2</span>
 <span style="color:green;">     107</span> : <span style="color:purple;">  4000d6:</span><span style="color:blue;">       add    rsi,0x3</span>
-       
+
 (pattern repeats...)
 </div>
 
@@ -211,19 +211,19 @@ The _selected_ instructions are the long-latency `mov`-chain, but also two speci
 ~~~nasm
 ;                            retire cycle
 mov    rax,QWORD PTR [rax] ; 0 (execution limited)
-nop                        ; 0       
-nop                        ; 0      
-nop                        ; 0      
-nop                        ; 1 <-- selected nop     
-nop                        ; 1      
-nop                        ; 1      
-nop                        ; 1      
-nop                        ; 2 <-- selected nop     
-nop                        ; 2      
-nop                        ; 2      
+nop                        ; 0
+nop                        ; 0
+nop                        ; 0
+nop                        ; 1 <-- selected nop
+nop                        ; 1
+nop                        ; 1
+nop                        ; 1
+nop                        ; 2 <-- selected nop
+nop                        ; 2
+nop                        ; 2
 mov    rax,QWORD PTR [rax] ; 4 (execution limited)
-nop                        ; 4   
-nop                        ; 4  
+nop                        ; 4
+nop                        ; 4
 ~~~
 
 In this example, the retirement of `mov` instructions are "execution limited" - i.e., their retirement cycle is determined by when they are done executing, not by any details of the retirement engine. The retirement of the other instructions, on the other hand, is determined by the retirement behavior: they are "ready" early but cannot retire because the in-order retirement pointer hasn't reached them yet (it is held up waiting for the `mov` to execute).
@@ -272,20 +272,20 @@ The `add` instruction is on the critical path: it increases the execution time o
                        |  |  |  /- retired
     mov  rax, [rax]  ; 0  0  5  5 <-- selected
     nop              ; 0  0  0  5 <-- sample
-    nop              ; 0  0  0  5 
-    nop              ; 0  0  0  5 
+    nop              ; 0  0  0  5
+    nop              ; 0  0  0  5
     nop              ; 1  1  1  6 <-- selected
     nop              ; 1  1  1  6 <-- sampled
     add  rax, 0      ; 1  5  6  6
     mov  rax, [rax]  ; 1  6 11 11 <-- selected
     nop              ; 2  2  2 11 <-- sampled
-    nop              ; 2  2  2 11 
-    nop              ; 2  2  2 11 
+    nop              ; 2  2  2 11
+    nop              ; 2  2  2 11
     nop              ; 2  2  2 12 <-- selected
-    nop              ; 3  3  3 12 <-- sampled 
-    add  rax, 0      ; 3 11 12 1
+    nop              ; 3  3  3 12 <-- sampled
+    add  rax, 0      ; 3 11 12 12
     mov  rax, [rax]  ; 3 12 17 17 <-- selected
-    nop              ; 3  3  3 17 <-- sampled 
+    nop              ; 3  3  3 17 <-- sampled
 ~~~
 
 On the right hand side, I've annotated each instruction with several key cycle values, described below.
@@ -298,7 +298,7 @@ The _complete_ column indicates when an instruction finishes execution. In this 
 
 Finally, the _retired_ column, what we're really after, shows when the instruction retires.  The rule is fairly simple: an instruction cannot retire until it is complete, and the instruction before it must be retired or retiring on this cycle. No more than 4 instructions can retire in a cycle. As a consequence of the "previous instruction must retired" part, this column is only increasing and so like the first column, retirement is _in order_.
 
-Once we have the _retired_ column filled out, we can identify the `<-- selected` instructions: they are the ones where the retirement cycle increases. In this case, selected instructions are always either the `mov` instruction (because of its long latency, it holds up retirement), or the fourth `nop` after the `mov` (because of the "only retire 4 per cycle" rule, this `nop` is at the head of the group that retires in the cycle after the `mov` retires). Finally, the _sampled_ instructions which are those will actually show up in the interrupt report are simply the instruction following each selected instruction.
+Once we have the _retired_ column filled out, we can identify the `<-- selected` instructions[^possibly]: they are the ones where the retirement cycle increases. In this case, selected instructions are always either the `mov` instruction (because of its long latency, it holds up retirement), or the fourth `nop` after the `mov` (because of the "only retire 4 per cycle" rule, this `nop` is at the head of the group that retires in the cycle after the `mov` retires). Finally, the _sampled_ instructions which are those will actually show up in the interrupt report are simply the instruction following each selected instruction.
 
 Here, the `add` is never selected because it executes in the cycle after the `mov`, so it is eligible for retirement in the next cycle and hence doesn't slow down retirement and so doesn't behave much differently than a `nop` for the purposes of retirement. We can change the position of the `add` slightly, so it falls in the same 4-instruction retirement window as the `mov`, [like this](https://github.com/travisdowns/interrupt-test/blob/master/load-add3.asm):
 
@@ -338,19 +338,29 @@ We've only slid the `add` up a few places. The number of instructions is the sam
 <span style="color:green;">      13</span> : <span style="color:purple;">  4000db:</span><span style="color:blue;">       nop</span>
 </div>
 
-The retirement pattern is now:
+Here's the cycle analysis and retirement pattern for this version:
 
 ~~~nasm
-                       /- eligible
-                       |  /- actual
-    mov  rax, [rax]  ; 0  0                 
-    nop              ; 0  0
-    nop              ; 0  0  
-    add  rax, 0      ; 1  1
-    nop              ; 1  1  
-    nop              ; 1  1  
-    nop              ; 0  1  
-    mov  rax, [rax]  ; 6  6          
+                        /- scheduled
+                       |  /- ready
+                       |  |  /- complete
+                       |  |  |  /- retired
+    mov  rax, [rax]  ; 0  0  5  5 <-- selected
+    nop              ; 0  0  0  5 <-- sample
+    nop              ; 0  0  0  5
+    add  rax, 0      ; 0  5  6  6 <-- selected
+    nop              ; 1  1  1  6 <-- sampled
+    nop              ; 1  1  1  6
+    nop              ; 1  1  1  6
+    mov  rax, [rax]  ; 1  6 11 11 <-- selected
+    nop              ; 2  2  2 11 <-- sampled
+    nop              ; 2  2  2 11
+    add  rax, 0      ; 2 11 12 12 <-- selected
+    nop              ; 2  2  2 12 <-- sampled
+    nop              ; 3  3  3 12
+    nop              ; 3  3  3 12
+    mov  rax, [rax]  ; 3 12 17 17 <-- selected
+    nop              ; 3  3  3 17 <-- sampled
 ~~~
 
 Now might be a good time to note that we also care about the actual sample counts, and not just their presence or absence. Here, the samples associated with the `mov` are more frequent than the samples associated with the `add`. In fact, there are about 4.9 samples for `mov` for every sample for `add` (calculated over the full results). That lines up almost exactly with the `mov` having a latency of 5 and the `add` a latency of 1: the `mov` will be the oldest unretired instruction 5 times as often as the `add`. So the sample counts are very meaningful in this case.
@@ -514,13 +524,15 @@ Thanks to HN user rrss for pointing out errors in my cycle chart.
 
 [^untrue]: Of course we will see that in some cases the _selected_ and _sampled_ instructions can actually be the same, in the case of interruptible instructions.
 
+[^possibly]: Of course this doesn't mean the instruction _will_ be selected, we only have a few thousand interrupts over one million or more interrupts, so usually nothign happens at all. These are just the locations that are highly likely to be chosen when an interrupt does arrive.
+
 [^already]: We have already seen this effect in all of the earlier examples: it is why the long-latency `add` is selected, even though that in the cycle that it retires the three subsequent instructions also retire. This behavior is nice because it ensures that longer latency instructions are generally selected, rather than some unrelated instruction (i.e., the usual skid is +1 not +4).
 
 [^4to6]: The increase is from 4 to 6, rather than 4 to 5, because of +1 cycle for the `add` itself (obvious) and +1 cycle because any ALU instruction in the address computation path of a pointer chasing loop disables the 4-cycle load fast path (much less obvious).
 
 [^atomiclat]: Latency is in scare quotes here because the apparent latency of atomic operations doesn't behave like most other instructions: if you measure the throughput of back-to-back atomic instructions you get higher performance if the instructions form a dependency chain, rather than if they don't! The latency of atomics doesn't fit neatly into an input-to-output model as their _execute at retirement_ behavior causes other bottlenecks.
 
-[^execretire]: That's the simple way of looking at it: reality is more complex as usual. Locked instructions may execute some of their instructions before they are ready to retire: e.g., loading the the required value and the ALU operation. However, the key "unlock" operation which verifies the result of the earlier operations and commits the results, in an atomic way, happens at retire and this is responsible for the majority of the cost of this instruction. 
+[^execretire]: That's the simple way of looking at it: reality is more complex as usual. Locked instructions may execute some of their instructions before they are ready to retire: e.g., loading the the required value and the ALU operation. However, the key "unlock" operation which verifies the result of the earlier operations and commits the results, in an atomic way, happens at retire and this is responsible for the majority of the cost of this instruction.
 
 [^uneven]: The uneven pattern among the `vpmulld` instructions is because the `lock add` instruction eats the retire cycles of the first `vpmulld` that occur after (they can retire quickly because they are already complete), so only the later ones have a full allocation.
 
