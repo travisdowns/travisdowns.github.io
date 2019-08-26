@@ -44,3 +44,5 @@
 *[MSROM]: Intel's name for the microcode engine: a component handles complex instructions which require more than 4 uops using microcode which feeds uops directly into the IDQ.
 *[HN]: HackerNews
 *[ROB]: Re-order buffer: An ordered buffer which stores in-progress instructions on an out-of-order processor.
+
+*[immediate]: When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.
