@@ -263,6 +263,10 @@ That brings us to our last, and perhaps most disappointing note: all of the ways
 
 The aliasing loophole is still there, and those writes still alias "anything" - it's just that there isn't anything else interesting to alias in this function ... yet. As soon as you add more to the function, it _bytes_ us again. A [random example](https://godbolt.org/z/iQHDY5). You'll be fighting the compiler to the end as long as you have writes to `uint8_t` arrays in your core loops[^extreme].
 
+### Comments
+
+Feedback of any type is welcome. I don't have a comments system[^comments] yet, so as usual I'll outsource discussion to [this HackerNews thread](https://news.ycombinator.com/item?id=20800076).
+
 
 ---
 ---
