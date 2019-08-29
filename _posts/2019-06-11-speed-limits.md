@@ -52,7 +52,7 @@ First, lets start with this list of very important caveats.
 **Intel:** Maximum 4 fused-uops[^ICL] per cycle<br>
 **AMD:** Maximum 5 fused-uops per cycle
 
-Every CPU can execute only a maximum number of operations per second. For many early CPUs, this was always less than one per cycle, but modern pipelined [superscalar](https://en.wikipedia.org/wiki/Superscalar_processor) processors can execute more, up to a limit. This underlying limit is not always be imposed in the same place, e.g., some CPUs may be limited by instruction encoding, others by register renaming or retirement - but there is always a limit (sometimes more than one limit depending on what you are counting).
+At a fundamental level, every CPU can execute only a maximum number of operations per cycle. For many early CPUs, this was always less than one per cycle, but modern pipelined [superscalar](https://en.wikipedia.org/wiki/Superscalar_processor) processors can execute more than one per cycle, up to some limit. This underlying limit is not always be imposed in the same place, e.g., some CPUs may be limited by instruction encoding, others by register renaming or retirement - but there is always a limit (sometimes more than one limit depending on what you are counting).
 
 For modern Intel chips this limit is 4 *fused-domain*[^fused-domain] operations, and for modern AMD it is 5 macro-operations. So if your loop contains N fused-uops, it will never execute at more than 1 iteration per cycle.
 
