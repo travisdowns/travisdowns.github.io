@@ -695,10 +695,10 @@ First, here's a big table of all the resource sizes we'll talk about the followi
 | Intel   | Ivy Bridge    | 168       | 64           | 36            | 160          | 144         | 48        | 15     |
 | Intel   | Haswell       | 192       | 72           | 42            | 168          | 168         | 48        | 14     |
 | Intel   | Broadwell     | 192       | 72           | 42            | 168          | 168         | 48        | 14     |
-| Intel   | Skylake-S Skylake-X | 224       | 72           | 42            | 180          | 168         | 48        | 14?    |
+| Intel   | Skylake[-X]   | 224       | 72           | 56            | 180          | 168         | 48        | 14?    |
 | Intel   | Sunny Cove    | 352       | 128          | 72            | ?            | ?           | 48        | ?      |
-| AMD     | Zen                 | 192       | 72           | 44            | 168          | 160         | ?         | ?      |
-| AMD     | Zen2                | 224       | ?            | 48            | 180          | 160         | ?         | ?      | 
+| AMD     | Zen           | 192       | 72           | 44            | 168          | 160         | ?         | ?      |
+| AMD     | Zen2          | 224       | ?            | 48            | 180          | 160         | ?         | ?      |
 
 
 ### Reorder Buffer Size
