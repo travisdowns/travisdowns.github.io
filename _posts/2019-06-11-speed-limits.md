@@ -686,19 +686,19 @@ All that to say that when you are thinking about out of order window, you have t
 
 With that background out of the way, let's look at the various OoO limits next. Most of these limits have the same *effect* which is to limit the available out-of-order window, stalling issue until a resource becomes available. They differ mostly in *what* they count, and how many of that thing can be buffered.
 
-First, here's a big table of all the resource sizes we'll talk about the following sections.
+First, here's a big table of all the resource sizes[^snote] we'll talk about the following sections.
 
 |-        |
-| Vendor  | Uarch | ROB Size  | Load Buffer  | Store Buffer  | Integer PRF  | Vector PRF  | Branches  | Calls  |
+| Vendor  | Uarch   |ROB Size| Sched (RS) | Load Buffer  | Store Buffer  | Integer PRF  | Vector PRF  | Branches (BOB)  | Calls  |
 | -       |
-| Intel   | Sandy Bridge  | 168       | 64           | 36            | 160          | 144         | 48        | 15     |
-| Intel   | Ivy Bridge    | 168       | 64           | 36            | 160          | 144         | 48        | 15     |
-| Intel   | Haswell       | 192       | 72           | 42            | 168          | 168         | 48        | 14     |
-| Intel   | Broadwell     | 192       | 72           | 42            | 168          | 168         | 48        | 14     |
-| Intel   | Skylake[-X]   | 224       | 72           | 56            | 180          | 168         | 48        | 14?    |
-| Intel   | Sunny Cove    | 352       | 128          | 72            | ?            | ?           | 48        | ?      |
-| AMD     | Zen           | 192       | 72           | 44            | 168          | 160         | ?         | ?      |
-| AMD     | Zen2          | 224       | ?            | 48            | 180          | 160         | ?         | ?      |
+| Intel   | Sandy Bridge  | 168       | 54         | 64           | 36            | 160          | 144         | 48        | 15     |
+| Intel   | Ivy Bridge    | 168       | 54         | 64           | 36            | 160          | 144         | 48        | 15     |
+| Intel   | Haswell       | 192       | 60         | 72           | 42            | 168          | 168         | 48        | 14     |
+| Intel   | Broadwell     | 192       | 64         | 72           | 42            | 168          | 168         | 48        | 14     |
+| Intel   | Skylake[-X]   | 224       | 97         | 72           | 56            | 180          | 168         | 48        | 14?    |
+| Intel   | Sunny Cove    | 352       | ?          | 128          | 72            | ?            | ?           | 48        | ?      |
+| AMD     | Zen           | 192   | 180[^zensched] | 72           | 44            | 168          | 160         | ?         | ?      |
+| AMD     | Zen2          | 224   | 188[^zen2sched]| ?            | 48            | 180          | 160         | ?         | ?      |
 
 
 ### Reorder Buffer Size
@@ -881,5 +881,11 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 [^comments]: If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
 
 [^bankconf]: Bank conflicts occur in a banked cache design when two loads try to access the same bank. [Per Fabian](https://twitter.com/rygorous/status/1138934828198326272) Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips have 16 banks per line (bank selected by bits `[5:2]` of the address), while Zen1 has 8 banks per line (bits `[5:3]` used). A load uses any bank it overlaps.
+
+[^snote]: In this table, note that the Intel and Zen scheduler (RS) sizes are not directly comparable, since Intel uses a unified scheduler for GP and SIMD ops, with "all" (actually most) scheduler entries available to most uops, while AMD has one scheduler (RS) per port. The numbers shown for AMD are the sum of all the ALU and AGU scheduler sizes.
+
+[^zensched]: The Zen scheduler has 4x14 GP ALU schedulers, a 96 entry FP scheduler and 2x14 AGU/mem schedulers.
+
+[^zen2sched]: The Zen2 scheduler has 4x16 GP ALU schedulers, a 96 entry (?) FP scheduler and a 1x28 AGU/mem scheduler.
 
 {% include glossary.md %}
