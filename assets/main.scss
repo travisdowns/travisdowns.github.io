@@ -8,3 +8,33 @@
   font-size: $small-font-size;
   margin: -10px 20px;
 }
+
+/* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_danger */
+
+.danger {
+  background-color: #ffdddd;
+  border-left: 6px solid #f44336;
+  padding: 4px 12px;
+  margin-left: 30px;
+}
+
+.success {
+  background-color: #ddffdd;
+  border-left: 6px solid #4CAF50;
+  padding: 4px 12px;
+  margin-left: 30px;
+}
+
+.info {
+  background-color: #e7f3fe;
+  border-left: 6px solid #2196F3;
+  padding: 4px 12px;
+  margin-left: 30px;
+}
+
+.warning {
+  background-color: #ffffcc;
+  border-left: 6px solid #ffeb3b;
+  padding: 4px 12px;
+  margin-left: 30px;
+}
