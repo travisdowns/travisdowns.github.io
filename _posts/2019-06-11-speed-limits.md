@@ -226,7 +226,7 @@ While noting that that the column naming scheme is [really bad](https://github.c
 
 Modern Intel and AMD chips (and many others) have a limit of two loads per cycle, which you can achieve if both loads hit in L1. You could just consider this the same as the "port pressure" limit, since there only two load ports - but the limit is interesting enough to call out on its own.
 
-Of course, like all limits this is a best case scenario: you might achieve much less than two loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts[^bankconf]. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed. In a throughput sense, loads that hit in cache are not all that expensive even compared to simple ALU ops.
+Of course, like all limits this is a best case scenario: you might achieve much less than two loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts present on AMD and older Intel chips[^bankconf]. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed. In a throughput sense, loads that hit in cache are not all that expensive even compared to simple ALU ops.
 
 It's not all that common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.
 
@@ -258,7 +258,7 @@ Note that gather instructions count "one" against this limit for *each* element 
 
 ### Split Cache Lines
 
-For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one (assuming no bank conflicts[^bankconf]), except loads that split a cache line, which count as two. A split cache line load is of at least two bytes and crosses a 64-byte boundary. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
+For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one, except loads that split a cache line, which count as two. A split cache line load is of at least two bytes and crosses a 64-byte boundary. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
 
 On AMD Zen1 loads suffer a penalty when crossing any 32-byte boundary - such loads also count as two against the load limit. 32-byte (AVX) loads also count as two on Zen1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halve will cross a 32-byte boundary.
 
