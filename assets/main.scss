@@ -38,3 +38,9 @@
   padding: 4px 12px;
   margin-left: 30px;
 }
+
+// see issue #9
+// fixes red error highlighting in nasm code snippets
+.highlight {
+  .err { all:unset; }
+}
