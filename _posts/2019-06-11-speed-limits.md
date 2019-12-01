@@ -316,11 +316,14 @@ The load and store limits discuss the ideal scenario where loads and stores hit 
 The limits are listed in _cache lines per cycle_ and not in bytes, because that's how you need to count the accesses: in unique cache lines accessed. The hardware transfers full lines. You can achieve these limits, but you may not be able to consume all the bytes from each cache line, because demand accesses to the L1 cache cannot occur on the same cycle that the L1 cache receives data from the outer cache levels. So, for example, the L2 can provide 64 bytes of data to the L1 cache per cycle, but you cannot _also_ access 64 bytes every cycle since the L1 cannot satisfy those reads from the core _and_ the incoming data from the L2 every cycle. All the gory details are [over here](https://github.com/travisdowns/uarch-bench/wiki/How-much-bandwidth-does-the-L2-have-to-give,-anyway%3F).
 
 |-------------|
-| Microarchitecture | L2 | L3 |
-| CNL | 0.75 | 0.2 - 0.3 |
-| SKX | 1 | ~0.1 (?) |
-| SKL | 1 | 0.2 - 0.3 |
-| HSW | 0.5 | 0.2 - 0.3 |
+| Vendor | Microarchitecture | L2 | L3 (Shared) |
+|-------------|
+| Intel  | CNL  | 0.75 | 0.2 - 0.3 |
+| Intel  | SKX  |   1  | ~0.1 (?) |
+| Intel  | SKL  |   1  | 0.2 - 0.3 |
+| Intel  | HSW  | 0.5  | 0.2 - 0.3 |
+| AMD    | Zen  | 0.5  | 0.5 |
+| AMD    | Zen2 | 0.5  | 0.5 |
 
 The very poor figure of 0.1 cache lines per cycle (about 6-7 bytes a cycle) from L3 on SKX is at odds with Intel's manuals, but it's what I measured on a W-2104. For architectures earlier than Haswell I think the numbers will be similar back to Sandy Bridge.
 

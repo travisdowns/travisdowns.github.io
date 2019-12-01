@@ -29,11 +29,13 @@
 *[MLP]: Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
 *[demand load]: A true load that appears in the source code or assembly, as opposed to loads initiated by software or hardware prefetch.
 
+{% comment %} Intel uarch abbreviations {% endcomment %}
 *[SNB]: Intel's Sandy Bridge architecture, aka 2nd Generation Intel Core i3,i5,i7
 *[IVB]: Intel's Ivy Bridge architecture, aka 3rd Generation Intel Core i3,i5,i7
 *[HSW]: Intel's Haswell architecture, aka 4th Generation Intel Core i3,i5,i7
 *[BDW]: Intel's Broadwell architecture, aka 5th Generation Intel Core i3,i5,i7
 *[SKL]: Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7
+*[CNL]: Intel's Cannon Lake (client) architecture, the i3-8121U was the only SKU ever released
 *[SKX]: Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W
 *[SNC]: Intel's Sunny Cove architecture, aka 10th Generation Intel Core i3,i5,i7
 
