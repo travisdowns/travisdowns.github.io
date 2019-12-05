@@ -186,7 +186,7 @@ Therefore I conclude that register to register[^regreg] moves involving mask reg
 
 ### Dependency Breaking Idioms
 
-The [best way](https://stackoverflow.com/a/33668295/149138) to set a GP register to zero in x86 is via the xor zeroing idiom: `xor reg, reg`. This works because any value xored with itself is zero. This is smaller (fewer instruction bytes) than the more obvious `mov eax, 0`, and also faster since the compiler recognizes it as a _zeroing idiom_ and performs the necessary work at rename[^zero], so no ALU is involved and no uop is dispatched.
+The [best way](https://stackoverflow.com/a/33668295/149138) to set a GP register to zero in x86 is via the xor zeroing idiom: `xor reg, reg`. This works because any value xored with itself is zero. This is smaller (fewer instruction bytes) than the more obvious `mov eax, 0`, and also faster since the processor recognizes it as a _zeroing idiom_ and performs the necessary work at rename[^zero], so no ALU is involved and no uop is dispatched.
 
 Furthermore, the idiom is _dependency breaking:_ although `xor reg1, reg2` in general depends on the value of both `reg1` and `reg2`, in the special case that `reg1` and `reg2` are the same, there is no dependency as the result is zero regardless of the inputs. All modern x86 CPUs recognize this[^otherzero] special case for `xor`. The same applies to SIMD versions of xor such as integer [`vpxor`](https://www.felixcloutier.com/x86/pxor) and floating point [`vxorps`](https://www.felixcloutier.com/x86/xorps) and [`vxorpd`](https://www.felixcloutier.com/x86/xorpd).
 
@@ -300,9 +300,11 @@ So our experiment seems to check out.
  
 ### Thanks
 
-Thanks to [Daniel Lemire](https://lemire.me) who provided access to the AVX-512 system I used for testing.
+[Daniel Lemire](https://lemire.me) who provided access to the AVX-512 system I used for testing.
 
-Thanks to [Henry Wong](http://www.stuffedcow.net/) who wrote the [original article](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/) which introduced me to this technique and graciously shared the code for his tool, which I now [host on github](https://github.com/travisdowns/robsize).
+[Henry Wong](http://www.stuffedcow.net/) who wrote the [original article](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/) which introduced me to this technique and graciously shared the code for his tool, which I now [host on github](https://github.com/travisdowns/robsize).
+
+[Jeff Baker](https://twitter.com/Jeffinatorator/status/1202642436406669314) for reporting a typo.
 
 Image credit: [Kellogg's Special K](https://www.flickr.com/photos/like_the_grand_canyon/31064064387) by [Like_the_Grand_Canyon](https://www.flickr.com/photos/like_the_grand_canyon/) is licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
 
