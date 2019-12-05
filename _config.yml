@@ -22,6 +22,7 @@ email: &email travis.downs@gmail.com
 author:
   name: Travis Downs
   email: *email
+  twitter: trav_downs
 baseurl: "" # the subpath of your site, e.g. /blog
 twitter_username: trav_downs
 github_username:  travisdowns
