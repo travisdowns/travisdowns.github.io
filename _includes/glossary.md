@@ -1,12 +1,12 @@
 {% comment %} this file defines commonly used terms so they can be used using the abbreviation syntax in posts {% endcomment %}
 
-*[p0]: port 0 (ALU, not-taken branches)
-*[p1]: port 1 (ALU, integer mul)
+*[p0]: port 0 (GP and SIMD ALU, not-taken branches)
+*[p1]: port 1 (GP and SIMD ALU, integer mul)
 *[p2]: port 2 (load/store AGU)
 *[p3]: port 3 (load/store AGU)
 *[p4]: port 4 (store data)
-*[p5]: port 5 (ALU, vector shuffles)
-*[p6]: port 6 (ALU, all branches)
+*[p5]: port 5 (GP and SIMD ALU, vector shuffles)
+*[p6]: port 6 (GP ALU, all branches)
 *[p7]: port 7 (limited store AGU)
 
 {% assign macro_fuse_def = 'The fusing of an ALU operation and subsequent jump, such as `dec eax; jnz label` into one operation' %}
@@ -20,10 +20,12 @@
 *[uop]: Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.
 *[RFO]: Request for ownership: when a request for a cache line originates from a store, or a type of prefetch that predicts the location is likely to be the target of a store, an RFO is performed which gets the line in an exclusive MESI state.
 *[IP]: Instruction pointer
+*[GP]: General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.
 
 {% assign ooo_def = 'Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.' %}
 *[OoO]: {{ ooo_def }}
 *[OOO]: {{ ooo_def }}
+*[out-of-order]: {{ ooo_def }}
 *[UPC]: Uops per cycle: The number of a uops executed per cycle, often closely related to IPC.
 *[IPC]: Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.
 *[MLP]: Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
@@ -45,6 +47,9 @@
 *[MITE]: Intel's name for the "legacy" decoder, i.e., the decoder that usually decodes instructions when they are not found in the MSROM.
 *[MSROM]: Intel's name for the microcode engine: a component handles complex instructions which require more than 4 uops using microcode which feeds uops directly into the IDQ.
 *[HN]: HackerNews
-*[ROB]: Re-order buffer: An ordered buffer which stores in-progress instructions on an out-of-order processor.
+*[ROB]: Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.
+*[RAT]: Register alias table: a table which maps an architectural register identifier to a physical register.
 
 *[immediate]: When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.
+*[uarch]: Microarchitecture: a specific implementation of an ISA, e.g., "Haswell microarchitecture". 
+*[SIMD]: Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.
