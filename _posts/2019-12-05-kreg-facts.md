@@ -301,7 +301,9 @@ So our experiment seems to check out.
 
 ### Comments
 
-Discussion on [Hacker News](https://news.ycombinator.com/item?id=21714390) or [Twitter](https://twitter.com/trav_downs/status/1202637229606264833). Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
+Discussion on [Hacker News](https://news.ycombinator.com/item?id=21714390), Reddit ([r/asm](https://www.reddit.com/r/asm/comments/e6kokb/x86_avx512_a_note_on_mask_registers/) and [r/programming](https://www.reddit.com/r/programming/comments/e6ko7i/a_note_on_mask_registers_avx512/)) or [Twitter](https://twitter.com/trav_downs/status/1202637229606264833).
+
+Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
  
 ### Thanks
 
