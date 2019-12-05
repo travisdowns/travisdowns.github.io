@@ -15,7 +15,7 @@ description: A look into some low level hardware details of the mask registers i
 If you are in a rush, you can [skip to the summary](#summary), but you'll miss out on the journey.
 {: .warning}
 
-AVX-512 introduced eight so-called _mask registers_, `k0`[^k0note] through `k7`, which apply to most ALU operations and allow you to apply a zero-masking or merging[^maskmerge] operation on a per-element basis, speeding up code that would otherwise require extra blending operations in AVX2 and earlier.
+AVX-512 introduced eight so-called _mask registers_[^naming], `k0`[^k0note] through `k7`, which apply to most ALU operations and allow you to apply a zero-masking or merging[^maskmerge] operation on a per-element basis, speeding up code that would otherwise require extra blending operations in AVX2 and earlier.
 
 If that single sentence doesn't immediately indoctrinate you into the mask register religion, here's a copy and paste from [Wikipedia](https://en.wikipedia.org/wiki/AVX-512#Opmask_registers) that should fill in the gaps and close the deal:
 
@@ -318,6 +318,8 @@ Image credit: [Kellogg's Special K](https://www.flickr.com/photos/like_the_grand
 ---
 ---
 <br>
+
+[^naming]: These _mask registers_ are often called _k_ registers or simply _kregs_ based on their naming scheme. [Rumor has it](https://twitter.com/tom_forsyth/status/1202666300591337472) that this letter was chosen randomly only after a long and bloody naming battle between  MFs.
 
 [^hcite]: H. Wong, _Measuring Reorder Buffer Capacity_, May, 2013. \[Online\]. Available: http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/
 
