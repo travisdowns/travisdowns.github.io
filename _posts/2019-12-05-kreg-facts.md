@@ -297,6 +297,10 @@ So our experiment seems to check out.
  - This is large enough compared to the other PRF size and the ROB to make it unlikely to be a bottleneck
  - Mask registers are not eligible for move elimination
  - Zeroing idioms[^tech] in mask registers are not recognized for execution elimination or dependency breaking
+
+### Comments
+
+Discussion on [Hacker News](https://news.ycombinator.com/item?id=21714390) or [Twitter](https://twitter.com/trav_downs/status/1202637229606264833). Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
  
 ### Thanks
 
