@@ -181,7 +181,7 @@ Let's check if something like `kmov k1, k2` also qualifies for move elimination.
 
 It looks exactly like Test 27 we saw earlier with `kaddd`. So we would suspect that physical registers are being consumed, unless we have happened to hit a different move-elimination related limit with exactly the same size and limiting behavior[^moves].
 
-Additional confirmation comes from uops.info which [shows that](https://uops.info/table.html?search=kmov%20(K%2C%20K)&cb_lat=on&cb_tp=on&cb_uops=on&cb_ports=on&cb_SKX=on&cb_measurements=on&cb_avx512=on) all variants of mask to mask register `kmov` take one uop dispatched to p0. If the move is eliminated, we don't wouldn't see any dispatched uops.
+Additional confirmation comes from uops.info which [shows that](https://uops.info/table.html?search=kmov%20(K%2C%20K)&cb_lat=on&cb_tp=on&cb_uops=on&cb_ports=on&cb_SKX=on&cb_measurements=on&cb_avx512=on) all variants of mask to mask register `kmov` take one uop dispatched to p0. If the move is eliminated, we wouldn't see any dispatched uops.
 
 Therefore I conclude that register to register[^regreg] moves involving mask registers are not eliminated.
 
@@ -311,7 +311,7 @@ Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a
 
 [Henry Wong](http://www.stuffedcow.net/) who wrote the [original article](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/) which introduced me to this technique and graciously shared the code for his tool, which I now [host on github](https://github.com/travisdowns/robsize).
 
-[Jeff Baker](https://twitter.com/Jeffinatorator/status/1202642436406669314) for reporting a typo.
+[Jeff Baker](https://twitter.com/Jeffinatorator/status/1202642436406669314), [Wojciech Muła](http://0x80.pl) for reporting typos.
 
 Image credit: [Kellogg's Special K](https://www.flickr.com/photos/like_the_grand_canyon/31064064387) by [Like_the_Grand_Canyon](https://www.flickr.com/photos/like_the_grand_canyon/) is licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
 
