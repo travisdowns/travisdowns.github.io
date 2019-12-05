@@ -689,7 +689,7 @@ All that to say that when you are thinking about out of order window, you have t
 
 With that background out of the way, let's look at the various OoO limits next. Most of these limits have the same *effect* which is to limit the available out-of-order window, stalling issue until a resource becomes available. They differ mostly in *what* they count, and how many of that thing can be buffered.
 
-First, here's a big table of all the resource sizes[^snote] we'll talk about the following sections.
+<a name="ooo-table"></a>First, here's a big table of all the resource sizes[^snote] we'll talk about the following sections.
 
 |-        |
 | Vendor  | Uarch   |ROB Size| Sched (RS) | Load Buffer  | Store Buffer  | Integer PRF  | Vector PRF  | Branches (BOB)  | Calls  |
