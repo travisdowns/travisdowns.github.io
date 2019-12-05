@@ -23,7 +23,7 @@ If that single sentence doesn't immediately indoctrinate you into the mask regis
 
 So mask registers[^kreg] are important, but are not household names unlike say general purpose registers (`eax`, `rsi` and friends) or SIMD registers (`xmm0`, `ymm5`, etc). They certainly aren't going to show up on Intel slides disclosing the size of uarch resources, like these:
 
-![Intel Slide]({{page.assets}}/intel-skx-slide.png)
+![Intel Slide]({{page.assetsmin}}/intel-skx-slide.png)
 
 <br>
 
