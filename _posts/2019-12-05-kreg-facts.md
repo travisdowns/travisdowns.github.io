@@ -292,6 +292,10 @@ This is the final result shown in the output above, and it runs much more quickl
 
 So our experiment seems to check out. 
 
+### Reproduction
+
+You can reproduce these results yourself with the [robsize](https://github.com/travisdowns/robsize) binary on Linux or Windows (using WSL). The specific results for this article are [also available](https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results) as are the [scripts](https://github.com/travisdowns/robsize/tree/master/scripts/kreg/) used to collect them and generate the plots.
+
 ### Summary
 
  - SKX has a separate PRF for mask registers with a speculative size of 134 and an estimated total size of 142
