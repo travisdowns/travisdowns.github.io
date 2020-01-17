@@ -10520,7 +10520,7 @@ L 672.180276 114.673666
 L 672.260003 115.110541 
 L 672.22023 114.347705 
 L 672.28 115.108078 
-" style="fill:none;stroke:#1f77b4;stroke-linecap:square;stroke-width:1.5;"/>
+" style="fill:none;stroke:#1f77b4;stroke-linecap:square;stroke-opacity:0.6;stroke-width:1.5;"/>
    </g>
    <g id="line2d_34">
     <path clip-path="url(#pbb94cd84ea)" d="M 47.72 115.657024 
@@ -21278,7 +21278,7 @@ L 672.240126 115.655924
 L 672.260123 115.108078 
 L 672.27996 115.873982 
 L 672.27996 115.873982 
-" style="fill:none;stroke:#ff7f0e;stroke-linecap:square;stroke-width:1.5;"/>
+" style="fill:none;stroke:#ff7f0e;stroke-linecap:square;stroke-opacity:0.6;stroke-width:1.5;"/>
    </g>
    <g id="line2d_35">
     <path clip-path="url(#pbb94cd84ea)" d="M 47.722053 114.91963 
@@ -31723,7 +31723,7 @@ L 672.080712 114.890838
 L 672.160399 115.758067 
 L 672.22021 114.78232 
 L 672.27998 115.433225 
-" style="fill:none;stroke:#2ca02c;stroke-linecap:square;stroke-width:1.5;"/>
+" style="fill:none;stroke:#2ca02c;stroke-linecap:square;stroke-opacity:0.6;stroke-width:1.5;"/>
    </g>
    <g id="patch_3">
     <path d="M 47.72 462.04 
@@ -46282,7 +46282,7 @@ L 672.200253 282.048601
 L 672.260003 283.812797 
 L 672.28 282.956245 
 L 672.28 282.956245 
-" style="fill:none;stroke:#d62728;stroke-linecap:square;stroke-width:1.5;"/>
+" style="fill:none;stroke:#d62728;stroke-linecap:square;stroke-opacity:0.6;stroke-width:1.5;"/>
    </g>
    <g id="patch_7">
     <path d="M 47.72 462.04 

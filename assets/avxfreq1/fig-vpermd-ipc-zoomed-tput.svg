@@ -44,17 +44,9 @@ z
    </g>
    <g id="patch_5">
     <path clip-path="url(#p7f25a4f8a2)" d="M 264.111 2420.26 
-L 293.47835 2420.26 
-L 293.47835 -480.806667 
-L 264.111 -480.806667 
-z
-" style="fill:#8fbc8f;stroke:#8fbc8f;stroke-linejoin:miter;"/>
-   </g>
-   <g id="patch_6">
-    <path clip-path="url(#p7f25a4f8a2)" d="M 293.47835 2420.26 
 L 511.415 2420.26 
 L 511.415 -480.806667 
-L 293.47835 -480.806667 
+L 264.111 -480.806667 
 z
 " style="fill:#00ced1;stroke:#00ced1;stroke-linejoin:miter;"/>
    </g>
@@ -2246,22 +2238,22 @@ z
      <use style="fill:#2ca02c;stroke:#2ca02c;" x="669.0713" xlink:href="#mc48785f5ad" y="393.503664"/>
     </g>
    </g>
-   <g id="patch_7">
+   <g id="patch_6">
     <path d="M 47.72 462.04 
 L 47.72 26.88 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
    </g>
-   <g id="patch_8">
+   <g id="patch_7">
     <path d="M 665.98 462.04 
 L 665.98 26.88 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
    </g>
-   <g id="patch_9">
+   <g id="patch_8">
     <path d="M 47.72 462.04 
 L 665.98 462.04 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
    </g>
-   <g id="patch_10">
+   <g id="patch_9">
     <path d="M 47.72 26.88 
 L 665.98 26.88 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
@@ -3149,29 +3141,29 @@ z
      <use style="fill:#d62728;stroke:#d62728;" x="665.989274" xlink:href="#m4885b32a4d" y="347.520108"/>
     </g>
    </g>
-   <g id="patch_11">
+   <g id="patch_10">
     <path d="M 47.72 462.04 
 L 47.72 26.88 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
    </g>
-   <g id="patch_12">
+   <g id="patch_11">
     <path d="M 665.98 462.04 
 L 665.98 26.88 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
    </g>
-   <g id="patch_13">
+   <g id="patch_12">
     <path d="M 47.72 462.04 
 L 665.98 462.04 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
    </g>
-   <g id="patch_14">
+   <g id="patch_13">
     <path d="M 47.72 26.88 
 L 665.98 26.88 
 " style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
    </g>
   </g>
   <g id="legend_1">
-   <g id="patch_15">
+   <g id="patch_14">
     <path d="M 557.28 94.426875 
 L 658.98 94.426875 
 Q 660.98 94.426875 660.98 92.426875 
