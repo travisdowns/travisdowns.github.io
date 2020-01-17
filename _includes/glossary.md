@@ -49,6 +49,7 @@
 *[HN]: HackerNews
 *[ROB]: Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.
 *[RAT]: Register alias table: a table which maps an architectural register identifier to a physical register.
+*[FIVR]: Fully Integrated Voltage Regulator
 
 *[immediate]: When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.
 *[uarch]: Microarchitecture: a specific implementation of an ISA, e.g., "Haswell microarchitecture". 
