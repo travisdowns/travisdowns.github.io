@@ -500,6 +500,8 @@ Thanks to HN user rrss for pointing out errors in my cycle chart.
 
 [Intel 8259 image](https://commons.wikimedia.org/wiki/File:Intel_8259.svg) by Wikipedia user German under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0).
 
+{% include other-posts.md %}
+
 ---
 ---
 <br>

@@ -245,6 +245,7 @@ Thanks to Nathan Kurz who pointed out some errors in the text and to [Daniel Lem
 
 I don't have a comment system, but I'll reply to stuff posted in the [Hacker News discussion](https://news.ycombinator.com/item?id=19445566), or [on Twitter](https://twitter.com/trav_downs/status/1108415599267450882).
 
+{% include other-posts.md %}
 
 ---
 ---

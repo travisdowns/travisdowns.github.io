@@ -837,6 +837,8 @@ Thanks to Daniel Lemire for providing access to hardware on which I was able to 
 
 I don't have a comments system[^comments] yet, so I'm basically just outsourcing discussion to HackerNews right now: [here is the thread](https://news.ycombinator.com/item?id=20157196) for this post.
 
+{% include other-posts.md %}
+
 ---
 ---
 <br>

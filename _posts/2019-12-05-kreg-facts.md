@@ -319,6 +319,8 @@ Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a
 
 Image credit: [Kellogg's Special K](https://www.flickr.com/photos/like_the_grand_canyon/31064064387) by [Like_the_Grand_Canyon](https://www.flickr.com/photos/like_the_grand_canyon/) is licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
 
+{% include other-posts.md %}
+
 ---
 ---
 <br>

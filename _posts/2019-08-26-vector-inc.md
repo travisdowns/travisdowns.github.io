@@ -271,6 +271,7 @@ The aliasing loophole is still there, and those writes still alias "anything" - 
 
 Feedback of any type is welcome. I don't have a comments system[^comments] yet, so as usual I'll outsource discussion to [this HackerNews thread](https://news.ycombinator.com/item?id=20800076).
 
+{% include other-posts.md %}
 
 ---
 ---
