@@ -3,6 +3,7 @@
 ---
 
 @import "minima";
+@import "comment-styles";
 
 .footnotes {
   font-size: $small-font-size;
@@ -46,3 +47,29 @@
 .highlight {
   .err { all:unset; }
 }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+.icon {
+  display: inline-block;
+  fill: currentColor;
+  height: 1em;
+  line-height: 1;
+  position: relative;
+  top: -0.125em; // fine-tune alignment
+  vertical-align: middle;
+  width: 1em;
+
+  &.spin {
+    animation: spin 2s infinite linear;
+  }
+}
+
