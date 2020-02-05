@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Comments Test
+title: Adding Staticman Comments
 category: blog
 tags: [meta, staticman]
 assets: /assets/now-with-comments
