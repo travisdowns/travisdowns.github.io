@@ -13,7 +13,7 @@
 title: Performance Matters
 description: >- # this means to ignore newlines until "baseurl:"
   A blog about low-level software and hardware performance.
-baseurl: "/blog-test" # the subpath of your site, e.g. /blog
+baseurl: / # the subpath of your site, e.g. /blog
 url: "https://travisdowns.github.io"
 permalink: /:categories/:year/:month/:day/:title:output_ext
 google_analytics: UA-136594956-1
@@ -39,7 +39,7 @@ plugins:
   - jekyll-feed
 
 # staticman (comments) configuration
-staticman_url: https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/blog-test/master/comments
+staticman_url: https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments
 
 reCaptcha:
   siteKey: 6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1
