@@ -4,6 +4,9 @@ title: Comments Test
 category: blog
 tags: [meta, staticman]
 assets: /assets/now-with-comments
+image: /assets/now-with-comments/twitter-card.png
+twitter:
+  card: summary
 comments: true
 ---
 
