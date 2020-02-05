@@ -43,7 +43,7 @@ comments:
   moderation: true
 
   # Name of the site. Used in notification emails.
-  name: "travisdowns.github.io"
+  name: "Performance Matters Blog"
 
   # Notification settings. When enabled, users can choose to receive notifications
   # via email when someone adds a reply or a new comment. This requires an account

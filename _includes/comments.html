@@ -1,11 +1,7 @@
-
 <section class="comments">
-  <!--<p> Page slug is: {{ page.slug }} </p>
-  {{ site.data.comments | inspect }} -->
-
+  <hr>
   {% if site.data.comments[page.slug] %}
   <!-- Existing comments -->
-  <hr>
   <div class="comments__existing">
     <h2>Comments</h2>
     {% assign comments = site.data.comments[page.slug] | where_exp: "item", "item.replying_to == ''" %}
