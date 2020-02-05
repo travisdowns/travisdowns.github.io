@@ -23,5 +23,10 @@ layout: default
     {%- include disqus_comments.html -%}
   {%- endif -%}
 
+  <!-- travis override -->
+  {% if page.comments == true %}
+    {% include comments.html %}
+  {% endif %}
+
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
