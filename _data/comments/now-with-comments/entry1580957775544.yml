@@ -1,0 +1,9 @@
+_id: 3d877410-488c-11ea-8ef7-4f7557522197
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to: ''
+replying_to_uid: ''
+message: "I appreciate the detail here, much more information than I expected from the title. Good to know there's a system for comments on a static site.\r\n\r\nreCAPTCHA often translates to a back-button-press for me. I've heard (but not tried) an easy anti-spam solution is to add hidden form fields and fail if they get filled out, which should stop most of the untargeted stuff."
+name: Zach Wegner
+email: d551071bc52af31fc9f78fcaef000413
+hp: ''
+date: 1580957775
