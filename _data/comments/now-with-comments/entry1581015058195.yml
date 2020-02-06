@@ -1,0 +1,13 @@
+_id: 9ca19bd0-4911-11ea-a68f-990916a38351
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to: '2'
+replying_to_uid: 3d877410-488c-11ea-8ef7-4f7557522197
+message: >-
+  Yes, I have a so-called hidden "honeypot" field as a second line of defense.
+  Some people say you should even have the field visible for it to work best,
+  and the theme I copied this from did that – but I just couldn't stomach making
+  it visible and telling people not to fill it out.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1581015058
