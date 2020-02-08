@@ -3,7 +3,7 @@
   uid="{{ include.uid }}">
 
   <div class="comment__author">
-    {{ include.name }},
+    {{ include.name | strip_html }},
     <span class="comment__date">
       {% if include.date %}
         {% if include.index %}
@@ -19,7 +19,7 @@
   </div>
 
   <div class="comment__body">
-    {{ include.message | markdownify }}
+    {{ include.message | strip_html | markdownify }}
   </div>
 
   {% unless include.replying_to != 0 %}
@@ -43,3 +43,7 @@
   {% assign message     = reply.message %}
   {% include comment.html index=index replying_to=replying_to email=email name=name url=url date=date message=message %}
 {% endfor %}
+
+{% unless include.replying_to != 0 %}
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+{% endunless %}

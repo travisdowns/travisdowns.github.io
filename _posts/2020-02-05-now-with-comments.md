@@ -12,7 +12,7 @@ comments: true
 
 {% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}
 
-I've added comments to my blog. For now, they are only on this post but I'll roll them out everywhere shortly.
+I've added comments to my blog. You can find the existing comments, if any, and the new comment form [at the bottom](#comment-section) of any post.
 
 I thought this would take a couple hours, but it actually took **[REDACTED]**. Estimates are hard.
 
@@ -25,7 +25,7 @@ Here's what I did.
 
 ## Introduction
 
-I am using [staticman](https://staticman.net/) as my comments system on this static site.
+I am using [staticman](https://staticman.net/), created by [Eduardo Bouças](https://github.com/eduardoboucas), as my comments system for this static site.
 
 The basic flow for comment submission is as follows:
 
