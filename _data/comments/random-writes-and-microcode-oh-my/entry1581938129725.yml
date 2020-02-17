@@ -1,0 +1,10 @@
+_id: ce0e0ec0-5176-11ea-a5fe-fd19547f6821
+_parent: >-
+  https://travisdowns.github.io/blog/2019/03/19/random-writes-and-microcode-oh-my.html
+replying_to: ''
+replying_to_uid: ''
+message: "\"This means that the core might receive the line in the S MESI state, adn then When the store occurs, a second request may be incurred to change the line from S state to M state.\"\r\n\r\nTypo, change \"adn\" to \"and\""
+name: Leonard Inkret
+email: ''
+hp: ''
+date: 1581938129
