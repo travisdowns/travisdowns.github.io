@@ -192,7 +192,7 @@ All this means that in this particular example you would face some tough tradeof
 
 ### Prefetching
 
-You can solve this particular problem using software prefetching instructions. If you prefetch the lines you are going to store to, a totally different path is invoked: the same one that handles loads, and here the memory level parallelism will be available regardless of the the limitations of the store path. One complication is that, except for `prefetchw`[^prefetchw], such prefetches will be "shared OK" requests for the line, rather than an RFO (request for ownership). This means that the core might receive the line in the S MESI state, adn then When the store occurs, a _second_ request may be incurred to change the line from S state to M state. In my testing this didn't see to be a problem in practice, perhaps because the lines are not shared across cores so generally arrive in the E state, and the E->M transition is cheap.
+You can solve this particular problem using software prefetching instructions. If you prefetch the lines you are going to store to, a totally different path is invoked: the same one that handles loads, and here the memory level parallelism will be available regardless of the the limitations of the store path. One complication is that, except for `prefetchw`[^prefetchw], such prefetches will be "shared OK" requests for the line, rather than an RFO (request for ownership). This means that the core might receive the line in the S MESI state, and then when the store occurs, a _second_ request may be incurred to change the line from S state to M state. In my testing this didn't see to be a problem in practice, perhaps because the lines are not shared across cores so generally arrive in the E state, and the E->M transition is cheap.
 
 We don't even really have to **pre**-fetch: that is, we don't need to issue the prefetch instructions early (which would be hard in this case since we'd need to run ahead of the RNG) - we just issue the PF at the same spot we would have otherwise done the store. This transforms the nature of the request from a store to a load, which is the goal here - even though it doesn't make the request visible to the CPU any earlier than before.
 
@@ -239,7 +239,7 @@ You can have fun reproducing all these results yourself as my code is available 
 
 ## Thanks
 
-Thanks to Nathan Kurz who pointed out some errors in the text and to [Daniel Lemire](https://lemire.me/en/) who kindly provided additional hardware on which I was able to test these results.
+Thanks to Nathan Kurz and Leonard Inkret who pointed out some errors in the text and to [Daniel Lemire](https://lemire.me/en/) who kindly provided additional hardware on which I was able to test these results.
 
 ## Comments
 
