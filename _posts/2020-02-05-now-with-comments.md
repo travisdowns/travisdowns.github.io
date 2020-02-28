@@ -268,6 +268,11 @@ So to use this integration in your `Jekyll` blow you need to:
  - Do the `include comments.html` thing shown above in an appropriate place in your template/theme.
  - Set `comments: true` in the front matter of posts you want to have comments (or set it as a default in `_config.yml`).
 
+## Thanks
+
+Thanks to Eduardo Boucas for creating staticman.
+
+Thanks to [Willy McAllister](https://spinningnumbers.org/) for nested comment display work I unabashedly cribbed, and helping me sort out an RSA key genreation problem.
 
 ## References
 
