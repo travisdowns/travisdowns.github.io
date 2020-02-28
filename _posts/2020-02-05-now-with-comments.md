@@ -154,9 +154,22 @@ This keypair will be used to encrypt secrets that will be stored in public place
 
 Use the following on your local to generate to generate the pair:
 
-    ssh-keygen -t rsa -b 4096 -C "staticman key" -f ~/.ssh/staticman_key
+    ssh-keygen -m PEM -t rsa -b 4096 -C "staticman key" -f ~/.ssh/staticman_key
     
 Don't use any passphrase[^pass]. You can change the `-f` argument if you want to save the key somewhere else, in which case you'll have to use the new location when setting up the Heroku config below.
+
+You can verify the key was genreated by running:
+
+    head -2 ~/.ssh/staticman_key
+
+Which should output something like:
+
+~~~
+-----BEGIN RSA PRIVATE KEY-----
+MIIJKAIBAAKCAgEAud7+fPWXzuxCoyyGbQTYCGi9C1N984roI/Tr7yJi074F+Cfp
+~~~
+
+Your second line will vary of course, but the first line must be `-----BEGIN RSA PRIVATE KEY-----`. If you see something else, perhaps mentioning `OPENSSH PRIVATE KEY`, it won't work.
 
 [^pass]: You could use a passphrase, but then you'll have to change the `cat` used below to echo the key into the Heroku config. If you want to be super safe, best is to generate the key to a transient location like ramfs and then simply delete the private portion after you've uploaded it to the Heroku config.
 
