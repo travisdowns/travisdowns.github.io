@@ -1,0 +1,12 @@
+_id: 287e0600-60bb-11ea-b3f4-e9d388b30bb5
+_parent: 'https://travisdowns.github.io/blog/2020/01/20/zero.html'
+replying_to: ''
+replying_to_uid: ''
+message: >-
+  Are you aware of std::memset? If you are, you should better explain why you
+  think using a C++ standard library function is unsafe or bad practice,
+  exactly.
+name: A.H.
+email: ''
+hp: ''
+date: 1583616754
