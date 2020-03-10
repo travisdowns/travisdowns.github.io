@@ -1,0 +1,9 @@
+_id: 86cc0170-626f-11ea-bd04-6116c010cf28
+_parent: 'https://travisdowns.github.io/blog/2020/01/20/zero.html'
+replying_to: '1'
+replying_to_uid: 287e0600-60bb-11ea-b3f4-e9d388b30bb5
+message: "Yes, I am aware of it. In fact, `memset` appears more that 20 times in this post alone and it didn't get there by accident.\r\n\r\n`memset` would be safe to use in this specific case for `char` arrays, but it tough to use safely in general (even for standard layout types in some cases) in C++, so I generally prefer `std::fill` in new code (not to mention std::fill is much more general).\r\n\r\nBTW, `std::memset` is only part of the \"standard C++ library\" by virtue of its more or less wholesale inclusion of the C standard library. So it's technically part of the library but it doesn't play nice with much of the language, in the same way that `malloc` and `free` are technically part of the standard, but could be considered a vestigial appendage from C."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1583804173
