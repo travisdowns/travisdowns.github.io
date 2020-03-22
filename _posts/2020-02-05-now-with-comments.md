@@ -185,7 +185,7 @@ The easiest way to do this is simply to click the _Deploy to Heroku_ button in t
 
 {% include assetimg.md alt="Deploy" path="deploy.png" width="50%" %}
 
-You'll probably see some building stuff (TODO: try this).
+You'll probably some logging indicating that the project is downloading, building and being deployed.
 
 ### Configure Bridge Secrets
 
