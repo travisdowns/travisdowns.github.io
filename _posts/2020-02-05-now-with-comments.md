@@ -83,7 +83,7 @@ In general, the stuff that goes in `_config.yml` is for use within the static ge
 
 Most of the configuration for the ABI bridge is set in `staticman.yml` which lives in the top level of your _blog repository_. This means that one API bridge can support many different blog repositories, each with their own configuration (indeed, this feature was critical for the original design of a shared ABI bridge).
 
-[Here's a sample file](https://github.com/eduardoboucas/staticman/blob/master/staticman.sample.yml) from the staticman GitHub repository, but you might want to use this one (TODO link) from my repository as it is a bit more fleshed out.
+[Here's a sample file](https://github.com/eduardoboucas/staticman/blob/master/staticman.sample.yml) from the staticman GitHub repository, but you might want to use [this one](https://github.com/travisdowns/travisdowns.github.io/blob/master/staticman.yml) from my repository as it is a bit more fleshed out.
 
 The main things you want to change are shown below.
 
