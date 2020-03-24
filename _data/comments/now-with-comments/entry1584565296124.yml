@@ -1,0 +1,9 @@
+_id: a72dabb0-695b-11ea-be74-5d7178b5214a
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to: '6'
+replying_to_uid: 1527c3f0-6617-11ea-8df9-332f20be4af5
+message: "I followed most of your steps - haven't set up recaptcha yet - and staticman is now running on Heroku and successfully forwarding comments as pull requests.\r\nThank you Travis Downs."
+name: Daniel D
+email: ''
+hp: ''
+date: 1584565296
