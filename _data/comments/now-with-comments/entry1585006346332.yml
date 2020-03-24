@@ -1,0 +1,9 @@
+_id: 8d950b10-6d5e-11ea-8b7c-87e8595887cb
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to: '7'
+replying_to_uid: 7b707640-6c9b-11ea-9683-37803f7596d9
+message: "Actually, I think that's consistent with footnote 8, but perhaps there is some confusion. Assuming you by \"via the Github linked\" you mean you accepted the invitation sent to your email, then I think you experience is as expected.\r\n\r\nThat is, you only need to accept the email invite *or* do the `v2/connect` thing: they serve the same purpose: to accept the invitation for the bot to become a collaborator to the repository. If you accepted the invite via email, you don't need to go to the `connect` URL: and if you do, you'll get the \"not found\" error since there is no waiting connection."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1585006346
