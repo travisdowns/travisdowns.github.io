@@ -1,0 +1,9 @@
+_id: 520120e0-6fb9-11ea-abf3-0f81154aad50
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to: '9'
+replying_to_uid: 4e0619c0-6f9e-11ea-a731-8f0153c6e592
+message: "Thanks!\r\n\r\nNote that almost everything about v2 and v3 are the same. v3 basically just extends the URL format to not assume github: it now supports gitlab as well, so either github or gitlab needs to be in the URL. You can follow this guide and use the v3 scheme just fine, others have done it.\r\n\r\nSo just to clarify that the problems you had were probably not related to v3 vs v2, but some other aspect of using the shared github bot, and that \"v2\" isn't really old: it has the same functionality as v3, minus gitlab support."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1585265232
