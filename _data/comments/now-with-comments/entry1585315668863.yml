@@ -1,0 +1,9 @@
+_id: c05fc5d0-702e-11ea-9327-49e12d1c73f0
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to: ''
+replying_to_uid: ''
+message: "Hello,\r\n\r\nThanks for this guide, as the main site of staticman is out of date, sadly even by following your instructions, I can't make it work for my blog. My bridge application on herokuapp.com always returns me errors, so I can't generate the encrypted secret key for recaptcha,...\r\n\r\nI hope that you can tell me why this is not working for me."
+name: Xavier
+email: ad311b96c529c2c3b7446ec96a456ccf
+hp: ''
+date: 1585315668
