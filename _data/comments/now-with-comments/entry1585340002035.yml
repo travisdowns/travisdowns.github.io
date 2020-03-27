@@ -1,0 +1,9 @@
+_id: 68093e00-7067-11ea-a089-152069685020
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to: '10'
+replying_to_uid: c05fc5d0-702e-11ea-9327-49e12d1c73f0
+message: "No, I can't tell you why it's not working without any details.\r\n\r\nYour best approach is to file a bug [against staticman](https://github.com/eduardoboucas/staticman/issues/) after checking that your error isn't also mentioned/solved in an existing issue.\r\n\r\nInclude full details of your error message, how you generated your keys, whether it works if you disable reCAPTCHA, etc.\r\n\r\nFinally note that a while ago I changed the `ssh-keygen` command to include `-m PEM` which is necessary to get the right key format in newer versions of openssl. If you used the command without that, you can try regenerating your keys."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1585340002
