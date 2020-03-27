@@ -32,7 +32,7 @@ The basic flow for comment submission is as follows:
  1. A reader submits the comment form on a blog post.
  2. Javascript[^backup] attached to the form submits it to my _staticman API bridge[^bridge]_ running on Heroku.
  3. The API bridge does some validation of the request and submits a [pull request](https://github.com/travisdowns/travisdowns.github.io/issues) to the github repo hosting my blog, consisting of a .yml file with the post content and meta data.
- 4. When I accept the pull request, it triggers a regeneration and republishing of the content (this is a GitHub pages feature), so the reply appears almost immediately[^cache]. 
+ 4. When I accept the pull request, it triggers a regeneration and republishing of the content (this is a GitHub pages feature), so the reply appears almost immediately[^cache].
 
 Here are the detailed steps to get this working. There are several other tutorials out there, with varying states of exhaustiveness, some of which
 I found only after writing most of this, but I'm going to add the pile anyways. There have been several changes to deploying staticman which mean that existing resources (and this one, of course) are marked by which "era" they were written in.
@@ -65,14 +65,6 @@ Next, you'll need to generate a GitHub _personal access token_, for your bot acc
 
 Copy and paste the displayed token somewhere safe: you'll need this token in a later step where I'll refer to it as  _${github\_token}_. Once you close this page there is no way to recover the access token.
 
-## Set Up reCAPTCHA
-
-You are going to gate comment submission being reCAPTCHA or a similar system so you don't get destroyed by spam (even if you have moderation enabled, dealing with all the pull requests will probably be tiring).
-
-Go to [reCAPTCHA](https://developers.google.com/recaptcha) and sign up if you haven't already, and create a new site. We are going to use the "v2, Checkbox" variant ([docs here](https://developers.google.com/recaptcha/docs/display)), although I'm interested to hear how it works out with other variants.
-
-You will need the reCAPTCHA _site key_ and _secret key_ for configuration later on.
-
 ## Set Up the Blog Repository Configuration
 
 You'll need to include configuration for staticman in two separate places in your blog repository: `_config.yml` (the primary Jekyll config file) and `staticman.yml`, both at the top level of the repository.
@@ -87,12 +79,6 @@ Most of the configuration for the ABI bridge is set in `staticman.yml` which liv
 
 The main things you want to change are shown below.
 
-**Note:** The `reCaptcha.secret` property is an [_encrypted_](https://staticman.net/docs/encryption) version of the _site secret_ you get from the reCAPTCHA admin console. Copy the secret from the admin console, and paste it at the end of the following URL in your browser:
-
-    https://${bridge_app_name}.herokuapp.com/v2/encrypt/{$recaptcha-site-secret}
-    
-You should get a blob of characters as a result (considerably longer than the original secret) -- it is _this_ value that you need to include as `reCaptcha.secret` in the configuration below (and again in `_config.yml`).    
-
 ~~~yaml
 
 # all of these fields are nested under the comments key, which corresponds to the final element
@@ -100,7 +86,7 @@ You should get a blob of characters as a result (considerably longer than the or
 # file all under different keys
 comments:
 
-  # There are many more required config values here, not shown: 
+  # There are many more required config values here, not shown:
   # use the file linked above as a template
 
   # I guess used only for email notifications?
@@ -110,18 +96,19 @@ comments:
   # reject posts without all of these fields
   requiredFields: ["name", "email", "message"]
 
-  # you are going to want reCaptcha set up
+  # you are going to want reCaptcha set up, but for now leave it disabled because we need the API
+  # bridge up and running in order to encrypt the secrets that go in this section
   reCaptcha:
-    enabled: true
-    siteKey: 6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1
-    secret: a big encrypted secret (see Note above)
+    enabled: false
+  #  siteKey: 6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1
+  #  secret: a big encrypted secret (see Note above)
 
 
 ~~~
 
 ### Configuring _config.yml
 
-The remainder of the configuration goes in `_config.yml`. Here's the configuration I had to add:
+The remainder of the configuration goes in `_config.yml`. Here's the configuration I added to start with (we'll add a bit more later):
 
 ~~~yaml
 # The URL for the staticman API bridge endpoint
@@ -135,13 +122,6 @@ The remainder of the configuration goes in `_config.yml`. Here's the configurati
 # for me, this line reads:
 # https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments
 staticman_url: https://${bridge_app_name}.herokuapp.com/v2/entry/${github-username}/${blog-repo}/master/comments
-
-# reCaptcha configuration info: the exact same site key and *encrypted* secret that you used in staticman.yml
-# I personally don't think the secret needs to be included in the generated site, but the staticman API bridge uses
-# it to ensure the site configuration and bridge configuration match (but why not just compare the site key?)
-reCaptcha:
-  siteKey: 6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1
-  secret: exactly the same secret as the staticman.yml file
 ~~~
 
 ## Set Up the API Bridge
@@ -155,7 +135,7 @@ This keypair will be used to encrypt secrets that will be stored in public place
 Use the following on your local to generate to generate the pair:
 
     ssh-keygen -m PEM -t rsa -b 4096 -C "staticman key" -f ~/.ssh/staticman_key
-    
+
 Don't use any passphrase[^pass]. You can change the `-f` argument if you want to save the key somewhere else, in which case you'll have to use the new location when setting up the Heroku config below.
 
 You can verify the key was genreated by running:
@@ -220,7 +200,6 @@ heroku config --app ${bridge_app_name}
 [^cache]: Well, subject to whatever edge caching GitHub pages is using -- btw you can bust the cache by appending any random query parameter to the page: `...post.html?foo=1234`.
 [^juice]: In particular, the _unverified_ (no credit card) free tier gives you 550 hours of uptime a month, and since the _dyno_ (heroku speak for their on-demand host) sleeps after 30 minutes, I figure you can handle 550/0.5 = 1100 sparsely submitted comments. Of course, if comments come in bursts, you could handle much more than that, since you've already "paid" for the 30 minute uptime.
 
-
 ## Invite and Accept Bot to Blog Repo
 
 Finally, you need to invite your GitHub _bot account_ that you created earlier to your blog repository[^whycollab] and accept the invite.
@@ -234,10 +213,60 @@ Open your blog repository, go to _Settings -> Collaborators_ and search for and 
 Next, accept[^invite] the invitation using the bridge API, by going to the following URL:
 
     https://${bridge_app_name}.herokuapp.com/v2/connect/${github-username}/${blog-repo}
-    
+
 You should see `OK!` as the output if it worked: this only appears _once_ when the invitation got accepted, at all other times it will show `Invitation not found`.
-    
+
 [^invite]: I guess you can also just accept the invitation by opening the email sent to you by github and following the link there. This workflow involving the `v2/connect` endpoint probably made more sense when the API was meant to be shared among many uses using a common github bot account.
+
+## Enable reCAPTCHA
+
+You are going to want to gate comment submission using reCAPTCHA or a similar system so you don't get destroyed by spam (even if you have moderation enabled, dealing with all the pull requests will probably be tiring).
+
+Here we'll cover setting up reCAPTCHA, which has built-in support in staticman. Although it involves modifying the same `_config.yml` and `staticman.yml` files that we've modified before, this part of the configuration needs to occur after the bridge is running because we use the `/encrypt` endpoint on the bridge as part of the setup.
+
+### Sign Up for reCAPTCHA
+
+Go to [reCAPTCHA](https://developers.google.com/recaptcha) and sign up if you haven't already, and create a new site. We are going to use the "v2, Checkbox" variant ([docs here](https://developers.google.com/recaptcha/docs/display)), although I'm interested to hear how it works out with other variants.
+
+You will need the reCAPTCHA _site key_ and _secret key_ for configuration in the next section.
+
+### Configure reCAPTCHA
+
+Next, we need to add the _site key_ and _secret key_ to the `_config.yml` and `staticman.yml` config files.
+
+The _site key_ will be used as-is, but the _secret key_ property will be [_encrypted_](https://staticman.net/docs/encryption) so that it is not exposed in plaintext in your configuration files. To encrypt the secret key copy the secret from the reCAPTCHA admin console, and load the following URL from your API bridge, replacing `YOUR_SITE_KEY` at with the copied secret key.
+
+    https://${bridge_app_name}.herokuapp.com/v2/encrypt/YOUR_SITE_KEY
+
+You should get a blob of characters back as a result (considerably longer than the original secret) -- it is _this_ value that you need to include as `reCaptcha.secret` in both `staticman.yml` and in `_config.yml`.
+
+The reCAPTCHA configuration for both files is almost the same. It looks like this for `staticman.yml`:
+
+~~~yaml
+comments:
+
+  # more stuff
+
+  # note that reCaptcha is nested under comments
+  reCaptcha:
+    enabled: true
+    # the siteKey is used as-is (no encryption)
+    siteKey: 6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1
+    # the secret is the encrypted blob you got back from the encrypt call
+    secret: a big encrypted secret (see description above)
+~~~
+
+The `_config.yml` version is similar except that they key appears at the top level and there is no enabled property:
+
+~~~yaml
+# reCaptcha configuration info: the exact same site key and *encrypted* secret that you used in staticman.yml
+# I personally don't think the secret needs to be included in the generated site, but the staticman API bridge uses
+# it to ensure the site configuration and bridge configuration match (but why not just compare the site key?)
+reCaptcha:
+  siteKey: 6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1
+  secret: exactly the same secret as the staticman.yml file
+~~~
+
 
 ## Integrate Comments Into Site
 
@@ -257,7 +286,7 @@ The key thing you need to do is include a blob of HTML and associated JavaScript
 {% endif %}{% endraw %}
 ~~~
 
-You can paste it into any post, or better add it to the `footer.html` include or something like that (details depend on your theme). The invariant is that wherever this appears, the existing comments appear, followed by a form to submit new comments. You can see the [`comments.html` include here](https://github.com/travisdowns/blog-test/blob/master/_includes/comments.html) -- in turn, it includes `comment.html` (once per comment, generates the comment html) and `comment_form.html` which generates the new comment form. 
+You can paste it into any post, or better add it to the `footer.html` include or something like that (details depend on your theme). The invariant is that wherever this appears, the existing comments appear, followed by a form to submit new comments. You can see the [`comments.html` include here](https://github.com/travisdowns/blog-test/blob/master/_includes/comments.html) -- in turn, it includes `comment.html` (once per comment, generates the comment html) and `comment_form.html` which generates the new comment form.
 
 This ultimately includes [external JavaScript](https://github.com/travisdowns/blog-test/blob/master/_includes/comments.html#L35) for JQuery and reCAPTCHA, as well as [main.js](https://github.com/travisdowns/blog-test/blob/master/assets/main.js) which includes the JavaScript to implement the replies (moving the form when the "reply to" button is clicked, and submitting the form via AJAX to the API bridge).
 
@@ -272,7 +301,7 @@ So to use this integration in your `Jekyll` blow you need to:
 
 Thanks to Eduardo Boucas for creating staticman.
 
-Thanks to [Willy McAllister](https://spinningnumbers.org/) for nested comment display work I unabashedly cribbed, and helping me sort out an RSA key genreation problem.
+Thanks to [Willy McAllister](https://spinningnumbers.org/) for nested comment display work I unabashedly cribbed, and helping me sort out an RSA key genreation problem, and pointing out some inconsistencies in the doc.
 
 ## References
 
