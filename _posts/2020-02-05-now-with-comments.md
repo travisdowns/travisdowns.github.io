@@ -311,7 +311,7 @@ This comment on [GitHub issue #318](https://github.com/eduardoboucas/staticman/i
 
 Willy McAllister describes setting up staticman [in this post](https://spinningnumbers.org/a/staticman.html) -- his implemented of nested comments forms the basis the one I used.
 
-Another [list of steps])https://gist.github.com/jannispaul/3787603317fc9bbb96e99c51fe169731) to get staticman working and some troubleshooting.
+Another [list of steps](https://gist.github.com/jannispaul/3787603317fc9bbb96e99c51fe169731) to get staticman working and some troubleshooting.
 
 Michael Rose, the author of minimal mistakes Jekyll theme [describes setting up nested staticman comments](https://mademistakes.com/articles/improving-jekyll-static-comments/) -- I cribbed some stuff from here such as the submitting spinner.
 

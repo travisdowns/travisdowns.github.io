@@ -56,21 +56,19 @@
 // addComment.moveForm is called from comment.html when the reply link is clicked.
 var addComment = {
   // commId - the id attribute of the comment replied to (e.g., "comment-10")
-  // parentId - the numeric index of comment repleid to (e.g., 10)
   // respondId - the string 'respond', I guess
   // postId - the page slug
-  moveForm: function( commId, parentId, respondId, postId, parentUid ) {
+  moveForm: function( commId, respondId, postId, parentUid ) {
     var div, element, style, cssHidden,
     t           = this,                    //t is the addComment object, with functions moveForm and I, and variable respondId
     comm        = t.I( commId ),                                // whole comment
     respond     = t.I( respondId ),                             // whole new comment form
     cancel      = t.I( 'cancel-comment-reply-link' ),           // whole reply cancel link
-    parent      = t.I( 'comment-replying-to' ),                 // hidden element in the comment
     parentuidF  = t.I( 'comment-replying-to-uid' ),             // a hidden element in the comment
     post        = t.I( 'comment-post-slug' ),                   // null
     commentForm = respond.getElementsByTagName( 'form' )[0];    // the <form> part of the comment_form div
 
-    if ( ! comm || ! respond || ! cancel || ! parent || ! commentForm ) {
+    if ( ! comm || ! respond || ! cancel || ! parentuidF || ! commentForm ) {
       return;
     }
 
@@ -88,7 +86,6 @@ var addComment = {
     if ( post && postId ) {
       post.value = postId;
     }
-    parent.value = parentId;
     parentuidF.value = parentUid;
     cancel.style.display = '';                        //make the cancel link visible
 

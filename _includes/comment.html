@@ -1,20 +1,16 @@
-<article id="comment{% unless include.r %}{{ index | prepend: '-' }}{% else %}{{ include.index | prepend: '-' }}{% endunless %}"
-  class="js-comment comment {% if include.name == site.author.name %}admin{% endif %} {% unless include.replying_to == 0 %}child{% endunless %}"
-  uid="{{ include.uid }}">
+
+{%- capture article_class %}js-comment comment{% if include.name == site.author.name %} admin{% endif %}{% if include.is_reply %} child{% endif %}{% endcapture %}
+{% assign comment_id = include.uid | prepend: 'comment-' %}
+<article id="{{ comment_id }}" class="{{ article_class }}" uid="{{ include.uid }}">
 
   <div class="comment__author">
-    {{ include.name | strip_html }},
+    {{- include.name | strip_html -}},
     <span class="comment__date">
-      {% if include.date %}
-        {% if include.index %}
-          <a href="#comment{{ include.index | prepend: '-' }}" title="Permalink to this comment">
-        {% endif %}
-        {{ include.date | date_to_long_string }}
-        {% comment %}
-          {% include format-date.html date=include.date time=false weekDay=false %}
-        {% endcomment %}
-        {% if include.index %}</a>{% endif %}
-      {% endif %}
+      {%- if include.date -%}
+        <a href="#{{ comment_id}}" title="Permalink to this comment">
+        {{- include.date | date:"%B %eth, %Y %H:%M" -}}
+        </a>
+      {%- endif -%}
     </span>
   </div>
 
@@ -22,28 +18,26 @@
     {{ include.message | strip_html | markdownify }}
   </div>
 
-  {% unless include.replying_to != 0 %}
+{% if include.is_reply %}
+</article>
+{% else %}
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-{{ include.index }}', '{{ include.index }}', 'respond', '{{ page.slug }}', '{{ include.uid }}')">↪&#xFE0E; Reply to {{ include.name }}</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('{{ comment_id }}', 'respond', '{{ page.slug }}', '{{ include.uid }}')">↪&#xFE0E; Reply to {{ include.name }}</a>
     </div>
-  {% endunless %}
 </article>
 
-{% capture i %}{{ include.index }}{% endcapture %}
-{% assign replies = site.data.comments[page.slug] | where_exp: 'item', 'item.replying_to == i' %}
-{% assign replies_date = replies | sort: 'date' %}
-{% for reply in replies_date %}
-  {% assign index       = forloop.index | prepend: '-' | prepend: include.index %}
-  {% assign r           = reply.replying_to %}
-  {% assign replying_to = r | to_integer %}
-  {% assign email       = reply.email %}
-  {% assign name        = reply.name %}
-  {% assign url         = reply.url %}
-  {% assign date        = reply.date %}
-  {% assign message     = reply.message %}
-  {% include comment.html index=index replying_to=replying_to email=email name=name url=url date=date message=message %}
-{% endfor %}
+  {%- capture this_uid %}{{ include.uid }}{% endcapture %}
+  {%- assign replies = site.data.comments[page.slug] | where_exp: 'item', 'item.replying_to_uid == this_uid' %}
+  {%- assign replies_date = replies | sort: 'date' %}
+  {% for reply in replies_date %}
+    {%- assign email       = reply.email -%}
+    {%- assign name        = reply.name -%}
+    {%- assign url         = reply.url -%}
+    {%- assign date        = reply.date -%}
+    {%- assign message     = reply.message -%}
+    {%- assign uid         = reply._id -%}
+    {% include comment.html is_reply=true uid=uid email=email name=name url=url date=date message=message %}
+  {% endfor %}
 
-{% unless include.replying_to != 0 %}
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
-{% endunless %}
+{% endif %}
