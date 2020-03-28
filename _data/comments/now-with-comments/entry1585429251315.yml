@@ -1,0 +1,8 @@
+_id: 34ba8380-7137-11ea-b42e-9fc3ec8d2c60
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: c05fc5d0-702e-11ea-9327-49e12d1c73f0
+message: "Yes the issue was the + characters in the post filename, I replaced C++ by Cpp to make it works. It was hard to understand the issue as I have almost 0 knowledge in web technologies and particularly in jekyll. It seems that jekyll add \" in some circumstances around string when interpreting it and sometimes it doesn't. So my page.slug variable did not contained the \" instead of the corresponding key of the site.data.comments table.\r\nYou can find my new blog at https://flamaros.github.io/."
+name: Xavier
+email: ad311b96c529c2c3b7446ec96a456ccf
+hp: ''
+date: 1585429251
