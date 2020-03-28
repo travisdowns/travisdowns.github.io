@@ -1,0 +1,8 @@
+_id: a3ad3b10-70fc-11ea-b5e1-2f5a8cc54610
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: c05fc5d0-702e-11ea-9327-49e12d1c73f0
+message: "I finally understood why '+' character in the file names cause an issue with jekyll, the page.slug have to be put between double quotes, which breaks which can lead in some errors in code.\r\n\r\nThank you again, I am super happy to leave Wordpress"
+name: Xavier
+email: 6828bc2021a3b75f3bb80c740261cd7c
+hp: ''
+date: 1585404097
