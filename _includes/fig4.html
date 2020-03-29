@@ -1,0 +1,17 @@
+
+{% comment %} Generates a srcset based <img> tag with 1x through 4x sizes {% endcomment %}
+
+{% capture stem %}{{assetpath}}/{{include.file}}{% endcapture %}
+
+<div style="position: relative; margin-bottom: 1em;">
+<img src="{{stem}}-740w.png" srcset="
+    {{stem }}-740w.png  740w,
+    {{stem}}-1480w.png 1480w,
+    {{stem}}-2220w.png 2220w,
+    {{stem}}-2960w.png 2960w
+    "
+    sizes="(max-width: 800px) calc(100vw - 30px), 740px"
+    alt="{{ include.alt | default: 'Figure' }}"
+    >
+<a style="position: absolute; font-size: 70%; right: 0px; bottom: 0px" href="{{stem}}.svg">SVG version of this plot</a>
+</div>
