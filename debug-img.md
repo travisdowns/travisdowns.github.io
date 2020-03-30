@@ -14,7 +14,7 @@ layout: post
 
 ---
 
-<div style="font-family: monospace; white-space:pre;">
+<div style="font-family: monospace; white-space:pre-wrap;">
     Window inner dims : <span id="inner"></span>
     Window client dims: <span id="client"></span>
     Device pixel ratio: <span id="dpr"></span>
