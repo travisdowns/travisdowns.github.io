@@ -1,0 +1,8 @@
+_id: 7e5d58f0-74de-11ea-af7e-ef9e18d20be0
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 4e0619c0-6f9e-11ea-a731-8f0153c6e592
+message: "Thanks again for the clarification. I am aware that v3 just extends the URL formats and have tried those scenarios. The problem was just i got errors and timeouts, and i totally forget to open the issue with a stacktrace XD. I think it was just some sort of incompatibility with that version of Node.\r\n\r\nAnyway i'm very happy with the setup, i was just stubborn for that v3/bot install... you know... rocket science :-)"
+name: HyperTesto
+email: a3d80b093e05b648fae26261e86d0496
+hp: ''
+date: 1585830954
