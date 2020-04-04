@@ -1,0 +1,8 @@
+_id: 8a2e26b0-7690-11ea-898a-852a73570658
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: b7cdc740-753e-11ea-a6c5-592cca6048e5
+message: "Hi Dug,\r\n\r\nSo that \"missing block\" error shows up for a lot of different problems due to bugs in the staticman error handling. You can get more detailed info using a fixed branch rather than staticman/master, but I'll respond more on [issue 345](https://github.com/eduardoboucas/staticman/issues/345) which I think you opened on this.\r\n\r\nYes, any newlines in the comment reply breaks the formatting in the pull request. I'm pretty sure the staticman project would happily accept a PR to fix that! I think it's just a matter of escaping (markdown style) the newlines when generating the text for the PR."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1586017375
