@@ -1,0 +1,10 @@
+_id: 8b49e5d0-7662-11ea-b926-b135953eecfd
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: b7cdc740-753e-11ea-a6c5-592cca6048e5
+message: >-
+  ...also just noticed that carriage return in a comment message field upsets
+  the key/vale pair layout in the generated pull request (I think)
+name: Dug
+email: 953a3c39860682e5d83e84ef1f2a526d
+hp: ''
+date: 1585997620
