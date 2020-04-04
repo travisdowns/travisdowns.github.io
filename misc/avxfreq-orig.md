@@ -1,6 +1,5 @@
 ---
 layout: post
-title: Gathering Intel on Intel AVX-512 Transitions
 category: blog
 tags: [performance, c++, Intel, uarch]
 assets: /assets/avxfreq1
