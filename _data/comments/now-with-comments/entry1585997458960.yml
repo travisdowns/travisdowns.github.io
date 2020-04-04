@@ -1,0 +1,8 @@
+_id: 2ae00b20-7662-11ea-b926-b135953eecfd
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: b7cdc740-753e-11ea-a6c5-592cca6048e5
+message: "Hi Travis, Dug replying to Dug here. Just to say I'm going to go through the installation again line by line double-checking against your instructions.\r\nOne thing that would be useful is a debbuging method. Current status is I'm getting the \"missing block\" config file error, which I think you listed as a Staticman issue? I'll get stuck in a bit later but all pointers welcome:-)"
+name: Dug
+email: 953a3c39860682e5d83e84ef1f2a526d
+hp: ''
+date: 1585997458
