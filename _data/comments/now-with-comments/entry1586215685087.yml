@@ -1,0 +1,8 @@
+_id: 43e03ed0-785e-11ea-b5c5-d342406766ae
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 6e90b390-785d-11ea-b5c5-d342406766ae
+message: "When you say \"the CSS for the comment submission isn’t appearing\", do you mean stuff is not being styled as expected?\r\n\r\nThe things to do would be to view source/dev tools on your page, and check that the classes are applied to the elements as you expect, the stylesheets are included as you expect and contain your styles, etc. The Firefox style browser or whatever the thing in chrome is called make this relatively easy."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1586215685
