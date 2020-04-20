@@ -1,0 +1,13 @@
+_id: 113bfab0-832a-11ea-be07-dd969cefdbae
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: bec58400-8288-11ea-9c16-35d3f6bde252
+message: >-
+  Travis - You guessed right. I changed `v1/webhook/` to `v1/webhook` and the
+  not-found problem cleared up. I started getting notification emails from
+  MailGun. This mailhook provides two services: It deletes unneeded branches
+  *and* it launches a notification email to people who have subscribed. This
+  second feature isn't mentioned in the Staticman documentation for webhooks.
+name: Willy McAllister
+email: 72f6ffec6e34ab5d69f3811272b5ae97
+hp: ''
+date: 1587402729
