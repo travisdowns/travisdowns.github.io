@@ -54,3 +54,4 @@
 *[immediate]: When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.
 *[uarch]: Microarchitecture: a specific implementation of an ISA, e.g., "Haswell microarchitecture". 
 *[SIMD]: Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.
+*[CAS]: Compare-and-swap: an atomic operation implemented on x86 and other CPUs
