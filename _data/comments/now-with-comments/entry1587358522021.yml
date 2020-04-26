@@ -1,7 +1,7 @@
 _id: 23abb2b0-82c3-11ea-ba2e-4dbfce738e5c
 _parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
 replying_to_uid: bec58400-8288-11ea-9c16-35d3f6bde252
-message: "I never set up a webhook due to laziness and I just click \"delete branch\" every time I accept a reply (not actually sure which is lazier, obviously the webhook will pay off if I get a to of replies, but so far that's not the case).\r\n\r\nSo I don't know anything about the webhook. However, maybe your problem is the trailing slash: try with `v1/webhook` not `v1/webhook/`"
+message: "I never set up a webhook due to laziness and I just click \"delete branch\" every time I accept a reply (not actually sure which is lazier, obviously the webhook will pay off if I get a lot of replies, but so far that's not the case).\r\n\r\nSo I don't know anything about the webhook. However, maybe your problem is the trailing slash: try with `v1/webhook` not `v1/webhook/`"
 name: Travis Downs
 email: c6937532928911c0dae3c9c89b658c09
 hp: ''
