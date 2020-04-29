@@ -98,7 +98,6 @@ var addComment = {
         return;
       }
 
-      t.I( 'comment-replying-to' ).value = null;      // forget the identity of the reply-to comment
       t.I( 'comment-replying-to-uid' ).value = null;
       temp.parentNode.insertBefore( respond, temp );  //move the comment form to its original location
       temp.parentNode.removeChild( temp );            //remove the bookmark div
