@@ -1,0 +1,8 @@
+_id: 9b3426e0-9093-11ea-9170-4181cea7519a
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 13290fb0-9046-11ea-bfc0-630eaf4f61ab
+message: "Did you accept the bot invite by email? If you did that (it's probably easiest way), you don't need to do the invite link in the API: it's one or the other. As soon as the invite has been accepted by any method, the API will return the \"Invitation not found\" message.\r\n\r\nIf you have further issues, try to make it reproducible so you can file an issue on the staticman repo, where you'll probably get better help."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1588877422
