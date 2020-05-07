@@ -1,0 +1,8 @@
+_id: c02de000-8d30-11ea-9db0-e9d644cafe33
+_parent: 'https://travisdowns.github.io/blog/2019/05/22/sorting.html'
+replying_to_uid: ''
+message: "Very interesting article !!! You seem to suggest that qsort is indeed weak in performance because of the iterative call of the compare function. If I understood the paper well, this function could be inlined, but it's not!! You also suggest that the C++ standard sort is better than C qsort. Now, sorry, I'm not a C++  man. I'm just trying to learn C and I find it difficult enough !!!\r\nWhat would be nice would be to publish a better qsort than the one we find in stdlib. Could you do that ?? And also (if possible) explain all the improvements.\r\nI read a lot of articles about qsort. Some guys say : \"don't worry ! qsort is a very good general purpose sorting algorithm. It has been done by very good programmers. Just use it and be happy!\".\r\nOther guys say : \"qsort could be much better. It has been done many years ago and no one bothered about improving this built-in function. It's time to do it !!\"\r\nWho is right ???\r\nFrom what I read, you should be able to provide a better qsort function. Of course, I'm interested by the C version of it (no C++ please !!!).\r\nThanks in advance. Although I didn't understand everything, I liked the article."
+name: Jip
+email: ''
+hp: ''
+date: 1588505111
