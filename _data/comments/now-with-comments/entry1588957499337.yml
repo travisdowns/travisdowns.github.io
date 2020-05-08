@@ -1,0 +1,8 @@
+_id: 0c7cbf00-914e-11ea-a6bb-5b36c84be69d
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 61293eb0-9122-11ea-951c-d9129305c6e7
+message: "Fixed! However, i'm facing another issue:\r\n\r\nOn my site i can now see comments, but when i reply to a comment using the button and filling everything, it gives me a INVALID_FILEDS error. Any idea why would this happen?"
+name: Vel-San
+email: ''
+hp: ''
+date: 1588957499
