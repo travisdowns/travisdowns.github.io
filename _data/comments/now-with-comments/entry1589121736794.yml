@@ -1,0 +1,8 @@
+_id: 71a23160-92cc-11ea-a621-c7ebe04983ba
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Hi! \r\nBig thanks for the guide!\r\n\r\nI have implemented it to a website and it seems to work. I have a couple of questions though.\r\n\r\nWhen clicking \"submit\" the message about \"pending\" shows up as it should, but the webpage goes \"greyed out\" and the message about the comment being pending is not clickable.\r\n\r\nI removed your `<a href>` in that message from `main.js`, thought that could be the problem but that did not help.\r\n\r\nAny ideas?\r\n\r\nAlso, I have almost none experience with HTML/CSS and my page uses some kind of dynamic font size. Could that be applied to '_sass/comment-styles.css` somehow?\r\n\r\nMy main.scss:\r\n```\r\n...\r\nhtml { /* apply a natural box layout model to all elements */ box-sizing: border-box; background-color: #f3f3f3; font-size: 16px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }\r\n@media (min-width: 48em) { html { font-size: 16px; } }\r\n@media (min-width: 64em) { html { font-size: 18px; } }\r\n@media (min-width: 80em) { html { font-size: 20px; } }\r\n\r\n.page__content p, .page__content li, .page__content dl {\r\n  font-size: smaller;\r\n}\r\n...\r\n```"
+name: frroool
+email: 91e0082da8aebc6dd956a7b1b599a36a
+hp: ''
+date: 1589121736
