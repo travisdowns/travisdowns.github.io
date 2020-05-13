@@ -297,6 +297,8 @@ Thanks to Daniel Lemire who provided access to the hardware used in the [Hardwar
 
 Thanks Alex Blewitt and Zach Wegner who pointed out the CSS tab technique (I used the one linked in the [comments of this post](https://twitter.com/zwegner/status/1223701307078402048)) and others who replied to [this tweet](https://twitter.com/trav_downs/status/1223690150175236102) about image carousels.
 
+Thanks to Tarlinian on Twitter who pointed out a truncated footnote.
+
 ### Discussion and Feedback
 
 Leave a comment below, or discuss on [Twitter](https://twitter.com/trav_downs/status/1260620313483771905) and [Hacker News](https://news.ycombinator.com/item?id=23169605).
@@ -335,7 +337,7 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 [^melty]: Those melty bits where the pattern gets all weird, in the middle and near the right side are not random artifacts: they are consistently reproducible. I suspect a collision in the branch predictor history.
 
-[^badvec]: It is worth noting[^nested] his performance deviation isn't exactly inescapable, just a consequence of poor remainder handling in the compiler's autovectorizer. An approach that would be much faster and generate much less code to handle the remaining elements would be to do a final full-width vector store but aligned to the 
+[^badvec]: It is worth noting[^nested] his performance deviation isn't exactly inescapable, just a consequence of poor remainder handling in the compiler's autovectorizer. An approach that would be much faster and generate much less code to handle the remaining elements would be to do a final full-width vector store but aligned to the end of the buffer. So instead of doing up to 7 additional scalar stores, you do one additional vector store (and suffer one less branch misprediction!).
 
 [^nested]: Ha! To me, everything is "worth noting" if it means another footnote.
 
