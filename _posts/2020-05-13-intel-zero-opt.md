@@ -299,9 +299,9 @@ Thanks Alex Blewitt and Zach Wegner who pointed out the CSS tab technique (I use
 
 ### Discussion and Feedback
 
-Leave a comment below if you'd like.
+Leave a comment below, or discuss on [Twitter](https://twitter.com/trav_downs/status/1260620313483771905) and [Hacker News](https://news.ycombinator.com/item?id=23169605).
 
-Feedback is also warmly welcomed by comment, [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
+Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
 
 [^g2ga]: It was the first full day of general availability for Graviton, so perhaps these hosts are very lightly used at the moment because it certainly felt like I had the whole thing to myself.
 
