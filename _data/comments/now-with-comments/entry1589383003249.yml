@@ -1,0 +1,16 @@
+_id: c049c0a0-952c-11ea-8394-c3d83ae44fcd
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: c05fc5d0-702e-11ea-9327-49e12d1c73f0
+message: >-
+  In the comment form and comment list, instead of just using page.slug, you
+  should slugify it, for me slugify: "ascii" is safe enough. The reason is that
+  comments are stored in a directory named after the "slug" you pass to
+  Staticman in the comment form, I suppose it is page.slug, if that slug
+  contains special characters then these characters will be altered and/or
+  discarded by Jekyll when it reads that directory name. Then when you use
+  page.slug again in the comment list, Jekyll doesn't find any comment for that
+  slug, thus no comment is displayed
+name: Phu
+email: ''
+hp: ''
+date: 1589383003
