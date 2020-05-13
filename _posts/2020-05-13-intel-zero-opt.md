@@ -147,6 +147,8 @@ Here are Intel's descriptions of these events:
 **l2_lines_out.non_silent**
 > Counts the number of lines that are evicted by L2 cache when triggered by an L2 cache fill. Those lines are in Modified state. Modified lines are written back to L3.
 
+The states being referred to here are [MESI](https://en.wikipedia.org/wiki/MESI_protocol) cache states, commonly abbreviated M (modified), E (exclusive, but not modified) and S (possibly shared, not modified).
+
 The second definition is not completely accurate. In particular, it implies that only modified lines trigger the _non-silent_ event. However, [I find](https://stackoverflow.com/q/52565303/149138) that unmodified lines in E state can also trigger this event. Roughly, the behavior for unmodified lines seems to be that lines that miss in L2 _and_ L3 usually get filled into the L2 in a state where they will be evicted _non-silently_, but unmodified lines that miss in L2 and _hit_ in L3 will generally be evicted silently[^silent]. Of course, lines that are modified _must_ be evicted non-silently in order to update the outer levels with the new data.
 
 In summary: silent evictions are associated with unmodified lines in E or S state, while non-silent evictions are associated with M, E or (possibly) S state lines, with the silent vs non-silent choice for E and S being made in some unknown matter.
@@ -297,7 +299,7 @@ Thanks to Daniel Lemire who provided access to the hardware used in the [Hardwar
 
 Thanks Alex Blewitt and Zach Wegner who pointed out the CSS tab technique (I used the one linked in the [comments of this post](https://twitter.com/zwegner/status/1223701307078402048)) and others who replied to [this tweet](https://twitter.com/trav_downs/status/1223690150175236102) about image carousels.
 
-Thanks to Tarlinian and 不良大脑的所有者 who pointed out typos or omissions in the text.
+Thanks to Tarlinian, 不良大脑的所有者 and Bruce Dawson who pointed out typos or omissions in the text.
 
 ### Discussion and Feedback
 
