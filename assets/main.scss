@@ -4,6 +4,7 @@
 
 @import "minima";
 @import "comment-styles";
+@import "tab-styles";
 
 .footnotes {
   font-size: $small-font-size;
@@ -82,3 +83,12 @@
   text-align: right;
 }
 
+// style for svg-fig include
+.svg-fig {
+  font-size: 80%;
+}
+
+sup[id^='fnref'] {
+  font-size: 0.8em;
+  line-height: 0; // prevent superscript from affecting the line height when it appears
+}
