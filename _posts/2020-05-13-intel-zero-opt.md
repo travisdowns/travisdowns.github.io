@@ -7,7 +7,7 @@ assets: /assets/intel-zero-opt
 image: /assets/intel-zero-opt/twitter-card.png
 results: https://github.com/travisdowns/zero-fill-bench/tree/master/results
 twitter:
-  card: summary
+  card: summary_large_image
 comments: true
 ---
 
