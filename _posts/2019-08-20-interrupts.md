@@ -482,7 +482,7 @@ Well one idea is that it lets us fairly precisely map out the retirement timing 
 
 Of course, this sounds way harder than the usual way of measuring latency: a long series of back-to-back instrucitons, but it does let us measure some things "in situ" without a long chain, and we can measure instructions that don't have an obvious way to chain (e.g,. have no output like stores or different-domain instructions).
 
-### TODO
+### Some Things That I Didn't Get To
 
  - Explain the variable (non-self synchronizing) results in terms of retire window patterns
  - Check interruptible instructions
