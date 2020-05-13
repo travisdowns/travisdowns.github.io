@@ -1,17 +1,11 @@
 {% comment %} Include for SVG-based figure {% endcomment %}
 
-{% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}
-{% capture tablepath %}{{ page.slug | prepend: "/misc/tables/" | relative_url }}{% endcapture %}
-
-{% capture stem %}{{assetpath}}/{{include.file}}{% endcapture %}
-
-{% capture test %}{{ "/bar" | relative_url }}{% endcapture %}
-
-<div> <!-- </div> style="position: relative;"> -->
-    <!-- <div style="position: absolute; top: 0;"> -->
-    <a style="font-size: 80%;" href="#{{include.file}}" id="{{include.file}}">[link to this chart]</a>
-    <!-- </div> -->
+<div class="svg-fig">
+    {% unless include.nolink | default: 1 %}<a href="#{{include.file}}" id="{{include.file}}">[link to this chart] </a>{% endunless %}
+    <a href="{{tablepath}}/{{include.file}}.html">[data table] </a>
+    {% if include.raw %}<a href="{{page.results}}/{{include.raw}}">[raw data] </a>{% endif %}
+    <br />
     <a href="{{tablepath}}/{{include.file}}.html">
-        <img src="{{stem}}.svg" alt="{{ include.alt | default: 'Figure' }}">
+        <img class="figimg" src="{{assetpath}}/{{include.file}}.svg" alt="{{ include.alt | default: 'Figure' }}">
     </a>
 </div>

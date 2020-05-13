@@ -1,0 +1,33 @@
+{% comment %}
+Copyright (c) 2020 by Vesa Piittinen (https://codepen.io/Merri/pen/bytea)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+{% endcomment %}
+
+{% capture stem %}{{assetpath}}/{{include.file}}{% endcapture %}
+
+{% assign tabsuffixes = include.suffixes | split: "," %}
+{% assign tabnames    = include.names    | split: "," %}
+{% assign rawnames    = include.raw      | split: "," %}
+
+<div class="tabs">
+    <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
+    {% for suffix in tabsuffixes %}
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-{{forloop.index}}" name="tab-group-1" {% if forloop.first %}checked{% endif %}>
+      <label class="tab-label" for="tab-{{forloop.index}}">{{tabnames[forloop.index0]}}</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          {% capture csf__file %}{{include.file}}-{{suffix}}{% endcapture %}
+          {% capture csf__raw %}{{rawnames[forloop.index0]}}{% endcapture %}
+          {% include svg-fig.html file=csf__file raw=csf__raw alt="Figure 4" nolink="1" %}
+          <!-- <img src="{{stem}}-{{suffix}}.svg" alt="{{ include.alt | default: 'Figure' }}"> -->
+        </div>
+      </div> 
+    </div>
+    {% endfor %}
+</div>
