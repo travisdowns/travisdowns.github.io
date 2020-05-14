@@ -131,11 +131,11 @@ This also explains the bumpy performance in the fastest region between ~1,000 an
 
 #### Getting Weird in the L3
 
-Unlike the L1 or L2, the performance in the L3 is _weird_.
+So while there are some interesting effects in the first half of the results, covering L1 and L2, they are fairly easy to explain and, more to the point, performance for the zero and one cases are identical: the samples are all concentric. As soon as we dip our toes into the L3, however, things start to get _weird_.
 
 Weird in that we we see a clear divergence between stores of zero versus ones. Remember that this is the exact same function, the same _machine_ code executing the same stream of instructions, only varying in the value of the `ymm1` register passed to the store instruction. Storing zero is consistently about 17% to 18% faster than storing one, both in the region covered by the L3 (up to 6 MiB on my system), and beyond that where we expect misses to RAM (it looks like the difference narrows in the RAM region, but it's mostly a trick of the eye: the relative performance difference is about the same).
 
-What's going on here? Why does the CPU care _what_ values are being stored, and why is zero special?
+What's going on here? Why does the CPU care _what values_ are being stored, and why is zero special?
 
 We can get some additional insight by measuring the `l2_lines_out.silent` and `l2_lines_out.non_silent` events while we focus on the regions that fit in L2 or L3. These events measure the number of lines evicted from L2 either _silently_ or _non-silently_.
 
@@ -299,11 +299,11 @@ Thanks to Daniel Lemire who provided access to the hardware used in the [Hardwar
 
 Thanks Alex Blewitt and Zach Wegner who pointed out the CSS tab technique (I used the one linked in the [comments of this post](https://twitter.com/zwegner/status/1223701307078402048)) and others who replied to [this tweet](https://twitter.com/trav_downs/status/1223690150175236102) about image carousels.
 
-Thanks to Tarlinian, 不良大脑的所有者 and Bruce Dawson who pointed out typos or omissions in the text.
+Thanks to Tarlinian, 不良大脑的所有者, Bruce Dawson and Zach Wegner who pointed out typos or omissions in the text.
 
 ### Discussion and Feedback
 
-Leave a comment below, or discuss on [Twitter](https://twitter.com/trav_downs/status/1260620313483771905) and [Hacker News](https://news.ycombinator.com/item?id=23169605).
+Leave a comment below, or discuss on [Twitter](https://twitter.com/trav_downs/status/1260620313483771905), [Hacker News](https://news.ycombinator.com/item?id=23169605), [reddit](https://www.reddit.com/r/asm/comments/gj3xq7/hardware_store_elimination/) or [RWT](https://www.realworldtech.com/forum/?threadid=191798&curpostid=191798).
 
 Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
 
@@ -319,7 +319,7 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 [^story]: Like many posts on this blog, what follows is essentially a _reconstruction_. I encountered the effect originally in a benchmark, as described, and then worked backwards from there to understand the underlying effect. Then, I wrote this post the other way around: building up a new benchmark to display the effect ... but at that point I already knew what we'd find. So please don't think I just started writing the benchmark you find on GitHub and then ran into this issue coincidentally: the arrow of causality points the other way.
 
-[^obbus]: By _outbound bus_ I mean the bus to the outer layers of the memory hierarchy. So for the L2, the outbound bus is the so-called _superqueue_ that connects the L2 to the uncore and the L3 cache.
+[^obbus]: By _outbound queues_ I mean the path between an inner and outer cache level. So for the L2, the outbound bus is the so-called _superqueue_ that connects the L2 to the uncore and L3 cache.
 
 [^imcevent]: On SKL client CPUs we can do this with the `uncore_imc/data_writes/` events, which polls internal counters in the memory controller itself. This is a socket-wide event, so it is important to do this measurement on as quiet a machine as possible.
 
@@ -335,15 +335,13 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 [^l2]: The ~ is there in ~256 KiB because unless you use huge pages, you might start to see L2 misses even before 256 KiB since only a 256 KiB _virtually contiguous_ buffer is not necessarily well behaved in terms of evictions: it depends how those 4k pages are mapped to physical pages. As soon as you get too many 4k pages mapping to the same group of sets, you'll see evictions even before 256 KiB.
 
-[^silent]: This behavior is interesting and a bit puzzling. There are several reasons why you might want to do a non-silent eviction. (1a) would be to keep the L3 snoop filter up to date: if the L3 knows a core no longer has a copy of the line, later requests for that line can avoid snooping the core and are some 30 cycles faster. (1b) Similarly, if the L3 wants to evict this line, this is faster if it knows it can do it without writing back, versus snooping the owning core for a possibly modified line. (2) Keeping the L3 LRU more up to date: the L3 LRU wants to know which lines are hot, but most of the accesses are filtered through the L1 and L2, so the L3 doesn't get much information – a non-silent eviction can provide some of the missing info (3) If the L3 serves as a victim cache, the L2 needs to write back the line for it to be stored in L3 at all. SKX L3 actually works this way, but despite being a very similar uarch, SKL apparently doesn't. However, one can imagine that on a miss to DRAM it may be advantageous to send the line directly to the L2, updating the L3 tags (snoop filter) only, without writing the data into L3. The data only gets written when the line is subsequently evicted from the owning L2. When lines are frequency modified, this cuts the number of writes to L3 in half. This behavior warrants further investigation.
+[^silent]: This behavior is interesting and a bit puzzling. There are several reasons why you might want to do a non-silent eviction. (1a) would be to keep the L3 snoop filter up to date: if the L3 knows a core no longer has a copy of the line, later requests for that line can avoid snooping the core and are some 30 cycles faster. (1b) Similarly, if the L3 wants to evict this line, this is faster if it knows it can do it without writing back, versus snooping the owning core for a possibly modified line. (2) Keeping the L3 LRU more up to date: the L3 LRU wants to know which lines are hot, but most of the accesses are filtered through the L1 and L2, so the L3 doesn't get much information – a non-silent eviction can provide some of the missing info (3) If the L3 serves as a victim cache, the L2 needs to write back the line for it to be stored in L3 at all. SKX L3 actually works this way, but despite being a very similar uarch, SKL apparently doesn't. However, one can imagine that on a miss to DRAM it may be advantageous to send the line directly to the L2, updating the L3 tags (snoop filter) only, without writing the data into L3. The data only gets written when the line is subsequently evicted from the owning L2. When lines are frequently modified, this cuts the number of writes to L3 in half. This behavior warrants further investigation.
 
 [^melty]: Those melty bits where the pattern gets all weird, in the middle and near the right side are not random artifacts: they are consistently reproducible. I suspect a collision in the branch predictor history.
 
-[^badvec]: It is worth noting[^nested] that this performance variation with buffer size isn't exactly inescapable. Rather, it is just a consequence of poor remainder handling in the compiler's auto-vectorizer. An approach that would be much faster and generate much less code to handle the remaining elements would be to do a final full-width vector store but aligned to the end of the buffer. So instead of doing up to 7 additional scalar stores, you do one additional vector store (and suffer one less branch misprediction!).
+[^badvec]: It is worth noting[^nested] that this performance variation with buffer size isn't exactly inescapable. Rather, it is just a consequence of poor remainder handling in the compiler's auto-vectorizer. An approach that would be much faster and generate much less code to handle the remaining elements would be to do a final full-width vector store but aligned to the end of the buffer. So instead of doing up to 7 additional scalar stores, you do one additional vector store (and suffer up to one fewer branch mispredictions for random lengths, since the scalar outro involves conditional jumps).
 
 [^nested]: Ha! To me, everything is "worth noting" if it means another footnote.
-
-So while there are some interesting effects on the left half, they are fairly easy to explain and, more to the point, performance for the zero and one cases are identical: the samples are all concentric. As soon as we dip our toes into the L3, however, things start to get _weird_.
 
 [^warm]: There are 27 samples total at each size: the first 10 are discarded as warmup and the remaining 17 are plotted.
 
