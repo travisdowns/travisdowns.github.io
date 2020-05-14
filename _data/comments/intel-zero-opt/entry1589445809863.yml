@@ -1,0 +1,11 @@
+_id: fc335990-95be-11ea-9278-c52ec055ca5f
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: d887d100-9560-11ea-8885-c1a370f2dc6c
+message: >-
+  gcc recognizes fill-with-same-bytes since gcc-4.9, see
+  const_with_all_bytes_same in gcc/tree-loop-distribution.c and this CE example:
+  https://godbolt.org/z/Neo9tN
+name: Alexander Monakov
+email: 455da12ee7a27b3fbac08e0374ba445e
+hp: ''
+date: 1589445809
