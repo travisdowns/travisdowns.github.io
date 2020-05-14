@@ -1,0 +1,12 @@
+_id: b56ba5c0-9637-11ea-9007-51f9f966835a
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  You really should run those tests in parallel, because server CPUs are
+  designed to run workloads that use more than one core. It's neat that Graviton
+  can drive 40 GB/s from a single core, but that's irrelevant unless you
+  actually care about workloads where only one core of many is moving data.
+name: Jeff Hammond
+email: b78ea06cf6ec29eea1d0cc82aab5f998
+hp: ''
+date: 1589497660
