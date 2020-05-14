@@ -262,13 +262,21 @@ Some observations on these results:
 
 <a id="summary-perma"></a>
 
+### Further Notes
+
+Here's a grab back of notes and observations that don't get their a full section, don't have any associated plots, etc. That doesn't mean they are less important! Don't say that! These ones matter too, they really do.
+
+ - Despite any impressions I may have given above: you don't need to _fully_ overwrite a cache line with zeros for this to kick in. Rather, the line must initially fully zero, and then all the _escaping[^escaping]_ writes must be zero. Another way of thinking about this is that the thing that matters is the value of the cache line written back, as well as the old value of the line that the writeback is replacing: these must both be fully zero, but that doesn't mean that you need to overwrite the line with zeros: any locations not written are still zero "from before". I directly test this in the `one_per0` and `one_per1` tests in the benchmark. These write only a single `int` value in each cache line, leaving the other values unchanged. In that benchmark the optimization kicks triggers in exactly the same way when writing a single zero.
+ - Although we didn't find evidence of this happening on other x86 hardware, nor on POWER or ARM, that doesn't mean it isn't or can't happen. It is possible the conditions for it to happen aren't triggered, or that it is happening but doesn't make a difference in performance. Similarly for the POWER9 and ARM chips: we didn't check any performance counters, so maybe the thing is happening but it just doesn't make any difference in performance. That's especially feasible in the ARM case where the performance is totally limited by the core-level 16-bytes-per-cycle write throughput: even if all writes are eliminated later on in the path to memory, we expect the performance to be the same.
+ - We could learn more about this effect by setting up a test which writes ones first to a region of some fixed size, then overwrites it with zeros, and repeats this in a rolling fashion over a larger buffer. This test basically lets the 1s escape to a certain level of the cache hierarchy, and seeing where the optimization kicks in will tell us something interesting.
+
 ## Wrapping Up
 
 ### Findings
 
 Here's a brief summary of what we found. This will be a bit redundant if you've just read the whole thing, but we need to accommodate everyone who just skipped down to this part, right?
 
- - Intel chips can apparently eliminate some redundant stores when an all-zero cache line is written to a cache line that was already all-zero.
+ - Intel chips can apparently eliminate some redundant stores when zeros are written to a cache line that is already all zero (the line doesn't need to be fully overwritten).
  - This optimization applies at least as early as L2 writeback to L3, so would apply to the extend that working sets don't fit in L2.
  - The effect eliminates both write accesses to L3, and writes to memory depending on the working set size.
  - For the pure store benchmark discussed here effect of this optimization is a reduction in the number of writes of ~63% (to L3) and ~50% (to memory), with a runtime reduction of between 15% and 20%.
@@ -282,7 +290,7 @@ Nothing like that, no – but it might provide a small boost for some cases.
 
 Many of those cases are probably getting the benefit without any special effort. After all, zero is already a special value: it's how memory arrives comes from the operating system, and at the language allocation level for some languages. So a lot of cases that could get this benefit, probably already are.
 
-Redundant zero-over-zero probably isn't as rare as you might think either: consider that in low level languages, memory is often cleared after receiving it from the allocator, but in many cases this memory came directly from the OS so it is already zero[^calloc].
+Redundant zero-over-zero probably isn't as rare as you might think either: consider that in low level languages, memory is often cleared after receiving it from the allocator, but in many cases this memory came directly from the OS so it is already zero[^calloc]. Consider also cases like fairly-sparse matrix multiplication: where your matrix isn't sparse enough to actually use dedicated sparse routines, but still has a lot of zeros. In that case, you are going to be writing 0 all the time in your final result and scratch buffers. This optimization will reduce the writeback traffic in that case.
 
 If you are making a ton of redundant writes, the first thing you might want to do is look for a way to stop doing that. Beyond that, we can list some ways you _might_ be able to take advantage of this new behavior:
 
@@ -290,6 +298,7 @@ If you are making a ton of redundant writes, the first thing you might want to d
  - In case you might have redundant zero-over-zero writes, pay a bit more attention to 64-byte alignment than you normally would because this optimization only kicks in when a full cache line is zero. So if you have some 64-byte structures that might often be all zero (but with non-zero neighbors), a forced 64-byte alignment will be useful since it would activate the optimization more frequently.
  - Probably the most practical advice of all: just keep this effect in mind because it can mess up your benchmarks and make you distrust performance counters. I found this when I noticed that the scalar version of a benchmark was writing 2x as much memory as the AVX version, despite them doing the same thing other than the choice of registers. As it happens, the dummy value in vector register I was storing was zero, while in the scalar case it wasn't: so there was a large difference that had nothing to do with scalar vs vector, but non-zero vs zero instead. Prefer non-zero values in store microbenchmarks, unless you really expect them to be zero in real life!
   - Keep an eye for a more general version of this optimization: maybe one day we'll see this effect apply to redundant writes that aren't zero-over-zero.
+  - Floating point has two zero values: +0 and -0. The representation of +0 is all-bits-zero, so using +0 gives you the chance of getting this optimization. Of course, everyone is already using +0 whenever they explicitly want zero.
 
 Of course, the fact that this seems to currently only apply on Skylake client hardware makes specifically targeting this quite dubious indeed.
 
@@ -306,6 +315,8 @@ Thanks to Tarlinian, 不良大脑的所有者, Bruce Dawson and Zach Wegner who 
 Leave a comment below, or discuss on [Twitter](https://twitter.com/trav_downs/status/1260620313483771905), [Hacker News](https://news.ycombinator.com/item?id=23169605), [reddit](https://www.reddit.com/r/asm/comments/gj3xq7/hardware_store_elimination/) or [RWT](https://www.realworldtech.com/forum/?threadid=191798&curpostid=191798).
 
 Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
+
+[^escaping]: By _escaping_ I mean that a store that visibly gets to the cache level where this optimization happens. For example, if I write a 1 immediately followed by a 0, the 1 will never make it out of the L1 cache, so from the point of view of the L2 and beyond only a zero was written. I expect the optimization to still trigger in this case.
 
 [^g2ga]: It was the first full day of general availability for Graviton, so perhaps these hosts are very lightly used at the moment because it certainly felt like I had the whole thing to myself.
 
