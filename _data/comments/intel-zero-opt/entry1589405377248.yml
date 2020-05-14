@@ -1,0 +1,8 @@
+_id: d887d100-9560-11ea-8885-c1a370f2dc6c
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: "Re: footnote 8: indeed, `std::fill(0)` vs. `std::fill(1)` with compile-time constant values can make very different code: https://stackoverflow.com/q/42558907/224132\r\n\r\nstd::fill(0) gets inlined a REP MOVSB on some GCC versions, but GCC doesn't do memset pattern recognition for patterns wider than 1 byte and can only auto-vectorize fill(1) the normal way.  (Like for a runtime-variable value)."
+name: Peter Cordes
+email: e4bb9b28531695f2f4574c5080f9cd61
+hp: ''
+date: 1589405377
