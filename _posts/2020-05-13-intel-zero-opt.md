@@ -124,9 +124,9 @@ At each region size (that is, at each position along the x-axis) 17 semi-transpa
 
 Not surprisingly, the performance depends heavily on what level of cache the filled region fits into.
 
-Everything is fairly sane when the buffer fits in the L1 or L2 cache (up to ~256 KiB[^l2]). The relatively poor performance for very small region sizes is explained by the prologue and epilogue of the vectorized implementation: for small sizes a relatively large amount of of time is spent in these int-at-a-time loops: rather than copying up to 32 bytes per cycle, we copy only 4.
+Everything is fairly sane when the buffer fits in the L1 or L2 cache (up to ~256 KiB[^l2]). The relatively poor performance for very small region sizes is explained by the prologue and epilogue of the vectorized implementation: for small sizes a relatively large amount of time is spent in these int-at-a-time loops: rather than copying up to 32 bytes per cycle, we copy only 4.
 
-This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That's because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to to do than the former[^badvec]. Essentially, we are sampling semi-randomly a sawtooth function and if you plot this region with finer granularity (go for it or just [click here]({{page.assets}}/sawtooth.svg)[^melty]) you can see it quite clearly.
+This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That's because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former[^badvec]. Essentially, we are sampling semi-randomly a sawtooth function and if you plot this region with finer granularity (go for it or just [click here]({{page.assets}}/sawtooth.svg)[^melty]) you can see it quite clearly.
 
 
 #### Getting Weird in the L3
@@ -308,7 +308,7 @@ Thanks to Daniel Lemire who provided access to the hardware used in the [Hardwar
 
 Thanks Alex Blewitt and Zach Wegner who pointed out the CSS tab technique (I used the one linked in the [comments of this post](https://twitter.com/zwegner/status/1223701307078402048)) and others who replied to [this tweet](https://twitter.com/trav_downs/status/1223690150175236102) about image carousels.
 
-Thanks to Tarlinian, 不良大脑的所有者, Bruce Dawson and Zach Wegner who pointed out typos or omissions in the text.
+Thanks to Tarlinian, 不良大脑的所有者, Bruce Dawson, Zach Wegner and Andrey Penechko who pointed out typos or omissions in the text.
 
 ### Discussion and Feedback
 
@@ -322,7 +322,7 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 [^calloc]: This phenomenon is why `calloc` is sometimes considerably faster than `malloc + memset`. With `calloc` the zeroing happens within the allocator, and the allocator can track whether the memory it is about to return is _known zero_ (usually because it the block is fresh from the OS, which always zeros memory before handing it out to userspace), and in the case of `calloc` it can avoid the zeroing entirely (so `calloc` runs as fast as `malloc` in that case). The client code calling `malloc` doesn't receive this information and can't make the same optimization. If you stretch the analogy almost to the breaking point, one can see what Intel is doing here as "similar, but in hardware".
 
-[^params]: I tried a bunch of other stuff that I didn't write up in detail. Many of them affect the behavior: we still see the optimization but with different levels of effectiveness. For example, with L2 prefetching off, only about 40% of the L2 evictions are eliminated (versus > 60% with prefetch on), and the performance difference between is close to zero despite the large number of eliminations. I tried other sizes of writes, and with narrow writes the effect is reduced until it is eliminated at 4-byte writes. I don't think the write size _directly_ affects the optimization, but rather narrower writes slows down the maximum possible performance which interacts in some way with the hardware mechanisms that support this to reduce of often it occurs (a similar observation could apply to prefetching).
+[^params]: I tried a bunch of other stuff that I didn't write up in detail. Many of them affect the behavior: we still see the optimization but with different levels of effectiveness. For example, with L2 prefetching off, only about 40% of the L2 evictions are eliminated (versus > 60% with prefetch on), and the performance difference between is close to zero despite the large number of eliminations. I tried other sizes of writes, and with narrow writes the effect is reduced until it is eliminated at 4-byte writes. I don't think the write size _directly_ affects the optimization, but rather narrower writes slow down the maximum possible performance which interacts in some way with the hardware mechanisms that support this to reduce how often it occurs (a similar observation could apply to prefetching).
 
 [^clangv]: Admittedly I didn't go line-by-line though the long vectorized version produced by clang but the line count is identical and if you squint so the assembly is just a big green and yellow blur they look the same...
 
