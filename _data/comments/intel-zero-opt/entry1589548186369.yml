@@ -1,0 +1,22 @@
+_id: 59652190-96ad-11ea-aacc-b1346604130d
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  Having a 512-wide arithmetic op--even just a wide OR--lying around in the
+  cache hierarchy outside of a processor seems rather peculiar to me. There also
+  aren't any arithmetic instruction ports used on a vector store (per Agner
+  Fog's tables), which raises the question of where the "is zero" bit is being
+  calculated. To speculate and conjecture wildly for a moment... I think the
+  most natural place for an "is zero" bit to come from is use of the (renamed)
+  zero register in either the integer or vector register file. In other words,
+  there's a little heuristic piece of hardware in the store port that detects if
+  you've just covered a cacheline with writes from the zero register, and sets
+  an "is zero" bit on the last write if so. My prediction, then, is that if you
+  "trick" a register into being zero, rather than performing operations that may
+  have it renamed to the zero register, you'll see the effect go away. One way I
+  can think of to do this would be to add three static vectors that you know in
+  advance sum to all zeros.
+name: Doug Miller
+email: 69860cd1b1a1185d383961952185abb6
+hp: ''
+date: 1589548186
