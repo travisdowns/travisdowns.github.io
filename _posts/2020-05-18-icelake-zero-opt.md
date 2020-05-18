@@ -296,7 +296,7 @@ Let's zoom in:
 <center><strong>Figure 11</strong></center>
 {% include svg-fig.html file="fig11" raw="icl/256-512-l2-l3.csv" alt="Figure 11" %}
 
-The 256-bit benchmarks start roughly tied with their 512 bit cousins, but then steadily pull away as the region approaches the full size of the L2. By the end of the L2 region, they have nearly a ~13% edge. This applies to _both_ `fill256` versions -- the zeros-writing and ones-writing flavors. So this effect doesn't seem explicable by store elimination: we already know ones are eliminated, and elimination only starts to play an obvious role when the region is L3-sized.
+The 256-bit benchmarks start roughly tied with their 512 bit cousins, but then steadily pull away as the region approaches the full size of the L2. By the end of the L2 region, they have nearly a ~13% edge. This applies to _both_ `fill256` versions -- the zeros-writing and ones-writing flavors. So this effect doesn't seem explicable by store elimination: we already know ones are not eliminated and, also, elimination only starts to play an obvious role when the region is L3-sized.
 
 In the L3, the situation changes: now the 256-bit version really pulls ahead, _but only the version that writes zeros_. The 256-bit and 512-bit one-fill versions fall down in throughput, nearly to the same level (but the 256-bit version still seems _slightly but measurably ahead_ at ~2% faster). The 256-bit zero fill version is now ahead by roughly 45%!
 
