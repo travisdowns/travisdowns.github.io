@@ -25,7 +25,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           {% capture csf__file %}{{include.file}}-{{suffix}}{% endcapture %}
           {% capture csf__raw %}{{rawnames[forloop.index0]}}{% endcapture %}
           {% include svg-fig.html file=csf__file raw=csf__raw alt="Figure 4" nolink="1" %}
-          <!-- <img src="{{stem}}-{{suffix}}.svg" alt="{{ include.alt | default: 'Figure' }}"> -->
         </div>
       </div> 
     </div>

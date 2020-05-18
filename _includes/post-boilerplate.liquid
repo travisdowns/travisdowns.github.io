@@ -3,7 +3,7 @@ here we add all the per-post liquid boilerplate
 {% endcomment %}
 
 {% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}
-{% capture tablepath %}{{ page.slug | prepend: "/misc/tables/" | relative_url }}{% endcapture %}
+{% capture tablepath %}{{ page.tables | default: page.slug | prepend: "/misc/tables/" | relative_url }}{% endcapture %}
 
 <!-- boilerplate 
 page.assets: {{page.assets}}
