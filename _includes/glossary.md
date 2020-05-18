@@ -41,6 +41,8 @@
 *[SKX]: Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W
 *[SNC]: Intel's Sunny Cove architecture, aka 10th Generation Intel Core i3,i5,i7
 
+*[Sunny Cove]: The new 7nm microarchitecture used in Ice Lake CPUs.
+
 *[PRF]: Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.
 *[LSD]: Lysergic acid diethylamide or Loop stream detector, but in the context of this blog probably the latter: The so-called loop buffer that can cache small loops of up to ~64 uops on recent Intel architectures. Not actually a separate structure: the hardware justs locks the loop down in the IDQ.
 *[IDQ]: Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).
@@ -51,7 +53,10 @@
 *[RAT]: Register alias table: a table which maps an architectural register identifier to a physical register.
 *[FIVR]: Fully Integrated Voltage Regulator
 
-*[immediate]: When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.
-*[uarch]: Microarchitecture: a specific implementation of an ISA, e.g., "Haswell microarchitecture". 
-*[SIMD]: Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.
+
 *[CAS]: Compare-and-swap: an atomic operation implemented on x86 and other CPUs
+*[immediate]: When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.
+*[MRU]: Most recently used - an eviction strategy suitable for data with little temporal locality
+*[LRU]: Least recently used - an eviction strategy suitable for data with temporal locality
+*[SIMD]: Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.
+*[uarch]: Microarchitecture: a specific implementation of an ISA, e.g., "Haswell microarchitecture".
