@@ -335,7 +335,7 @@ Ice Lake photo by [Marcus Löfvenberg](https://unsplash.com/@marcuslofvenberg) o
 
 ## Discussion and Feedback
 
-If you have something to say, leave a comment below or discuss on [Hacker News](https://news.ycombinator.com/item?id=23225260).
+If you have something to say, leave a comment below. There are also discussions on [Twitter](https://twitter.com/trav_downs/status/1262428350511022081) and [Hacker News](https://news.ycombinator.com/item?id=23225260).
 
 Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
 
