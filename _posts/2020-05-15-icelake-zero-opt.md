@@ -5,24 +5,26 @@ category: blog
 tags: [Intel, x86, uarch, icelake]
 assets: /assets/intel-zero-opt
 tables: /intel-zero-opt
-image: /assets/intel-zero-opt/twitter-card.png
+image: /assets/intel-zero-opt/twitter-card-post2.png
 results: https://github.com/travisdowns/zero-fill-bench/tree/master/results
 twitter:
   card: summary_large_image
 comments: true
 ---
 
-TODO: update twitter-card
-
 {% include post-boilerplate.liquid %}
 
-## Ice Lake Commeth
+## Introduction
 
 If you made it down to the [hardware survey]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}#hardware-survey) on the last post, you might have [wondered](https://twitter.com/tarlinian/status/1260629853000265728) where Intel's newest mainstream architecture was. _Ice Lake was missing!_
 
 Well good news: it's here... and it's interesting. We'll jump right into the same analysis we did last time for Skylake client. If you haven't read the [first article]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}) you'll probably want to star there, because we'll refer to concepts introduced there without reexplaining them here.
 
-## Charts Charts Charts
+As usual, you can skip to the [summary](#summary) for the bite sized version of the findings.
+
+## ICL Results
+
+### The Compiler Has an Opinion
 
 Let's first take a look at the overall performance: facing off `fill0` vs `fill1` as we've been doing for every microarchitecture. Remember, `fill0` fills a region with zeros, while `fill1` fills a region with the value one (as a 4-byte `int`).
 

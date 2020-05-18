@@ -38,7 +38,7 @@ Now, there are some notable exceptions:
  - BMI2 instructions `pdep` and `pext` have [famously terrible](https://twitter.com/uops_info/status/1202950247900684290) and data-dependent performance on AMD Zen and Zen2 chips.
  - Floating point instructions often have slower performance when [denormal numbers](https://en.wikipedia.org/wiki/Denormal_number#Performance_issues) are encountered, although some rounding modes such as _flush to zero_ may avoid this.
 
-That list is not exhaustive: there are other cases of data-dependent performance, especially when you start digging into complex microcoded instructions such as [`cpuid`](https://www.felixcloutier.com/x86/cpuid). Still, it isn't unreasonable to assume that most simple instructions not listed above execute in constant time. 
+That list is not exhaustive: there are other cases of data-dependent performance, especially when you start digging into complex microcoded instructions such as [`cpuid`](https://www.felixcloutier.com/x86/cpuid). Still, it isn't unreasonable to assume that most simple instructions not listed above execute in constant time.
 
 How about memory operations, such as loads and stores?
 
@@ -258,7 +258,7 @@ Some observations on these results:
  - The POWER9 performance is neither terrible nor great. The most interesting part is probably the high L3 fill throughput: L3 throughput is as high or higher than L1 or L2 throughput, but still not in Zen2 territory.
  - Amazon's new Graviton processor is very interesting. It seems to be limited to one 16-byte store per cycle[^armcompile], giving it a peak possible store throughput of 40 GB/s, so it doesn't do well in the L1 region versus competitors that can hit 100 GB/s or more (they have both higher frequency and 32 byte stores), but it sustains the 40 GB/s all the way to RAM sizes, with a RAM result flat enough to serve drinks on, and this on a shared 64-CPU host where I paid for only a single core[^g2ga]! The RAM performance is the highest out of all hardware tested.
 
-[^armcompile]: The Graviton 2 uses the Cortex A76 uarch, which can _execute_ 2 stores per cycle, but the L1 cache write ports limits sustained execution to only one 128-bit store per cycle. 
+[^armcompile]: The Graviton 2 uses the Cortex A76 uarch, which can _execute_ 2 stores per cycle, but the L1 cache write ports limits sustained execution to only one 128-bit store per cycle.
 
 <a id="summary-perma"></a>
 
@@ -326,7 +326,7 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 [^clangv]: Admittedly I didn't go line-by-line though the long vectorized version produced by clang but the line count is identical and if you squint so the assembly is just a big green and yellow blur they look the same...
 
-[^bpurp]: For benchmarking purposes, we wrap this in another function (TODO: link code) so we can slap a `noinline` attribute on this function to ensure that we have a single non-inlined version to call for different values. If we just called `std::fill` with a literal `int` value, it highly likely to get inlined at the call site and we'd have code with different alignment (and possibly other differences) for each value.
+[^bpurp]: For benchmarking purposes, we wrap this in [another function](https://github.com/travisdowns/zero-fill-bench/blob/post1/algos.cpp#L28) so we can slap a `noinline` attribute on this function to ensure that we have a single non-inlined version to call for different values. If we just called `std::fill` with a literal `int` value, it highly likely to get inlined at the call site and we'd have code with different alignment (and possibly other differences) for each value.
 
 [^story]: Like many posts on this blog, what follows is essentially a _reconstruction_. I encountered the effect originally in a benchmark, as described, and then worked backwards from there to understand the underlying effect. Then, I wrote this post the other way around: building up a new benchmark to display the effect ... but at that point I already knew what we'd find. So please don't think I just started writing the benchmark you find on GitHub and then ran into this issue coincidentally: the arrow of causality points the other way.
 
@@ -342,7 +342,7 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 [^atall]: Is it deployed anywhere at all on x86? Ping me if you know.
 
-[^otherc]: It's hard to say which is faster if they are compiled as written: x86 has indexed addressing modes that make the indexing more or less free, at least for arrays of element size 1, 2, 4 or 8, so the usual arguments againt indexed access mostly don't apply. Probably, it doesn't matter: this detail might have made a big difference 20 years ago, but it is unlikely to make a difference on a decent compiler today, which can transform one into the other, depending on the target hardware. 
+[^otherc]: It's hard to say which is faster if they are compiled as written: x86 has indexed addressing modes that make the indexing more or less free, at least for arrays of element size 1, 2, 4 or 8, so the usual arguments againt indexed access mostly don't apply. Probably, it doesn't matter: this detail might have made a big difference 20 years ago, but it is unlikely to make a difference on a decent compiler today, which can transform one into the other, depending on the target hardware.
 
 [^l2]: The ~ is there in ~256 KiB because unless you use huge pages, you might start to see L2 misses even before 256 KiB since only a 256 KiB _virtually contiguous_ buffer is not necessarily well behaved in terms of evictions: it depends how those 4k pages are mapped to physical pages. As soon as you get too many 4k pages mapping to the same group of sets, you'll see evictions even before 256 KiB.
 
