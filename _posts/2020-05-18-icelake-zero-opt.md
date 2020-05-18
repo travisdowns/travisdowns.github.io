@@ -18,7 +18,7 @@ comments: true
 
 If you made it down to the [hardware survey]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}#hardware-survey) on the last post, you might have [wondered](https://twitter.com/tarlinian/status/1260629853000265728) where Intel's newest mainstream architecture was. _Ice Lake was missing!_
 
-Well good news: it's here... and it's interesting. We'll jump right into the same analysis we did last time for Skylake client. If you haven't read the [first article]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}) you'll probably want to star there, because we'll refer to concepts introduced there without reexplaining them here.
+Well good news: it's here... and it's interesting. We'll jump right into the same analysis we did last time for Skylake client. If you haven't read the [first article]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}) you'll probably want to start there, because we'll refer to concepts introduced there without reexplaining them here.
 
 As usual, you can skip to the [summary](#summary) for the bite sized version of the findings.
 
