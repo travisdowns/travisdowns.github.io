@@ -331,7 +331,7 @@ For fine-grained advice, see the [list in the previous post]({{ site.baseurl }}{
 
 ## Thanks
 
-Vijay for pointing out a typo.
+Vijay and Zach Wegner for pointing out typos.
 
 Ice Lake photo by [Marcus Löfvenberg](https://unsplash.com/@marcuslofvenberg) on Unsplash.
 
@@ -355,7 +355,7 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 [^stricly]: Strictly speaking, a silent writeback is a _sufficient_, but not a _necessary_ condition for elimination, so it is a lower bound on the number of eliminated stores. For all I know, 100% of stores are eliminated, but out of those 4% are written back not-silently (but not in a modified state).
 
-[^altwrites]: One reason could be that writing only alternating lines is somewhat more expensive than writing half the data but contiguously. Of course this is obviously true closer to the core, since you touch half the number of the pages in the contiguous case, need half the number of page walks, prefetching is more effective since you cross half as many 4K boundaries (prefetch stores at 4K boundaries) and so on. Even at the memory interface, alternating line writes might be less efficient because you get less benefit from opening each DRAM page, can't do longer than 64-byte bursts, etc. In a pathological case, alternating lines could be _half_ the bandwidth if the controller maps alternating lines to alternating channels, since you'll only be accessing a single channel. We could try to isolate this effect by trying more coarse grained interleaving.
+[^altwrites]: One reason could be that writing only alternating lines is somewhat more expensive than writing half the data but contiguously. Of course this is obviously true closer to the core, since you touch half the number of the pages in the contiguous case, need half the number of page walks, prefetching is more effective since you cross half as many 4K boundaries (prefetch stops at 4K boundaries) and so on. Even at the memory interface, alternating line writes might be less efficient because you get less benefit from opening each DRAM page, can't do longer than 64-byte bursts, etc. In a pathological case, alternating lines could be _half_ the bandwidth if the controller maps alternating lines to alternating channels, since you'll only be accessing a single channel. We could try to isolate this effect by trying more coarse grained interleaving.
 
 [^l1port]: Most likely, the L1 has a single 64 byte wide write port, like SKX, and the commit logic at the head of the store buffer can look ahead one store to see if it is in the same line in order to dequeue two stores in a single cycle. Without this feature, you could _execute_ two stores per cycle, but only commit one, so the long-run store throughput would be limited to one per cycle.
 
