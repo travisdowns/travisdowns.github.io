@@ -258,6 +258,8 @@ Some observations on these results:
  - The POWER9 performance is neither terrible nor great. The most interesting part is probably the high L3 fill throughput: L3 throughput is as high or higher than L1 or L2 throughput, but still not in Zen2 territory.
  - Amazon's new Graviton processor is very interesting. It seems to be limited to one 16-byte store per cycle[^armcompile], giving it a peak possible store throughput of 40 GB/s, so it doesn't do well in the L1 region versus competitors that can hit 100 GB/s or more (they have both higher frequency and 32 byte stores), but it sustains the 40 GB/s all the way to RAM sizes, with a RAM result flat enough to serve drinks on, and this on a shared 64-CPU host where I paid for only a single core[^g2ga]! The RAM performance is the highest out of all hardware tested.
 
+Intel's newest microarchitecture is missing from this list, because there's a [whole separate post]({{ site.baseurl }}{% post_url 2020-05-18-icelake-zero-opt %}) on it.
+
 [^armcompile]: The Graviton 2 uses the Cortex A76 uarch, which can _execute_ 2 stores per cycle, but the L1 cache write ports limits sustained execution to only one 128-bit store per cycle.
 
 <a id="summary-perma"></a>
@@ -300,7 +302,7 @@ If you are making a ton of redundant writes, the first thing you might want to d
   - Keep an eye for a more general version of this optimization: maybe one day we'll see this effect apply to redundant writes that aren't zero-over-zero.
   - Floating point has two zero values: +0 and -0. The representation of +0 is all-bits-zero, so using +0 gives you the chance of getting this optimization. Of course, everyone is already using +0 whenever they explicitly want zero.
 
-Of course, the fact that this seems to currently only apply on Skylake client hardware makes specifically targeting this quite dubious indeed.
+Of course, the fact that this seems to currently only apply on Skylake and [Ice Lake]({{ site.baseurl }}{% post_url 2020-01-20-zero %}) client hardware makes specifically targeting this quite dubious indeed.
 
 ### Thanks
 

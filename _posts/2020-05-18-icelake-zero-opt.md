@@ -260,7 +260,7 @@ This chart also includes results for the `alt01` benchmark. Recall that this ben
 
 The asymptotic speedup for the all zero case for the RAM region is less than the L3 region, at about 23% but that's still not exactly something to sneeze at. The speedup for the alternating case is 10%, somewhat less than half the benefit of the all zero case[^altwrites]. In the L3 region, we also note that the benefit of elimination for `alt01` is only about 7%, much smaller than the ~20% benefit you'd expect if you cut the 40% benefit the all-zeros case sees. We saw a similar effect in Skylake-S.
 
-Finally it's worth noting that this little uptick in uncore writes in the `fill0` case:
+Finally it's worth noting this little uptick in uncore writes in the `fill0` case:
 
 ![Little Uptick]({{assetpath}}/little-uptick.png)
 
@@ -330,6 +330,8 @@ Unless you are developing only for your own laptop, as of May 2020 Ice Lake is d
 For fine-grained advice, see the [list in the previous post]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}#tuning-advice).
 
 ## Thanks
+
+Vijay for pointing out a typo.
 
 Ice Lake photo by [Marcus Löfvenberg](https://unsplash.com/@marcuslofvenberg) on Unsplash.
 
