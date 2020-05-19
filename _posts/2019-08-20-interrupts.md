@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Where do interrupts happen?"
+title: Where Do Interrupts Happen?
 category: blog
 tags: [performance, benchmarking]
 assets: /assets/interrupts

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "What has your microcode done for you lately?"
+title:  What Has Your Microcode Done for You Lately?
 date:   2019-03-19 12:00:00 -300
 category: blog
 tags: [intel, memory, performance]
@@ -8,7 +8,7 @@ assets: /assets/2019-03-19
 ---
 
 
-## Microcode Mystery 
+## Microcode Mystery
 
 Did you ever wonder what is *inside* those microcode updates that get silently applied to your CPU via Windows update, BIOS upgrades, and various microcode packages on Linux?
 
@@ -16,7 +16,7 @@ Well, you are in the wrong place, because this blog post won't answer that quest
 
 In fact, the overwhelming majority of this this post is about the performance of scattered writes, and not very much at all about the details of CPU microcode. Where the microcode comes in, and what might make this more interesting than usual, is that performance on a purely CPU-bound benchmark can vary dramatically _depending on microcode version_. In particular, we will show that the most recent Intel microcode version can significantly slow down a store heavy workload when some stores hit in the L1 data cache, and some miss.
 
-My results are intended to be reproducible and the benchmarking and data collection code is available as described [at the bottom](#the-source). 
+My results are intended to be reproducible and the benchmarking and data collection code is available as described [at the bottom](#the-source).
 
 ## A series of random writes
 
@@ -27,7 +27,7 @@ If we use larger regions, we expect performance to slow down as many of the writ
 | Region Size | Cycles/Write | Typical Read Latency |
 |-|
 | L1 | 1 | 5 |
-| L2 | 3 | 12 | 
+| L2 | 3 | 12 |
 | L3 | 5-6 | ~35 |
 | RAM | 15-20 | ~200 |
 
@@ -77,7 +77,7 @@ With some help from user Adrian on the [RWT forums](https://www.realworldtech.co
 
 ![Interleaved vs Single Stores (New Microcode)]({{page.assets}}/skl/i-vs-s-new.svg)
 
-The behavior of interleaved for small regions (left hand side of chart) is drastically different - the throughput is less than half of the old microcode. It is not obvious just by visual comparison it, but performance is actually reduced across the range of tested sizes for the interleaved case, albeit by only a few cycles as the region size becomes large. I tested various microcode versions and found that only the most recent SKL microcode, revision `0xc6` and released in August 2018 exhibits the "always slow" behavior shown above. The preceding version `0xc2` usually results in the fast behavior. 
+The behavior of interleaved for small regions (left hand side of chart) is drastically different - the throughput is less than half of the old microcode. It is not obvious just by visual comparison it, but performance is actually reduced across the range of tested sizes for the interleaved case, albeit by only a few cycles as the region size becomes large. I tested various microcode versions and found that only the most recent SKL microcode, revision `0xc6` and released in August 2018 exhibits the "always slow" behavior shown above. The preceding version `0xc2` usually results in the fast behavior.
 
 What's up with that?
 
@@ -97,7 +97,7 @@ Despite the large difference in performance, there is very little to no differen
 
 So despite the much slower performance, for L1-sized second regions, the difference doesn't obviously originate in different cache hit behavior. Indeed, with the new microcode, performance goes _down_ as the L1 hit rate goes _up_.
 
-So it seems that the likeliest explanation is that _the presence of an L1 hit in the store buffer prevents overlapping of miss handling for stores on either side_, at least with the new microcode, on SKL hardware. That is, a series of consecutive stores can be handled in parallel only if none of them is an L1 hit. In this way L1 store hits somehow act as a store fence with the new microcode. The performance is in line with each store going alone to the memory hierarchy: roughly the L2 latency plus a few cycles. 
+So it seems that the likeliest explanation is that _the presence of an L1 hit in the store buffer prevents overlapping of miss handling for stores on either side_, at least with the new microcode, on SKL hardware. That is, a series of consecutive stores can be handled in parallel only if none of them is an L1 hit. In this way L1 store hits somehow act as a store fence with the new microcode. The performance is in line with each store going alone to the memory hierarchy: roughly the L2 latency plus a few cycles.
 
 ### Will the real sfence please stand up
 
@@ -208,7 +208,7 @@ The simplest solution is to simply avoid the newest microcode updates. These upd
 
 This strategy is not feasible once the microcode update contains something you need.
 
-Additionally, as noted above, even the old microcodes _sometimes_ experience the same slower performance that new microcodes always exhibit. I cannot exactly characterize the conditions in which this occurs, but one should at least be aware that old microcodes aren't _always_ fast. 
+Additionally, as noted above, even the old microcodes _sometimes_ experience the same slower performance that new microcodes always exhibit. I cannot exactly characterize the conditions in which this occurs, but one should at least be aware that old microcodes aren't _always_ fast.
 
 ## Other findings
 
@@ -223,7 +223,7 @@ This post is already longer than I wanted it to be. The idea is for posts closer
 
 ### Other platforms
 
-An obvious and immediate question is what happens on other micro-architectures, beyond my Skylake client core. 
+An obvious and immediate question is what happens on other micro-architectures, beyond my Skylake client core.
 
 On Haswell, the behavior is _always slow_. That is, whether with old or new microcode, store misses mixed with L1 store hits were much slower than expected. So if you target Haswell or (perhaps) Broadwell era hardware, you might want to keep this in mind regardless of microcode version.
 
@@ -264,7 +264,7 @@ I don't have a comment system, but I'll reply to stuff posted in the [Hacker New
 
 [^7]: See your microcode version on Linux using `cat /proc/cpuinfo | grep -m1 micro` or `dmesg | grep micro`. The latter option also helps you determine if the microcode was updated during boot by the Linux microcode driver.
 
-[^9]: I used the weasel word "contributes" here rather than "ultimately results in an L1 miss" to cover the case where two stores occur to the same line in short succession and that line is not in L1. In this case, both stores will miss, but there will generally only be one reference to L2 since the fill buffers operate on whole cache lines, so both stores will be satisfied by the same miss. The same effect occurs for loads and can be measured explicitly by the `mem_load_retired.fb_hit` event: those are loads that missed in L1, but subsequently hit the _fill buffer_ (aka miss status handling register) allocated for an earlier access to the same cache line that also missed. 
+[^9]: I used the weasel word "contributes" here rather than "ultimately results in an L1 miss" to cover the case where two stores occur to the same line in short succession and that line is not in L1. In this case, both stores will miss, but there will generally only be one reference to L2 since the fill buffers operate on whole cache lines, so both stores will be satisfied by the same miss. The same effect occurs for loads and can be measured explicitly by the `mem_load_retired.fb_hit` event: those are loads that missed in L1, but subsequently hit the _fill buffer_ (aka miss status handling register) allocated for an earlier access to the same cache line that also missed.
 
 [^sfence-note]: Actually, this doesn't seem to be strictly true. The results on some CPUs are too good to represent zero overlapping between stores. E.g., the [old microcode results]({{page.assets}}/skl/i-sfence-old.svg)) show the sfenceB results staying under 30 cycles even for main-memory sized regions (and quite close to the no sfence results), which is only possible with a lot of store overlapping. So something remains to be discovered about sfence behavior.
 
@@ -276,7 +276,7 @@ I don't have a comment system, but I'll reply to stuff posted in the [Hacker New
 
 [^patent-note]: This patent is interesting not least because the title is "Apparatus and method for store address for store address prefetch **and line locking**", but as far as I can tell the latter part about "line locking" is never mentioned again in the body of the patent. One might imagine that line locking involves something like delaying or nacking incoming snoops for a line that is about to be written.
 
-[^wc-note]: It is an open question whether normal writes which miss in L1 simply wait in the store buffer until the RFO request is complete, or whether they instead get stashed in a write combining buffer associated with the cache line, potentially collecting several store misses to the same line. The latter sounds more efficient but any combining of stores out of order with respect to the store buffer is problematic: committing multiple such WC buffers when the line is available in L1 could change the apparent order of stores unless all WC buffers are committed as a unit or some other approach is taken. 
+[^wc-note]: It is an open question whether normal writes which miss in L1 simply wait in the store buffer until the RFO request is complete, or whether they instead get stashed in a write combining buffer associated with the cache line, potentially collecting several store misses to the same line. The latter sounds more efficient but any combining of stores out of order with respect to the store buffer is problematic: committing multiple such WC buffers when the line is available in L1 could change the apparent order of stores unless all WC buffers are committed as a unit or some other approach is taken.
 
 [^wc-stores]: I am not 100% sure this is the mechanism, versus an alternative of say stalling the store buffer with the missing store at the head, until the fill buffer returns, but we have evidence both in wording from the Intel manuals, and [this answer on StackOverflow](https://stackoverflow.com/a/53438221). The main argument in favor of this implementation would be performance: it prevents the store buffer from stalling, allowing more stores to commit or start additional requests to memory and keeping the store buffer smaller to avoid stalling the front-end. The main argument against is that it seems hard to maintain ordering in this scenario: if a stream of stores is coalesced into more than one fill buffer, the relative order between the stores is lost, and it is not in general possible to commit the store buffers to L1 "one at a time" while preserving the original store order, you'd basically have to commit all the fill buffers at once (atomically wrt the outside world), or put limits on what stores can be coalesced.
 

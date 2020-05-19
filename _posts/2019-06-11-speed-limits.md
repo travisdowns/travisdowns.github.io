@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Performance speed limits"
+title: Performance Speed Limits
 category: blog
 tags: [performance, benchmarking]
 assets: /assets/speed-limits

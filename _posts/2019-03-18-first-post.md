@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "A blog appears!"
+title:  A Blog Appears!
 date:   2019-03-18 12:00:00 -300
 categories: blog
 ---

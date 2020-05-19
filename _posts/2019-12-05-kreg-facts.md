@@ -1,6 +1,6 @@
 ---
 layout: post
-title: A note on mask registers
+title: A Note on Mask Registers
 category: blog
 date: 2019-12-05 11:30:00 -500
 tags: [performance, c++, Intel, uarch]
@@ -29,7 +29,7 @@ So mask registers[^kreg] are important, but are not household names unlike say g
 
 In particular, I don't think the size of the mask register physical register file (PRF) has ever been reported. Let's fix that today.
 
-We use an updated version of the ROB size [probing tool](https://github.com/travisdowns/robsize) originally authored and [described by Henry Wong](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/)[^hcite] (hereafter simply _Henry_), who used it to probe the size of various documented and undocumented out-of-order structures on earlier architecture. If you haven't already read that post, stop now and do it. This post will be here when you get back. 
+We use an updated version of the ROB size [probing tool](https://github.com/travisdowns/robsize) originally authored and [described by Henry Wong](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/)[^hcite] (hereafter simply _Henry_), who used it to probe the size of various documented and undocumented out-of-order structures on earlier architecture. If you haven't already read that post, stop now and do it. This post will be here when you get back.
 
 You've already read Henry's blog for a full description (right?), but for the naughty among you here's the fast food version:
 
@@ -114,7 +114,7 @@ kaddd  k1,k2,k3
 add    ebx,ebx
 kaddd  k1,k2,k3
 mov    rdx,QWORD PTR [rdx]
-lfence 
+lfence
 ~~~
 
 Here's the chart:
@@ -144,7 +144,7 @@ kaddd  k1,k2,k3
 vxorps ymm4,ymm4,ymm5
 kaddd  k1,k2,k3
 mov    rdx,QWORD PTR [rdx]
-lfence 
+lfence
 ~~~
 
 Here's the corresponding chart:
@@ -290,7 +290,7 @@ This is the final result shown in the output above, and it runs much more quickl
 <span style="background: green;">         kreg-GP roundtrip + mov from GP      2.00      0.63</span>
 </pre>
 
-So our experiment seems to check out. 
+So our experiment seems to check out.
 
 ### Reproduction
 
@@ -308,7 +308,7 @@ You can reproduce these results yourself with the [robsize](https://github.com/t
 Discussion on [Hacker News](https://news.ycombinator.com/item?id=21714390), Reddit ([r/asm](https://www.reddit.com/r/asm/comments/e6kokb/x86_avx512_a_note_on_mask_registers/) and [r/programming](https://www.reddit.com/r/programming/comments/e6ko7i/a_note_on_mask_registers_avx512/)) or [Twitter](https://twitter.com/trav_downs/status/1202637229606264833).
 
 Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a GitHub issue](https://github.com/travisdowns/travisdowns.github.io/issues).
- 
+
 ### Thanks
 
 [Daniel Lemire](https://lemire.me) who provided access to the AVX-512 system I used for testing.

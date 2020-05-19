@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Incrementing vectors"
+title: Incrementing Vectors
 category: blog
 tags: [performance, c++]
 assets: /assets/vector-inc
