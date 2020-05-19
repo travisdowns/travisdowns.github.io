@@ -55,19 +55,14 @@ Those two have a couple of key differences. The first is this weird thing that *
   top: 0;
   left: 0;
 }
-
-.svg-center-xfrm * {
-  transform-box: fill-box;
-  transform-origin: center;
-}
 </style>
 
 <div class="img-overlay-wrap">
   <img class="figimg" src="{{assetpath}}/fig7a.svg" alt="Figure 7a Annotated">
   <svg viewBox="0 0 90 60">
-    <g class="svg-center-xfrm" stroke-width=".5" fill="none" opacity="0.5">
-      <ellipse transform="rotate(-25)" cx="34" cy="10" rx="12" ry="5" stroke="green" />
-      <ellipse transform="rotate(-25)" cx="34" cy="34.5" rx="12" ry="5" stroke="red" />
+    <g stroke-width=".5" fill="none" opacity="0.5">
+      <ellipse transform="rotate(-25 34 10)" cx="34" cy="10" rx="12" ry="5" stroke="green" />
+      <ellipse transform="rotate(-25 34 34.5)" cx="34" cy="34.5" rx="12" ry="5" stroke="red" />
     </g>
   </svg>
 </div>
@@ -77,8 +72,8 @@ The second thing is that while both of the plots show _some_ of the zero optimiz
 <div class="img-overlay-wrap">
   <img class="figimg" src="{{assetpath}}/fig7b.svg" alt="Figure 7a Annotated">
   <svg viewBox="0 0 90 60">
-    <g class="svg-center-xfrm" stroke-width=".5" fill="none" opacity="0.5">
-      <ellipse transform="rotate(0)" cx="63" cy="40" rx="10" ry="8" stroke="blue" />
+    <g stroke-width=".5" fill="none" opacity="0.5">
+      <ellipse cx="63" cy="40" rx="10" ry="8" stroke="blue" />
     </g>
   </svg>
 </div>
