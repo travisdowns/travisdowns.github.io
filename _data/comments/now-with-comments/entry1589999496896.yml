@@ -1,0 +1,8 @@
+_id: 23772910-9ac8-11ea-ad6f-bbbf8e601ec3
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 71a23160-92cc-11ea-a621-c7ebe04983ba
+message: "Sorry, I can’t really help you debug this issue much.\r\n\r\nIt may be a problem with your styles. You can see that it works in my case. You could try to triangulate what's different between my setup and yours, or reduce the example to the bare minimum and add stuff back in until it stops working.\r\n\r\nI wrote this post about staticman because it was harder than I thought and it might help others, but I can't really help you debug your individual issues."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1589999496
