@@ -1,0 +1,8 @@
+_id: 8b2e53e0-9ac7-11ea-ad6f-bbbf8e601ec3
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ca319090-99f3-11ea-9972-5f2aa4dbc829
+message: "Sorry, I can't help you debug it.\r\n\r\nIn general, staticman is a \"batteries not included\" solution that will probably, at some point require some basic debugging on your part. Familiarity with html and javascript (including node.js) is a plus. If you run into a specific, reproducible issue you could consider [filing an issue](https://github.com/eduardoboucas/staticman/issues/) on the staticman repo, although as a free project you can expect that the current maintainers may not always have the time or energy to look into specific issues."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1589999241
