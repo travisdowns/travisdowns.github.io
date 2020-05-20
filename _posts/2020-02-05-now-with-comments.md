@@ -315,6 +315,7 @@ Another [list of steps](https://gist.github.com/jannispaul/3787603317fc9bbb96e99
 
 Michael Rose, the author of minimal mistakes Jekyll theme [describes setting up nested staticman comments](https://mademistakes.com/articles/improving-jekyll-static-comments/) -- I cribbed some stuff from here such as the submitting spinner.
 
+Willy McAllister subsequently wrote a [great guide](https://spinningnumbers.org/a/staticman-heroku.html) to setting up Staticman, similar in nature to this one but with some additional sections such as _troubleshooting_ and setting up reply notifications via MailGun. If that one was around when I started out, I wouldn't have felt the need to write this one.
 
 ---
 <br>
