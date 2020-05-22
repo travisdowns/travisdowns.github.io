@@ -330,6 +330,8 @@ Vijay and Zach Wegner for pointing out typos.
 
 Ice Lake photo by [Marcus Löfvenberg](https://unsplash.com/@marcuslofvenberg) on Unsplash.
 
+Saagar Jha for helping me track down and fix a WebKit rendering [issue](https://github.com/travisdowns/travisdowns.github.io/issues/102).
+
 ## Discussion and Feedback
 
 If you have something to say, leave a comment below. There are also discussions on [Twitter](https://twitter.com/trav_downs/status/1262428350511022081) and [Hacker News](https://news.ycombinator.com/item?id=23225260).
