@@ -8,7 +8,6 @@ image: /assets/intel-zero-opt/twitter-card.png
 results: https://github.com/travisdowns/zero-fill-bench/tree/master/results
 twitter:
   card: summary_large_image
-comments: true
 ---
 
 {% include post-boilerplate.liquid %}

@@ -7,7 +7,6 @@ assets: /assets/now-with-comments
 image: /assets/now-with-comments/twitter-card.png
 twitter:
   card: summary
-comments: true
 ---
 
 {% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}
