@@ -1,0 +1,11 @@
+_id: 9f32bba0-9c8f-11ea-bcc4-0d6f4fedc904
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 673bab10-9c28-11ea-91cb-2bc366514c9a
+message: >-
+  Must be related to the css classes that the javascript applies. Make sure you
+  have all the classes referred to in [this section of
+  code](https://github.com/travisdowns/travisdowns.github.io/blob/master/assets/main.js#L42).
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1590195125
