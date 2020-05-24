@@ -1,0 +1,8 @@
+_id: 816d0dc0-9e0e-11ea-944e-b706636399d8
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Great post and tutorial on getting Staticman up and running via Heroku. Took some time, but I was able to get comments up and running on one of my Jekyll sites hosted on Netlify.\r\n\r\nThe only place I had a problem was getting Heroku to accept my RSA Private Key via the command line. I'm a Heroku noob and, because the suntax in your post was different for the variable on the RSA key than for the `${braidge_app_name}` and `${github_token}`, it took me quite awhile to figure out I needed to run `cat ~/.ssh/staticman_key | tr -d '\\n'` in my command line and use the output in the Heroku command.\r\n\r\nEverything else was pretty much a breeze. Thanks again for a super post!"
+name: David
+email: d0ca2e179cb50a6d367c26e8b9168f21
+hp: ''
+date: 1590359572
