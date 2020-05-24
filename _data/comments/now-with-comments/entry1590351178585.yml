@@ -1,0 +1,14 @@
+_id: f618d9b0-9dfa-11ea-a7b4-f3f2f05e3cab
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 673bab10-9c28-11ea-91cb-2bc366514c9a
+message: >-
+  Hi Travis, I really appreciate your help. The problem is related the Bootstrap
+  modal. When the modal container has a fixed or relative position or is within
+  an element with a fixed or relative position, the modal window appears
+  underneath the grey fade and is noneditable. I fixed this problem by replacing
+  the showModal function call with Sweetalert2. Thanks again for your awesome
+  post!
+name: Qi
+email: ''
+hp: ''
+date: 1590351178
