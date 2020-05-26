@@ -37,6 +37,7 @@
 *[HSW]: Intel's Haswell architecture, aka 4th Generation Intel Core i3,i5,i7
 *[BDW]: Intel's Broadwell architecture, aka 5th Generation Intel Core i3,i5,i7
 *[SKL]: Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7
+*[KBL]: Intel's Kaby Lake client CPU architecture (7th, 8th gen): substantially identical to Skylake
 *[CNL]: Intel's Cannon Lake (client) architecture, the i3-8121U was the only SKU ever released
 *[SKX]: Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W
 *[SNC]: Intel's Sunny Cove architecture, aka 10th Generation Intel Core i3,i5,i7
