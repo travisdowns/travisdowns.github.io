@@ -153,6 +153,9 @@ Here's the corresponding chart:
 
 The behavior is basically identical to the prior test, so we conclude that there is no direct sharing between the mask register and SIMD PRFs either.
 
+This turned out not to be the end of the story. The mask registers _are_ shared, just not with the general purpose or SSE/AVX register file. For all the details, see this [follow up post]({{ site.baseurl }}{% post_url 2020-05-26-kreg2 %}).
+{: .warning}
+
 #### An Unresolved Puzzle
 
 Something we notice in both of the above tests, however, is that the spike seems to finish around 212 filler instructions. However, the ROB size for this microarchtiecture is 224. Is this just _non ideal behavior_ as we saw earlier? Well we can test this by comparing against Test 4, which just uses `nop` instructions as the filler: these shouldn't consume almost any resources beyond ROB entries. Here's Test 4 (`nop` filer) versus Test 29 (alternating `kaddd` and scalar `add`):
@@ -194,6 +197,7 @@ Furthermore, the idiom is _dependency breaking:_ although `xor reg1, reg2` in ge
 That background out of the way, a curious person might wonder if the `kxor` [variants](https://www.felixcloutier.com/x86/kxorw:kxorb:kxorq:kxord) are treated the same way. Is `kxorb k1, k1, k1`[^notall] treated as a zeroing idiom?
 
 This is actually two separate questions, since there are two aspects to zeroing idioms:
+
  - Zero latency execution with no execution unit (elimination)
  - Dependency breaking
 
@@ -302,6 +306,10 @@ You can reproduce these results yourself with the [robsize](https://github.com/t
  - This is large enough compared to the other PRF size and the ROB to make it unlikely to be a bottleneck
  - Mask registers are not eligible for move elimination
  - Zeroing idioms[^tech] in mask registers are not recognized for execution elimination or dependency breaking
+
+### Part II
+
+I didn't expect it to happen, but it did: there is a [follow up post]({{ site.baseurl }}{% post_url 2020-05-26-kreg2 %}) about mask registers, where we (roughly) confirm the register file size by looking at an image of a SKX CPU captured via microcope, and make an interesting discovery regarding sharing.
 
 ### Comments
 
