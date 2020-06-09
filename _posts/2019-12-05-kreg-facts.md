@@ -9,7 +9,7 @@ assetsmin: /assets/kreg/min
 image:  /assets/kreg/specialk.jpg
 twitter:
   card: summary_large_image
-description: A look into some low level hardware details of the mask registers introduced in AVX-512
+excerpt: Some mostly too-low-level-to-care-about hardware details of the mask registers introduced in AVX-512.
 ---
 
 If you are in a rush, you can [skip to the summary](#summary), but you'll miss out on the journey.

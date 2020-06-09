@@ -7,6 +7,7 @@ assets: /assets/interrupts
 image:  /assets/interrupts/Intel_8259.png
 twitter:
   card: summary
+excerpt: Trying to determine exactly where asynchronous interrupts are delivered on Intel CPUs.
 ---
 
 <style>

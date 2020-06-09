@@ -9,6 +9,7 @@ image: /assets/intel-zero-opt/twitter-card-post2.png
 results: https://github.com/travisdowns/zero-fill-bench/tree/master/results
 twitter:
   card: summary_large_image
+excerpt: We look at the zero store optimization as it applies to Intel's newest micro-architecture.
 ---
 
 {% include post-boilerplate.liquid %}

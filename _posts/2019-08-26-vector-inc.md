@@ -7,6 +7,7 @@ assets: /assets/vector-inc
 image:  /assets/vector-inc/cpp_logo.png
 twitter:
   card: summary
+excerpt: Incrementing <code>vector&lt;T&gt;</code> for various <code>T</code> may not perform as you'd expect.
 ---
 
 

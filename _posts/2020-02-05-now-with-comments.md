@@ -7,6 +7,7 @@ assets: /assets/now-with-comments
 image: /assets/now-with-comments/twitter-card.png
 twitter:
   card: summary
+excerpt: Adding static comments to a static blog using staticman. Static.
 ---
 
 {% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}

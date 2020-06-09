@@ -8,6 +8,7 @@ image: /assets/intel-zero-opt/twitter-card.png
 results: https://github.com/travisdowns/zero-fill-bench/tree/master/results
 twitter:
   card: summary_large_image
+excerpt: Probing a previously undocumented zero-related optimization on Intel CPUs.
 ---
 
 {% include post-boilerplate.liquid %}

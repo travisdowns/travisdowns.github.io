@@ -5,8 +5,8 @@ date:   2019-03-19 12:00:00 -300
 category: blog
 tags: [intel, memory, performance]
 assets: /assets/2019-03-19
+excerpt: CPU microcode updates can cause silent and dramatic performance changes.
 ---
-
 
 ## Microcode Mystery
 

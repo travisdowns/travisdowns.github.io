@@ -7,6 +7,7 @@ assets: /assets/speed-limits
 image:  /assets/speed-limits/speed-limit-50-ns.png
 twitter:
   card: summary
+excerpt: A laundry list of speed limits that your code can't exceed.
 ---
 
 ## How fast can it go?

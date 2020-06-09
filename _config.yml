@@ -17,6 +17,7 @@ baseurl: # the subpath of your site, e.g. /blog
 url: "https://travisdowns.github.io"
 permalink: /:categories/:year/:month/:day/:title:output_ext
 google_analytics: UA-136594956-1
+show_excerpts: true
 
 # me info
 email: &email travis.downs@gmail.com
@@ -32,7 +33,7 @@ github_username:  travisdowns
 twitter:
   username: trav_downs
 
-# Build settings
+# global settings
 markdown: kramdown
 theme: minima
 plugins:
