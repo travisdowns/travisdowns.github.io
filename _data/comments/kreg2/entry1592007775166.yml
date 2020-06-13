@@ -1,0 +1,8 @@
+_id: 068b80c0-ad0c-11ea-8b39-8b8c985f0a72
+_parent: 'https://travisdowns.github.io/blog/2020/05/26/kreg2.html'
+replying_to_uid: c13b12a0-acdf-11ea-beab-bfa7389242c5
+message: "What is \"this\"? The comment system on this blog? It is described [over here](https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html).\r\n\r\nIf you want to automatically approve comments, that's possible: it's just a setting in staticman. I have the approval enabled as a form of moderation, but since I've gotten almost zero spam comments, I think maybe I could take that out and maybe let the comments be posted immediately."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1592007775
