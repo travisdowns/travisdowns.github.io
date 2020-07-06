@@ -4,7 +4,7 @@ title: A Concurrency Cost Hierarchy
 category: blog
 tags: [performance, c++, concurrency]
 assets: /assets/concurrency-costs
-image:  /assets/concurrency-costs/avatar.png
+image:  /assets/concurrency-costs/avatar.jpg
 results: https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results
 twitter:
   card: summary_large_image
