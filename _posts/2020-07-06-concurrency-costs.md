@@ -38,7 +38,7 @@ The source for every benchmark here is [available](https://github.com/travisdown
 
 All of the performance results are provided for several different hardware platforms: Intel Skylake, Ice Lake, Amazon Graviton and Graviton 2. However except when I explicitly mention other hardware, the prose refers to the results on Skylake. Although the specific numbers vary, most of the qualitative relationships hold for the hardware hardware too, but _not always_. Not only does the hardware vary, but the OS and library implementations will vary as well.
 
-It's almost inevitable that this will be used to compare across hardware ("wow, Graviton 2 sure kicks Graviton 1's ass"), but that's not my goal here. The benchamrks are written primarily to tease apart the characteristics of the different levels, and _not_ as a hardware shootout.
+It's almost inevitable that this will be used to compare across hardware ("wow, Graviton 2 sure kicks Graviton 1's ass"), but that's not my goal here. The benchmarks are written primarily to tease apart the characteristics of the different levels, and _not_ as a hardware shootout.
 
 Find below the details of the hardware used:
 
