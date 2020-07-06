@@ -24,7 +24,7 @@ If that first paragraph got your hopes up, this second one is here to dash them:
 
 Instead, I'm going to describe a higher level taxonomy that I use to think about concurrent performance. We'll group the performance of concurrent operations into six broad _levels_ running from fast to slow, with each level differing from its neighbors by roughly an order of magnitude in performance.
 
-I often mind myself thinking in terms of these categories when I need high performance concurrency: what is the best level I can practically achieve for the given problem? Keeping the levels in mind is useful both during initial design (sometimes a small change in requirements or high level design can allow you to achieve a better level), and also while evaluating existing systems (to better understand existing performance and evaluate the path of least resistance to improvements).
+I often find myself thinking in terms of these categories when I need high performance concurrency: what is the best level I can practically achieve for the given problem? Keeping the levels in mind is useful both during initial design (sometimes a small change in requirements or high level design can allow you to achieve a better level), and also while evaluating existing systems (to better understand existing performance and evaluate the path of least resistance to improvements).
 
 ### A "Real World" Example
 
@@ -78,7 +78,7 @@ We'll call this implementation _mutex add_, and on my 4 CPU Skylake-S i7-6700HQ 
 
 {% include carousel-svg-fig-2.html file="mutex" suffixes=uarches names=unames raw=uresults alt="Mutex" %}
 
-The reported value is the median of all trials, and the vertical black error lines at the top of each bar indicate the _interdecile range_, i.e. the values at the 10th and 90th percentile. Where the error bars don't show up, it means there no difference between the p10 and p90 values at all, at least within the limits of the reporting resolution (100 picoseconds).
+The reported value is the median of all trials, and the vertical black error lines at the top of each bar indicate the _interdecile range_, i.e., the values at the 10th and 90th percentile. Where the error bars don't show up, it means there is no difference between the p10 and p90 values at all, at least within the limits of the reporting resolution (100 picoseconds).
 {: .info}
 
 This shows that the baseline contended cost to modify an integer protected by a lock starts at about 125 nanoseconds for two threads, and grows somewhat with increasing thread count.
@@ -133,7 +133,7 @@ Can it get slower? You bet it can. _Way_ slower.
 
 The next level up ("up" is not good here...) is level 3. The key characteristic of implementations at this level is that they make a _system call on almost every operation_.
 
-It is easy to write concurrency primitives that make a system call _unconditionally_ (e.g,. a lock which always tries to wake waiters via a `futex(2)` call, even if there aren't any), but we won't look at those here. Rather we'll take a look at a case where the fast path is written to avoid a system call, but the design or way it is used implies that such a call usually happens anyway.
+It is easy to write concurrency primitives that make a system call _unconditionally_ (e.g., a lock which always tries to wake waiters via a `futex(2)` call, even if there aren't any), but we won't look at those here. Rather we'll take a look at a case where the fast path is written to avoid a system call, but the design or way it is used implies that such a call usually happens anyway.
 
 Specifically, we are going to look at some _fair locks_. Fair locks allow threads into the critical section in the same order they began waiting. That is, when the critical section becomes available, the thread that has been waiting the longest is given the chance to take it.
 
@@ -180,7 +180,7 @@ This is level 3 visualized: it is an order of magnitude slower than the level 2 
 
 This lock _does_ have a fast path where `sched_yield` isn't called: if the lock is available, no spinning occurs and `sched_yield` is never called. However, the combination of being a _fair_ lock and the high contention in this test means that a lock convoy quickly forms (we'll describe this in more detail later) and so the spin loop is entered basically every time `lock()` is called.
 
-So have we _now_ fully plumbed the depths of slow concurrency constructs? Not in close. We are only now just about to cross the River Styx.
+So have we _now_ fully plumbed the depths of slow concurrency constructs? Not even close. We are only now just about to cross the River Styx.
 
 #### Revisiting std::mutex
 
@@ -200,7 +200,7 @@ As the experts recommend whenever one suggests _yielding_ in a spin loop, let us
 
 **Blocking Locks**\\
 \\
-A more resource friendly design, and one that will often perform better is a _blocking_ lock.<br/><br/>Rather than busy waiting, these locks ask the OS to put the current thread to sleep until the lock becomes available. On Linux, the [`futex(3)`](http://man7.org/linux/man-pages/man2/futex.2.html) system call is the preferred way to accomplish this, while on Windows you have the [`WaitFor*Object`](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject) API family. Above the OS interfaces, things like C++'s `std::condition_varibale` provide a general purpose mechanism to wait until an arbitrary condition is true.
+A more resource friendly design, and one that will often perform better is a _blocking_ lock.<br/><br/>Rather than busy waiting, these locks ask the OS to put the current thread to sleep until the lock becomes available. On Linux, the [`futex(3)`](http://man7.org/linux/man-pages/man2/futex.2.html) system call is the preferred way to accomplish this, while on Windows you have the [`WaitFor*Object`](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject) API family. Above the OS interfaces, things like C++'s `std::condition_variable` provide a general purpose mechanism to wait until an arbitrary condition is true.
 {: .info}
 
 Our first blocking lock is again a ticket-based design, except this time it uses a condition variable to block when it detects that it isn't first in line to be served (i.e., that the lock was held by another thread). We'll name it ticket blocking and it looks like this:
@@ -253,13 +253,13 @@ You're probably seeing the pattern now: performance is again a new level of terr
 
 **Lock Convoy**\\
 \\
-Unlike unfair locks, fair locks result can result in sustained convoys involving only a single lock, once the contention reaches a certain point[^hyst].\\
+Unlike unfair locks, fair locks can result in sustained convoys involving only a single lock, once the contention reaches a certain point[^hyst].\\
 \\
 Consider what happens when two threads, `A` and `B`, try to acquire the lock repeatedly. Let's say `A` gets ticket 1 and `B` ticket 2. So `A` gets to go first and `B` has to wait, and for these implementations that means blocking (we can say the thread is _parked_ by the OS). Now, `A` unlocks the lock and sees `B` waiting and wakes it. `A` is still running and soon tries to get the lock again, receiving ticket 3, but it cannot acquire the lock immediately because the lock is _fair_: `A` can't jump the queue and acquire the lock with ticket 3 before `B`, holding ticket 2, gets its chance to enter the lock.\\
 \\
 Of course, `B` is going to be a while: it needs to be woken by the scheduler and this takes a microsecond or two, at least. Now `B` wakes and gets the lock, and the same scenario repeats itself with the roles reversed. The upshot is that there is a full context switch for each acquisition of the lock.\\
 \\
-Unfair locks avoid this problem because they all queue jumping: in the scenario above, `A` (or any other thread) could re-acquire the lock after unlocked it, before `B` got its chance. So the use of the shared resource doesn't grind to a halt while `B` wakes up.
+Unfair locks avoid this problem because they all queue jumping: in the scenario above, `A` (or any other thread) could re-acquire the lock after unlocking it, before `B` got its chance. So the use of the shared resource doesn't grind to a halt while `B` wakes up.
 {: .info}
 
 So, are you tired of seeing mostly-white plots where the newly introduced algorithm relegates the rest of the pack to little chunks of color near the x-axis, yet?
@@ -268,7 +268,7 @@ I've just got one more left on the slow end of the scale. Unlike the other examp
 
 ### Level 5: Catastrophe
 
-Here's a ticket lock which is identical to the [first ticket lock we saw](#ys-lock), except that the `sched_yield();` is replaced by `;`. That is, it busy waits instead of yielding (look [here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31) for the spin flavors which specialize on a shared ticket lock template). You could also replace this by an CPU-specific "relax" instruction like [`pause`](https://www.felixcloutier.com/x86/pause), but it won't change the outcome (see [here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26)). We call it ticket spin, and here's how it performs compared to the existing candidates:
+Here's a ticket lock which is identical to the [first ticket lock we saw](#ys-lock), except that the `sched_yield();` is replaced by `;`. That is, it busy waits instead of yielding (look [here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31) for the spin flavors which specialize on a shared ticket lock template). You could also replace this by a CPU-specific "relax" instruction like [`pause`](https://www.felixcloutier.com/x86/pause), but it won't change the outcome (see [here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26)). We call it ticket spin, and here's how it performs compared to the existing candidates:
 
 *[ticket spin]: A traditional spin-based ticket lock that does a hot spin while waiting for its ticket to be next.
 
@@ -301,7 +301,7 @@ If I was good at diagrams, there would be a diagram here.
 
 Another way of thinking about this is that in this over-subscription scenario, the ticket spin lock implies roughly the same number of context switches as the blocking ticket lock[^perf], but in the former case each context switch comes with a giant delay caused by the need to exhaust the timeslice, while in the blocking case we are only limited by how fast a context switch can occur.
 
-Interestingly, although this benchmark uses 100% CPU on every core, the performance of the benchmark in the oversubscribed case doesn't almost depend on your CPU speed! Performance is approximately the same if I throttle my CPU to 1 GHz, or enable turbo up to 3.5 GHz. All of other implementations scale almost proportionally with CPU frequency. The benchmark does scale strongly with adjustment to `sched_latency_ns` (and `sched_min_granularity_ns` if the former is set low enough): lower scheduling latency values gives proportionally better performance as the time slices shrink, helping to confirm our theory of how this works.
+Interestingly, although this benchmark uses 100% CPU on every core, the performance of the benchmark in the oversubscribed case almost doesn't depend on your CPU speed! Performance is approximately the same if I throttle my CPU to 1 GHz, or enable turbo up to 3.5 GHz. All of other implementations scale almost proportionally with CPU frequency. The benchmark does scale strongly with adjustment to `sched_latency_ns` (and `sched_min_granularity_ns` if the former is set low enough): lower scheduling latency values gives proportionally better performance as the time slices shrink, helping to confirm our theory of how this works.
 
 This behavior also explains the large amount of variance once the available cores are oversubscribed: by definition, not all threads will be running at once, so the test becomes very sensitive to exactly where the not-running threads took their context switch. At the beginning of the test, only 4 of 6 threads will be running, and the two will switched out, still waiting on the the [barrier](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/master/cyclic-barrier.hpp) that synchronizes the test start. Since the two switched out thread haven't tried to get the lock yet, the four running threads will be able to quickly share the lock between themselves, since the six-thread convoy hasn't been set up.
 
@@ -313,7 +313,7 @@ We can probably invent something even worse, but that's enough for now. Let's mo
 
 Recall that we started at level 2: contended atomics. The name gives it away: the next faster level is when atomic operations are used but there is no contention, either by design or by luck. You might have noticed that so far we've only shown results for at least two threads. That's because the single threaded case involves no contention, and so every implementation so far is level 1 if run on a single thread[^notexx].
 
-Here's the results for all the implementations we've looked at so far, for a single thread:
+Here are the results for all the implementations we've looked at so far, for a single thread:
 
 {% include carousel-svg-fig-2.html file="single" alt="Increment Cost: Single Threaded"
 suffixes=uarches names=unames raw=uresults %}
@@ -341,7 +341,7 @@ The last row in the table shows the performance of mutex3, an implementation we 
 
 So the idea that you can almost ignore things that are in a lower cost tier seems to hold here. Don't take this too far: if you design a lock with a single atomic operation but 1,000 other instructions, it is not going to be fast. There are also reasons to keep your instruction count low other than microbenchmark performance: smaller instruction cache footprint, less space occupied in various out-of-order execution buffers, more favorable inlining tradeoffs, etc.
 
-Here it is important to note that the change in level of our various functions didn't require a change in implementation. These are exactly the same few implementations we discussed in the slower levels. Instead, we simply changed (by fiat, i.e., adjusting the benchmark parameters) the contention level from "very high" to "zero". So in this case the  level doesn't depend only on the code, but also this external factor. Of course, just saying that we are going to get to level 1 by only running one thread is not very useful in real like: we often can't simply ban multi-threaded operation.
+Here it is important to note that the change in level of our various functions didn't require a change in implementation. These are exactly the same few implementations we discussed in the slower levels. Instead, we simply changed (by fiat, i.e., adjusting the benchmark parameters) the contention level from "very high" to "zero". So in this case the  level doesn't depend only on the code, but also this external factor. Of course, just saying that we are going to get to level 1 by only running one thread is not very useful in real life: we often can't simply ban multi-threaded operation.
 
 So can we get to level 1 even under concurrent calls from multiple threads? For this particular problem, we can.
 
@@ -416,9 +416,9 @@ This improvement in increment performance comes at a cost, however:
 
 Some of these downsides can be partly mitigated:
 
-- A much smaller number of counters would probably better for most all practical uses. We could also set the array size dynamically based on the detected number of logical CPUs since a larger array should not provide much of a performance increase. Better yet, we might make the size even more dynamic, based on contention: start with a single element and grow it only when contention is detected. This means that even on systems with many CPUs, the size will remain small if contention is never seen in practice. This has a runtime cost[^rtcost], however.
+- A much smaller number of counters would probably be better for most practical uses. We could also set the array size dynamically based on the detected number of logical CPUs since a larger array should not provide much of a performance increase. Better yet, we might make the size even more dynamic, based on contention: start with a single element and grow it only when contention is detected. This means that even on systems with many CPUs, the size will remain small if contention is never seen in practice. This has a runtime cost[^rtcost], however.
 - We could optimize the `read()` method by stopping when we see a zero counter. I believe a careful analysis shows that the non-zero counter values for any instance of this class are all in a contiguous region starting from the beginning of the counter array[^subtle].
-- We could mitigate some of the code footprint by carefully carving the less hot"[^lesshot] slow path out into a another function, and use our [magic powers](https://xania.org/201209/forcing-code-out-of-line-in-gcc) to encourage the small fast path (the first CAS) to be inlined while the fallback remains not inlined.
+- We could mitigate some of the code footprint by carefully carving the "less hot"[^lesshot] slow path out into a another function, and use our [magic powers](https://xania.org/201209/forcing-code-out-of-line-in-gcc) to encourage the small fast path (the first CAS) to be inlined while the fallback remains not inlined.
 - We could make the thread-local `idx` per instance specific to solve the "shared `idx` across all instances" problem. This does require some non-negligible amount of work to implement a dynamic TLS system which can create as many thread local keys as you want[^dynamictls], and it is slower.
 
 So while we got a good looking chart, this solution doesn't exactly dominate the simpler ones. You pay a price along several axes for the lack of contention and you shouldn't blindly replace the simpler solutions with this one -- it needs to be a carefully considered and use-case dependent decision.
@@ -529,8 +529,8 @@ As we saw at the last 1, this improvement in performance doesn't come for free:
 
 - The total code size is considerably larger than the per-CPU approach, although most of it is related to creation of the initial object on each thread, and not on the hot path.
 - We have one object per thread, instead of per CPU. For an application with many threads using the counter, this may mean the creation of many individual counters which use both more memory[^tlsmem] and result in a slower `read()` function.
-- This implementation only supports _one_ counter: the key methods in `tls_counter` are static. This boils down to the need for a `thread_local` object for the physical counter, which must be static by the rules of C++. A template parameter could be added to allow multiple counters based on dummy types used as tags, but this is still more awkward to use than instances of a class (and some platforms [have limits](https://docs.microsoft.com/en-us/windows/win32/procthread/thread-local-storage) on the number of `thead_local` variables). This limitation could be removed in the same way as discussed earlier for the cas multi `idx` variable, but at a cost in performance and complexity.
-- A lock was introduced to protect the array of all counters. Although the important increment operation is still lock-free, things like the `read()` call, the first counter access on a given thread and thread destruction all complete for the same lock. This could be eased with a read-write lock or a concurrent data structure, but at a cost as always.
+- This implementation only supports _one_ counter: the key methods in `tls_counter` are static. This boils down to the need for a `thread_local` object for the physical counter, which must be static by the rules of C++. A template parameter could be added to allow multiple counters based on dummy types used as tags, but this is still more awkward to use than instances of a class (and some platforms [have limits](https://docs.microsoft.com/en-us/windows/win32/procthread/thread-local-storage) on the number of `thread_local` variables). This limitation could be removed in the same way as discussed earlier for the cas multi `idx` variable, but at a cost in performance and complexity.
+- A lock was introduced to protect the array of all counters. Although the important increment operation is still lock-free, things like the `read()` call, the first counter access on a given thread and thread destruction all compete for the same lock. This could be eased with a read-write lock or a concurrent data structure, but at a cost as always.
 
 ## The Table
 
@@ -555,9 +555,9 @@ Let's summarize all the levels in this table.
 
 The _~Cost_ column is a _very_ approximate estimate of the cost of each "occurrence" of the expensive operation associated with the level. It should be taken as a very rough ballpark for current Intel and AMD hardware, but especially the later levels can vary a lot.
 
-The _Perf Event_ column lists a Linux `perf` even that you can use to count the number of times the operation associated with this level occurs, i.e., the thing that is slow. For example, in level 1, you count atomic operations using the `mem_inst_retired.lock_loads` counter, and if you get three counts per high level operation, you can expect roughly 3 x 10 ns = 30 ns cost. Of course, you don't necessarily need perf in this case: you can inspect the assembly too.
+The _Perf Event_ column lists a Linux `perf` event that you can use to count the number of times the operation associated with this level occurs, i.e., the thing that is slow. For example, in level 1, you count atomic operations using the `mem_inst_retired.lock_loads` counter, and if you get three counts per high level operation, you can expect roughly 3 x 10 ns = 30 ns cost. Of course, you don't necessarily need perf in this case: you can inspect the assembly too.
 
-The _Local_ column records whether the behavior of this level is _core local_. If yes, it means that operations on different cores complete independently and don't compete and so the performance scales with the number of cores. If not, there is contention or serialization, so the throughput of the entire system is often limited, regardless of how many cores are involved. For example, only one core at time perform an atomic operation on a cache line, so the throughput of the whole system is fixed and the throughput per core decreases as more cores become involved.
+The _Local_ column records whether the behavior of this level is _core local_. If yes, it means that operations on different cores complete independently and don't compete and so the performance scales with the number of cores. If not, there is contention or serialization, so the throughput of the entire system is often limited, regardless of how many cores are involved. For example, only one core at time performs an atomic operation on a cache line, so the throughput of the whole system is fixed and the throughput per core decreases as more cores become involved.
 
 The _Key Characteristic_ tries to get across the idea of the level in one bit-sized chunk.
 
@@ -588,7 +588,7 @@ Here's a quick look at some usual and unusual ways of achieving levels lower on 
 
 #### Level 4
 
-You probably don't want to really be in level 4 but it's certainly better than level 5. So, if you still have your job and your users haven't all abandoned you, it's usually pretty easy to get out of level 5. More than half the battle is just recognizing what's going on and from there the solution is often clear. Many times, you've simply violated some rule lie "don't use pure spinlocks in userspace" or "you built a spinlock by accident" or "so-and-so accidentally held that core lock during IO". There's never almost never any inherent reason you'd need to stay in level 5 and you can usually find an almost tradeoff-free fix.
+You probably don't want to really be in level 4 but it's certainly better than level 5. So, if you still have your job and your users haven't all abandoned you, it's usually pretty easy to get out of level 5. More than half the battle is just recognizing what's going on and from there the solution is often clear. Many times, you've simply violated some rule like "don't use pure spinlocks in userspace" or "you built a spinlock by accident" or "so-and-so accidentally held that core lock during IO". There's never almost never any inherent reason you'd need to stay in level 5 and you can usually find an almost tradeoff-free fix.
 
 A better approach than targeting level 4 is just to skip to level 2, since that's usually not too difficult.
 
@@ -633,11 +633,10 @@ It is not always easy or possible to remove the last atomic access from your fas
 - The general approach of using thread local storage, as discussed above, can also be extended to structures more complicated than counters.
 - Many lock-free structures offer atomic-free _read_ paths, notably concurrent containers in garbage collected languages, such as `ConcurrentHashMap` in Java. Languages without garbage collection have fewer straightforward options, mostly because safe memory reclamation is a [hard problem](http://concurrencyfreaks.blogspot.com/2017/08/why-is-memory-reclamation-so-important.html), but there are still [some](http://concurrencykit.org/) [good](https://software.intel.com/content/www/us/en/develop/documentation/tbb-documentation/top/intel-threading-building-blocks-developer-guide/containers.html) [options](https://github.com/facebook/folly/tree/master/folly/concurrency) out there.
 - I find that [RCU](https://liburcu.org/) is especially powerful and fairly general if you are using a garbage collected language, or can satisfy the requirements for an efficient reclamation method in a non-GC language.
-- The [seqlock](https://en.wikipedia.org/wiki/Seqlock)[^despite] is an under-rated and little known alternative to RCU without reclaim problems, although not as general. Concurrencykit has [an implementation](http://concurrencykit.org/doc/ck_sequence.html). It has an atomic-free read path for readers. Unfortunately, seqlocks don't integrate cleanly with either the Java[^stampedlock] or [C++](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1478r1.html) memory models.
+- The [seqlock](https://en.wikipedia.org/wiki/Seqlock)[^despite] is an underrated and little known alternative to RCU without reclaim problems, although not as general. Concurrencykit has [an implementation](http://concurrencykit.org/doc/ck_sequence.html). It has an atomic-free read path for readers. Unfortunately, seqlocks don't integrate cleanly with either the Java[^stampedlock] or [C++](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1478r1.html) memory models.
 - It is also possible in some cases to do a per-CPU rather than a per-thread approach using only vanilla instructions, although the possibility of interruption at any point makes this tricky. [Restartable sequences (rseq)](https://www.efficios.com/blog/2019/02/08/linux-restartable-sequences/) can help, and there are other tricks lurking out there.
 - This is the last point, but it should be the first: you can probably often redesign your algorithm or application to avoid sharing data in the first place, or to share much less. For example, rather than constantly updating a shared collection with intermediate results, do as much private computation as possible before only merging the final results.
 
-[^despite]: Despite the current claim in wikipedia that seqlocks are somehow a Linux-specific construct involving the kernel, they work great in userspace only and are not tied to Linux.
 
 ### Summary
 
@@ -649,11 +648,13 @@ Thanks to [Paul Khuong](https://pvk.ca/) who showed me something that made me re
 
 Thanks to [@never_released](https://twitter.com/never_released) for help on a problem I had bringing up an EC2 bare-metal instance (tip: just wait).
 
+[matt_dz](https://twitter.com/matt_dz) for _thirty three_ typo fixes.
+
 Traffic light photo by <a href="https://unsplash.com/@harshaldesai">Harshal Desai</a> on <a href="https://unsplash.com/s/photos/traffic-light">Unsplash</a>.
 
 ### Discussion and Feedback
 
-You can leave a [comment below](#comment-section) or discuss on [Hacker News](https://news.ycombinator.com/item?id=23749172).
+You can leave a [comment below](#comment-section) or discuss on [Hacker News](https://news.ycombinator.com/item?id=23749172), [r/programming](https://www.reddit.com/r/programming/comments/hma5y1/a_concurrency_cost_hierarchy/) or [r/cpp](https://www.reddit.com/r/cpp/comments/hmaocb/a_concurrency_cost_hierarchy/).
 
 {% include other-posts.md %}
 
@@ -677,15 +678,15 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 
 [^dynamictls]: A sketch of an implementation would be to use something like a single static `thread_local` pointer to an array or map, which maps an ID contained in the dynamic TLS key to the object data. Lookup speed is important, which favors an array, but you also need to be able to remove elements, which can favor some type of hash map. All of this is probably at least twice as slow as a plain `thread_local` access ... or just use [folly](https://github.com/facebook/folly/blob/master/folly/docs/ThreadLocal.md) or [boost](https://www.boost.org/doc/libs/1_73_0/doc/html/thread/thread_local_storage.html).
 
-[^lesshot]: I'm not sure if "less hold" means `__attribute__((cold))` necessarily, that might be _too_ cold. We mostly just want to separate the first-cas-succeeds case and the rest of the logic so we don't may the code size impact except when the fallback path is taken.
+[^lesshot]: I'm not sure if "less hot" means `__attribute__((cold))` necessarily, that might be _too_ cold. We mostly just want to separate the first-cas-succeeds case and the rest of the logic so we don't pay the dynamic code size impact except when the fallback path is taken.
 
 [^subtle]: The intuition is later counter positions only get written when an earlier position failed a compare and swap, which necessarily implies it was written to by some other thread and hence non-zero. There is some subtlety here: this wouldn't hold if `compare_exchange_weak` was used instead of `compare_exchange_strong`, and it more obviously wouldn't apply if we allowed decrements or wanted to change the "probe" strategy.
 
-[^rtcost]: At least, an extra indirection to access the array which is no longer embedded in in the object[^soa], and checks to ensure the array is large enough. Furthermore, we have another decision to make: when to expand the array. How much contention should we suffer before we decide the array is too small?
+[^rtcost]: At least, an extra indirection to access the array which is no longer embedded in the object[^soa], and checks to ensure the array is large enough. Furthermore, we have another decision to make: when to expand the array. How much contention should we suffer before we decide the array is too small?
 
 [^soa]: Of course, we could go even _one step further_ and embed a small array of 1 or 2 elements in the counter object, in the hope that this is enough and only use a dynamically allocated array and suffer the additional indirection if we observe contention.
 
-[^sharedidx]: In particular, if contention is seen on one object, the per-thread index will change to avoid it, which changes the index all other objects as well, even if they have not seen any contention. This doesn't seem like much of a problem for this simple implementation (which index we write to doesn't matter much), but it could make some other optimizations more difficult: e.g., if we size the counter array dynamically, we don't want to unnecessarily change the `idx` for uncontended objects, since it requires an larger counter array, unnecessarily.
+[^sharedidx]: In particular, if contention is seen on one object, the per-thread index will change to avoid it, which changes the index all other objects as well, even if they have not seen any contention. This doesn't seem like much of a problem for this simple implementation (which index we write to doesn't matter much), but it could make some other optimizations more difficult: e.g., if we size the counter array dynamically, we don't want to unnecessarily change the `idx` for uncontended objects, since it requires a larger counter array, unnecessarily.
 
 [^read]: In this limited case, I _think_ `read()` provides the same guarantees as the single-counter case. Informally, `read()` returns some value that the counter had at some point between the start and end of the `read()` call. Formally, there is a _linearization point_ within `read()` although this point can only be determined in retrospect by examining the returned value (unlike the single-counter approaches, where the linearization is clear regardless of the value). However, _this is only true because the only mutating operation is `increment()`_. If we also offered a `decrement()` method, this would no longer be true: you could read values that the logical counter never had based on the sequence of increments and decrements. Specifically, if you execute do `increment(); decrement(); increment()` and even if you know these operations are strictly ordered (e.g., via locking), a concurrent call to `read()` could return _2_, even though the counter never logically exceeded 1.
 
@@ -695,21 +696,21 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 
 [^perfsame]: Not surprising, since there is no contention and the fast path looks the same for either algorithm: a single CAS that always succeeds.
 
-[^twolayer]: Actually three layers, [libstc++](https://github.com/gcc-mirror/gcc/blob/4ff685a8705e8ee55fa86e75afb769ffb0975aea/libstdc%2B%2B-v3/include/bits/std_mutex.h#L98), then [libgcc](https://github.com/gcc-mirror/gcc/blob/4ff685a8705e8ee55fa86e75afb769ffb0975aea/libgcc/gthr-posix.h#L775) and then finally pthreads. I'll count the first two as one though because those can all inline into the caller. Based on a rough accounting, probably 75% of the instruction count comes from pthreads, the rest from the other two layers. The pthreads mutexes are more general purpose than what `std::mutex` alone (e.g., they support recursion), and the features are configured at runtime on a per-mutex basis, so that explains a lot of the additional work these functions are doing. It's only due to cost of atomic operations that `std::mutex` doesn't take a significant penalty compared to a more svelte design.
+[^twolayer]: Actually three layers, [libstc++](https://github.com/gcc-mirror/gcc/blob/4ff685a8705e8ee55fa86e75afb769ffb0975aea/libstdc%2B%2B-v3/include/bits/std_mutex.h#L98), then [libgcc](https://github.com/gcc-mirror/gcc/blob/4ff685a8705e8ee55fa86e75afb769ffb0975aea/libgcc/gthr-posix.h#L775) and then finally pthreads. I'll count the first two as one though because those can all inline into the caller. Based on a rough accounting, probably 75% of the instruction count comes from pthreads, the rest from the other two layers. The pthreads mutexes are more general purpose than what `std::mutex` offers (e.g., they support recursion), and the features are configured at runtime on a per-mutex basis, so that explains a lot of the additional work these functions are doing. It's only due to cost of atomic operations that `std::mutex` doesn't take a significant penalty compared to a more svelte design.
 
 [^atomhow]: On Intel hardware you can use [details.sh](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/master/scripts/details.sh) to collect the atomic instruction count easily, taking advantage of the `mem_inst_retired.lock_loads` performance counter.
 
-[^notexx]: This won't always _necessarily_ be the case. You could write a primitive that always makes a system call, putting it at level 3, even if there is no contention, but here I've sure to always have a no-syscall fast path for the no-contention case.
+[^notexx]: This won't always _necessarily_ be the case. You could write a primitive that always makes a system call, putting it at level 3, even if there is no contention, but here I've made sure to always have a no-syscall fast path for the no-contention case.
 
 [^perf]: In fact, you can measure this with `perf` and see that the total number of context switches is usually within a factor of 2 for both tests, when oversubscribed.
 
 [^fastest]: That's for six threads, where the atomic add runs in about 100 ns and this lock takes more than 8,000,000 ns (more than 8 milliseconds).
 
-[^once]: In fact, the _once_ scenario is the most likely, since one would assume with homogenous threads the scheduler will approximate something like round-robin scheduling. So the thread that is descheduled is most likely the one that is also closest to the head of the lock queue, because it had been spinning the longest.
+[^once]: In fact, the _once_ scenario is the most likely, since one would assume with homogeneous threads the scheduler will approximate something like round-robin scheduling. So the thread that is descheduled is most likely the one that is also closest to the head of the lock queue, because it had been spinning the longest.
 
 [^huh]: Actually I find it remarkable that this performs about as well as the CAS-based atomic add, since the fairness necessarily implies that the lock is acquired in a round-robin order, so the cache line with the lock must at a minimum move to around to each acquiring thread. This is a real stress test of the arbitrary and coherency mechanisms offered by the CPU.
 
-[^hyst]: An interesting thing about convoys is that they exhibit hysterisis: once you start having a convoy, they become self-sustaining, even if the conditions that started it are removed. Imagine two threads that lock a common lock for 1 nanosecond every 10,000 nanoseconds. Contention is low: the chance of any particular lock acquisition being contended is 0.01%. However, as soon as a contended acquisition occurs, the lock effectively becomes held for the amount of time it takes to do a full context switch (for the losing thread to block, and then to wake up). If that's longer than 10,000 nanoseconds, the convoy will sustain itself indefinitely, until something happens to break the loop (e.g., one thread doing deciding to work on something else). A restart also "fixes" it, which is one of many possible exlanations for processes that suddenly shoot to 100% CPU (but are still making progress), but can be fixed by a restart. Everything becomes worse with more than two threads, too.
+[^hyst]: An interesting thing about convoys is that they exhibit hysteresis: once you start having a convoy, they become self-sustaining, even if the conditions that started it are removed. Imagine two threads that lock a common lock for 1 nanosecond every 10,000 nanoseconds. Contention is low: the chance of any particular lock acquisition being contended is 0.01%. However, as soon as a contended acquisition occurs, the lock effectively becomes held for the amount of time it takes to do a full context switch (for the losing thread to block, and then to wake up). If that's longer than 10,000 nanoseconds, the convoy will sustain itself indefinitely, until something happens to break the loop (e.g., one thread deciding to work on something else). A restart also "fixes" it, which is one of many possible explanations for processes that suddenly shoot to 100% CPU (but are still making progress), but can be fixed by a restart. Everything becomes worse with more than two threads, too.
 
 [^parisc]: Some hardware supports very limited atomic operations, which may be mostly useful _only_ for locking, although you can [get tricky](https://parisc.wiki.kernel.org/index.php/FutexImplementation).
 
@@ -719,17 +720,17 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 
 [^l3]: On my system and most (all?) modern Intel systems this is essentially the L3 cache, as the caching home agent (CHA) lives in or adjacent to the L3 cache.
 
-[^inter]: This doesn't imply that each atomic operation needs to take 70 cycles under contention: a single core could do _multiple_ operations on the cache line after it gains exclusive ownership, so the cost of obtained the line could be amortized over all of these operations. How much of this occurs is a measure of fairness: a very CPU will not let any core monopolize the line for long, but this makes high concurrent benchmarks like this slower. Recent Intel CPUs seem quite fair in this sense.
+[^inter]: This doesn't imply that each atomic operation needs to take 70 cycles under contention: a single core could do _multiple_ operations on the cache line after it gains exclusive ownership, so the cost of obtaining the line could be amortized over all of these operations. How much of this occurs is a measure of fairness: a very CPU will not let any core monopolize the line for long, but this makes high concurrent benchmarks like this slower. Recent Intel CPUs seem quite fair in this sense.
 
 [^post]: We could actually use either the pre or post-increment version of the operator here. The usual advice is to prefer the pre-increment form `++c` as it can be faster as it can return the mutated value, rather than making a copy to return after the mutation. Now this advice rarely applies to primitive values, but atomic increment is actually an interesting case which turns it on its head: the post-increment version is probably better (at least, never slower) since the underlying hardware operation returns the previous value. So it's [at least one extra operation](https://godbolt.org/z/p4TDjX) to calculate the pre-increment value (or much worse, apparently, if icc gets involved).
 
 [^notwhat]: It also might not [work how you think](https://www.realworldtech.com/forum/?threadid=189711&curpostid=189752), depending on details of the OS scheduler.
 
-[^spectre]: They use to be cheaper: based on my measurements the cost of system calls has more than doubled, on most Intel hardware, after the Spectre and Meltdown mitigations have been applied.
+[^spectre]: They used to be cheaper: based on my measurements the cost of system calls has more than doubled, on most Intel hardware, after the Spectre and Meltdown mitigations have been applied.
 
 [^notallfailure]: Actually, not _all_ failure indicates contention: there is a small chance also that a context switch exactly splits the load and the subsequent CAS, and in this case the CAS would fail when the thread was scheduled again if any thread that ran in the meantime updated the same counter. Treating this as contention doesn't really cause any serious problems.
 
-[^tlsmem]: On the other handle, the TLS approach doesn't need padding since the counters will generally appear next to other thread-local data, and not subject to false sharing, which means an 8x reduction (from 64 to 8 bytes) in the per-counter size, so if your process has a number of threads roughly equal to the number of cores, you will probably _save_ memory over the per-CPU approach.
+[^tlsmem]: On the other hand, the TLS approach doesn't need padding since the counters will generally appear next to other thread-local data, and not subject to false sharing, which means an 8x reduction (from 64 to 8 bytes) in the per-counter size, so if your process has a number of threads roughly equal to the number of cores, you will probably _save_ memory over the per-CPU approach.
 
 [^noht]: And no SMT enabled, so there are 4 logical processors from the point of view of the OS.
 
@@ -738,3 +739,5 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 [^casworse]: The cas add implementation comes off looking slightly worse than the other single-atomic implementations here because the load required to set up the CAS value effectively adds to the dependency chain involving the atomic operation, which explains the 5-cycle difference with atomic add. This goes away if you can do a _blind CAS_ (e.g., in locks acquire paths), but that's not possible here.
 
 [^whitelie]: This is a very small white lie. I'll explain more elsewhere.
+
+[^despite]: Despite the current claim in wikipedia that seqlocks are somehow a Linux-specific construct involving the kernel, they work great in userspace only and are not tied to Linux. I is likely they were not invented for use Linux but [pre-dated](https://twitter.com/davidtgoldblatt/status/1280189008803278848) the OS, although maybe the use is Linux was where the name _seqlock_ first appeared?
