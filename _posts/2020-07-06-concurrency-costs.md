@@ -50,7 +50,7 @@ Find below the details of the hardware used:
 | Graviton 2 | AArch64 | Neoverse N1 | 2.5 GHz | 16[^g2cores] | Ubuntu 20.04 | c6g.4xlarge |
 
 
-[^g2cores]: The Graviton 2 bare metal hardware has 64 cores, but this instance size makes 16 of them available. This means that it principle the results can be affected by the coherency traffic of other tenants on the same hardware, but the relatively stable results seem to indicate it doesn't affect the results much.
+[^g2cores]: The Graviton 2 bare metal hardware has 64 cores, but this instance size makes 16 of them available. This means that in principle the results can be affected by the coherency traffic of other tenants on the same hardware, but the relatively stable results seem to indicate it doesn't affect the results much.
 
 ## Level 2: Contended Atomics
 
