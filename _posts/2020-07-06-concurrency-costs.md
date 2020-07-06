@@ -633,9 +633,11 @@ It is not always easy or possible to remove the last atomic access from your fas
 - The general approach of using thread local storage, as discussed above, can also be extended to structures more complicated than counters.
 - Many lock-free structures offer atomic-free _read_ paths, notably concurrent containers in garbage collected languages, such as `ConcurrentHashMap` in Java. Languages without garbage collection have fewer straightforward options, mostly because safe memory reclamation is a [hard problem](http://concurrencyfreaks.blogspot.com/2017/08/why-is-memory-reclamation-so-important.html), but there are still [some](http://concurrencykit.org/) [good](https://software.intel.com/content/www/us/en/develop/documentation/tbb-documentation/top/intel-threading-building-blocks-developer-guide/containers.html) [options](https://github.com/facebook/folly/tree/master/folly/concurrency) out there.
 - I find that [RCU](https://liburcu.org/) is especially powerful and fairly general if you are using a garbage collected language, or can satisfy the requirements for an efficient reclamation method in a non-GC language.
-- The [seqlock] is an under-rated and little known alternative to RCU without reclaim problems, although not as general. Concurrencykit has [an implementation](http://concurrencykit.org/doc/ck_sequence.html). It has an atomic-free read path for readers. Unfortunately, seqlocks don't integrate cleanly with either the Java[^stampedlock] or [C++](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1478r1.html) memory models.
+- The [seqlock](https://en.wikipedia.org/wiki/Seqlock)[^despite] is an under-rated and little known alternative to RCU without reclaim problems, although not as general. Concurrencykit has [an implementation](http://concurrencykit.org/doc/ck_sequence.html). It has an atomic-free read path for readers. Unfortunately, seqlocks don't integrate cleanly with either the Java[^stampedlock] or [C++](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1478r1.html) memory models.
 - It is also possible in some cases to do a per-CPU rather than a per-thread approach using only vanilla instructions, although the possibility of interruption at any point makes this tricky. [Restartable sequences (rseq)](https://www.efficios.com/blog/2019/02/08/linux-restartable-sequences/) can help, and there are other tricks lurking out there.
 - This is the last point, but it should be the first: you can probably often redesign your algorithm or application to avoid sharing data in the first place, or to share much less. For example, rather than constantly updating a shared collection with intermediate results, do as much private computation as possible before only merging the final results.
+
+[^despite]: Despite the current claim in wikipedia that seqlocks are somehow a Linux-specific construct involving the kernel, they work great in userspace only and are not tied to Linux.
 
 ### Summary
 
@@ -643,7 +645,7 @@ We looked at the six different levels that make up this concurrency cost hierarc
 
 ### Thanks
 
-Thanks to [Paul Khuong](https://pvk.ca/) who showed me something that made me reconsider in what scenarios level 0 is achievable.
+Thanks to [Paul Khuong](https://pvk.ca/) who showed me something that made me reconsider in what scenarios level 0 is achievable and typo fixes.
 
 Thanks to [@never_released](https://twitter.com/never_released) for help on a problem I had bringing up an EC2 bare-metal instance (tip: just wait).
 
