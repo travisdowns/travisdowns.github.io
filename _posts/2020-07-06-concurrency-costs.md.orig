@@ -233,7 +233,11 @@ void blocking_ticket::unlock() {
 }
 ~~~
 
-The main difference with the earlier implementation occrs in case when we don't acquire the lock immediately (we don't return at the location marked `// uncontended case`). Instead of yielding in a loop, we take the mutex associated with the condition variable and wait until notified. Every time we are notified we check if it is our turn.
+<<<<<<< Updated upstream
+The main difference with the earlier lock is the case when we don't acquire the lock immediately (we don't return at the location marked `// uncontended case`). Instead, we take the mutex associated with the condition variable and wait until notified. Every time we are notified we check if it is our turn.
+=======
+The main difference with the earlier implementation is that when we don't acquire the lock immediately (we don't return at the location marked `// uncontended case`). Instead, we take the mutex associated with the condition variable and wait until notified. Every time we are notified we check if it is our turn.
+>>>>>>> Stashed changes
 
 Even without spurious wakeups we might get woken many times, because this lock suffers from the _thundering herd_ problem where every waiter is woken on `unlock()` even though only one will ultimately be able to get the lock.
 
@@ -648,9 +652,7 @@ Thanks to [Paul Khuong](https://pvk.ca/) who showed me something that made me re
 
 Thanks to [@never_released](https://twitter.com/never_released) for help on a problem I had bringing up an EC2 bare-metal instance (tip: just wait).
 
-Special thanks to [matt_dz](https://twitter.com/matt_dz) and Zach Wenger for helping fix about _sixty_ typos between them.
-
-Thanks to Alexander Monakov and Dave Andersen for reporting typos.
+[matt_dz](https://twitter.com/matt_dz) for _thirty three_ typo fixes, and Alexander Monakov for reporting a typo.
 
 Traffic light photo by <a href="https://unsplash.com/@harshaldesai">Harshal Desai</a> on <a href="https://unsplash.com/s/photos/traffic-light">Unsplash</a>.
 
@@ -666,7 +668,11 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 
 {% include glossary.md %}
 
+<<<<<<< Updated upstream
+[^realworld]: Well, this is quite real world: such atomic counters are used widely for a variety of purposes. I throw the "-if-you-squint" in there because, after all, we are using microbenchmarks which simulate a probably-unrealistic density of increments to this counter, and it is a _bit_ of a stretch to make this one example span all five levels -- but I tried!
+=======
 [^realworld]: Well, this is quite real world: such atomic counters are used widely for a variety of purposes. I throw the _if you squint_ in there because, after all, we are using microbenchmarks which simulate a probably-unrealistic density of increments to this counter, and it is a _bit_ of a stretch to make this one example span all five levels -- but I tried!
+>>>>>>> Stashed changes
 
 [^stampedlock]: Java does provide [StampedLock](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/locks/StampedLock.html) which offers seqlock functionality.
 
