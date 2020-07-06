@@ -653,7 +653,7 @@ Traffic light photo by <a href="https://unsplash.com/@harshaldesai">Harshal Desa
 
 ### Discussion and Feedback
 
-You can leave a [comment below](#comment-section).
+You can leave a [comment below](#comment-section) or discuss on [Hacker News](https://news.ycombinator.com/item?id=23749172).
 
 {% include other-posts.md %}
 
