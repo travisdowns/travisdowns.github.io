@@ -1,0 +1,12 @@
+_id: 36cbbc20-c05b-11ea-9c85-e34dac5bcfe2
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: ''
+message: >-
+  This is very helpful for someone working on atomics and lock right now. But
+  one missing part is the benchmark of Intel xeon CPUs, which I believe is
+  critical. I am picking two CPUs and running the same benchmark, if you are
+  interested, I can send the results over.
+name: Jason
+email: 48901a8156df6f726c326ab0bf35703d
+hp: ''
+date: 1594130858
