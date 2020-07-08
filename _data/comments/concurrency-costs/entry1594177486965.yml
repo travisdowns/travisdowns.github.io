@@ -1,0 +1,8 @@
+_id: c7966a90-c0c7-11ea-949b-e10c063dc6bd
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: e207f270-c05b-11ea-9c85-e34dac5bcfe2
+message: "I am not seeing any particular overhead, at least for Graviton 2: the Graviton 2 results look fine.\r\n\r\nOf course, the numbers for most of the non-scalable ones (level 2 and above) get worse the more CPUs you add, so 16 CPUs looks \"worse\" than 4, but that's not fault of the CPU design.\r\n\r\nI don't think virtualization will cause any noticeable overhead here, at least for the majority of the tests. Most of these are \"pure CPU\" and virtualization generally runs those loads with basically zero overhead. Of course, this would be different if you were getting a fraction of a CPU (e.g., the hypervisor is time-slicing multiple guests onto one physical CPU), but that's not the case for these EC2 instances.\r\n\r\nWhat is possible is interference with other tenants in the same box, but I didn't see much evidence of it."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1594177486
