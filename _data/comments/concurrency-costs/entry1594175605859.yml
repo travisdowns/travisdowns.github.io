@@ -1,0 +1,10 @@
+_id: 66567800-c0c3-11ea-949b-e10c063dc6bd
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: ''
+message: >-
+  Loads and stores are atomic so in CRDT "level 0" case why do you need
+  synchronization at all?
+name: Darkmercy
+email: ''
+hp: ''
+date: 1594175605
