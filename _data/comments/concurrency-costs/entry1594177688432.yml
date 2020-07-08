@@ -1,0 +1,8 @@
+_id: 3fae9660-c0c8-11ea-949b-e10c063dc6bd
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: 66567800-c0c3-11ea-949b-e10c063dc6bd
+message: "Do you mean why is `std::atomic<>` used at all for the TLS based approach? It is because there is still concurrent writers and readers, and at the C++ level this requires `std::atomic` even if you \"know\" reads and writes are atomic. More detail in [this footnote](https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html?fojosdfjss=x#fnref:whyatomic).\r\n\r\nIt doesn't really add any overhead, because we \"build our own\" non-atomic increment, so the code ends up basically just as nice as if we went the UB route and used plain `uint64_t` without `std::atomic`."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1594177688
