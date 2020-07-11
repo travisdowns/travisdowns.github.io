@@ -233,7 +233,7 @@ void blocking_ticket::unlock() {
 }
 ~~~
 
-The main difference with the earlier implementation occrs in case when we don't acquire the lock immediately (we don't return at the location marked `// uncontended case`). Instead of yielding in a loop, we take the mutex associated with the condition variable and wait until notified. Every time we are notified we check if it is our turn.
+The main difference with the earlier implementation occurs the in case where we don't acquire the lock immediately (we don't return at the location marked `// uncontended case`). Instead of yielding in a loop, we take the mutex associated with the condition variable and wait until notified. Every time we are notified we check if it is our turn.
 
 Even without spurious wakeups we might get woken many times, because this lock suffers from the _thundering herd_ problem where every waiter is woken on `unlock()` even though only one will ultimately be able to get the lock.
 
@@ -650,7 +650,7 @@ Thanks to [@never_released](https://twitter.com/never_released) for help on a pr
 
 Special thanks to [matt_dz](https://twitter.com/matt_dz) and Zach Wenger for helping fix about _sixty_ typos between them.
 
-Thanks to Alexander Monakov and Dave Andersen for reporting typos.
+Thanks to Alexander Monakov, Dave Andersen and Laurent for reporting typos.
 
 Traffic light photo by <a href="https://unsplash.com/@harshaldesai">Harshal Desai</a> on <a href="https://unsplash.com/s/photos/traffic-light">Unsplash</a>.
 
