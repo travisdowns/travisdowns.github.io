@@ -427,7 +427,7 @@ Is it over yet? Can I close this browser tab and reclaim all that memory? Almost
 
 ### Level 0: Vanilla
 
-The last, fastest level is no atomic instructions at all, without contention.
+The last and fastest level is achieved when only vanilla instructions are used (and without contention). By _vanilla instructions_ I mean things like regular loads and stores which don't imply additional synchronization above what the hardware memory model offers by default[^noatomic].
 
 How can we increment a counter atomically while allowing it to be read from any thread? By ensuring there is only one writer for any given physical counter. If we keep a counter _per thread_ and only allow the owning thread to write to it, there is no need for an atomic increment.
 
@@ -621,7 +621,6 @@ I can't give a step-by-step recipe for reducing contention, but here's a laundry
 - Consider using structures that use fine-grained locks, striped locks or similar mechanisms that reduce contention by locking only portions of a container.
 - Consider per-CPU structures, as in the examples above, or some approximation of them (e.g., hashing the current thread ID into an array of structures). This post used an atomic counter as a simple example, but it applies more generally to any case where the mutations can be done independently and aggregated later.
 
-
 For all of the advice above, when I say _consider doing X_ I really mean _consider finding and using an existing off-the shelf component that does X_. Writing concurrent structures yourself should be considered a last resort -- despite what you think, your use case is probably not all that unique.
 
 Level 1 is where a lot of well written, straightforward and high-performing concurrent code lives. There is nothing wrong with this level -- it is a happy place.
@@ -650,7 +649,7 @@ Thanks to [@never_released](https://twitter.com/never_released) for help on a pr
 
 Special thanks to [matt_dz](https://twitter.com/matt_dz) and Zach Wenger for helping fix about _sixty_ typos between them.
 
-Thanks to Alexander Monakov, Dave Andersen and Laurent for reporting typos.
+Thanks to Alexander Monakov, Dave Andersen and Laurent for reporting typos, and Aaron Jacobs for suggesting clarifications to the level 0 definition.
 
 Traffic light photo by <a href="https://unsplash.com/@harshaldesai">Harshal Desai</a> on <a href="https://unsplash.com/s/photos/traffic-light">Unsplash</a>.
 
@@ -743,3 +742,5 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 [^whitelie]: This is a very small white lie. I'll explain more elsewhere.
 
 [^despite]: Despite the current claim in wikipedia that seqlocks are somehow a Linux-specific construct involving the kernel, they work great in userspace only and are not tied to Linux. I is likely they were not invented for use Linux but [pre-dated](https://twitter.com/davidtgoldblatt/status/1280189008803278848) the OS, although maybe the use is Linux was where the name _seqlock_ first appeared?
+
+[^noatomic] On x86, what's vanilla and what isn't is fairly cut and dried: regular memory accesses and read-modify-write instructions are _vanilla_ while LOCKed RMW instructions, whether explicit like `lock inc` or implicit like [`xchg [mem], reg`](https://www.felixcloutier.com/x86/xchg), are not and are an order of magnitude slower. Out of the fences, `mfence` is also a slow non-vanilla instruction, comparable in cost to a LOCKed instruction. On other platforms like ARM or POWER, there may be shades of grey: you still have vanilla accesses on one end, and expensive full barriers like `dmb` on ARM or `sync` on POWER at the other, but you also have things in the middle with some additional ordering guarantees but still short of sequential consistency. This includes things like `LDAR` and `LDAPR` on ARM which implement sort of a sliding scale of load ordering and performance. Still, on any given hardware, you might find that instructions generally fall into a "cheap" (vanilla) and "expensive" (non-vanilla) bucket.

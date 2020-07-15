@@ -55,7 +55,8 @@
 *[FIVR]: Fully Integrated Voltage Regulator
 
 
-*[CAS]: Compare-and-swap: an atomic operation implemented on x86 and other CPUs
+*[CAS]: Compare-and-swap: an atomic operation implemented on x86 and other CPUs.
+*[RMW]: Read-modify-write: an instruction that reads from a memory location, operates on the value, and writes the result back to the same location.
 *[immediate]: When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.
 *[MRU]: Most recently used - an eviction strategy suitable for data with little temporal locality
 *[LRU]: Least recently used - an eviction strategy suitable for data with temporal locality
