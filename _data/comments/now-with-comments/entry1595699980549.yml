@@ -1,0 +1,12 @@
+_id: 9c8013b0-cea0-11ea-83f0-cb81f4d3e54b
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: a88d8160-ce46-11ea-9e44-77ee3abe9081
+message: >-
+  Yes, it is. In principle, this approach does not depend on "staticman" to keep
+  working, because you are hosting your own service. There is no 3rd party
+  shared service involved. So you would really ask "is my staticman instance
+  hosted at XYZ" still running, or something like that.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1595699980
