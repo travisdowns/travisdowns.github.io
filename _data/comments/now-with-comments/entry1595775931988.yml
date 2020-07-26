@@ -1,0 +1,11 @@
+_id: 731184d0-cf51-11ea-adfe-e944f0d58139
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: >-
+  Hi, following your guide I set up the heroku instance successfully. But now I
+  am clueless about inegrating this to the actual site. Should I use the
+  _includes folder from your test-blog and copy everything over?
+name: jeansn
+email: ''
+hp: ''
+date: 1595775931
