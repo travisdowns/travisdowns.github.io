@@ -286,13 +286,13 @@ The key thing you need to do is include a blob of HTML and associated JavaScript
 {% endif %}{% endraw %}
 ~~~
 
-You can paste it into any post, or better add it to the `footer.html` include or something like that (details depend on your theme). The invariant is that wherever this appears, the existing comments appear, followed by a form to submit new comments. You can see the [`comments.html` include here](https://github.com/travisdowns/blog-test/blob/master/_includes/comments.html) -- in turn, it includes `comment.html` (once per comment, generates the comment html) and `comment_form.html` which generates the new comment form.
+You can paste it into any post, or better add it to the `footer.html` include or something like that (details depend on your theme). The invariant is that wherever this appears, the existing comments appear, followed by a form to submit new comments. You can see the [`comments.html` include here](https://github.com/travisdowns/travisdowns.github.io/blob/master/_includes/comments.html) -- in turn, it includes `comment.html` (once per comment, generates the comment html) and `comment_form.html` which generates the new comment form.
 
-This ultimately includes [external JavaScript](https://github.com/travisdowns/blog-test/blob/master/_includes/comments.html#L35) for JQuery and reCAPTCHA, as well as [main.js](https://github.com/travisdowns/blog-test/blob/master/assets/main.js) which includes the JavaScript to implement the replies (moving the form when the "reply to" button is clicked, and submitting the form via AJAX to the API bridge).
+This ultimately includes [external JavaScript](https://github.com/travisdowns/travisdowns.github.io/blob/4a57e4f6d8cb4ef0ac8801a31740d1ca32dfa8ae/_includes/comments.html#L28) for JQuery and reCAPTCHA, as well as [main.js](https://github.com/travisdowns/travisdowns.github.io/blob/master/assets/main.js) which includes the JavaScript to implement the replies (moving the form when the "reply to" button is clicked, and submitting the form via AJAX to the API bridge).
 
-So to use this integration in your `Jekyll` blow you need to:
+You can try to use this same integration in your Jekyll blog. You'd need to:
 
- - Copy the `_includes/comment.html`, `_includes/comments.html`, `_includes/comment_form.html`, `assets/main.js`, and `_sass/comment-styles.css` files to your blog repository.
+ - Copy the `_includes/comment.html`, `_includes/comments.html`, `_includes/comment_form.html`, `assets/main.js`, and `_sass/comment-styles.css` from my [blog files](https://github.com/travisdowns/travisdowns.github.io/blob/master) to your blog repository.
  - Include `@import "comment-styles";` in your `assets/main.scss` file. If you don't have one, you'll need to create it following the rules for your theme. Usually this just means a `main.scss` with empty front-matter and an `@import "your-theme";` line to import the theme SCSS. Alternately, you could avoid putting anything in `main.scss` and just include the comment styles as a separate file, but this adds another request to each post.
  - Do the `include comments.html` thing shown above in an appropriate place in your template/theme.
  - Set `comments: true` in the front matter of posts you want to have comments (or set it as a default in `_config.yml`).
