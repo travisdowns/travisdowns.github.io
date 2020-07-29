@@ -604,6 +604,8 @@ Level 3 isn't a _terrible_ place to be, but you'll always have that gnawing in y
 
 Most library provided concurrency primitives already avoid system calls on the happy path. E.g., pthreads mutex, `std::mutex`, Windows `CRITICAL_SECTION` will avoid a system call while acquiring and releasing an uncontended lock. There are some notable exceptions though: if are using a [Win32 mutex object](https://docs.microsoft.com/en-us/windows/win32/sync/mutex-objects) or [System V semaphore](https://man7.org/linux/man-pages/man2/semop.2.html) object, you are paying a for a system call on every operation. Double check if you can use an in-process alternative in this case.
 
+For more general synchronization purposes which don't fit the lock-unlock pattern, a condition variable often fits the bill and a quality implementation generally avoids system calls on the fast path. A relatively unknown and higher performance alternative to condition variables, especially suitable for coordinating blocking for otherwise lock-free structures, is an [_event count_](http://pvk.ca/Blog/2019/01/09/preemption-is-gc-for-memory-reordering/#event-counts-with-x86-tso-and-futexes). Paul's implementation is [available in concurrency kit](https://github.com/concurrencykit/ck/blob/master/include/ck_ec.h) and we'll mention it again at Level 0.
+
 System calls often creep in when home-grown synchronization solutions are used, e.g., using Windows events to build your own read-write lock or striped lock or whatever the flavor of the day is. You can often remove the call in the fast path by making a check in user-space to see if a system call is necessary. For example, rather than unconditionally unblocking any waiters when releasing some exclusive object, _check_ to see if there are waiters[^tricky] in userspace and skip the system call if there are none.
 
 If a lock is generally held for a short period, you can avoid unnecessary system calls and context switches with a hybrid lock that spins for an appropriate[^spin] amount of time before blocking. This can trade tens of nanoseconds of spinning for hundreds or thousands of nanoseconds of system calls.
@@ -634,6 +636,7 @@ It is not always easy or possible to remove the last atomic access from your fas
 - I find that [RCU](https://liburcu.org/) is especially powerful and fairly general if you are using a garbage collected language, or can satisfy the requirements for an efficient reclamation method in a non-GC language.
 - The [seqlock](https://en.wikipedia.org/wiki/Seqlock)[^despite] is an underrated and little known alternative to RCU without reclaim problems, although not as general. Concurrencykit has [an implementation](http://concurrencykit.org/doc/ck_sequence.html). It has an atomic-free read path for readers. Unfortunately, seqlocks don't integrate cleanly with either the Java[^stampedlock] or [C++](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1478r1.html) memory models.
 - It is also possible in some cases to do a per-CPU rather than a per-thread approach using only vanilla instructions, although the possibility of interruption at any point makes this tricky. [Restartable sequences (rseq)](https://www.efficios.com/blog/2019/02/08/linux-restartable-sequences/) can help, and there are other tricks lurking out there.
+- Event counts, mentioned earlier, [can even be level 0](https://pvk.ca/Blog/2019/01/09/preemption-is-gc-for-memory-reordering/#event-counts-with-x86-tso-and-futexes:~:text=However%2C%20if%20we%20go) in a single writer scenario, as Paul shows.
 - This is the last point, but it should be the first: you can probably often redesign your algorithm or application to avoid sharing data in the first place, or to share much less. For example, rather than constantly updating a shared collection with intermediate results, do as much private computation as possible before only merging the final results.
 
 
@@ -643,7 +646,7 @@ We looked at the six different levels that make up this concurrency cost hierarc
 
 ### Thanks
 
-Thanks to [Paul Khuong](https://pvk.ca/) who showed me something that made me reconsider in what scenarios level 0 is achievable and typo fixes.
+Thanks to Paul Khuong who [showed me something](https://pvk.ca/Blog/2020/07/07/flatter-wait-free-hazard-pointers) that made me reconsider in what scenarios level 0 is achievable and typo fixes.
 
 Thanks to [@never_released](https://twitter.com/never_released) for help on a problem I had bringing up an EC2 bare-metal instance (tip: just wait).
 
