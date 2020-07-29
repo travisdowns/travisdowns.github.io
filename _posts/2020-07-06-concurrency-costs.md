@@ -632,7 +632,7 @@ Level 1 is where a lot of well written, straightforward and high-performing conc
 It is not always easy or possible to remove the last atomic access from your fast paths, but if you just can't live with the extra ~10 ns, here are some options:
 
 - The general approach of using thread local storage, as discussed above, can also be extended to structures more complicated than counters.
-- You can often achieve fewer than 1 atomic operation per logical operation by _batching:_ saving up multiple operations and committing them at once with a small fixed number of atomic operations. You can add batching yourself on a case-by-case basis, or use a container which provides a batching API, or even try to implement batching internally beyond an unchanged API offering only single-element operations.
+- You may be able to achieve fewer than one expensive atomic instruction per logical operation by _batching:_ saving up multiple operations and then committing them at all once with a small fixed number of atomic operations. Some containers or concurrent structures may have a batched API which does this for you, but even if not you can sometimes add batching yourself, e.g., by inserting collections of elements rather than a single element[^hiddenbatch].
 - Many lock-free structures offer atomic-free _read_ paths, notably concurrent containers in garbage collected languages, such as `ConcurrentHashMap` in Java. Languages without garbage collection have fewer straightforward options, mostly because safe memory reclamation is a [hard problem](http://concurrencyfreaks.blogspot.com/2017/08/why-is-memory-reclamation-so-important.html), but there are still [some](http://concurrencykit.org/) [good](https://software.intel.com/content/www/us/en/develop/documentation/tbb-documentation/top/intel-threading-building-blocks-developer-guide/containers.html) [options](https://github.com/facebook/folly/tree/master/folly/concurrency) out there.
 - I find that [RCU](https://liburcu.org/) is especially powerful and fairly general if you are using a garbage collected language, or can satisfy the requirements for an efficient reclamation method in a non-GC language.
 - The [seqlock](https://en.wikipedia.org/wiki/Seqlock)[^despite] is an underrated and little known alternative to RCU without reclaim problems, although not as general. Concurrencykit has [an implementation](http://concurrencykit.org/doc/ck_sequence.html). It has an atomic-free read path for readers. Unfortunately, seqlocks don't integrate cleanly with either the Java[^stampedlock] or [C++](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1478r1.html) memory models.
@@ -668,6 +668,8 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 <br>
 
 {% include glossary.md %}
+
+[^hiddenbatch]: An interesting design point is a data type that implements batching internally behind an API offering single-element operations. For example, a queue might decide that added elements won't be immediately consumed (because there are already some elements in the queue), and hold them in a local staging area until several can be added as a batch, or until their absence would be noticed.
 
 [^realworld]: Well, this is quite real world: such atomic counters are used widely for a variety of purposes. I throw the _if you squint_ in there because, after all, we are using microbenchmarks which simulate a probably-unrealistic density of increments to this counter, and it is a _bit_ of a stretch to make this one example span all five levels -- but I tried!
 
