@@ -259,7 +259,7 @@ Consider what happens when two threads, `A` and `B`, try to acquire the lock rep
 \\
 Of course, `B` is going to be a while: it needs to be woken by the scheduler and this takes a microsecond or two, at least. Now `B` wakes and gets the lock, and the same scenario repeats itself with the roles reversed. The upshot is that there is a full context switch for each acquisition of the lock.\\
 \\
-Unfair locks avoid this problem because they all queue jumping: in the scenario above, `A` (or any other thread) could re-acquire the lock after unlocking it, before `B` got its chance. So the use of the shared resource doesn't grind to a halt while `B` wakes up.
+Unfair locks avoid this problem because they allow queue jumping: in the scenario above, `A` (or any other thread) could re-acquire the lock after unlocking it, before `B` got its chance. So the use of the shared resource doesn't grind to a halt while `B` wakes up.
 {: .info}
 
 So, are you tired of seeing mostly-white plots where the newly introduced algorithm relegates the rest of the pack to little chunks of color near the x-axis, yet?
