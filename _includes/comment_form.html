@@ -8,23 +8,23 @@
 
   <div class="textfield">
     <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="{{ page.url | absolute_url }}#respond" style="display:none;">(cancel reply)</a></small></h2>
-      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required></textarea>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
 
-    <div class="textfield">
+    <div class="textfield narrowfield">
       <label for="comment-form-name">Name
         <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
       </label>
     </div>
 
-    <div class="textfield">
+    <div class="textfield narrowfield">
       <label for="comment-form-email">E-mail
         <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
       </label>
     </div>
 
-    <div class="textfield hp">
+    <div class="textfield narrowfield hp">
       <label for="hp">
         <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
       </label>
