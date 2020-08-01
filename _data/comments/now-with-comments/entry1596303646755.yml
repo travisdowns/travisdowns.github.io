@@ -1,0 +1,8 @@
+_id: 217a44f0-d41e-11ea-805f-61fd967a4fdb
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: db711290-d34b-11ea-bc72-9f3711045b46
+message: "Yes I figured it out! It was a really silly issue: my `assets/main.scss` was missing the Jekyll \"top matter\" thing:\r\n\r\n```\r\n---\r\n# this is mandatory :(\r\n---\r\n```\r\n\r\nSo, I think it was getting ignored by Jekyll entirely. I'm not 100% sure yet how Jekyll works, but I'm slowly getting the hang of it.\r\n\r\nI was also thinking it might be nice to modify the comments style a little. I'll enjoy seeing what you come up with. And I'll let you know if I make any changes myself!"
+name: Sam Westrick
+email: ''
+hp: ''
+date: 1596303646
