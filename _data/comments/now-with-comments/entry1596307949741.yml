@@ -1,0 +1,8 @@
+_id: 2654e660-d428-11ea-bcfd-5926e8a7f29c
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: db711290-d34b-11ea-bc72-9f3711045b46
+message: "Ah right.\r\n\r\nSo when your site gets generated, I think Jekyll has three high level behaviors for files appearing in the source repository:\r\n\r\n- Files that are copied \"as is\" to the output (the \"output\" is your static site, ready to server, by default the `_site` sub-directory), like stuff in `assets` say png files.\r\n- Files that are not copied at all: this is anything with an underscore prefix, like `_sass`\r\n- Files that are \"processed\" by Jekyll: this end up as part of your site, but after processing my Jekyll. E.g., you wrote your post as a `foo.md` file and Jekyll processes it and creates a `foo.html` with the markdown transformed to html, the post template applied, etc. Processing is triggered when the file has front matter (the `--------` stuff).\r\n\r\nProcessing includes transforming scss to css and copying it to `_site/assets` So stuff in the `_sass` directory like `main.scss` won't  get into your site at all without front-matter.\r\n\r\nThat's how I understand it, at least!"
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1596307949
