@@ -1,0 +1,8 @@
+_id: f63af420-d412-11ea-805f-61fd967a4fdb
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: db711290-d34b-11ea-bc72-9f3711045b46
+message: "Hi Sam,\r\n\r\nThanks for the kind comment! Your blog looks up my alley (admittedly based on the sample size of 1 entry), and I'm definitely adding it to my list of blogs to check for new articles. \r\n\r\nAbout the shite appearance, I'm not sure. It looks OK now, maybe you fixed it? You need to ensure the styles are actually included, e.g., by including main.js  (or whatever the name of the file with your comment styles is: you can organize it in a few different ways) somehow in your html.\r\n\r\nNow as design, html and CSS are not my strong suit, I'd personally argue even my comments look like more or less shite even when the styles are added correctly. It would be nice if each comment was visually distinguished a bit, maybe with a subtle background color, but I've never really modified it since I set it up (minus fixing a few bugs).\r\n\r\nActually I think I'm going to make a change right now so that the \"comments\" field has the full width, by default as it's annoying to expand it every time I want to write a longer comment."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1596298849
