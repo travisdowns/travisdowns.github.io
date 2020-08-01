@@ -1,0 +1,8 @@
+_id: db711290-d34b-11ea-bc72-9f3711045b46
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Thanks Travis! Beautifully straightforward and thorough tutorial. I've been throwing together a blog as a side project (https://shwestrick.github.io/), and your instructions here were perfect; everything seemed to just work.\r\n\r\nAlso, your other posts look really interesting! I'll enjoy reading through them this weekend.\r\n\r\nNow I have some styling work to do---it seems like the .scss files might not be getting loaded correctly because my \"Add Comment\" form looks like shite. Perhaps the version of minima theme I'm using is different. Oh well, that will be a little puzzle for another day."
+name: Sam Westrick
+email: ''
+hp: ''
+date: 1596213334
