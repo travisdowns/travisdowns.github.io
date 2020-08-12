@@ -256,6 +256,7 @@ void vector8_inc_restrict(std::vector<uint8_t>& __restrict v) {
     for (size_t i = 0; i < v.size(); i++) {
         v[i]++;
     }
+}
 ~~~
 
 The `__restrict` keyword is not standard C++, but it is in [C since C99](https://en.cppreference.com/w/c/language/restrict) (as `restrict`). For those compilers that implement it as an extension in C++, you can reasonably expect that it follows the C semantics. Of course, C doesn't have references at all - so you can mentally substitute the vector reference with a pointer to a vector.
