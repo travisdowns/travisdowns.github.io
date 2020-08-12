@@ -125,7 +125,7 @@ So that explains the small performance difference between the `uint8_t` and `uin
 That's easy - clang can autovectorize this loop in the `uint32_t` case:
 
 ~~~nasm
-.LBB1_6:                                ; =>This Inner Loop Header: Depth=1
+.LBB1_6:
     vmovdqu ymm1, ymmword ptr [rax + 4*rdi]
     vmovdqu ymm2, ymmword ptr [rax + 4*rdi + 32]
     vmovdqu ymm3, ymmword ptr [rax + 4*rdi + 64]
@@ -152,7 +152,7 @@ That's easy - clang can autovectorize this loop in the `uint32_t` case:
     vmovdqu ymmword ptr [rax + 4*rdi + 224], ymm4
     add     rdi, 64
     add     rsi, 2
-jne     .LBB1_6
+    jne     .LBB1_6
 ~~~
 
 The loop as been unrolled 8x, and this is basically as fast as you'll get, approaching one vector (8 elements) per cycle in the L1 cache (limited by one store per cycle[^align]).
@@ -197,13 +197,13 @@ This is the one where we calculate `size()` only once, before the loop, and stas
 
 It seems like this should work, right? The problem was `size()` and now we are saying "freeze `size()` into a local `s` at the start of the loop, and the compiler knows locals cannot overlap with anything". Basically we manually hoist the thing the compiler couldn't. It actually does generate better code (compared to the original version):
 
-~~~c++
+~~~nasm
 .L9:
-        mov     rdx, QWORD PTR [rdi]
-        add     BYTE PTR [rdx+rax], 1
-        add     rax, 1
-        cmp     rax, rcx
-        jne     .L9
+    mov     rdx, QWORD PTR [rdi]
+    add     BYTE PTR [rdx+rax], 1
+    add     rax, 1
+    cmp     rax, rcx
+    jne     .L9
 ~~~
 
 There is only one extra read and no `sub`. So what is that extra read (`rdx, QWORD PTR [rdi]`) doing if it isn't part of calculating the size? It's loading the `data()` pointer from `v`!
