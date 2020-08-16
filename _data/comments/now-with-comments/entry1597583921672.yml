@@ -1,0 +1,8 @@
+_id: 00e3b040-dfc3-11ea-a0cb-a1d2d62499bf
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Is this system XSS-protected?\r\n<script>alert(\"Hi there! I noticed an XSS in your comment form!\")</script>"
+name: techboyg5
+email: 31928fd332df25a2b67fb4d6bdece81e
+hp: ''
+date: 1597583921
