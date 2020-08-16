@@ -11,6 +11,11 @@
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
+	
+	<script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
+	<script>
+		CKEDITOR.replace("comment-form-message");
+	</script>
 
     <div class="textfield narrowfield">
       <label for="comment-form-name">Name
