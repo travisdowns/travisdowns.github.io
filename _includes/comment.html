@@ -15,7 +15,7 @@
   </div>
 
   <div class="comment__body">
-    <iframe src="data:text/html,{{ include.message | markdownify }}" srcdoc="{{ include.message | markdownify }}" height="200" style="border:none;width:100%"></iframe>
+    <iframe src='data:text/html,{{ include.message | markdownify }}' srcdoc='{{ include.message | markdownify }}' height="200" style="border:none;width:100%"></iframe>
   </div>
 
 {% if include.is_reply %}
