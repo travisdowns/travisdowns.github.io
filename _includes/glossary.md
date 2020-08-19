@@ -62,3 +62,4 @@
 *[LRU]: Least recently used - an eviction strategy suitable for data with temporal locality
 *[SIMD]: Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.
 *[uarch]: Microarchitecture: a specific implementation of an ISA, e.g., "Haswell microarchitecture".
+*[ILP]: Instruction level parallelism: a measure of inter-instruction parallelism on a superscalar CPU
