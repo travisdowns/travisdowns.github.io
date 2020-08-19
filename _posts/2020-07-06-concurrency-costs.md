@@ -8,6 +8,7 @@ image:  /assets/concurrency-costs/avatar.jpg
 results: https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results
 twitter:
   card: summary_large_image
+excerpt: Concurrent operations can be grouped relatively neatly into categories based on their cost
 ---
 
 {% include post-boilerplate.liquid %}
