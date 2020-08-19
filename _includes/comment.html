@@ -15,7 +15,18 @@
   </div>
 
   <div class="comment__body">
-    <iframe src="about:blank" srcdoc="<link rel=stylesheet href=https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css integrity=sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z crossorigin=anonymous> {{ include.message }}" height="200" title="Comment" style="border:none;width:100%"></iframe>
+    <iframe src="about:blank" srcdoc="
+                                      <html lang=en>
+                                      <head>
+                                      <meta charset=utf-8>
+                                      <title>Comment</title>
+                                      <base target=_top>
+                                      <link rel=stylesheet href=https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css integrity=sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z crossorigin=anonymous>
+                                      </head>
+                                      <body class=bg-transparent>
+                                      {{ include.message }}
+                                      </body>
+                                      </html>" height="200" title="Comment" style="border:none;width:100%"></iframe>
   </div>
 
 {% if include.is_reply %}
