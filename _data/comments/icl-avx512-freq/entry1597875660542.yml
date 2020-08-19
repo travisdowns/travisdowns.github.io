@@ -1,0 +1,8 @@
+_id: 42d2e670-e26a-11ea-9e9d-93acc238399a
+_parent: 'https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html'
+replying_to_uid: ''
+message: "That's great news, really!\r\n\r\nDid you measure the voltage-only-transitions from your Skylake post? Those are to some extent much scarier to me for some latency-sensitive cases.  I'd weakly guess you wouldn't seen these with this improvement but I'm not confident."
+name: Andrew Hunter
+email: 187657ec9b2b8b32730f68c5602698af
+hp: ''
+date: 1597875660
