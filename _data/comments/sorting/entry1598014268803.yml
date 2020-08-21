@@ -1,0 +1,8 @@
+_id: fbb93340-e3ac-11ea-9955-9556da4b6cf3
+_parent: 'https://travisdowns.github.io/blog/2019/05/22/sorting.html'
+replying_to_uid: ''
+message: "It is possible to do radix sort in-place, as given in [Wikipedia](https://en.wikipedia.org/wiki/Radix_sort). Instead of having `queue_ptrs` consist of pointers to a second array, one can just use the existing array and swap in-place, with a check to avoid out-of-bounds for each bucket. \r\n\r\nAn additional trade-off is that the in-place algorithm is not [stable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability), ie \"equal\" elements may not end up in the same order as they were in the input (I found this out the hard way, as I wanted to speed up a sorting of `vector<pair<double, double>>` after reading this post)."
+name: Gautham
+email: ''
+hp: ''
+date: 1598014268
