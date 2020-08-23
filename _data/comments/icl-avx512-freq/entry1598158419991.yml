@@ -1,0 +1,8 @@
+_id: 9c9651d0-e4fc-11ea-ae80-25b8a230c3c5
+_parent: 'https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html'
+replying_to_uid: 42d2e670-e26a-11ea-9e9d-93acc238399a
+message: "I went ahead and measured them, and I also find voltage-only transitions and I find them to be about 2x as long as SKX (this might not represent any difference between the uarches, but between the voltage levels required, or something).\r\n\r\nYou can find some more details [on Twitter](https://twitter.com/trav_downs/status/1297392603307167745)."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1598158419
