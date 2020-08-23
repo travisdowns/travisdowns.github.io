@@ -1,0 +1,11 @@
+_id: 5fda6060-e4fc-11ea-ae80-25b8a230c3c5
+_parent: 'https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html'
+replying_to_uid: e979b5e0-e309-11ea-a642-2143fc83c6f8
+message: >-
+  The transitions is hard. Although like SKX there is a period where the
+  instructions still execute but at reduced throughput, but a single instruction
+  triggers the transition, just like all the "wider" transitions in SKX.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1598158318
