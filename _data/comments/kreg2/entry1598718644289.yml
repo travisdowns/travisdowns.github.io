@@ -1,0 +1,8 @@
+_id: fc4112b0-ea14-11ea-b566-159a22b6ac2b
+_parent: 'https://travisdowns.github.io/blog/2020/05/26/kreg2.html'
+replying_to_uid: 484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca
+message: "Mask registers are a feature of AVX-512, an instruction set extension which isn't available in Sandy Bridge. It is available starting in Skylake Xeon (SKX).\r\n\r\nUnfortunately, this means you won't be able to run this test (and several other tests in robsize which use AVX-512)."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1598718644
