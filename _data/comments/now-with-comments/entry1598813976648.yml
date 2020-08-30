@@ -1,0 +1,8 @@
+_id: f2d19c70-eaf2-11ea-a0a5-0155e2492e3a
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Thanks Travis, this post is very informative! I spent about 10 hours on making everything work and this post helped most. I did not find a single place, other than your post, that explained I need an RSA key to self host staticman, not even in the official document. :-(\r\n\r\nExcept that\r\n1. staticman has moved to Github Apps on v3. The process is a little bit different.\r\n2. Now the private keys can (and must) contain newlines. It seems octokit/app updated their code.\r\n\r\nAnd reCaptca is annoying since I run uMatrix."
+name: ditsing
+email: 30d9ee514b116fdb952406d16326e306
+hp: ''
+date: 1598813976
