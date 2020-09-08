@@ -4,6 +4,10 @@ layout: default
 <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
+    <div class="gh-issue-button" style="float:right">
+      <gh-issue-button></gh-issue-button>
+    </div>
+    <script src="https://techboyg5-php.herokuapp.com/gh-issue-button.php?user=travisdowns&repo=travisdowns.github.io&path=master/{{ page.path }}"></script>
     <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
