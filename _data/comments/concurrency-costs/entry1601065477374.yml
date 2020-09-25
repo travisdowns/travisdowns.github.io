@@ -1,0 +1,8 @@
+_id: 21c5c9f0-ff6d-11ea-a6a7-5da3c03edee8
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: d00c9470-fac8-11ea-ab88-0be8ecc64f23
+message: "Indeed, I didn't get any difference in the code generation with or without a likely hint: in both cases the compiler favored the success case (putting it as the fall through).\r\n\r\nWhat I was suggesting was something along the lines of [this](https://godbolt.org/z/b8qea9). Here, the `inc2` version carves off the slow path into its own function (not visible, here) so that the slow path doesn't add much to the inlined version of the increment function. Here the difference isn't all that much since the entire slow path (the stuff at labels L2 and L9 in the gcc version) is fairly small, not much bigger than the code to call the slow path (L14 and L15 in the gcc version)."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1601065477
