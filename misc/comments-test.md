@@ -1,5 +1,6 @@
 ---
 layout: post
+title: Comments Test
 comments: true
 ---
 
