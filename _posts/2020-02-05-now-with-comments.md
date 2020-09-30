@@ -297,6 +297,12 @@ You can try to use this same integration in your Jekyll blog. You'd need to:
  - Do the `include comments.html` thing shown above in an appropriate place in your template/theme.
  - Set `comments: true` in the front matter of posts you want to have comments (or set it as a default in `_config.yml`).
 
+
+## Testing on This Post
+
+If you want to leave a non-trivial comment on the content of this post, you can do so below. However, if you'd instead like to make a "just testing" post, to see how the http request works, or check the  created pull request, etc, please do it [over here]({{ site.baseurl }}/misc/comments-test.html). Testing only comments made on this post will be closed without accepting them.
+
+
 ## Thanks
 
 Thanks to Eduardo Boucas for creating staticman.
