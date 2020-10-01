@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Comments Test
+slug: comments-test
 comments: true
 ---
 
