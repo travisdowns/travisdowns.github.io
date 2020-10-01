@@ -5,9 +5,9 @@ layout: default
 
   <header class="post-header">
     <div class="gh-issue-button" style="float:right">
-      <gh-issue-button></gh-issue-button>
+      <gh-issue-button data-user="travisdowns" data-repo="travisdowns.github.io" data-path="master/{{ page.path }}" data-alignment="sw"></gh-issue-button>
     </div>
-    <script src="https://techboyg5-php.herokuapp.com/gh-issue-button.php?user=travisdowns&repo=travisdowns.github.io&path=master/{{ page.path }}&alignment=sw" async></script>
+    <script src="https://techboyg5-php.herokuapp.com/gh-issue-button.php" async></script>
     <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
