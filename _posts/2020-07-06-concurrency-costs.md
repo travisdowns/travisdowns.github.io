@@ -603,7 +603,7 @@ You don't usually really want to be in level 3 though: just skip right to level 
 
 Level 3 isn't a _terrible_ place to be, but you'll always have that gnawing in your stomach that you're leaving a 10x speedup on the table. You just need to get rid of that system call or context switch, bringing you to level 2.
 
-Most library provided concurrency primitives already avoid system calls on the happy path. E.g., pthreads mutex, `std::mutex`, Windows `CRITICAL_SECTION` will avoid a system call while acquiring and releasing an uncontended lock. There are some notable exceptions though: if are using a [Win32 mutex object](https://docs.microsoft.com/en-us/windows/win32/sync/mutex-objects) or [System V semaphore](https://man7.org/linux/man-pages/man2/semop.2.html) object, you are paying a for a system call on every operation. Double check if you can use an in-process alternative in this case.
+Most library provided concurrency primitives already avoid system calls on the happy path. E.g., pthreads mutex, `std::mutex`, Windows `CRITICAL_SECTION` will avoid a system call while acquiring and releasing an uncontended lock. There are, however, some notable exceptions: if you are using a [Win32 mutex object](https://docs.microsoft.com/en-us/windows/win32/sync/mutex-objects) or [System V semaphore](https://man7.org/linux/man-pages/man2/semop.2.html) object, you are paying a for a system call on every operation. Double check if you can use an in-process alternative in this case.
 
 For more general synchronization purposes which don't fit the lock-unlock pattern, a condition variable often fits the bill and a quality implementation generally avoids system calls on the fast path. A relatively unknown and higher performance alternative to condition variables, especially suitable for coordinating blocking for otherwise lock-free structures, is an [_event count_](http://pvk.ca/Blog/2019/01/09/preemption-is-gc-for-memory-reordering/#event-counts-with-x86-tso-and-futexes). Paul's implementation is [available in concurrency kit](https://github.com/concurrencykit/ck/blob/master/include/ck_ec.h) and we'll mention it again at Level 0.
 
@@ -654,7 +654,7 @@ Thanks to [@never_released](https://twitter.com/never_released) for help on a pr
 
 Special thanks to [matt_dz](https://twitter.com/matt_dz) and Zach Wenger for helping fix about _sixty_ typos between them.
 
-Thanks to Alexander Monakov, Dave Andersen and Laurent for reporting typos, and Aaron Jacobs for suggesting clarifications to the level 0 definition.
+Thanks to Alexander Monakov, Dave Andersen, Laurent and Kriau for reporting typos, and Aaron Jacobs for suggesting clarifications to the level 0 definition.
 
 Traffic light photo by <a href="https://unsplash.com/@harshaldesai">Harshal Desai</a> on <a href="https://unsplash.com/s/photos/traffic-light">Unsplash</a>.
 
