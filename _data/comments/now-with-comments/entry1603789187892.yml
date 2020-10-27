@@ -1,0 +1,11 @@
+_id: c3c410d0-1832-11eb-9d03-b55c3e3c0440
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: >-
+  "Copy the ... `assets/main.js` ... " - rather: copy `assets/main.js` and
+  replace link in `showModal('Comment submitted', 'Thanks! Your comment is <a
+  href="https://github.com/travisdowns/travisdowns.github.io/pulls">pending</a>...`
+name: Andrzej Kubaszek
+email: ed4bdd717b6e8677f7c5bdf774329147
+hp: ''
+date: 1603789187
