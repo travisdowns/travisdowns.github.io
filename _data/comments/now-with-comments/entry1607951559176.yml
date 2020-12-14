@@ -1,0 +1,8 @@
+_id: 0a59e5a0-3e0e-11eb-a51a-338d5e9fe6d5
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Thank you for such a thorough tutorial. It works!\r\nThe only problem is I do not get the message of a successful comment submission. It shows a message \"Sending...\" and disappears. However, it works fine on a test website. Probably, there is some js conflict. I am still figuring it out...\r\nI also wonder if someone tried to use `staticman-netlify-function` on Netlify, instead of Heroku?"
+name: ALU
+email: 5c55afc9187d4a988df4524967c03f26
+hp: ''
+date: 1607951559
