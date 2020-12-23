@@ -1,0 +1,8 @@
+_id: d3eb6090-449b-11eb-8fb6-4d55eb2d05c1
+_parent: 'https://travisdowns.github.io/misc/comments-test.html'
+replying_to_uid: ''
+message: "#Test\r\nNew line without a break.\r\n\r\nNew line with a break\r\n\r\n<strong>Some html</strong>\r\n\r\nEmoji \U0001F642"
+name: chrome
+email: ''
+hp: ''
+date: 1608672163
