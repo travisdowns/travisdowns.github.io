@@ -1,5 +1,28 @@
 {% comment %} this file defines commonly used terms so they can be used using the abbreviation syntax in posts {% endcomment %}
 
+{% comment %} this main section should be in sorted order {% endcomment %}
+*[AGU]: Address Generation Unit
+*[cross-lane]: A SIMD operation whose lane-wise output depends on elements from lanes other than the same lane in the inputs (lanes are 128 bits in x86).
+*[delamination]: An situation where an instruction using an indexed addressing mode, that is otherwise eligible for micro-fusion, stays fused in the uop-cache, but then delaminates into two separate uops prior to issue, and so counts as two against the pipeline (rename) limit of four uops.
+*[GP]: General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.
+*[IP]: Instruction pointer
+*[IPC]: Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.
+{% assign macro_fuse_def = 'The fusing of an ALU operation and subsequent jump, such as `dec eax; jnz label` into one operation' %}
+*[macro-fuse]: {{ macro_fuse_def }}
+*[macro-fusion]: {{ macro_fuse_def }}
+*[macro-fused]: {{ macro_fuse_def }}
+*[MLP]: Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
+*[demand load]: A true load that appears in the source code or assembly, as opposed to loads initiated by software or hardware prefetch.
+*[naturally aligned]: Naturally aligned data is data whose location in memory is a multiple of its size, e.g., a 4 byte element whose address is a multiple of 4 bytes.
+*[basic block]: a straight-line code sequence with no branches in except to the entry and no branches out except at the exit (Wikipedia).
+*[RFO]: Request for ownership: when a request for a cache line originates from a store, or a type of prefetch that predicts the location is likely to be the target of a store, an RFO is performed which gets the line in an exclusive MESI state.
+{% assign ooo_def = 'Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.' %}
+*[OoO]: {{ ooo_def }}
+*[OOO]: {{ ooo_def }}
+*[out-of-order]: {{ ooo_def }}
+*[uop]: Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.
+*[UPC]: Uops per cycle: The number of a uops executed per cycle, often closely related to IPC.
+
 *[p0]: port 0 (GP and SIMD ALU, not-taken branches)
 *[p1]: port 1 (GP and SIMD ALU, integer mul)
 *[p2]: port 2 (load/store AGU)
@@ -8,28 +31,6 @@
 *[p5]: port 5 (GP and SIMD ALU, vector shuffles)
 *[p6]: port 6 (GP ALU, all branches)
 *[p7]: port 7 (limited store AGU)
-
-{% assign macro_fuse_def = 'The fusing of an ALU operation and subsequent jump, such as `dec eax; jnz label` into one operation' %}
-*[macro-fuse]: {{ macro_fuse_def }}
-*[macro-fusion]: {{ macro_fuse_def }}
-*[macro-fused]: {{ macro_fuse_def }}
-*[delamination]: An situation where an instruction using an indexed addressing mode, that is otherwise eligible for micro-fusion, stays fused in the uop-cache, but then delaminates into two separate uops prior to issue, and so counts as two against the pipeline (rename) limit of four uops.
-*[naturally aligned]: Naturally aligned data is data whose location in memory is a multiple of its size, e.g., a 4 byte element whose address is a multiple of 4 bytes.
-*[AGU]: Address Generation Unit
-*[basic block]: a straight-line code sequence with no branches in except to the entry and no branches out except at the exit (Wikipedia).
-*[uop]: Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.
-*[RFO]: Request for ownership: when a request for a cache line originates from a store, or a type of prefetch that predicts the location is likely to be the target of a store, an RFO is performed which gets the line in an exclusive MESI state.
-*[IP]: Instruction pointer
-*[GP]: General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.
-
-{% assign ooo_def = 'Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.' %}
-*[OoO]: {{ ooo_def }}
-*[OOO]: {{ ooo_def }}
-*[out-of-order]: {{ ooo_def }}
-*[UPC]: Uops per cycle: The number of a uops executed per cycle, often closely related to IPC.
-*[IPC]: Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.
-*[MLP]: Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
-*[demand load]: A true load that appears in the source code or assembly, as opposed to loads initiated by software or hardware prefetch.
 
 {% comment %} Intel uarch abbreviations {% endcomment %}
 *[SNB]: Intel's Sandy Bridge architecture, aka 2nd Generation Intel Core i3,i5,i7
