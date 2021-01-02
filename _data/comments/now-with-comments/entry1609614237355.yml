@@ -1,0 +1,8 @@
+_id: 43bcdd10-4d2d-11eb-9ba4-edbcfa27132f
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Hi, congrats on the success of this beautiful integration.\r\nI am relatively 'new' to static websites and jekyll, including integrating with APIs. \r\n\r\nI currently have Staticman running as a local server via localhost or 0.0.0.0\r\nI have setup a simple HTML form to post to http://localhost. \r\n\r\nThe question I have is: how will I know the localhost POST and GET are working? I want to have the localhost development working before submission to public domain. \r\n\r\nI have kept eye out on the terminal for any changes after submitting the form. Maybe, I need to understand the flowchart more on how each piece speaks to one another for both local and remote hosting."
+name: Charles
+email: 01a62e0c8418efa8bb3e989c7434fb0d
+hp: ''
+date: 1609614237
