@@ -1,0 +1,8 @@
+_id: a0f84900-52b0-11eb-81b1-95b3310c8fa9
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Thanks for the post.\r\n\r\nI hope that you guy's might be interested to hear my following thoughts (I'm super lazy and this commenting architecture appears too complex for my liking :peace:)\r\n\r\nDo we need to use liquid for the comments ? We could just integrate them in every post (would appear simpler and little bit faster) - instead of having a separate comments folder.\r\n\r\nDo we actually need an online deployed service (staticman) and a complex api to receive them ? \r\n\r\nWe could just receive them via email through any free form processing tool from sth like formspree to even a wordpress/google sites/wix/etc form. (Aggregate a couple and) Imap receive via JS (lazy) when and as often we feel like, add them to the blog - by authoring a commit (automated or not).\r\n\r\nThe staticman's md5 nowadays seems like a joke. We could publicly store an encrypted version of the email address via gpg (encrypt by public key). This could be done before saving and committing a new comment to the repository. Now we can contact the author of each comment if we feel like it. With the hashes we lose the contact functionality"
+name: Nick
+email: 90248bc096b41290ef6ec0f1d00cc713
+hp: ''
+date: 1610220413
