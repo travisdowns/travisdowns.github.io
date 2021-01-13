@@ -1,0 +1,8 @@
+_id: 40dba220-555c-11eb-bfb5-01430c7bddbd
+_parent: 'https://travisdowns.github.io/blog/2019/06/11/speed-limits.html'
+replying_to_uid: ''
+message: "Hi,\r\n\r\nYou seem to say that L1d cache cannot both retrieve from L2 and write to the core in the same cycle\r\n>  You can achieve these limits, but you may not be able to consume all the bytes from each cache line, because demand accesses to the L1 cache cannot occur on the same cycle that the L1 cache receives data from the outer cache levels. So, for example, the L2 can provide 64 bytes of data to the L1 cache per cycle, but you cannot also access 64 bytes every cycle since the L1 cannot satisfy those reads from the core and the incoming data from the L2 every cycle.\r\n\r\nBut in another article you seem to say the opposite (about skylake). \r\nhttps://community.intel.com/t5/Software-Tuning-Performance/Haswell-L2-cache-bandwidth-to-L1-64-bytes-cycle/m-p/1014887/highlight/true#M3863\r\n\r\nCan you explain what I am missing between these two explinations? Thank you!"
+name: Noah Goldstein
+email: 5c6c5e08ed042ab5db692956c8c768c2
+hp: ''
+date: 1610514028
