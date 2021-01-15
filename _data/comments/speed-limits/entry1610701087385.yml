@@ -1,0 +1,8 @@
+_id: c8dc0340-570f-11eb-a528-c3ba3c204256
+_parent: 'https://travisdowns.github.io/blog/2019/06/11/speed-limits.html'
+replying_to_uid: 40dba220-555c-11eb-bfb5-01430c7bddbd
+message: "Hi Noah,\r\n\r\nGood catch!\r\n\r\nThere is a subtle difference between the two claims that explains the apparent inconsistency. \r\n\r\nBased on my tests, the _L1 cache_ itself cannot service both a request from the core and accept an incoming line from L2 in the same cycle (that's the claim in this post). However, the incoming line from L2 _can_ be used to satisfy an outstanding read of that line, _bypassing_ the L1 cache. So a line can be accepted from L2, and a read can be satisfied, in the same cycle: but only one read and only if it is to the same line as is incoming from L2.\r\n\r\nBy the way, exploiting this is the basis for a trick that lets you increase your read bandwidth from the L2: normal linear reads can't take advantage of the \"bypass\" described above, but a different pattern can and you can get ~42 bytes/cycle (3 lines every 2 cycles) instead of 32. I've written it up and hope to post it here soon."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1610701087
