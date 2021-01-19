@@ -1,0 +1,8 @@
+_id: 3e568a70-5a29-11eb-9e5b-15b668946273
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: "Regarding:\r\n> What is the weirdest of all, however, is that the optimization doesn’t kick in 100% of the time but only for 40% to 60%\r\n\r\nand\r\n\r\n> Let’s try a benchmark which adds a new implementation, alt01 which alternates between writing a cache line of zeros and a cache line of ones.\r\n\r\nIf you didn't have the L2 prefetchers off the 40 - 60% success rate seems to corresponding somewhat reasonably with the fact that the [L2 spatial and streamer prefetchers will attempt to prefetch 128 byte cache line pair](https://stackoverflow.com/questions/20544917/prefetching-data-at-l1-and-l2) and if this was indeed what was causing that number (say something like only the 128 byte aligned line could be \"store-eliminated\") then that might explain wait the ```alt01``` version didn't have any affect.\r\n\r\nI think your next blog post's data on icelake about how ```ymm``` fill beats ```zmm``` fill might also support your theory that the \"store-elimination\" is done opportunistically when there is heavy store pressure i.e you get 2x the writes with ```ymm``` so if you theory is correct twice the pressure would induce more efforts for \"store-elimination\". \r\n\r\nMostly bullshitting but it kind of lines up :)"
+name: Noah Goldstein
+email: 5c6c5e08ed042ab5db692956c8c768c2
+hp: ''
+date: 1611041875
