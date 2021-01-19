@@ -1,0 +1,17 @@
+_id: bd7e59c0-5a2b-11eb-9e5b-15b668946273
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: ''
+message: >-
+  An interesting thing about restartable sequences is that the critical section
+  only needs to be atomic s.t any interrupt to the processor at any time
+  returning RIP to the abort handler needs to be graceful. On x86_64 for example
+  this means your commit instruction could be an AVX2 store (so 32 byte atomic
+  operation percpu which in itself is pretty cool). But there may be a way using
+  Travis' investigation of [where interrupts
+  happen](https://travisdowns.github.io/blog/2019/08/20/interrupts.html) to
+  build a multi instruction commit if all the instructions retired at the same
+  time.
+name: Noah Goldstein
+email: 5c6c5e08ed042ab5db692956c8c768c2
+hp: ''
+date: 1611042947
