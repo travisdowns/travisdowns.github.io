@@ -1,0 +1,8 @@
+_id: 7bddb460-5eb9-11eb-802a-d773fbbe9b0a
+_parent: 'https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html'
+replying_to_uid: b91ab1d0-5b39-11eb-8312-1f521cd29d10
+message: "Thanks, are you running this under a VM? The output indicates 2 physical cores but the 1165G7 should have 4?\r\n\r\nIn any case, the results are strange. Most tests run at ~4.1 GHz except the 1-core FMA test which runs at ~4.6 GHz, but if anything should be slower it should that one. Perhaps virtualization is interfering, although the numbers do look fairly consistent to me (e.g., little variance around the typical Mops of 4076)."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1611543630
