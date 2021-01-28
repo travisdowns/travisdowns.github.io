@@ -1,0 +1,8 @@
+_id: 79d35640-61aa-11eb-ae6f-195020150b40
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: 3e568a70-5a29-11eb-9e5b-15b668946273
+message: "Hi Noah,\r\n\r\nThanks for your comment!\r\n\r\nThe results shown have prefetching on, but I did also try with prefetching off and some other variations as discussed briefly [in a footnote](https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html#fn:params). In fact, I found _less_ elimination with prefetching off."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1611867038
