@@ -1,0 +1,8 @@
+_id: 90183a70-61f9-11eb-8073-2b87c96cc065
+_parent: 'https://travisdowns.github.io/blog/2019/06/11/speed-limits.html'
+replying_to_uid: e6910110-4d05-11eb-8e32-8da66f6a8063
+message: "Hi Lk, sorry in the delay in my reply.\r\n\r\nYou can find the associated benchmark [here in uarch-bench](https://github.com/travisdowns/uarch-bench/blob/1326be98a0d66583e01beb002d0c69e3cd1e4665/cpp-benches.cpp#L281). I tried compiling it just now on my current system (gcc 9.3.0) and it produced very similar but not identical code to what I have in the post (still 15 instructions, but there is some reordering and some different register choices) as this is a new compiler than what I was using when I wrote this. Still, it wouldn't affect the conclusion.\r\n\r\nI think I was using gcc 5.4 on Ubuntu 16.04 when I wrote this, and indeed [godbolt seems to give identical assembly to that shown in the post for that version](https://godbolt.org/z/Kj5Y5K)."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1611901005
