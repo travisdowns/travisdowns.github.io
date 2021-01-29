@@ -1,0 +1,8 @@
+_id: 02454660-61c8-11eb-b4e8-69e1fbbf9903
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: bd7e59c0-5a2b-11eb-9e5b-15b668946273
+message: "Yeah definitely! It's a whole new way of thinking about atomic operations, since now you're looking for instructions which aren't necessarily atomic in the usual sense, but just do a lot of work in a single instruction. For example, you can use `movsq` to copy 64 bits from one place to another \"instruction atomically\" (in the rseq sense) which isn't even possible with existing atomic instructions.\r\n\r\nI wonder about instructions like `rep movsb` which have a `rep` prefix. These are \"interruptible\" in that they may partially execute: updating their to/from and count pointers. I suppose these aren't supported as \"commit\" instructions for rseq since the implementation probably expects instructions to fully execute, or not."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1611879722
