@@ -481,7 +481,7 @@ Can we do anything with this information?
 
 Well one idea is that it lets us fairly precisely map out the retirement timing of instructions. For example, we can set up an instruction to test, and a parallel series of instructions with a known latency. Then we observe what is selected by interrupts: the instruction under test or the end of the known-latency chain. Whichever is selected has longer retirement latency and the known-latency chain can be adjusted to narrow it down exactly.
 
-Of course, this sounds way harder than the usual way of measuring latency: a long series of back-to-back instrucitons, but it does let us measure some things "in situ" without a long chain, and we can measure instructions that don't have an obvious way to chain (e.g,. have no output like stores or different-domain instructions).
+Of course, this sounds way harder than the usual way of measuring latency: a long series of back-to-back instructions, but it does let us measure some things *in situ* without a long chain, and we can measure instructions that don't have an obvious way to chain (e.g,. have no output like stores or different-domain instructions).
 
 ### Some Things That I Didn't Get To
 
@@ -499,6 +499,8 @@ Feedback of any type is welcome. I don't have a comments system[^comments] yet, 
 
 Thanks to HN user rrss for pointing out errors in my cycle chart.
 
+Thanks to Alex Dowad for pointing out a typo in the text.
+
 [Intel 8259 image](https://commons.wikimedia.org/wiki/File:Intel_8259.svg) by Wikipedia user German under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0).
 
 {% include other-posts.md %}
@@ -515,7 +517,7 @@ Thanks to HN user rrss for pointing out errors in my cycle chart.
 
 [^whymov]: I use `mov` here to avoid creating any dependency chains, i.e., the destination of `mov` is _write-only_ unlike most x86 integer instructions which both read and write their first operand.
 
-[^ipc]: In general I'll just say "this code executes like this" or "the bottleneck is this", without futher justification as the examples are usually simple with one obvious bottleneck. Even though I won't always mentioned it, I _have_ checked that the examples perform as expected, usually with a `perf stat` to confirm the IPC or cycles per iteration or whatever.
+[^ipc]: In general I'll just say "this code executes like this" or "the bottleneck is this", without further justification as the examples are usually simple with one obvious bottleneck. Even though I won't always mentioned it, I _have_ checked that the examples perform as expected, usually with a `perf stat` to confirm the IPC or cycles per iteration or whatever.
 
 [^likely]: Originally I thought it was guaranteed that instructions on the critical path would be eligible for sampling, but it is not: later we construct an example where a critical instruction never gets selected.
 
