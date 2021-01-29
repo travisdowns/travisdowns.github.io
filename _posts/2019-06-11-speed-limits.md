@@ -692,18 +692,173 @@ With that background out of the way, let's look at the various OoO limits next. 
 
 <a name="ooo-table"></a>First, here's a big table of all the resource sizes[^snote] we'll talk about the following sections.
 
-|-        |
-| Vendor  | Uarch   |ROB Size| Sched (RS) | Load Buffer  | Store Buffer  | Integer PRF  | Vector PRF  | Branches (BOB)  | Calls  |
-| -       |
-| Intel   | Sandy Bridge  | 168       | 54         | 64           | 36            | 160          | 144         | 48        | 15     |
-| Intel   | Ivy Bridge    | 168       | 54         | 64           | 36            | 160          | 144         | 48        | 15     |
-| Intel   | Haswell       | 192       | 60         | 72           | 42            | 168          | 168         | 48        | 14     |
-| Intel   | Broadwell     | 192       | 64         | 72           | 42            | 168          | 168         | 48        | 14     |
-| Intel   | Skylake[-X]   | 224       | 97         | 72           | 56            | 180          | 168         | 48        | 14?    |
-| Intel   | Sunny Cove    | 352       | ?          | 128          | 72            | ?            | ?           | 48        | ?      |
-| AMD     | Zen           | 192   | 180[^zensched] | 72           | 44            | 168          | 160         | ?         | ?      |
-| AMD     | Zen2          | 224   | 188[^zen2sched]| ?            | 48            | 180          | 160         | ?         | ?      |
+<style>
+.outer {
+  position: relative;
+  box-sizing: border-box;
+}
 
+#ooo-inner table {
+  border: 0;
+  margin-bottom: 0;
+}
+
+#ooo-inner {
+  overflow-x: scroll;
+  overflow-y: visible;
+  margin-left: 170px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+#ooo-inner th:first-child {
+  position: absolute;
+  margin-left: -170px;
+  width: 50px;
+}
+
+#ooo-inner th:nth-child(2) {
+  position: absolute;
+  margin-left: -110px;
+  width: 100px;
+}
+
+#ooo-inner td {
+  text-align: right;
+}
+
+#ooo-inner thead th {
+  height: 3em;
+}
+
+#ooo-inner tbody th {
+  white-space: nowrap;
+}
+
+#ooo-inner th, #ooo-inner td {
+    padding: 10px 5px;
+}
+
+</style>
+
+<div id="ooo-outer" markdown="1">
+  <div id="ooo-inner">
+    <table>
+        <thead>
+            <tr>
+            <th>Vendor</th>
+            <th>Microarch</th>
+            <th>ROB Size</th>
+            <th>Sched (RS)</th>
+            <th>Load Buffer</th>
+            <th>Store Buffer</th>
+            <th>Integer PRF</th>
+            <th>Vector PRF</th>
+            <th>Branches (BOB)</th>
+            <th>Calls</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            <th>Intel</th>
+            <th>Sandy Bridge</th>
+            <td>168</td>
+            <td>54</td>
+            <td>64</td>
+            <td>36</td>
+            <td>160</td>
+            <td>144</td>
+            <td>48</td>
+            <td>15</td>
+            </tr>
+            <tr>
+            <th>Intel</th>
+            <th>Ivy Bridge</th>
+            <td>168</td>
+            <td>54</td>
+            <td>64</td>
+            <td>36</td>
+            <td>160</td>
+            <td>144</td>
+            <td>48</td>
+            <td>15</td>
+            </tr>
+            <tr>
+            <th>Intel</th>
+            <th>Haswell</th>
+            <td>192</td>
+            <td>60</td>
+            <td>72</td>
+            <td>42</td>
+            <td>168</td>
+            <td>168</td>
+            <td>48</td>
+            <td>14</td>
+            </tr>
+            <tr>
+            <th>Intel</th>
+            <th>Broadwell</th>
+            <td>192</td>
+            <td>64</td>
+            <td>72</td>
+            <td>42</td>
+            <td>168</td>
+            <td>168</td>
+            <td>48</td>
+            <td>14</td>
+            </tr>
+            <tr>
+            <th>Intel</th>
+            <th>Skylake</th>
+            <td>224</td>
+            <td>97</td>
+            <td>72</td>
+            <td>56</td>
+            <td>180</td>
+            <td>168</td>
+            <td>48</td>
+            <td>14?</td>
+            </tr>
+            <tr>
+            <th>Intel</th>
+            <th>Sunny Cove</th>
+            <td>352</td>
+            <td>?</td>
+            <td>128</td>
+            <td>72</td>
+            <td>?</td>
+            <td>?</td>
+            <td>48</td>
+            <td>?</td>
+            </tr>
+            <tr>
+            <th>AMD</th>
+            <th>Zen</th>
+            <td>192</td>
+            <td markdown="span">180[^zensched]</td>
+            <td>72</td>
+            <td>44</td>
+            <td>168</td>
+            <td>160</td>
+            <td>?</td>
+            <td>?</td>
+            </tr>
+            <tr>
+            <th>AMD</th>
+            <th>Zen 2</th>
+            <td>224</td>
+            <td markdown="span">188[^zen2sched]</td>
+            <td>?</td>
+            <td>48</td>
+            <td>180</td>
+            <td>160</td>
+            <td>?</td>
+            <td>?</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
 
 ### Reorder Buffer Size
 
