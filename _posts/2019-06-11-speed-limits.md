@@ -836,7 +836,7 @@ With that background out of the way, let's look at the various OoO limits next. 
             <th>Zen</th>
             <td>192</td>
             <td markdown="span">180[^zensched]</td>
-            <td>72</td>
+            <td markdown="span">72[^zenlsq]</td>
             <td>44</td>
             <td>168</td>
             <td>160</td>
@@ -848,10 +848,22 @@ With that background out of the way, let's look at the various OoO limits next. 
             <th>Zen 2</th>
             <td>224</td>
             <td markdown="span">188[^zen2sched]</td>
-            <td>?</td>
+            <td markdown="span">72[^zenlsq]</td>
             <td>48</td>
             <td>180</td>
             <td>160</td>
+            <td>?</td>
+            <td>?</td>
+            </tr>
+            <tr>
+            <th>AMD</th>
+            <th markdown="span">Zen 3[^zen3buffers]</th>
+            <td>256</td>
+            <td markdown="span">>192[^zen3sched]</td>
+            <td markdown="span">72[^zenlsq]</td>
+            <td>64</td>
+            <td>192</td>
+            <td>?</td>
             <td>?</td>
             <td>?</td>
             </tr>
@@ -1047,7 +1059,13 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 
 [^zensched]: The Zen scheduler has 4x14 GP ALU schedulers, a 96 entry FP scheduler and 2x14 AGU/mem schedulers.
 
-[^zen2sched]: The Zen2 scheduler has 4x16 GP ALU schedulers, a 96 entry (?) FP scheduler and a 1x28 AGU/mem scheduler.
+[^zen2sched]: The Zen 2 scheduler has 4x16 GP ALU schedulers, a 96 entry (?) FP scheduler and a 1x28 AGU/mem scheduler for a total of 188 entries.
+
+[^zen3sched]: The Zen 3 scheduler has 4x24 GP ALU/mem schedulers, and an unknown number (but larger than 96) of FP/SIMD scheduler entries.
+
+[^zenlsq]: AnandTech [reports](https://www.anandtech.com/show/16214/amd-zen-3-ryzen-deep-dive-review-5950x-5900x-5800x-and-5700x-tested/4) an LSQ of 44 entries plus an address generation queue of 28 entries for a total of 72, but I don't know the details of this structure. The LSQ on Zen doesn't act in the same way as that on Intel: entries seem to be freed before retirement (perhaps after the load completes or after no earlier loads are outstanding) and so [can't easily be measured by robsize](https://twitter.com/DROP_ALL_TABLES/status/1188860067543703552).
+
+[^zen3buffers]: Most of the Zen 3 buffer size data from AMD slides via [AnandTech](https://www.anandtech.com/show/16214/amd-zen-3-ryzen-deep-dive-review-5950x-5900x-5800x-and-5700x-tested/3).
 
 [^sunnybuffers]: Ice Lake/Sunny Cove data from [robsize tool](https://github.com/travisdowns/robsize), [Ice Lake client](https://en.wikichip.org/wiki/File:sunny_cove_buffer_capacities.png) and [Ice Lake server](https://www.servethehome.com/wp-content/uploads/2020/08/Hot-Chips-32-Intel-Ice-Lake-SP-Sunny-Cove-Microarchitecture.jpg) slides. The value of 384 for "out-of-order window (i.e., the ROB size), in the last link is a [typo](https://twitter.com/MarkDSimmons/status/1295837457158725633) -- it should be 352.
 
