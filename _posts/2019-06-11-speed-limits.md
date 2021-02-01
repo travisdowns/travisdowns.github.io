@@ -821,14 +821,14 @@ With that background out of the way, let's look at the various OoO limits next. 
             </tr>
             <tr>
             <th>Intel</th>
-            <th>Sunny Cove</th>
+            <th markdown="span">Sunny Cove[^sunnybuffers]</th>
             <td>352</td>
-            <td>?</td>
+            <td>160</td>
             <td>128</td>
             <td>72</td>
+            <td>280</td>
+            <td>224</td>
             <td>?</td>
-            <td>?</td>
-            <td>48</td>
             <td>?</td>
             </tr>
             <tr>
@@ -1048,5 +1048,7 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 [^zensched]: The Zen scheduler has 4x14 GP ALU schedulers, a 96 entry FP scheduler and 2x14 AGU/mem schedulers.
 
 [^zen2sched]: The Zen2 scheduler has 4x16 GP ALU schedulers, a 96 entry (?) FP scheduler and a 1x28 AGU/mem scheduler.
+
+[^sunnybuffers]: Ice Lake/Sunny Cove data from [robsize tool](https://github.com/travisdowns/robsize), [Ice Lake client](https://en.wikichip.org/wiki/File:sunny_cove_buffer_capacities.png) and [Ice Lake server](https://www.servethehome.com/wp-content/uploads/2020/08/Hot-Chips-32-Intel-Ice-Lake-SP-Sunny-Cove-Microarchitecture.jpg) slides. The value of 384 for "out-of-order window (i.e., the ROB size), in the last link is a [typo](https://twitter.com/MarkDSimmons/status/1295837457158725633) -- it should be 352.
 
 {% include glossary.md %}
