@@ -50,8 +50,11 @@ First, lets start with this list of very important caveats.
 
 ## Pipeline Width
 
-**Intel:** Maximum 4 fused-uops[^ICL] per cycle<br>
-**AMD:** Maximum 5 fused-uops per cycle
+**Intel Skylake:** Maximum 4 fused uops per cycle<br>
+**Intel Ice Lake:** Maximum 5 fused uops per cycle<br>
+**AMD Zen, Zen 2:** Maximum 6 MOPs from up to 5 instructions per cycle<br>
+**AMD Zen 3:** Maximum 6 MOPs from up to 6 instructions per cycle<br>
+**Apple M1:** Maximum 8 ops per cycle
 
 At a fundamental level, every CPU can execute only a maximum number of operations per cycle. For many early CPUs, this was always less than one per cycle, but modern pipelined [superscalar](https://en.wikipedia.org/wiki/Superscalar_processor) processors can execute more than one per cycle, up to some limit. This underlying limit is not always be imposed in the same place, e.g., some CPUs may be limited by instruction encoding, others by register renaming or retirement - but there is always a limit (sometimes more than one limit depending on what you are counting).
 
@@ -124,7 +127,7 @@ Your only goal is to reduce the number of operations (in the fused domain), whic
 
 ## Port/Execution Unit Limits
 
- **Intel, AMD:** One operation per port, per cycle
+ **Intel, AMD, Apple:** One operation per port, per cycle
 
  Let us use our newfound knowledge of the pipeline width limitation, and tackle another example loop:
 
@@ -198,20 +201,17 @@ Essnentially an open-source version if IACA. Displays cumulative port pressure i
 
 **LLVM-MCA**
 
-Another tool similar to IACA and OSACA, shows port pressure in a similar way and attempts to find an ideal solution (algorithm unclear, but it's open source so someone could check). Comes with LLVM 7 or higher and documentation is [here](https://llvm.org/docs/CommandGuide/llvm-mca.html).
+Another tool, similar to IACA and OSACA, llvm-mca shows port pressure in a similar way and attempts to find an ideal solution (algorithm unclear, but it's open source so someone could check). Comes with LLVM 7 or higher and documentation is [here](https://llvm.org/docs/CommandGuide/llvm-mca.html).
 
 ### Measuring It
 
 You can measure the actual port pressure using the `perf` and the `uops_dispatched_port` counters. For example, to measure the full port pressure across all 8 ports, you can do the following in uarch-bench:
 
 ~~~
-./uarch-bench.sh --timer=perf --test-name=cpp/mul-4 --extra-events=uops_dispatched_port.port_0,uops_dispatched_port.port_1,uops_dispatched_port.port_2,uops_dispatched_port.port_3,uops_dispatched_port.port_4,uops_dispatched_port.port_5,uops_dispatched_port.port_6,uops_dispatched_port.port_7
+$ ./uarch-bench.sh --timer=perf --test-name=cpp/mul-4 --extra-events=uops_dispatched_port.port_0#p0,uops_dispatched_port.port_1#p1,uops_dispatched_port.port_2#p2,uops_dispatched_port.port_3#p3,uops_dispatched_port.port_4#p4,uops_dispatched_port.port_5#p5,uops_dispatched_port.port_6#p6,uops_dispatched_port.port_7#p7
 ...
-Running benchmarks groups using timer perf
-
-** Running group cpp : Tests written in C++ **
-           Benchmark       Cycles       uops_d       uops_d       uops_d       uops_d       uops_d       uops_d       uops_d       uops_d
-Four multiplications         4.00         1.06         4.00         0.50         0.50         0.00         0.97         1.81         0.00
+           Benchmark       Cycles           p0           p1           p2           p3           p4           p5           p6           p7
+Four multiplications         4.00         0.86         4.00         0.50         0.50         0.00         0.90         1.58         0.00
 ~~~
 
 While noting that that the column naming scheme is [really bad](https://github.com/travisdowns/uarch-bench/issues/50) in this case, we see that the port1 (the 3rd numeric column) has 4 operations dispatched every iteration, and iterations take 4 cycles, so the port is active every cycle, i.e., 100% pressure. None of the other ports have significant pressure at all, they are all active less than 50% of the time.
@@ -223,15 +223,19 @@ While noting that that the column naming scheme is [really bad](https://github.c
 
 ## Load Throughput Limit
 
-**Intel, AMD:** 2 loads per cycle
+**Intel Skylake, Ice Lake:** 2 loads per cycle<br>
+**AMD Zen, Zen 2:** 2 loads per cycle<br>
+**AMD Zen 3:** 3 loads per cycle<br>
+**Apple M1:** 3 loads per cycle
 
-Modern Intel and AMD chips (and many others) have a limit of two loads per cycle, which you can achieve if both loads hit in L1. You could just consider this the same as the "port pressure" limit, since there only two load ports - but the limit is interesting enough to call out on its own.
 
-Of course, like all limits this is a best case scenario: you might achieve much less than two loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts present on AMD and older Intel chips[^bankconf]. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed. In a throughput sense, loads that hit in cache are not all that expensive even compared to simple ALU ops.
+Modern Intel and AMD chips (and many others) have a limit of two or three loads per cycle, which can generally only be achieved if all the loads hit in L1. You could just consider this the same as the "port pressure" limit, since there are generally the same number of load ports as the "maximum loads" figure -- but the limit is interesting enough to call out on its own.
 
-It's not all that common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.
+Of course, like all limits this is a best case scenario: you might achieve much less than the maximum number of loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts present on AMD and older Intel chips[^bankconf]. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed on Intel chips, as well as on AMD's Zen 3 (3 loads out of a max width of 6) . In a throughput sense, loads that hit in cache are not all that expensive even compared to simple ALU ops.
 
-It's not all _that_ common to hit this limit, but it can often happen in an indirect load scenario (where part of the load address is itself calculated using a value from memory), or when heavy use of lookup tables is made. Consider the following loop, does an indirect loop in `data` based on the `offsets` array and sums the values it finds[^written-weirdly]:
+It's not all _that_ common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.
+
+One scenario where you might hit this limit is in an indirect load scenario (where part of the load address is itself calculated using a value from memory), or when making heavy use of lookup tables. Consider the following loop, which does an indirect loop of `data` based on the an index read from the `offsets` array and which simply sums the resulting values[^written-weirdly]:
 
 ~~~c++
 do {
@@ -244,13 +248,13 @@ do {
 This compiles to the following assembly:
 
 ~~~nasm
-88:                                       ; total fused uops
+.top:                                     ; total fused uops
     mov    r8d,DWORD PTR [rsi+rdx*4-0x4]  ; 1
     add    ecx,DWORD PTR [rdi+r8*4]       ; 2
     mov    r8d,DWORD PTR [rsi+rdx*4-0x8]  ; 3
     add    eax,DWORD PTR [rdi+r8*4]       ; 4
     sub    rdx,0x2                        ; (fuses w/ jne)
-    jne    88                             ; 5
+    jne    .top                           ; 5
 ~~~
 
 There are only 5 fused-uops[^delam2] here, so maybe this executes in 1.25 cycles? Not so fast - it takes 2 cycles because there are 4 loads and we have a speed limit of 2 loads per cycle[^add-indirect].
@@ -261,11 +265,11 @@ Note that gather instructions count "one" against this limit for *each* element 
 
 For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one, except loads that split a cache line, which count as two. A split cache line load is of at least two bytes and crosses a 64-byte boundary. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
 
-On AMD Zen1 loads suffer a penalty when crossing any 32-byte boundary - such loads also count as two against the load limit. 32-byte (AVX) loads also count as two on Zen1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halve will cross a 32-byte boundary.
+On AMD Zen 1 loads suffer a penalty when crossing any 32-byte boundary - such loads also count as two against the load limit. 32-byte (AVX/AVX2) loads also count as two on Zen 1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halve will cross a 32-byte boundary. On Zen 2, there is no such penalty for crossing a 32-byte boundary: like on Intel a penalty occurs only when crossing a 64-byte cache line boundary.
 
 ### Remedies
 
-If you are lucky enough to hit this limit, you just need less loads. Note that the limit is not expressed in terms of the _number of bytes loaded_, but in the number of separate loads. So sometimes you can combine two or more adjacent loads into a single load. An obvious application of that is vector loads: 32-byte AVX loads _still_ have the same limit of two per cycle as byte loads. It is difficult to use vector loads in concert with scalar code however: although you can do 8x 32-bit loads at once, if you want to feed those loads to scalar code you have trouble, because you can't efficiently get that data into scalar registers[^vector-scalar]. That is, you'll have to work on vectorizing the code that consumes the loads as well.
+If you are lucky enough to hit this limit, you just need fewer loads. Note that the limit is not expressed in terms of the _number of bytes loaded_, but in the number of separate loads. So sometimes you can combine two or more adjacent loads into a single load. An obvious application of that is vector loads: 32-byte AVX loads _still_ have the same limit of two per cycle as byte loads. It is difficult to use vector loads in concert with scalar code however: although you can do 8x 32-bit loads at once, if you want to feed those loads to scalar code you have trouble, because you can't efficiently get that data into scalar registers[^vector-scalar]. That is, you'll have to work on vectorizing the code that consumes the loads as well.
 
 You can also sometimes use wider scalar loads in this way. In the example above, we do four 32-bit loads - two of which are scattered (the access to `data[]`), but two of which are adjacent (the accesses to `offsets[i - 1]` and `offsets[i - 2]`). We could combine those two adjacent loads into one 64-bit load, like so[^portable]:
 
@@ -282,7 +286,7 @@ do {
 This compiles to:
 
 ~~~nasm
-98:                                        ; total fused uops
+.top:                                      ; total fused uops
     mov    rcx,QWORD PTR [rsi+rdx*4-0x8]   ; 1
     mov    r9,rcx                          ; 2
     mov    ecx,ecx                         ; 3
@@ -290,20 +294,20 @@ This compiles to:
     add    eax,DWORD PTR [rdi+rcx*4]       ; 5
     add    r8d,DWORD PTR [rdi+r9*4]        ; 6
     sub    rdx,0x2                         ; (fuses w/ jne)
-    jne    98                              ; 7
+    jne    .top                            ; 7
 ~~~
 
 We have 7 fused-domain uops rather than 5, yet this runs in 1.81 cycles, about 10% faster. The theoretical limit based on pipeline width is 7 / 4 = 1.75 cycles, so we are probably getting collisions on p6 between the `shr` and the taken branch (unrolling a bit more would help). Clang 5.0 manages to do better, by one uop:
 
 ~~~nasm
-70:
+.top:
     mov    r8,QWORD PTR [rsi+rdx*4-0x8]
     mov    r9d,r8d
     shr    r8,0x20
     add    ecx,DWORD PTR [rdi+r8*4]
     add    eax,DWORD PTR [rdi+r9*4]
     add    rdx,0xfffffffffffffffe
-    jne    70
+    jne    .top
 ~~~
 
 It avoided the `mov r9,rcx` instruction by combining that and the zero extension (which is effectively the `& 0xFFFFFFFF`) into a single `mov r9d,rd8`. It runs at 1.67 cycles per iteration, saving 20% over the 4-load version, but still slower than the 1.5 limit implied by the 4-wide fused-domain limit.
@@ -324,7 +328,7 @@ The limits are listed in _cache lines per cycle_ and not in bytes, because that'
 | Intel  | SKL  |   1  | 0.2 - 0.3 |
 | Intel  | HSW  | 0.5  | 0.2 - 0.3 |
 | AMD    | Zen  | 0.5  | 0.5 |
-| AMD    | Zen2 | 0.5  | 0.5 |
+| AMD    | Zen 2 | 0.5  | 0.5 |
 
 The very poor figure of 0.1 cache lines per cycle (about 6-7 bytes a cycle) from L3 on SKX is at odds with Intel's manuals, but it's what I measured on a W-2104. For architectures earlier than Haswell I think the numbers will be similar back to Sandy Bridge.
 
@@ -354,19 +358,19 @@ for (size_t i = 0; i < len; i++) {
 This does only a single multiplication per iteration, and compiles to the following tight loop:
 
 ~~~c++
-50:
+.top:
     imul   eax,DWORD PTR [rdi]
     add    rdi,0x4
     cmp    rdi,rdx
-    jne    50
+    jne    .top
 ~~~
 
 That's only 3 fused uops, so our pipeline speed limit is 0.75 cycles/iteration. But wait, we know the imul needs p1, and the other two operations can go to other ports, so the p1 pressure means a limit of 1 cycle/iteration. What does the real world have to say?
 
 ~~~
-./uarch-bench.sh --timer=perf --test-name=cpp/mul-chain --extra-events=$PE_PORTS
-              Benchmark       Cycles       uops_d       uops_d       uops_d       uops_d       uops_d       uops_d       uops_d       uops_d
-Chained multiplications         2.98         0.50         1.00         0.50         0.50         0.00         0.50         1.00         0.00
+$ ./uarch-bench.sh --timer=perf --test-name=cpp/mul-chain --extra-events=uops_dispatched_port.port_0#p0,uops_dispatched_port.port_1#p1,uops_dispatched_port.port_2#p2,uops_dispatched_port.port_3#p3,uops_dispatched_port.port_4#p4,uops_dispatched_port.port_5#p5,uops_dispatched_port.port_6#p6
+              Benchmark      Cycles          p0          p1          p2          p3          p4          p5          p6
+Chained multiplications        2.98        0.48        1.00        0.50        0.50        0.00        0.52        1.00
 ~~~
 
 Bleh, 2.98 cycles, or 3x slower than we predicted.
@@ -376,7 +380,7 @@ What happened? As it turns out, the `imul` instruction has a _latency_ of 3 cycl
 Note that we mostly care about _loop carried_ dependencies, which are dependency chains that cross loop iterations, i.e., where some output register in one iteration is used as an input register for the same chain in the next iteration. In the example, the carried chain involves only `eax`, but more complex chains are common in practice. In the earlier example, the four `imul` instructions _did_ form a chain:
 
 ~~~nasm
-930:
+.top:
     mov    r10d,DWORD [rdi+rcx*4+0x4] ; load
     mov    r8d,r10d                   ;
     imul   r8d,ecx                    ; imul1
@@ -387,21 +391,21 @@ Note that we mostly care about _loop carried_ dependencies, which are dependency
     mov    r9d,r10d                   ;
     add    eax,r8d                    ; add
     cmp    rcx,rsi                    ;
-    jne    930                        ;
+    jne    .top                       ;
 ~~~
 
 Note how each `imul` depends on the previous through the input/output `r8d`. Finally, the result is added to `eax` ,and `eax` is indeed used as input in the next iteration, so do we have a loop-carried dependency chain? Yes - but a very small one involving only `eax`. The dependency chain looks like this:
 
 ~~~
-iteration 1       load -> imul1 -> imul -> imul -> imul -> add
-                                                            |
-                                                            v
-iteration 2       load -> imul1 -> imul -> imul -> imul -> add
-                                                            |
-                                                            v
-iteration 3       load -> imul1 -> imul -> imul -> imul -> add
-                                                            |
-                                                            v
+iteration 1   load -> imul1 -> imul2 -> imul3 -> imul4 -> add
+                                                           |
+                                                           v
+iteration 2   load -> imul1 -> imul2 -> imul3 -> imul4 -> add
+                                                           |
+                                                           v
+iteration 3   load -> imul1 -> imul2 -> imul3 -> imul4 -> add
+                                                           |
+                                                           v
 etc ...                                                    ...
 ~~~
 
@@ -494,15 +498,27 @@ On AMD Zen, any store which crosses a 16 byte boundary suffers a significant pen
 
 Remove unnecessary stores from your core loops. If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is different, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you want to take advantage of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a single vectorized store. Of course, if your stores are not contiguous, this will be difficult or impossible.
 
+
+## Address Generation Limit
+
+**AMD Zen:** 2/cycle
+**AMD Zen 2:** 3/cycle
+**AMD Zen 3:** 3/cycle
+**Apple M1:** 4/cycle
+
+Both loads and store require an address generation unit to perform addressing calculation. Often, these units are shared between load and store units, and there may be fewer of these units than the sum of load and store units. For example, AMD Zen 3 can do 3 loads per cycle, and also 2 stores per cycle, but only has a total of 3 AGU. This means it can't do 3 loads _and_ 2 stores in the same cycle: there is a limit of three memory accesses in total, which may be (for example) 3 loads and no stores, or 1 load and 2 stores, etc.
+
+### Remedies
+
+Fewer loads and stores, as described in the remedies section for loads and stores above.
+
 ## Complex Addressing Limit
 
-**Max of 1 load (any addressing) concurrent with a store with complex addressing per cycle.**
+**Intel Skylake:** Max of 1 load (any addressing) concurrent with a store with complex addressing per cycle.
 
-_This limit is Intel specific._
+Recent Intel chips have the same number of AGUs as load and store units, so don't directly suffer the AGU limit: but they do suffer a related limitation involving complex addressing.
 
-The load and store limits above are written as if they are independent. That is, they imply that you can do 2 loads **and** 1 store per cycle. Sometimes that is true, but it depends on the addressing modes used.
-
-Each load and store operation needs an _address generation_ which happens in an AGU. There are three AGUs on modern Intel chips: p2, p3 and p7. However, p7 is restricted: it can _only_ be used by stores, and it can only be used if the store addressing mode is simple. [Simple addressing](https://stackoverflow.com/a/51664696) is anything that is of the form `[base_reg + offset]` where `offset` is in `[0, 2047]`. So `[rax + 1024]` is simple addressing, but all of `[rax + 4096]`, `[rax + rcx * 2]` and `[rax * 2]` are not.
+Each load and store operation needs an _address generation_ which happens in an AGU. There are three AGUs on modern Intel Skylake chips: p2, p3 and p7. However, p7 is restricted: it can _only_ be used by stores, and it can only be used if the store addressing mode is simple. [Simple addressing](https://stackoverflow.com/a/51664696) is anything that is of the form `[base_reg + offset]` where `offset` is in `[0, 2047]`. So `[rax + 1024]` is simple addressing, but all of `[rax + 4096]`, `[rax + rcx * 2]` and `[rax * 2]` are not.
 
 To apply this limit, count *all* load and any stores with complex addressing: these operations cannot execute at more than 2 per cycle.
 
@@ -1015,7 +1031,9 @@ Thanks to Daniel Lemire for providing access to hardware on which I was able to 
 
 ## Comments
 
-I don't have a comments system[^comments] yet, so I'm basically just outsourcing discussion to HackerNews right now: [here is the thread](https://news.ycombinator.com/item?id=20157196) for this post.
+You can leave any comments or questions using the form below.
+
+This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hacker News.
 
 {% include other-posts.md %}
 
@@ -1062,8 +1080,6 @@ I don't have a comments system[^comments] yet, so I'm basically just outsourcing
 [^speedlemire]: I think this speed limit term came from [Daniel Lemire](https://lemire.me). I guess I liked it because I have used it a lot since then.
 
 [^thatsaid]: That said, I am quite sure you can reach or at least approach closely these limits as I've tested most of them myself. Sure, a lot of these are micro-benchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can't - I'm interested to hear about it.
-
-[^comments]: If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears.
 
 [^bankconf]: Bank conflicts occur in a banked cache design when two loads try to access the same bank. [Per Fabian](https://twitter.com/rygorous/status/1138934828198326272) Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips have 16 banks per line (bank selected by bits `[5:2]` of the address), while Zen1 has 8 banks per line (bits `[5:3]` used). A load uses any bank it overlaps.
 
