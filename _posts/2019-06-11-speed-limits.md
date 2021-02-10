@@ -895,6 +895,18 @@ With that background out of the way, let's look at the various OoO limits next. 
                 <td>?</td>   <!-- BOB -->
                 <td>?</td>   <!-- max calls -->
             </tr>
+            <tr>
+                <th>Amazon</th>
+                <th markdown="span">Graviton 2[^g2buffers]</th>
+                <td>~124</td> <!-- ROB size -->
+                <td>~48</td> <!-- sched size -->
+                <td>~62</td> <!-- load buffers -->
+                <td>~40</td>  <!-- store buffers -->
+                <td>~92</td> <!-- integer PRF -->
+                <td>~96</td> <!-- SIMD PRF -->
+                <td>~46</td>   <!-- BOB -->
+                <td>?</td>   <!-- max calls -->
+            </tr>
         </tbody>
     </table>
     </div>
@@ -902,7 +914,7 @@ With that background out of the way, let's look at the various OoO limits next. 
 
 ### Reorder Buffer Size
 
-The ROB is the largest and most general out of order buffer: all uops, even those that don't execute such as `nop` or zeroing idioms, take a slot in the ROB. This structure holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest un-retired instruction to the youngest instruction that can be issued. On Intel, the ROB holds micro-fused ops, so the size is measured in the fused-domain.
+The ROB is the largest and most general out of order buffer: all uops, even those that don't execute such as `nop` or zeroing idioms, take a slot in the ROB[^robgen]. This structure holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the OoO window as measured from the oldest un-retired instruction to the youngest instruction that can be issued. On Intel, the ROB holds micro-fused ops, so the size is measured in the fused-domain.
 
 As an example, a load instruction takes a cache miss which means it cannot retire until the miss is complete. Let's say the load takes 300 cycles to finish, which is a typical latency. Then, on an Haswell machine with a ROB size of 192, _at most_ 191 additional instructions can execute while waiting for the load: at that point the ROB window is exhausted and the core stalls. This puts an upper bound on the maximum IPC of the region of 192 / 300 = 0.64. It also puts a bound on the maximum MLP achievable, since only loads that appear in the next 191 instructions can (potentially) execute in parallel with the original miss. In fact, this behavior is used by Henry Wong's [robsize tool](https://github.com/travisdowns/robsize) to measure the ROB size and other OoO buffer sizes, using a missed load followed by a series of filler instructions and finally another load miss. By varying the number of filler instructions and checking whether the loads executed in parallel or serially, the ROB size can be [determined experimentally](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/).
 
@@ -1098,5 +1110,9 @@ This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hac
 [^m1buffers]: The M1 data comes from AnandTech's [deep dive](https://www.anandtech.com/show/16226/apple-silicon-m1-a14-deep-dive/2) on M1, by [Andrei](https://twitter.com/andreif7), using Veedrac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on the [robsize tool](https://github.com/travisdowns/robsize).
 
 [^sunnybuffers]: Ice Lake/Sunny Cove data from [robsize tool](https://github.com/travisdowns/robsize), [Ice Lake client](https://en.wikichip.org/wiki/File:sunny_cove_buffer_capacities.png) and [Ice Lake server](https://www.servethehome.com/wp-content/uploads/2020/08/Hot-Chips-32-Intel-Ice-Lake-SP-Sunny-Cove-Microarchitecture.jpg) slides. The value of 384 for "out-of-order window (i.e., the ROB size), in the last link is a [typo](https://twitter.com/MarkDSimmons/status/1295837457158725633) -- it should be 352.
+
+[^robgen]: Well this is at least true on Intel. Recent chips from AMD, Apple and others seem to use _nop compression_ to pack several nops into one ROB slot: so in this case we can imagine that each nop takes only a _fraction_ of a slot. It is not impossible to imagine an microarchitecture that entire avoids putting nops in the ROB. 
+
+[^g2buffers]: These numbers I measured myself using a modified version of Veerdac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on [robsize](https://github.com/travisdowns/robsize) (but unlike robsize supports Arm 64-bit platforms). My results for ROB size are [here]({{page.assets}}/g2results/generic-aarch64.svg) and [here]({{page.assets}}/g2results/nop.svg) (the latter test indicating that _nop compression_ does not appear to be present on Graviton 2). Scheduler size results, using instructions which are dependent on the fencing loads are [here]({{page.assets}}/g2results/depadd-aarch64.svg). There are also [load]({{page.assets}}/g2results/load-aarch64.svg) and [store]({{page.assets}}/g2results/store-aarch64.svg) buffer results, as well as [integer PRF]({{page.assets}}/g2results/add-aarch64.svg) and [SIMD PRF]({{page.assets}}/g2results/fmla-aarch64.svg) results. [This test]({{page.assets}}/g2results/movz-fmla-aarch64.svg) indicates that the integer and SIMD PRFs are not shared. It isn't shown in the table, but [this result testing `cmp`]({{page.assets}}/g2results/cmp.svg) indicates that there is a separate set of renamed flag registers with ~36 entries. [These results]({{page.assets}}/g2results/branch-aarch64.svg) indicate that up to 46 calls can be in flight at once. There are [even more](https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results) results not mentioned here.
 
 {% include glossary.md %}
