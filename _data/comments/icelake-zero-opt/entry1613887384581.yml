@@ -1,0 +1,8 @@
+_id: 75fafc90-740a-11eb-93fe-079499d9a376
+_parent: 'https://travisdowns.github.io/blog/2020/05/18/icelake-zero-opt.html'
+replying_to_uid: 4afb2ef0-73c1-11eb-9aaa-d51dc4f5f74f
+message: "Hi Noah, thanks for your comment and observation about `rep stosb`!\r\n\r\nI think your finding makes sense: `rep stosb` can use a \"RFO-ND\" (request ownership _without data_) protocol for larger region sizes, as opposed to [vanilla RFO](https://en.wikipedia.org/wiki/MESI_protocol#Read_For_Ownership) which brings the existing cache line up into the cache hierarchy. This works because the core can guarantee entire lines will be overwritten by the string operation since it knows the total size of the operation: thus the old data is \"dead\".\r\n\r\nSince the old data isn't fetched, it can't be compared against zero, and a zero-over-zero optimization couldn't happen. In essence, this RFO-ND optimization is the opposite approach to that discussed in this post: RFO-ND avoids the _read_ implied by a store, while this zero-over-zero optimization avoids the _write_. I think you have to pick one or the other: I don't see an easy way to do both for data in RAM. The RFO-ND approach has the benefit of applying to any value, not just zero."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1613887384
