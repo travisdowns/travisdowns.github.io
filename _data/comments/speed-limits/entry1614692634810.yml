@@ -1,0 +1,8 @@
+_id: 54918510-7b5d-11eb-9c06-973f46681990
+_parent: 'https://travisdowns.github.io/blog/2019/06/11/speed-limits.html'
+replying_to_uid: ''
+message: "Hi,\r\n\r\nI have tested the store-on-port-7 \"hack\" (with simple addressing on write).\r\nhttps://godbolt.org/z/PPutUu\r\n\r\nHowever, gcc seems to have problems with this code if you try to add loop unrolling `-funroll-loops`, which is also crucial when you try to achieve maximum performance when using AVX/FMA intrinsic.\r\n\r\nWith clang I'm able to generate unrolled and vectorized code with simple addressing, but it looks like gcc is incapable of this.\r\n\r\nThis thread: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88760\r\nis discussing some shortcomings in gcc compared with clang.\r\n\r\nYou don't happen to know if it is possible to generate unrolled and vectorized code with simple addressing?\r\n\r\nThanks\r\n- Jp"
+name: jpaasen
+email: ''
+hp: ''
+date: 1614692634
