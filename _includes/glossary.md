@@ -42,6 +42,7 @@
 *[CNL]: Intel's Cannon Lake (client) architecture, the i3-8121U was the only SKU ever released
 *[SKX]: Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W
 *[SNC]: Intel's Sunny Cove architecture, aka 10th Generation Intel Core i3,i5,i7
+*[RKL]: Intel's Rocket Lake architecture, aka 11th Generation Intel Core i3,i5,i7 and i9
 
 *[Sunny Cove]: The new 7nm microarchitecture used in Ice Lake CPUs.
 

@@ -82,6 +82,12 @@
   font-size: 80%;
 }
 
+// optioinal style to right align data in tables
+.td-right td {
+  text-align:right;
+}
+
+
 sup[id^='fnref'] {
   font-size: 0.8em;
   line-height: 0; // prevent superscript from affecting the line height when it appears
