@@ -1,0 +1,13 @@
+_id: 05cb0120-9612-11eb-9ec2-33c79e181b6f
+_parent: 'https://travisdowns.github.io/blog/2019/11/19/toupper.html'
+replying_to_uid: ''
+message: >-
+  I have commented on the bug you linked
+  (https://sourceware.org/bugzilla/show_bug.cgi?id=25214#c4). Looks like a
+  libstdc++ issue caused by it inconsistently overriding C headers. And IMHO it
+  is worth requesting libstdc++ to implement the same optimization glibc does in
+  order to make locale functions inlinable.
+name: Andrey Semashev
+email: ''
+hp: ''
+date: 1617628972
