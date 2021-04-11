@@ -1,0 +1,8 @@
+_id: 477dc470-9a83-11eb-a7e1-433b870d86b2
+_parent: 'http://0.0.0.0:4000/blog/2019/06/11/speed-limits.html'
+replying_to_uid: 54918510-7b5d-11eb-9c06-973f46681990
+message: "Well in your linked godbolt, your `sum2` version seems to successfully use simple addressing for the store, even with `-funroll-loops`?\r\n\r\nThat said, if it wasn't working you could almost certainly force simple addressing by laundering the address to store though an empty asm that \"potentially modifies\" the address (the `+r` output constraint), [like this](https://godbolt.org/z/qMo41P7Pd). At some point though, when you know exactly the asm you want and are trying to trick every supported version of the compiler into producing it, why not just check the assembly into your project and assemble that?\r\n\r\nWell, there are a lot of reasons, but sometimes it's an appealing idea..."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1618117420
