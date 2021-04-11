@@ -770,7 +770,7 @@ With that background out of the way, let's look at the various OoO limits next. 
             <th>Store Buffer</th>
             <th>Integer PRF</th>
             <th>Vector PRF</th>
-            <th>Branches (BOB)</th>
+            <th>Branches</th>
             <th>Calls</th>
             </tr>
         </thead>
@@ -885,13 +885,25 @@ With that background out of the way, let's look at the various OoO limits next. 
             </tr>
             <tr>
                 <th>Apple</th>
-                <th markdown="span">M1[^m1buffers]</th>
-                <td>~636</td> <!-- ROB size -->
-                <td>?</td> <!-- sched size -->
-                <td>~148</td> <!-- load buffers -->
-                <td>~106</td>  <!-- store buffers -->
-                <td>~354</td> <!-- integer PRF -->
-                <td>~384</td> <!-- SIMD PRF -->
+                <th markdown="span">M1 Firestorm[^m1buffers]</th>
+                <td markdown="span">636[^m1rob]</td> <!-- ROB size -->
+                <td markdown="span">326[^m1sched]</td> <!-- sched size -->
+                <td>130</td> <!-- load buffers -->
+                <td>60</td>  <!-- store buffers -->
+                <td>~380</td> <!-- integer PRF -->
+                <td>~434</td> <!-- SIMD PRF -->
+                <td>~144</td>   <!-- BOB -->
+                <td>?</td>   <!-- max calls -->
+            </tr>
+            <tr>
+                <th>Apple</th>
+                <th markdown="span">M1 Icestorm[^m1buffersice]</th>
+                <td markdown="span">111[^m1rob]</td> <!-- ROB size -->
+                <td markdown="span">71[^m1schedice]</td> <!-- sched size -->
+                <td>30</td> <!-- load buffers -->
+                <td>18</td>  <!-- store buffers -->
+                <td>~79</td> <!-- integer PRF -->
+                <td>~87</td> <!-- SIMD PRF -->
                 <td>?</td>   <!-- BOB -->
                 <td>?</td>   <!-- max calls -->
             </tr>
@@ -1107,7 +1119,15 @@ This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hac
 
 [^zen3buffers]: Most of the Zen 3 buffer size data from AMD slides via [AnandTech](https://www.anandtech.com/show/16214/amd-zen-3-ryzen-deep-dive-review-5950x-5900x-5800x-and-5700x-tested/3).
 
-[^m1buffers]: The M1 data comes from AnandTech's [deep dive](https://www.anandtech.com/show/16226/apple-silicon-m1-a14-deep-dive/2) on M1, by [Andrei](https://twitter.com/andreif7), using Veedrac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on the [robsize tool](https://github.com/travisdowns/robsize).
+[^m1rob]: The M1 Firestorm and Icestorm cores don't appear to have a traditional one-uop-one-entry ROB, but rather a ~330 (Firestorm) or 60 entry (Icestorm) structure which has something like _macro entries_ which can hold up to 7 uops which can retire as a group. Discovered by [Dougall J](https://twitter.com/dougallj) who describes them in more detail under _Other limits_ on his [Firestorm summary](https://dougallj.github.io/applecpu/firestorm.html). Instead of listing this value, which would greatly underestimate the ROB size compared to the other microarchitectures in most scenarios, I use the _in-flight renames_ value which is mostly 1:1 to uops and is more directly comparable with the values for non-Apple chips. In practice, you'll hit this rename limit or one of the physical register file limits long before you get to the 330 * 7 = ~2,310 outstanding ops (Firestorm) implied by totally filling the macro-entry structure.
+
+[^m1sched]: The M1 Firestorm apparently has 326 scheduler entries across 14 execution ports. From [Dougall's breakdown](https://twitter.com/dougallj/status/1373973478731255812) we have six schedulers for the 6 integer ALU units of 24, 26, 16, 12, 28 and 28 entries, a 48-entry scheduler shared between the load, store and AMX units, and 4 x 36 entry schedulers for the 4 NEON SIMD units. 
+
+[^m1schedice]: The M1 Icestorm apparently has 71 scheduler entries across 7 execution ports. From [Dougall's breakdown](https://twitter.com/dougallj/status/1373973478731255812) we have 3 x 9-entry, 18 entry and 2 x 13 entry schedulers for the general purpose, load/store/AMX and SIMD units, respectively.
+
+[^m1buffers]: Most of the M1 Firestorm data comes from [Dougall J's extensive analysis and reverse engineering](https://twitter.com/dougallj/status/1373973478731255812) (see also [here](https://dougallj.github.io/applecpu/firestorm.html)) of the M1 chip. Earlier revisions had numbers mostly from AnandTech's [deep dive](https://www.anandtech.com/show/16226/apple-silicon-m1-a14-deep-dive/2) on M1, by [Andrei](https://twitter.com/andreif7), using Veedrac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on the [robsize tool](https://github.com/travisdowns/robsize).
+
+[^m1buffersice]: The M1 Icestorm data comes from [Dougall J's extensive analysis and reverse engineering](https://twitter.com/dougallj/status/1373973478731255812) (see also [here](https://dougallj.github.io/applecpu/icestorm.html)) of the M1 chip.
 
 [^sunnybuffers]: Ice Lake/Sunny Cove data from [robsize tool](https://github.com/travisdowns/robsize), [Ice Lake client](https://en.wikichip.org/wiki/File:sunny_cove_buffer_capacities.png) and [Ice Lake server](https://www.servethehome.com/wp-content/uploads/2020/08/Hot-Chips-32-Intel-Ice-Lake-SP-Sunny-Cove-Microarchitecture.jpg) slides. The value of 384 for "out-of-order window (i.e., the ROB size), in the last link is a [typo](https://twitter.com/MarkDSimmons/status/1295837457158725633) -- it should be 352.
 

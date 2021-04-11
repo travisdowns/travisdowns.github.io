@@ -46,6 +46,12 @@
 
 *[Sunny Cove]: The new 7nm microarchitecture used in Ice Lake CPUs.
 
+{% comment %} Apple CPU stuff {% endcomment %}
+*[M1]: The first generally available Apple CPU ("Apple Silicon") for laptops with 4 Firestorm and 4 Icestorm cores.
+*[Firestorm]: The big, high IPC cores in the Apple M1 CPU.
+*[Icestorm]: The low power efficiency cores in the Apple M1 CPU.
+
+
 *[PRF]: Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.
 *[LSD]: Lysergic acid diethylamide or Loop stream detector, but in the context of this blog probably the latter: The so-called loop buffer that can cache small loops of up to ~64 uops on recent Intel architectures. Not actually a separate structure: the hardware justs locks the loop down in the IDQ.
 *[IDQ]: Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).
