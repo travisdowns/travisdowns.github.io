@@ -1,0 +1,8 @@
+_id: 2acdbc20-9efe-11eb-ae0e-d964fd7cf875
+_parent: 'https://travisdowns.github.io/blog/2019/11/19/toupper.html'
+replying_to_uid: 05cb0120-9612-11eb-9ec2-33c79e181b6f
+message: "Thanks Andrey. Yes, it looks like when you include `ctype.h` there is no override for it in libstdc++, so the usual C version is used, but things like stdlib.h do have overrides (and the override results in a different definition).\r\n\r\nI'll comment further on the glibc issue."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1618610004
