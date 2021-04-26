@@ -1,0 +1,8 @@
+_id: a487fa90-a6d2-11eb-bb3c-c559e9317af9
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Super helpful, thanks! I've used this to add comments on a couple sites of mine.\r\n\r\nBut I'm having an issue with one thing! I'm trying to add a new field to the form (It's a question field, and if they get the question wrong then the form errors). I'm able to do this if I add it as name=\"question\" and then validate it via js. But if I add it as name=\"fields[question]\" and add \"question\" to the allowedFields, I get an error \"INVALID_FIELDS\". Is there a step I'm missing for adding in new fields?\r\n\r\nConfused and confused,\r\nRyan"
+name: Ryan
+email: ce3c211334f156ea432180247c56e69f
+hp: ''
+date: 1619470920
