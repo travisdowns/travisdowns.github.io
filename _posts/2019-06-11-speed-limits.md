@@ -221,21 +221,44 @@ While noting that that the column naming scheme is [really bad](https://github.c
  - Of course, any solution that removes instructions causing port pressure can help, so most of the same remedies that apply to the *pipeline width* limit also apply here.
  - Additionally, you might try replacing instructions which contend for a high-pressure port with others that use different ports, even if the replacement results in more total instructions/uops. For example, sometimes p5 shuffle operations can be replaced with blend operations: you need more total blends but the resulting code can be faster since the blends execute on otherwise underused p0 and p1. Some 32 and 64-bit register-to-register broadcasts that use p5 don't use p5 at all if you instead use a memory source, a rare case where memory source can be *faster* than register source for the same operation.
 
-## Load Throughput Limit
+## Memory Related Limits
 
-**Intel Skylake, Ice Lake:** 2 loads per cycle<br>
-**AMD Zen, Zen 2:** 2 loads per cycle<br>
-**AMD Zen 3:** 3 loads per cycle<br>
-**Apple M1:** 3 loads per cycle
+There are several limits related to the maximum number of memory accesses[^memaccess] that can be made per cycle, summarized in the following table. The values indicated are the maximum number of load, stores and accesses (either loads or stores) the CPU can sustain _per cycle_[^armstp].
 
+| CPU | Loads | Stores | Accesses |
+| - | -: | -: | -: |
+| Intel Sandy Bridge, Ivy Bridge | 2 | 1 | 2 |
+| Intel Haswell, Skylake | 2 | 1 | 3 |
+| Intel Ice Lake, Tiger Lake | 2 | 2[^iclstore] | 4 |
+| AMD Zen, Zen 2 | 2 | 1 | 3 |
+| AMD Zen 3 | 3 | 2 | 3 |
+| Apple M1  | 3 | 2 | 4 |
+| Amazon Graviton 2 | 2 | 2 | 2 |
 
-Modern Intel and AMD chips (and many others) have a limit of two or three loads per cycle, which can generally only be achieved if all the loads hit in L1. You could just consider this the same as the "port pressure" limit, since there are generally the same number of load ports as the "maximum loads" figure -- but the limit is interesting enough to call out on its own.
+[^iclstore]: Two stores can be sustained only with significant restrictions on the store pattern, as detailed below.
 
-Of course, like all limits this is a best case scenario: you might achieve much less than the maximum number of loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts present on AMD and older Intel chips[^bankconf]. Still, it is interesting to note how *high* this limit is: given the pipeline width of four, fully *half* of your instructions can be loads while still running at maximum speed on Intel chips, as well as on AMD's Zen 3 (3 loads out of a max width of 6) . In a throughput sense, loads that hit in cache are not all that expensive even compared to simple ALU ops.
+[^armstp]: Both of the Arm CPUs on this list support `LDP` and `STP` instructions which store a _pair_ of registers, and both can merge this into a single wider store so it only counts as one access and such paired accesses also count as one access in this table.
+### Load Throughput Limit
 
-It's not all _that_ common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.
+| Vendor | Microarchitecture | Loads/Cycle |
+| - | - | -: |
+| Intel | All Recent[^recentintel] | 2 |
+| AMD   | Zen, Zen 2 | 2 |
+| AMD   | Zen 3 | 3[^zen3ll] |
+| Apple | M1 | 3 |
+| Arm/Amazon | Graviton 2 | 2 | 
 
-One scenario where you might hit this limit is in an indirect load scenario (where part of the load address is itself calculated using a value from memory), or when making heavy use of lookup tables. Consider the following loop, which does an indirect loop of `data` based on the an index read from the `offsets` array and which simply sums the resulting values[^written-weirdly]:
+[^recentintel]: Every mainstream core since Sandy Bridge (inclusive) has two read ports.
+
+[^zen3ll]: Zen 3 can do three general-purpose loads per cycle, but only two vector (128b or larger) loads per cycle.
+
+Modern big cores from leading vendors have a limit of two or three loads per cycle, which can generally only be achieved if all the loads hit in L1. You could just consider this the same as the "port pressure" limit, since there are generally the same number of load ports as the "maximum loads" figure -- but the limit is interesting enough to call out on its own.
+
+Of course, like all limits this is a best case scenario: you might achieve much less than the maximum number of loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts present on some chips[^bankconf]. Still, it is interesting to note how *high* this limit is: fully *half* of your instructions can be loads while still running at maximum speed on Intel chips (two loads out of a maximum width of four on pre-Ice Lake Intel), as well as on AMD's Zen 3 (three loads out of a max width of six). In a throughput sense, loads that hit in cache are not all that expensive even when the point of comparison is simple ALU ops.
+
+Because each loaded value will usually have some computation performed on it, it is not all _that_ common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.
+
+One scenario where you might hit this limit is in an indirect load scenario (where part of the load address is itself calculated using a value from memory), or when making heavy use of lookup tables. Consider the following loop, which does an indirect access of `data` based on the an index read from the `offsets` array and which then sums the retrieved values[^written-weirdly]:
 
 ~~~c++
 do {
@@ -248,7 +271,8 @@ do {
 This compiles to the following assembly:
 
 ~~~nasm
-.top:                                     ; total fused uops
+                                          ; total fused uops
+.top:                                     ; ↓
     mov    r8d,DWORD PTR [rsi+rdx*4-0x4]  ; 1
     add    ecx,DWORD PTR [rdi+r8*4]       ; 2
     mov    r8d,DWORD PTR [rsi+rdx*4-0x8]  ; 3
@@ -257,19 +281,27 @@ This compiles to the following assembly:
     jne    .top                           ; 5
 ~~~
 
-There are only 5 fused-uops[^delam2] here, so maybe this executes in 1.25 cycles? Not so fast - it takes 2 cycles because there are 4 loads and we have a speed limit of 2 loads per cycle[^add-indirect].
+There are only 5 fused-uops[^delam2] here, so maybe this executes in 5 / 4 = 1.25 cycles? No... it is not so fast: it takes 2 cycles because there are 4 loads and we have a speed limit of 2 loads per cycle[^add-indirect].
 
-Note that gather instructions count "one" against this limit for *each* element they they load. `vpgatherdd ymm0, ...` for example, counts as 8 against this limit since it loads eight elements.
+Note that gather instructions count "one" against this limit for *each* element they they load. `vpgatherdd ymm0, ...` for example, counts as 8 against this limit since it loads 8 32-bit elements[^gatherdd].
 
-### Split Cache Lines
+[^gatherdd]: Meaning that the maximum theoretical throughput is 1 per 4 cycles on Intel based on the load limit, while the actual measured throughput is slightly worse at 1 per 5. Most of the gather instructions follow this pattern: a throuhgput 1 or 2 cycles worse than that suggested by the load limit.
 
-For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one, except loads that split a cache line, which count as two. A split cache line load is of at least two bytes and crosses a 64-byte boundary. If your loads are naturally aligned, you will never split a cache line. If your loads have totally random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
+#### Load Split Cache Lines
 
-On AMD Zen 1 loads suffer a penalty when crossing any 32-byte boundary - such loads also count as two against the load limit. 32-byte (AVX/AVX2) loads also count as two on Zen 1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halve will cross a 32-byte boundary. On Zen 2, there is no such penalty for crossing a 32-byte boundary: like on Intel a penalty occurs only when crossing a 64-byte cache line boundary.
+For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one, except loads that split a cache line, which count as two. A split cache line load is one that crosses a 64-byte boundary. Loads that are naturally aligned never split a cache line. With random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you'll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.
 
-### Remedies
+On AMD Zen 1, loads suffer a similar penalty when crossing a 32-byte boundary -- such loads also count as two against the load limit. 32-byte (AVX/AVX2) loads also count as two on Zen 1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halves will cross a 32-byte boundary.
 
-If you are lucky enough to hit this limit, you just need fewer loads. Note that the limit is not expressed in terms of the _number of bytes loaded_, but in the number of separate loads. So sometimes you can combine two or more adjacent loads into a single load. An obvious application of that is vector loads: 32-byte AVX loads _still_ have the same limit of two per cycle as byte loads. It is difficult to use vector loads in concert with scalar code however: although you can do 8x 32-bit loads at once, if you want to feed those loads to scalar code you have trouble, because you can't efficiently get that data into scalar registers[^vector-scalar]. That is, you'll have to work on vectorizing the code that consumes the loads as well.
+On Zen 2 and 3, there is no such penalty for crossing a 32-byte boundary: as on Intel, a penalty occurs only when crossing a 64-byte cache line boundary.
+
+#### Remedies
+
+If you are lucky enough to hit this limit, you just need fewer loads. Note that the limit is not expressed in terms of the number of _bytes_ loaded, but rather in the number of _loads_. So sometimes you can combine two or more adjacent loads into a single load to reduce the total load count.
+
+An obvious application of that is vector loads: 32-byte AVX loads have the same limits byte loads (with some exceptions[^simdloadex]). It is difficult to use vector loads in concert with scalar code however: although you can do 8x 32-bit loads at once, if you want to feed those loads to scalar code you have trouble, because you can't efficiently get that data into scalar registers[^vector-scalar]. That is, you'll have to work on vectorizing the code that consumes the loads as well.
+
+[^simdloadex]: As mentioned, Zen 1 can only do one 256-bit load per cycle, but two loads of other types, and Zen 3 can do two vector loads but three loads of other types. Still, vector loads, when they can be used, are usually very advantageous on these CPUs. 
 
 You can also sometimes use wider scalar loads in this way. In the example above, we do four 32-bit loads - two of which are scattered (the access to `data[]`), but two of which are adjacent (the accesses to `offsets[i - 1]` and `offsets[i - 2]`). We could combine those two adjacent loads into one 64-bit load, like so[^portable]:
 
@@ -297,7 +329,9 @@ This compiles to:
     jne    .top                            ; 7
 ~~~
 
-We have 7 fused-domain uops rather than 5, yet this runs in 1.81 cycles, about 10% faster. The theoretical limit based on pipeline width is 7 / 4 = 1.75 cycles, so we are probably getting collisions on p6 between the `shr` and the taken branch (unrolling a bit more would help). Clang 5.0 manages to do better, by one uop:
+We have traded ALU operations for loads: this version has seven fused-domain uops versus five in the original, yet on Skylake the new version runs in 1.81 cycles, about 10% faster. The theoretical limit based on pipeline width is 7 / 4 = 1.75 cycles, so we are probably getting collisions on p6 between the `shr` and the taken branch (unrolling a bit more would help).
+
+Clang 5.0 manages to do better, by one uop:
 
 ~~~nasm
 .top:
@@ -314,6 +348,165 @@ It avoided the `mov r9,rcx` instruction by combining that and the zero extension
 
 This code is an obvious candidate for vectorization with gather, which could in principle approach 1.25 cycles per iteration (8 gathered loads + 1 256-bit load from `offset` per 4 iterations) and newer clang versions even manage to do it, if you allow some inlining so they can see the size and alignment of the buffer. However, [the result](https://gist.github.com/travisdowns/b8294098c5082886f4a043ef8b6607bd) is not good: it was more than twice as slow as the scalar approach.
 
+### Store Throughput Limit
+
+| Vendor | Microarchitecture | Stores/Cycle |
+| - | - | -: |
+| Intel | <= Skylake | 1 |
+| Intel | >= Ice Lake | 2[^iclstore] |
+| AMD   | Zen, Zen 2 | 1 |
+| AMD   | Zen 3 | 2[^zen3store] |
+| Apple | M1 | 2 |
+| Arm/Amazon | Graviton 2 | 2 | 
+
+[^zen3store]: On Zen 3, only 64-bit or smaller stores from general purpose stores can achieve two per cycle. Vector stores are limited to one per cycle.
+
+Modern mainstream CPUs can perform one or two stores per cycle. For many algorithms that make a predictable number of stores, this is a useful and easy to caculate upper bound on a performance, especially on CPUs where the limit is one store per cycle. For example, a 32-bit radix sort that makes four passes and does two stores per element for each pass[^radix] will never achieve performance better than eight cycles per element on a single store/cycle CPU (in most radix sort implementations, actual performance usually ends up much worse so this isn't necessarily the dominant factor in practice, only an upper bound on throughput).
+
+[^radix]: One to move the element to a bucket and one to update the bucket pointer.
+
+This limit applies also to vector scatter instructions, where each element counts as one against this limit.
+
+#### Store Split Cache Lines
+
+On all recent Intel CPUs, stores that cross a cache line boundary (64 bytes) counts as two against the store limit, but other unaligned stores suffer no penalty.
+
+On AMD the situation is more complicated: the penalties for stores that cross a boundary are larger, and it's not just 64-byte boundaries that matter.
+
+On AMD Zen, any store which crosses a 16 byte boundary suffers a significant penalty: such stores can only execute one per _five_ cycles, so maybe you should count these as five for the purposes of this limit[^amdunalignedstore].
+
+[^amdunalignedstore]: I'm weaseling around here because it is possible that this penalty isn't cumulative with other stores but just represents worst case where many such stores occur back-to-back but the performance when mixed with non-crossing stores is better than this worst case. For example 5 non-crossing store + 1 crossing one might not count as 10 but rather 6 or 7. More testing needed on that one. Suffice it to say you should avoid boundary-crossing stores if you can. Additional details [at RWT](https://www.realworldtech.com/forum/?threadid=176780&curpostid=176849).
+
+On AMD Zen 2 and Zen 3, the situation is similar but applies only to stores that cross a 32-byte boundary: stores which cross a 16-byte boundary which is not also a 32-byte boundary suffer no penalty.
+
+#### Remedies
+
+Remove unnecessary stores from your core loops. Easier said than done, of course!
+
+If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is different, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you want to take advantage of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a single vectorized store. Of course, if your stores are not contiguous, this will be difficult or impossible.
+
+In some cases it can be profitable to merge two (or more) narrow stores into a larger one, e.g., two 32-bit stores into a 64-bit store. This trades ALU operations for stores in a similar way to the load example.
+
+On Intel Ice Lake and later CPUs, try to organize your data and store pattern so that the "same cache line" restriction for consecutive stores is met, allowing two rather than one store per cycle.
+
+### Total Accesses Limit
+
+| Vendor | Microarchitecture | Stores/Cycle |
+| - | - | -: |
+| AMD   | Zen | 2 |
+| AMD   | Zen 3 | 3 |
+| Apple | M1 | 4 |
+| Arm/Amazon | Graviton 2 | 2 | 
+
+The individual limits on loads and stores were discussed above, but for the microarchitectures listed above there is a _combined_ limit on both which is less than the sum of the individual limits[^combinedwhy]. For example, AMD Zen 3 can do three loads per cycle, or two stores per cycle, but only has a total of three address generation units. This means it can't do three loads _and_ two stores in the _same_ cycle: there is a limit of three memory accesses of any type in total, which may be (for example) three loads and no stores, or one load and two stores, etc.
+
+[^combinedwhy]: One reason these limits arise is that both loads and stores require an address generation unit to perform addressing calculations. These units are shared between load and store units, and there may be fewer of these units than there are load and store units. Other reasons include a limited number of busses to/from the L1 cache and or sharing of resources between the read and write ports of the L1 cache.
+
+#### Remedies
+
+No specific remedies apply to combined limits -- the fix is fewer loads and stores, as described in the remedy sections above. The only trick is you need to be aware of this limit when calculating your speed limit.
+
+### Complex Addressing Limit
+
+**Intel Skylake:** Maximum of one load (any addressing) concurrent with a store with complex addressing per cycle.
+
+Recent Intel chips have the same number of AGUs as load and store units, so don't directly suffer the AGU limit: but they do suffer a related limitation involving complex addressing.
+
+Each load and store operation needs an _address generation_ which happens in an AGU. There are three AGUs on modern Intel Skylake chips: p2, p3 and p7. However, p7 is restricted: it can _only_ be used by stores, and it can only be used if the store addressing mode is simple. [Simple addressing](https://stackoverflow.com/a/51664696) is anything that is of the form `[base_reg + offset]` where `offset` is in `[0, 2047]`. So `[rax + 1024]` is simple addressing, but all of `[rax + 4096]`, `[rax + rcx * 2]` and `[rax * 2]` are not.
+
+To apply this limit, count *all* load and any stores with complex addressing: these operations cannot execute at more than two per cycle.
+
+Since Ice Lake, this limitation no longer applies: load and store units all have a dedicated AGU.
+
+#### Remedies
+
+At the assembly level, the main remedy is make sure that your stores use simple addressing modes. Usually you do this by incrementing a pointer by the size of the element rather than using indexed addressing modes.
+
+That is, rather than this:
+
+~~~nasm
+mov [rdi + rax*4], rdx
+add rax, 1
+~~~
+
+You want this:
+
+~~~nasm
+mov [rdi], rdx
+add rdi, 4
+~~~
+
+Of course, that's often simpler said than done: indexed addressing modes are very useful for using a single loop counter to access multiple arrays, and also when the value of the loop counter is directly used in the loop (as opposed to simply being used for addressing). For example, consider the following loop which writes the element-wise sum of two arrays to a third array:
+
+~~~c++
+void sum(const int *a, const int *b, int *d, size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        d[i] = a[i] + b[i];
+    }
+}
+~~~
+
+The loop compiles to the following assembly:
+
+~~~nasm
+.L3:
+    mov     r8d, DWORD PTR [rsi+rax*4]
+    add     r8d, DWORD PTR [rdi+rax*4]
+    mov     DWORD PTR [rdx+rax*4], r8d
+    add     rax, 1
+    cmp     rcx, rax
+    jne     .L3
+~~~
+
+This loop will be limited by the complex addressing limitation to 1.5 cycles per iteration, since there are 1 store that uses complex addressing, plus one load.
+
+We could use separate pointers for each array and increment all of them, like:
+
+~~~nasm
+.L3:
+    mov     r8d, DWORD PTR [rsi]
+    add     r8d, DWORD PTR [rdi]
+    mov     DWORD PTR [rdx], r8d
+    add     rsi, 4
+    add     rdi, 4
+    add     rdx, 4
+    cmp     rcx, rdx
+    jne     .L3
+~~~
+
+Everything uses simple addressing, great! However, we've added two uops and so the speed limit is pipeline width: 7/4 = 1.75, so it will probably be slower than before.
+
+The trick is to only use simple addressing for the store, and calculate the load addresses relative to the store address:
+
+~~~nasm
+.L3:
+    mov     eax, DWORD PTR [rdx+rsi] ; rsi and rdi have been adjusted so that
+    add     eax, DWORD PTR [rdx+rdi] ; rsi+rdx points to a and rdi+rdx to b
+    mov     DWORD PTR [rdx], eax
+    add     rdx, 4
+    cmp     rcx, rdx
+    ja      .L3
+~~~
+
+When working in a higher level language, you may not always be able to convince the compiler to generate the code we want as it might simply see through our transformations. In this case, however, [we can convince](https://godbolt.org/z/PPutUu) gcc to generate the code we want by writing out the transformation ourselves:
+
+~~~c++
+void sum2(const int *a, const int *b, int *d, size_t len) {
+    int *end = d + len;
+    ptrdiff_t a_offset = (a - d);
+    ptrdiff_t b_offset = (b - d);
+    for (; d < end; d++) {
+        *d = *(d + a_offset) + *(d + b_offset);
+    }
+}
+~~~
+
+This is UB all over the place if you pass in arbitrary arrays, because we subtract unrelated pointers (`a - d`) and use pointer arithmetic which outside of the bounds of the original array (`d + a_offset`) - but I'm not aware of any compiler that will take advantage of this (as a standalone function it seems unlikely that will ever be the case: because the arrays all _could_ be related, so the function isn't always UB). Still you should avoid stuff like this unless you have a _really_ good reason to push the boundaries. You could achieve the same effect with `uintptr_t` which isn't UB but only unspecified, and that will work on every platform I'm aware of.
+
+Another way to get simple addressing without adding too much overhead for separate loop pointers is to unroll the loop a little bit. The increment only needs to be done once per iteration, so every unroll reduces the cost.
+
+Note that even if stores have non-complex addressing, it may not be possible to sustain 2 loads/1 store, because the store may sometimes choose one of the port 2 or port 3 AGUs instead, starving a load that cycle.
+
 ## Memory and Cache Bandwidth
 
 The load and store limits discuss the ideal scenario where loads and stores hit in L1 (or hit in L1 "on average" enough to not slow things down), but there are throughput limits for other levels of the cache. If your know your loads hit primarily in a particular level of the cache you can use these limits to get a speed limit.
@@ -328,7 +521,8 @@ The limits are listed in _cache lines per cycle_ and not in bytes, because that'
 | Intel  | SKL  |   1  | 0.2 - 0.3 |
 | Intel  | HSW  | 0.5  | 0.2 - 0.3 |
 | AMD    | Zen  | 0.5  | 0.5 |
-| AMD    | Zen 2 | 0.5  | 0.5 |
+| AMD    | Zen 2 | 0.5 | 0.5 |
+| AMD    | Zen 3 | 0.5 | 0.5 |
 
 The very poor figure of 0.1 cache lines per cycle (about 6-7 bytes a cycle) from L3 on SKX is at odds with Intel's manuals, but it's what I measured on a W-2104. For architectures earlier than Haswell I think the numbers will be similar back to Sandy Bridge.
 
@@ -479,137 +673,6 @@ The more important limitations are specific to the individual sources. For examp
  - The LSD suffers from reduced throughput at the boundary between one iteration and the next, although hardware unrolling reduces the impact of the effect. Full details [are on Stack Overflow](https://stackoverflow.com/a/39940932). Note that the LSD is disabled on most recent CPUs due to a bug. It is re-enabled on some of the most recent chips (CNL and maybe Cascade Lake).
 
  Again, this is only scratching the surface - see Agner for a comprehensive treatment.
-
-## Store Throughput Limit
-
-**1 store per cycle**
-
-Modern Intel and AMD CPUs can perform at most one store per cycle. No matter what, you won't exceed that. For many algorithms that make a predictable number of stores, this is a useful upper bound on a performance. For example, a 32-bit radix sort that makes 4 passes and does a store per element for each pass will never operate faster than 4 cycles per element (in radix sort, actual performance usually ends up much worse so this isn't the dominant factor for most implementations).
-
-This limit applies also to vector scatter instructions, where each element counts as "one" against this limit. Like loads, a store that crosses a cache line counts as two, but other unaligned stores only count as one on Intel. On AMD the situation is more complicated: the penalties for stores that cross a boundary is larger, and it's not just 64-byte boundaries that matter - more [details here](https://www.realworldtech.com/forum/?threadid=176780&curpostid=176849).
-
-### Split Cache Lines
-
-On Intel, stores that cross a cache line boundary (64 bytes) count as two, but stores of any other alignment suffer no penalty.
-
-On AMD Zen, any store which crosses a 16 byte boundary suffers a significant penalty: such stores can only execute one per _five_ cycles, so maybe you should count these as five for the purposes of this limit. However, it is possible that this penalty isn't cumulative with other stores but just represents worst case where many such stores occur back-to-back but the performance when mixed with non-crossing stores is better than this worst case. For example 5 non-crossing store + 1 crossing one might not count as 10 but rather 6 or 7. More testing needed on that one. Suffice it to say you should avoid boundary-crossing stores if you can.
-
-### Remedies
-
-Remove unnecessary stores from your core loops. If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is different, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you want to take advantage of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a single vectorized store. Of course, if your stores are not contiguous, this will be difficult or impossible.
-
-
-## Address Generation Limit
-
-**AMD Zen:** 2/cycle
-**AMD Zen 2:** 3/cycle
-**AMD Zen 3:** 3/cycle
-**Apple M1:** 4/cycle
-
-Both loads and store require an address generation unit to perform addressing calculation. Often, these units are shared between load and store units, and there may be fewer of these units than the sum of load and store units. For example, AMD Zen 3 can do 3 loads per cycle, and also 2 stores per cycle, but only has a total of 3 AGU. This means it can't do 3 loads _and_ 2 stores in the same cycle: there is a limit of three memory accesses in total, which may be (for example) 3 loads and no stores, or 1 load and 2 stores, etc.
-
-### Remedies
-
-Fewer loads and stores, as described in the remedies section for loads and stores above.
-
-## Complex Addressing Limit
-
-**Intel Skylake:** Max of 1 load (any addressing) concurrent with a store with complex addressing per cycle.
-
-Recent Intel chips have the same number of AGUs as load and store units, so don't directly suffer the AGU limit: but they do suffer a related limitation involving complex addressing.
-
-Each load and store operation needs an _address generation_ which happens in an AGU. There are three AGUs on modern Intel Skylake chips: p2, p3 and p7. However, p7 is restricted: it can _only_ be used by stores, and it can only be used if the store addressing mode is simple. [Simple addressing](https://stackoverflow.com/a/51664696) is anything that is of the form `[base_reg + offset]` where `offset` is in `[0, 2047]`. So `[rax + 1024]` is simple addressing, but all of `[rax + 4096]`, `[rax + rcx * 2]` and `[rax * 2]` are not.
-
-To apply this limit, count *all* load and any stores with complex addressing: these operations cannot execute at more than 2 per cycle.
-
-### Remedies
-
-At the assembly level, the main remedy is make sure that your stores use simple addressing modes. Usually you do this by incrementing a pointer by the size of the element rather indexed addressing modes.
-
-That is, rather than this:
-
-~~~nasm
-mov [rdi + rax*4], rdx
-add rax, 1
-~~~
-
-You want this:
-
-~~~nasm
-mov [rdi], rdx
-add rdi, 4
-~~~
-
-Of course, that's often simpler said than done: indexed addressing modes are very useful for using a single loop counter to access multiple arrays, and also when the value of the loop counter is directly used in the loop (as opposed to simply being used for addressing). For example, consider the following loop which writes the element-wise sum of two arrays to a third array:
-
-~~~c++
-void sum(const int *a, const int *b, int *d, size_t len) {
-    for (size_t i = 0; i < len; i++) {
-        d[i] = a[i] + b[i];
-    }
-}
-~~~
-
-The loop compiles to the following assembly:
-
-~~~nasm
-.L3:
-    mov     r8d, DWORD PTR [rsi+rax*4]
-    add     r8d, DWORD PTR [rdi+rax*4]
-    mov     DWORD PTR [rdx+rax*4], r8d
-    add     rax, 1
-    cmp     rcx, rax
-    jne     .L3
-~~~
-
-This loop will be limited by the complex addressing limitation to 1.5 cycles per iteration, since there are 1 store that uses complex addressing, plus one load.
-
-We could use separate pointers for each array and increment all of them, like:
-
-~~~nasm
-.L3:
-    mov     r8d, DWORD PTR [rsi]
-    add     r8d, DWORD PTR [rdi]
-    mov     DWORD PTR [rdx], r8d
-    add     rsi, 4
-    add     rdi, 4
-    add     rdx, 4
-    cmp     rcx, rdx
-    jne     .L3
-~~~
-
-Everything uses simple addressing, great! However, we've added two uops and so the speed limit is pipeline width: 7/4 = 1.75, so it will probably be slower than before.
-
-The trick is to only use simple addressing for the store, and calculate the load addresses relative to the store address:
-
-~~~nasm
-.L3:
-    mov     eax, DWORD PTR [rdx+rsi] ; rsi and rdi have been adjusted so that
-    add     eax, DWORD PTR [rdx+rdi] ; rsi+rdx points to a and rdi+rdx to b
-    mov     DWORD PTR [rdx], eax
-    add     rdx, 4
-    cmp     rcx, rdx
-    ja      .L3
-~~~
-
-When working in a higher level language, you may not always be able to convince the compiler to generate the code we want as it might simply see through our transformations. In this case, however, [we can convince](https://godbolt.org/z/PPutUu) gcc to generate the code we want by writing out the transformation ourselves:
-
-~~~c++
-void sum2(const int *a, const int *b, int *d, size_t len) {
-    int *end = d + len;
-    ptrdiff_t a_offset = (a - d);
-    ptrdiff_t b_offset = (b - d);
-    for (; d < end; d++) {
-        *d = *(d + a_offset) + *(d + b_offset);
-    }
-}
-~~~
-
-This is UB all over the place if you pass in arbitrary arrays, because we subtract unrelated pointers (`a - d`) and use pointer arithmetic which outside of the bounds of the original array (`d + a_offset`) - but I'm not aware of any compiler that will take advantage of this (as a standalone function it seems unlikely that will ever be the case: because the arrays all _could_ be related, so the function isn't always UB). Still you should avoid stuff like this unless you have a _really_ good reason to push the boundaries. You could achieve the same effect with `uintptr_t` which isn't UB but only unspecified, and that will work on every platform I'm aware of.
-
-Another way to get simple addressing without adding too much overhead for separate loop pointers is to unroll the loop a little bit. The increment only needs to be done once per iteration, so every unroll reduces the cost.
-
-Note that even if stores have non-complex addressing, it may not be possible to sustain 2 loads/1 store, because the store may sometimes choose one of the port 2 or port 3 AGUs instead, starving a load that cycle.
 
 ## Taken Branches
 
@@ -1105,7 +1168,7 @@ This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hac
 
 [^thatsaid]: That said, I am quite sure you can reach or at least approach closely these limits as I've tested most of them myself. Sure, a lot of these are micro-benchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can't - I'm interested to hear about it.
 
-[^bankconf]: Bank conflicts occur in a banked cache design when two loads try to access the same bank. [Per Fabian](https://twitter.com/rygorous/status/1138934828198326272) Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips have 16 banks per line (bank selected by bits `[5:2]` of the address), while Zen1 has 8 banks per line (bits `[5:3]` used). A load uses any bank it overlaps.
+[^bankconf]: Bank conflicts occur in a banked cache design when two loads try to access the same bank. [Per Fabian](https://twitter.com/rygorous/status/1138934828198326272) Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips have 16 banks per line (bank selected by bits `[5:2]` of the address), while Zen1 has 8 banks per line (bits `[5:3]` used). A load uses any bank it overlaps. I also find bank-conflict like effects on Graviton 2 (only tested for stores) as many patterns of stores, especially unaligned, achieve less than the theoretical maximum of 2/cycle -- even when the stores are all to the same cache line.
 
 [^snote]: In this table, note that the Intel and Zen scheduler (RS) sizes are not directly comparable, since Intel uses a unified scheduler for GP and SIMD ops, with "all" (actually most) scheduler entries available to most uops, while AMD has one scheduler (RS) per port. The numbers shown for AMD are the sum of all the ALU and AGU scheduler sizes.
 
@@ -1134,5 +1197,8 @@ This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hac
 [^robgen]: Well this is at least true on Intel. Recent chips from AMD, Apple and others seem to use _nop compression_ to pack several nops into one ROB slot: so in this case we can imagine that each nop takes only a _fraction_ of a slot. It is not impossible to imagine an microarchitecture that entire avoids putting nops in the ROB. 
 
 [^g2buffers]: These numbers I measured myself using a modified version of Veerdac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on [robsize](https://github.com/travisdowns/robsize) (but unlike robsize supports Arm 64-bit platforms). My results for ROB size are [here]({{page.assets}}/g2results/generic-aarch64.svg) and [here]({{page.assets}}/g2results/nop.svg) (the latter test indicating that _nop compression_ does not appear to be present on Graviton 2). Scheduler size results, using instructions which are dependent on the fencing loads are [here]({{page.assets}}/g2results/depadd-aarch64.svg). There are also [load]({{page.assets}}/g2results/load-aarch64.svg) and [store]({{page.assets}}/g2results/store-aarch64.svg) buffer results, as well as [integer PRF]({{page.assets}}/g2results/add-aarch64.svg) and [SIMD PRF]({{page.assets}}/g2results/fmla-aarch64.svg) results. [This test]({{page.assets}}/g2results/movz-fmla-aarch64.svg) indicates that the integer and SIMD PRFs are not shared. It isn't shown in the table, but [this result testing `cmp`]({{page.assets}}/g2results/cmp.svg) indicates that there is a separate set of renamed flag registers with ~36 entries. [These results]({{page.assets}}/g2results/branch-aarch64.svg) indicate that up to 46 calls can be in flight at once. There are [even more](https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results) results not mentioned here.
+
+[^memaccess]: Now _memory access_ doesn't necessarily mean that the main memory (RAM) of the system is accessed: just that the machine code contains instructions which involve memory access. For most programs the overwhelming majority of these accesses hit in cache and never get to main memory.
+
 
 {% include glossary.md %}
