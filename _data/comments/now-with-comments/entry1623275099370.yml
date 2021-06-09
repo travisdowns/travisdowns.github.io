@@ -1,0 +1,8 @@
+_id: f0278ea0-c96b-11eb-9dc1-d5a886ca0ca1
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ebdccdc0-c938-11eb-9ca1-7bfaffb09392
+message: "Hi, augussst.\r\n\r\nI'm not really able to diagnose staticman or HTML issues here. If you think your problem is with the staticman server, I'd recommend taking a look on their github repo.\r\n\r\nIf you think instead the problem is more likely to be with the HTML or javascript necessary to integrate the form, try StackOverflow.\r\n\r\nGood luck!"
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1623275099
