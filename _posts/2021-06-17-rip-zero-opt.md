@@ -9,7 +9,7 @@ image: /assets/rip-zero-opt/og-image.jpg
 results: https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3
 twitter:
   card: summary_large_image
-excerpt: The death of hardware store optimization
+excerpt: The death of hardware store optimization.
 ---
 
 {% include post-boilerplate.liquid %}
@@ -47,6 +47,10 @@ I hope that once the wave of vulnerabilities and disclosures that started with M
 
 In any case, I still plan to write about performance-related microarchitectural details. I just hope this outcome does not repeat itself.
 
+### Thanks
+
+Stone photo by <a href="https://unsplash.com/@imagefactory">Colin Watts</a> on Unsplash.
+
 ---
 <br>
 
@@ -72,6 +76,6 @@ In any case, I still plan to write about performance-related microarchitectural 
 
 [^power]: This observation becomes almost universal once you consider that the _values_ involved in any operation affect power use (see e.g. [Schöne et al](https://arxiv.org/pdf/1905.12468.pdf) or [Cornebize and Legrand](https://hal.inria.fr/hal-02401760/document)). Since power use can be directly (e.g., RAPL or external measurements) or indirectly (e.g., because of heat-dependent frequency changes) observed, it means that in theory _any_ operation, even those widely considered to be constant-time, may leak information.
 
-[^whitelie]: I'm embellishing a bit here. The effect does present as described based on the data, but these particular two data series were generated a week later when I had time to collect the data properly in a relatively noise free environment. So the two series were collected back-to-back on the same day, varying only the hidden parameter you'll learn about two paragraphs from now. 
+[^whitelie]: I'm doing a bit of a retcon here. The effect is present as described based on the date, and I observed and benchmarked it "on Wednesday", but the specific data series used for the plot were generated a week later when I had time to collect the data properly in a relatively noise free environment. So the two series were collected back-to-back on the same day, varying only the hidden parameter you'll learn about two paragraphs from now.
 
 [^impact]: The performance regression shown in the plots is close to a worst case: the benchmark only fills zeros and nothing else. Real code doesn't spend _that much_ time filling zeros, although zero *is* no doubt the dominant value in large block fills, at least because the OS must zero pages before returning them to user processes and memory-safe languages like Java will zero some objects and array types in bulk.
