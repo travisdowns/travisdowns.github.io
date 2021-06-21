@@ -14,6 +14,7 @@
 *[MLP]: Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.
 *[demand load]: A true load that appears in the source code or assembly, as opposed to loads initiated by software or hardware prefetch.
 *[naturally aligned]: Naturally aligned data is data whose location in memory is a multiple of its size, e.g., a 4 byte element whose address is a multiple of 4 bytes.
+*[microcode]: Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates. 
 *[basic block]: a straight-line code sequence with no branches in except to the entry and no branches out except at the exit (Wikipedia).
 *[RFO]: Request for ownership: when a request for a cache line originates from a store, or a type of prefetch that predicts the location is likely to be the target of a store, an RFO is performed which gets the line in an exclusive MESI state.
 {% assign ooo_def = 'Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.' %}
