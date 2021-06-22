@@ -1,0 +1,11 @@
+_id: 1de6da20-d368-11eb-a28b-2b17081581e0
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  The solutions is "ghost parity." For every bit-store in the CPU, create a
+  parallel bit-store that always contains the complement bits. Thus parity is
+  preserved.
+name: Cap'n O.
+email: ''
+hp: ''
+date: 1624372969
