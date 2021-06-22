@@ -37,6 +37,10 @@ To be clear, I don't know _for sure_ that the microcode disables the zero store 
 
 Although I suspect the performance impact will be minuscule on average[^impact], this surprise still serves as a reminder that raw CPU performance can _silently_ change due to microcode updates and most Linux distributions and modern Windows have these updates enabled by default. We've [seen this before]({{ site.baseurl }}{% post_url 2019-03-19-random-writes-and-microcode-oh-my %}). If you are trying to run reproducible benchmarks, you should always re-run your _entire_ suite in order to make accurate comparisons, even on the same hardware, rather than just running the stuff you think has changed.
 
+### Reproduction
+
+The code to collect this performance data and reproduce my results is available in [zero-fill-bench](https://github.com/travisdowns/zero-fill-bench/tree/post3).
+
 ### Mea Culpa and an Unsustainable Path
 
 In writing the earlier blog entries on this topic, I was interested in the _performance_ aspects of this optimization, not its potential as an attack vector. However, merely by observing (and publishing) the results, the optimization was affected: [the system under measurement changed as a result of the observation](https://en.wikipedia.org/wiki/Measurement_problem). I can't be sure that the optimization wouldn't have eventually been disabled anyway, but it does seem that the proximate cause this change to the microcode was my earlier post.
