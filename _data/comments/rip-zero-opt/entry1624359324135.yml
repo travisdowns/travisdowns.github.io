@@ -1,0 +1,17 @@
+_id: 5879dea0-d348-11eb-a28b-2b17081581e0
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  I think the only place this will end is where the Burroughs engineers were
+  trying to tell the shared hardware advocates in the late 60s.  The only secure
+  (running) hardware is hardware that never shares resources between processes. 
+  Back then the argument was cost.  RAM and CPU time was prohibitively
+  expensive.   Cost won over security only because all users on any particular
+  system could be trusted and inter system networking didn’t exist as now. Now
+  the shared resource model is breaking down in the face of an entire world of
+  potentially hostile users aimed at any particular machine. It’s not
+  sustainable.
+name: Heretical blacksheep
+email: ''
+hp: ''
+date: 1624359324
