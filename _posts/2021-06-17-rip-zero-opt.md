@@ -53,7 +53,7 @@ Stone photo by <a href="https://unsplash.com/@imagefactory">Colin Watts</a> on U
 
 ### Discussion and Feedback
 
-You can join the discussion on [Twitter](https://twitter.com/trav_downs/status/1407110595761950720) or [Hacker News](https://news.ycombinator.com/item?id=27588258).
+You can join the discussion on [Twitter](https://twitter.com/trav_downs/status/1407110595761950720), [Hacker News](https://news.ycombinator.com/item?id=27588258) or [r/Intel](https://www.reddit.com/r/intel/comments/o5b9gg/your_intel_cpu_may_have_slowed_down_on_wednesday/).
 
 If you have a question or any type of feedback, you can leave a [comment below](#comment-section).
 
