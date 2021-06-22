@@ -1,0 +1,13 @@
+_id: 540b2b20-d34e-11eb-a28b-2b17081581e0
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  Quick question regarding Graviton performance. ARMv8 has an explicit
+  instruction to zero out a cache line (DCZVA). Do you know if std::fill or
+  memset have a short circuit for the case where the value to fill is zero which
+  defaults to using DCZVA. I assume it would improve zero-fill significantly,
+  although obviously, it is not a dynamic feature.
+name: pmuldq
+email: ''
+hp: ''
+date: 1624361893
