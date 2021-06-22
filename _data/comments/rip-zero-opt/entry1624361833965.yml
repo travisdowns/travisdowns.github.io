@@ -1,0 +1,11 @@
+_id: 3073d720-d34e-11eb-a28b-2b17081581e0
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  CMOS behaves like that, but not all logic families do. ECL-based computers
+  like the early Cray machines looked to the PSU like a giant resistor. It's not
+  a terribly likely direction of travel for modern computing, though.
+name: Dave O
+email: ''
+hp: ''
+date: 1624361833
