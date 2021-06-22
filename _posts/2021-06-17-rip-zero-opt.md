@@ -43,7 +43,7 @@ The code to collect this performance data and reproduce my results is available 
 
 ### Mea Culpa and an Unsustainable Path
 
-In writing the earlier blog entries on this topic, I was interested in the _performance_ aspects of this optimization, not its potential as an attack vector. However, merely by observing (and publishing) the results, the optimization was affected: [the system under measurement changed as a result of the observation](https://en.wikipedia.org/wiki/Measurement_problem). I can't be sure that the optimization wouldn't have eventually been disabled anyway, but it does seem that the proximate cause this change to the microcode was my earlier post.
+In writing the earlier blog entries on this topic, I was interested in the _performance_ aspects of this optimization, not its potential as an attack vector. However, merely by observing (and publishing) the results, the optimization was affected: [the system under measurement changed as a result of the observation](https://en.wikipedia.org/wiki/Measurement_problem). Now I can't be sure that the optimization wouldn't have eventually been disabled anyway, but it does seem that the reason for this behavior change to occur now was my earlier post.
 
 I am not convinced that removing any optimization which can be used in a timing-based side channel is sustainable. I am not sure this is a thread you want to keep pulling on: practically _every_ aspect of a modern CPU can vary in performance and timing based on internal state[^power]. Trying to draw the security boundaries tightly around co-located entities (e.g., processes on the same CPU, especially on the same core), without allowing any leaks seems destined to fail without a complete overhaul of CPU design, likely at the cost of a large amount of performance. There are just too many holes to plug.
 
@@ -52,6 +52,8 @@ I hope that once the wave of vulnerabilities and disclosures that started with M
 In any case, I still plan to write about performance-related microarchitectural details. I just hope this outcome does not repeat itself.
 
 ### Thanks
+
+Thanks to JN and Chris Martin for reporting or fixing typos in the text.
 
 Stone photo by <a href="https://unsplash.com/@imagefactory">Colin Watts</a> on Unsplash.
 
