@@ -39,7 +39,7 @@ Although I suspect the performance impact will be minuscule on average[^impact],
 
 ### Reproduction
 
-The code to collect this performance data and reproduce my results is available in [zero-fill-bench](https://github.com/travisdowns/zero-fill-bench/tree/post3).
+The code to collect this performance data and reproduce my results is available in [zero-fill-bench](https://github.com/travisdowns/zero-fill-bench/tree/post3), with some [instructions](https://github.com/travisdowns/zero-fill-bench#third-post-rip-zero-store-optimization) in the README.
 
 ### Mea Culpa and an Unsustainable Path
 
