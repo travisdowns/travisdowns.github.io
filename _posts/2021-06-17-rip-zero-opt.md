@@ -53,7 +53,7 @@ Stone photo by <a href="https://unsplash.com/@imagefactory">Colin Watts</a> on U
 
 ### Discussion and Feedback
 
-You can join the discussion on [Twitter](https://twitter.com/trav_downs/status/1407110595761950720) or [Hacker News](https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html).
+You can join the discussion on [Twitter](https://twitter.com/trav_downs/status/1407110595761950720) or [Hacker News](https://news.ycombinator.com/item?id=27588258).
 
 If you have a question or any type of feedback, you can leave a [comment below](#comment-section).
 
