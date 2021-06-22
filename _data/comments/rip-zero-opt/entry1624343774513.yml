@@ -1,0 +1,12 @@
+_id: 242c52a0-d324-11eb-a28b-2b17081581e0
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  My (shaky) understanding is that, since modern computation is destructive and
+  nonreversible and information is conserved, overwritten values are leaked as
+  heat. I wonder if reversible computing would, by its inherent nature, shut a
+  whole bunch of side channels off...
+name: Freyaday
+email: ''
+hp: ''
+date: 1624343774
