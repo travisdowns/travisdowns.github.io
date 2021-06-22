@@ -1,0 +1,8 @@
+_id: 4b7e54f0-d335-11eb-a28b-2b17081581e0
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "I am here to *experience* the Staticman comment system. Yea, __this__ feels really good.\r\n\r\nTrying out some bullets:\r\n  - One\r\n  - Two\r\n  - Three\r\n  - Four\r\n  - Five\r\n\r\nHere's an `inline code` and here's a code block:\r\n\r\n```c\r\nint main(){\r\n   printf(\"%d is a prime number\", 7);\r\n}\r\n```\r\n---\r\nGreat!"
+name: Jennifer
+email: ''
+hp: ''
+date: 1624351141
