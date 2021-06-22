@@ -1,0 +1,8 @@
+_id: de0602d0-d337-11eb-a28b-2b17081581e0
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: 242c52a0-d324-11eb-a28b-2b17081581e0
+message: "Even with reversible computing, most reasonable uses (e.g. perform irreversible computations) end up converting ancilla zero bits into \"garbage\". This garbage is what gives the logical reversibility, and thus it will contain the necessary information to recompute the input. Now, you either clone output & uncompute the garbage (to get zeroes again), with a huge performance overhead, or you destroy the garbage, which again dissipates/leaks the information. At least that's the theory...\r\n\r\nIn any case, I would also love to see research on the intersection of security & reversible computing. To me any exciting future must involve NVRAM + error correction + reversible computing."
+name: pepe
+email: ''
+hp: ''
+date: 1624352246
