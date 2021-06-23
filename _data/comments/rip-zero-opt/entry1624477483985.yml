@@ -1,0 +1,8 @@
+_id: 753d82d0-d45b-11eb-a781-93a616abab19
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: f34f24d0-d429-11eb-8cd7-c3e13a62ea8f
+message: "Sorry, classic off-by-one on my part.\r\n    \r\nThe CVE was made public and the microcode was released by Intel on Tuesday the _8th_, but Intel didn't package it until the next day, the 9th. So the 7th is the \"last definitely fast day\" and the 8th is ambiguous depending on how you get your microcode (and when you reboot). I've changed the comparison days to the 7th and 9th and fixed the text, and credited you."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1624477483
