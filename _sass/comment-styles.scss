@@ -82,6 +82,11 @@ button:hover {
 .comment__author {
     color: $grey-color;
 }
+.comment__admin_tag {
+    background-color: rgb(187, 255, 187);
+    border-radius: 3px;
+    padding: 3px;
+}
 .comment__date {
     font-size: $small-font-size;
 }

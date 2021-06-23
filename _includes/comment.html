@@ -4,9 +4,13 @@
 <article id="{{ comment_id }}" class="{{ article_class }}" uid="{{ include.uid }}">
 
   <div class="comment__author">
-    {{- include.name | strip_html -}},
+    {% if include.name == site.author.name %} 
+    <span class="comment__admin_tag">Author</span>
+    {% endif %}
+    {{- include.name | strip_html }}
     <span class="comment__date">
       {%- if include.date -%}
+        •
         <a href="#{{ comment_id}}" title="Permalink to this comment">
         {{- include.date | date:"%B %eth, %Y %H:%M" -}}
         </a>
