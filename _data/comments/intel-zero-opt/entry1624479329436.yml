@@ -1,0 +1,8 @@
+_id: c1337a10-d45f-11eb-a781-93a616abab19
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: 540b2b20-d34e-11eb-a28b-2b17081581e0
+message: "I doubt `std::fill` has a special case itself, because the standard library implementations rarely seem to use platform specific code to improve performance, relying instead on compiler transformations. Now, the compiler [can transform](https://godbolt.org/z/GMqfhrs1h) `std::fill` to `memset`, and `memset` _does_ have a DCVZA [path in glibc](https://github.com/bminor/glibc/blob/17a73a6d8b4c46f3e87fc53c7c25fa7cec01d707/sysdeps/aarch64/memset.S#L103) at least!\r\n\r\nSo it would be interesting to see how much difference this makes."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1624479329
