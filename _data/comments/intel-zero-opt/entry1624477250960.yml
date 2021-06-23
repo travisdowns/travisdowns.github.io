@@ -1,0 +1,8 @@
+_id: ea575830-d45a-11eb-a781-93a616abab19
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: "On point 27., the memory you get from the OS is initially mapped to the shared zero page, but on the first access violation (non-zero write!), you get an interrupt which spends about half the time in updating the page tables, and the other half in performing a memset to 0. (Which by the way happens with a `rep stos`, not an AVX loop.)\r\n\r\nThe freshly mapped pages *may* have been already zeroed out, but not always are, and unless the OS would be zeroing eagerly, it wouldn't know either.\r\n\r\nFor that interrupt, this is (or was...) an essential optimization. Partly because newer Intel CPUs have a failed design, where non-\"thread\"-safe interrupts (such as a page fault) must use a spin lock as the only possible safeguard against a corrupted page table, but too many cores in the spinlock burn up all the cache bandwidth and thereby slow down the work in the critical section. In summary, you may have 1TB of RAM, and a couple dozen cores, but if you ain't careful, all cores get trapped in the interrupt while you can't page fault at a rate of more than 10-15GB/s."
+name: Ext3h
+email: 2503121b7e7487cd870c8afe40f0cf21
+hp: ''
+date: 1624477250
