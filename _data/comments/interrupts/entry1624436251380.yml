@@ -1,0 +1,8 @@
+_id: 74b0d4d0-d3fb-11eb-b2f8-5d7287282354
+_parent: 'https://travisdowns.github.io/blog/2019/08/20/interrupts.html'
+replying_to_uid: ''
+message: "Running indep-mov test (#0) on my Nehalem:\r\nperf record -e task-clock ./indep-mov | perf annotate -Mintel --stdio --no-source --stdio-color --show-nr-samples\r\nshows pattern which looks more similar to indep-add but there is non-zero (but still very small compared to max/avg) values. Like 45 0 6 40 22 35 0 0 [cycle] 7 33 0 9 1 26 32 0 [cycle]...\r\nThis is definitely not your distribution. Of course, there is an absence of any prioritized instruction (if I sum values for all cycles I will likely get the same picture), but for you it works at per-cycle basis."
+name: kolya
+email: ''
+hp: ''
+date: 1624436251
