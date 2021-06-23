@@ -18,12 +18,11 @@ excerpt: The death of hardware store optimization.
 
 The plot below shows the throughput of filling a region of the given size (varying on the x-axis) with zeros[^stdfill] on Skylake (and Ice Lake in the second tab).
 
-The two series were generated under apparently identical conditions: the same binary on the same machine. Only the date the benchmark was run varies. That is, on Tuesday (June 7th) filling with zeros is substantially faster than the same benchmark on Wednesday, at least when the region no longer fits in the L2 cache[^whitelie].
-
+The two series were generated under apparently identical conditions: the same binary on the same machine. Only the date the benchmark was run varies. That is, on Monday, June 7th, filling with zeros is substantially faster than the same benchmark on Wednesday, at least when the region no longer fits in the L2 cache[^whitelie].
 
 {% include carousel-svg-fig-2.html file="fig1" suffixes="skl,icl" names="Skylake,Ice Lake"
     raw="skl-combined/l2-focus.csv,icl-combined/l2-focus.csv"
-    alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Tuesday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" %}
+    alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" %}
 
 ### Hump Day Strikes Back
 
@@ -31,7 +30,7 @@ What's going on here? Are my Skylake and Ice Lake hosts simply work-weary by Wed
 
 Believe it or not, it is none of the above!
 
-These hosts run Ubuntu 20.04 and on Wednesday June 8th an update to the [intel-microcode](https://launchpad.net/ubuntu/+source/intel-microcode) OS package was released. After a reboot[^reboot], this loads the CPU with new _microcode_ that causes the behavior shown above. Specifically, this microcode[^versions] disables the [hardware zero store]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}) optimization we discussed in a previous post. It was disabled to mitigate [CVE-2020-24512](http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-24512) further described[^barely] in Intel security advisory [INTEL-SA-00464](https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00464.html).
+These hosts run Ubuntu 20.04 and on Wednesday June 9th an update to the [intel-microcode](https://launchpad.net/ubuntu/+source/intel-microcode) OS package was released. After a reboot[^reboot], this loads the CPU with new _microcode_ (released a day earlier by Intel) that causes the behavior shown above. Specifically, this microcode[^versions] disables the [hardware zero store]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}) optimization we discussed in a previous post. It was disabled to mitigate [CVE-2020-24512](http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-24512) further described[^barely] in Intel security advisory [INTEL-SA-00464](https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00464.html).
 
 To be clear, I don't know _for sure_ that the microcode disables the zero store optimization -- but the evidence is rather overwhelming. After the update, performance is the same when filling zeros as for any other value, and the performance counters tracking L2 evictions suggestion that substantially all evictions are now non-silent (recall from the previous posts that silent evictions were a hallmark of the optimization).
 
@@ -53,7 +52,7 @@ In any case, I still plan to write about performance-related microarchitectural 
 
 ### Thanks
 
-Thanks to JN and Chris Martin for reporting or fixing typos in the text.
+Thanks to JN, Chris Martin, Jonathan and m_ueberall for reporting or fixing typos in the text.
 
 Stone photo by <a href="https://unsplash.com/@imagefactory">Colin Watts</a> on Unsplash.
 
@@ -90,6 +89,6 @@ If you have a question or any type of feedback, you can leave a [comment below](
 
 [^power]: This observation becomes almost universal once you consider that the _values_ involved in any operation affect power use (see e.g. [Schöne et al](https://arxiv.org/pdf/1905.12468.pdf) or [Cornebize and Legrand](https://hal.inria.fr/hal-02401760/document)). Since power use can be directly (e.g., RAPL or external measurements) or indirectly (e.g., because of heat-dependent frequency changes) observed, it means that in theory _any_ operation, even those widely considered to be constant-time, may leak information.
 
-[^whitelie]: I'm doing a bit of a retcon here. The effect is present as described based on the date, and I observed and benchmarked it "on Wednesday", but the specific data series used for the plot were generated a week later when I had time to collect the data properly in a relatively noise free environment. So the two series were collected back-to-back on the same day, varying only the hidden parameter you'll learn about two paragraphs from now.
+[^whitelie]: I'm doing a bit of a retcon here. The effect is present as described on the gates given, and I observed and benchmarked it on Wednesday myself, but the specific data series used for the plots were generated a week later when I had time to collect the data properly in a relatively noise free environment. So the two series were collected back-to-back on the same day, varying only the hidden parameter you'll learn about two paragraphs from now.
 
 [^impact]: The performance regression shown in the plots is close to a worst case: the benchmark only fills zeros and nothing else. Real code doesn't spend _that much_ time filling zeros, although zero *is* no doubt the dominant value in large block fills, at least because the OS must zero pages before returning them to user processes and memory-safe languages like Java will zero some objects and array types in bulk.
