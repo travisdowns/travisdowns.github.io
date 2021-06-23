@@ -1,0 +1,8 @@
+_id: 01901510-d464-11eb-a781-93a616abab19
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: da0ea060-d378-11eb-a28b-2b17081581e0
+message: "The concern isn't an attacker that can read and write to the memory, but one that can't.\r\n\r\nE.g., another process on the same machine could possible observe whether a cache line it cannot access is zero or not if it manages to evict it from cache and observe the timing. Or an attacker that doesn't have access to the machine could time operations from the outside to determine if zero cache lines were involved. These are so-called \"timing side channel attacks\"."
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1624481155
