@@ -1,0 +1,8 @@
+_id: d7182ce0-d55e-11eb-b4ca-af5dfef9ac70
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: ''
+message: "The feature is both a power and a performance optimisation.  It takes effect when you write zero to an already-zeroed cache line.  In addition to the page scrubbing case given, consider also a program stack with blocks of local variables initialised to zero.\r\n\r\nThe performance optimisation comes from reduced cache coherency overhead - the cache line doesn't have to move out of the shared state if it doesn't logically become modified.  The power optimisation comes from reduced DIMM traffic, and reducing DIMM traffic is a very big deal for devices running on battery.\r\n\r\nThe problem is that it introduces data-dependent timing differences, and undermines a critical security property of hardened crypto libraries, which are designed to have timing which is invariant to the key, cypher and plaintext that they're processing."
+name: anon
+email: ''
+hp: ''
+date: 1624588887
