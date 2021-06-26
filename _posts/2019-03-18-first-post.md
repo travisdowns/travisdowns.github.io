@@ -3,6 +3,7 @@ layout: post
 title:  A Blog Appears!
 date:   2019-03-18 12:00:00 -300
 categories: blog
+tags: [ blog ]
 ---
 
 If there's one thing the internet needs, it's another blog. So after messing around with Jekyll and Github Pages for way longer than is reasonable, here we are.

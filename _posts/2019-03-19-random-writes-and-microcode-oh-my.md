@@ -3,7 +3,7 @@ layout: post
 title:  What Has Your Microcode Done for You Lately?
 date:   2019-03-19 12:00:00 -300
 category: blog
-tags: [intel, memory, performance]
+tags: [Intel, memory, performance]
 assets: /assets/2019-03-19
 excerpt: CPU microcode updates can cause silent and dramatic performance changes.
 ---

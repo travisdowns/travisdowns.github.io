@@ -51,10 +51,14 @@ reCaptcha:
 defaults:
   # Post defaults
   - scope:
-      path: "_posts"
+      path: _posts
       type: posts
     values:
       comments: true
+  - scope:
+      path: tags
+    values:
+      layout: tag-list
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list

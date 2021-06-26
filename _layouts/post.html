@@ -1,7 +1,12 @@
 ---
 layout: default
 ---
+
+<!-- BASE: {{ site.baseurl }} -->
+
 <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+<!-- INSIDE -->
 
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
@@ -11,8 +16,17 @@ layout: default
         {{ page.date | date: date_format }}
       </time>
       {%- if page.author -%}
-        • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
-      {%- endif -%}</p>
+      • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
+      {%- endif -%}
+      <!-- travis override -->
+      {%- if page.tags -%}
+        <span>
+          •
+          {% for tag in page.tags %}<span class="tag-link"><a href="{{ tag | prepend: 'tags/' | relative_url }}.html">{{ tag }}</a></span>{% endfor %}
+        </span>
+      {%- endif -%}
+      <!-- end override -->
+    </p>
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
@@ -27,6 +41,7 @@ layout: default
   {% if page.comments == true %}
     {% include comments.html %}
   {% endif %}
+  <!-- end override -->
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
