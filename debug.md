@@ -7,14 +7,28 @@ url: {{ site.url }}
 
 baseurl: {{ site.baseurl }}
 
+[bad link]({{ 'notexist.html' | relative_url}})  
+[self link]({{ 'debug.html' | relative_url}})
 
 <style>
-#props span {
+#props span, .mono {
     font-family: monospace;
     white-space: pre;
+}
+
+#props span {
     background-color: lightgrey;
 }
 </style>
+
+<div class="mono">
+<script>
+        document.write('location.href    : ' + location.href + '<br>')
+        document.write('window.location  : ' + window.location + '<br>')
+        document.write('document.referrer: ' + document.referrer + '<br>')
+    </script>
+</div>
+
 
 <div id="props">
 

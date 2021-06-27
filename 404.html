@@ -19,6 +19,16 @@ layout: default
 <div class="container">
   <h1>404</h1>
 
-  <p><strong>Page not found :(</strong></p>
-  <p>The requested page could not be found.</p>
+  <p><strong>Page not found</strong></p>
+  
+  <p>If you followed a link from this site, please
+    <a id="issue-link" href='https://github.com/travisdowns/travisdowns.github.io/issues/new?title=404+Missing+Page&body=Please+mention+the+link+you+clicked.&labels=404'>create an issue</a>
+    issue to get this fixed.
+  </p>
+
+  <script>
+    var base = 'https://github.com/travisdowns/travisdowns.github.io/issues/new?title=404+Missing+Page&labels=404'
+    document.getElementById("issue-link").href = base + '&body=' + encodeURIComponent('Source: ' + location.href + '\nLink: ' + document.referrer)
+  </script>
+
 </div>
