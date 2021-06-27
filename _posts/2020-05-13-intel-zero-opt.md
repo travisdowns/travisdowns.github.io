@@ -50,7 +50,7 @@ The full benchmark associated with this post (including some additional benchmar
 
 ## Benchmarks
 
-That's enough prelude <img src="{{assetpath}}/prelude.jpg" style="display:inline; height: 1.2em;"> for now. Let's write some benchmarks.
+That's enough prelude <img src="{{assetpath}}/prelude.jpg" alt="a small red car" style="display:inline; height: 1.2em;"> for now. Let's write some benchmarks.
 
 ### A Very Simple Loop
 

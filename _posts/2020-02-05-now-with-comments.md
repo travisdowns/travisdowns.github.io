@@ -292,7 +292,7 @@ This ultimately includes [external JavaScript](https://github.com/travisdowns/tr
 
 You can try to use this same integration in your Jekyll blog. You'd need to:
 
- - Copy the `_includes/comment.html`, `_includes/comments.html`, `_includes/comment_form.html`, `assets/main.js`, and `_sass/comment-styles.css` from my [blog files](https://github.com/travisdowns/travisdowns.github.io/blob/master) to your blog repository.
+ - Copy the `_includes/comment.html`, `_includes/comments.html`, `_includes/comment_form.html`, `assets/main.js`, and `_sass/comment-styles.css` from my [blog files](https://github.com/travisdowns/travisdowns.github.io) to your blog repository.
  - In `assets/main.js`, replace the link to `https://github.com/travisdowns/travisdowns.github.io/pulls` with a link to your own repository (or otherwise customize the "success" message as you see fit).
  - Include `@import "comment-styles";` in your `assets/main.scss` file. If you don't have one, you'll need to create it following the rules for your theme. Usually this just means a `main.scss` with empty front-matter and an `@import "your-theme";` line to import the theme SCSS. Alternately, you could avoid putting anything in `main.scss` and just include the comment styles as a separate file, but this adds another request to each post.
  - Do the `include comments.html` thing shown above in an appropriate place in your template/theme.

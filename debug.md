@@ -3,6 +3,8 @@
 
 relative foo: {{ '/foo' | relative_url }}
 
+[link](http://www.example.com)
+
 url: {{ site.url }}
 
 baseurl: {{ site.baseurl }}
@@ -29,10 +31,13 @@ baseurl: {{ site.baseurl }}
     </script>
 </div>
 
+<a href="#pages-table">Jump to PAGES table</a><br>
+<a href="#posts-table">Jump to POSTS table</a><br>
+<a href="#static-table">Jump to STATIC table</a><br>
 
 <div id="props">
 
-<h2>site.pages</h2>
+<h2 id="pages-table" >site.pages</h2>
 {%- for page in site.pages -%}
     <strong>{{ page.path }}:</strong><br>
     <table>
@@ -47,7 +52,7 @@ baseurl: {{ site.baseurl }}
     </table>
 {%- endfor -%}
 
-<h2>site.posts</h2>
+<h2 id="posts-table">site.posts</h2>
 
 {% assign liquid_posts = site.posts | map: 'to_liquid' %}
 
@@ -94,7 +99,23 @@ baseurl: {{ site.baseurl }}
     
 {%- endfor -%}
 
-<br /><strong>allprops:</strong><br />
+<br /><strong>All posts props:</strong><br />
 {{allprops | split: ',' | uniq | join: '<br />'}}
+
+<h2 id="static-table">site.static_files</h2>
+    
+    {%- for page in site.static_files -%}
+    <strong>{{ page.path }}:</strong><br>
+    <table>
+        <tr><th>Property</th><th>Value</th></tr>
+
+        <tr><td>path         </td><td><span>{{ page.path       }}</span></td></tr>
+        <tr><td>collection   </td><td><span>{{ page.collection       }}</span></td></tr>
+        <tr><td>modified_time</td><td><span>{{ page.modified_time       }}</span></td></tr>
+        <tr><td>basename     </td><td><span>{{ page.basename       }}</span></td></tr>
+        <tr><td>name         </td><td><span>{{ page.name       }}</span></td></tr>
+        <tr><td>extname      </td><td><span>{{ page.extname       }}</span></td></tr>
+    </table>
+{%- endfor -%}
 
 </div>

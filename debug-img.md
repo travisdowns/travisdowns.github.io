@@ -10,7 +10,8 @@ layout: post
     https://dummyimage.com/3700x500/000/fff&text=3700w 3700w,
     https://dummyimage.com/4440x600/000/fff&text=4440w 4440w,
     "
-    sizes="(max-width: 800px) calc(100vw - 30px), 740px">
+    sizes="(max-width: 800px) calc(100vw - 30px), 740px"
+    alt="dummy">
 
 ---
 

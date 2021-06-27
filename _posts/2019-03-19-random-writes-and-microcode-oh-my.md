@@ -12,7 +12,7 @@ excerpt: CPU microcode updates can cause silent and dramatic performance changes
 
 Did you ever wonder what is *inside* those microcode updates that get silently applied to your CPU via Windows update, BIOS upgrades, and various microcode packages on Linux?
 
-Well, you are in the wrong place, because this blog post won't answer that question (you might like [this](https://www.emsec.ruhr-uni-bochum.de/media/emma/veroeffentlichungen/2017/08/16/usenix17-microcode.pdf) though).
+Well, you are in the wrong place, because this blog post won't answer that question (you might like [this](https://www.usenix.org/system/files/conference/usenixsecurity17/sec17-koppe.pdf) though).
 
 In fact, the overwhelming majority of this this post is about the performance of scattered writes, and not very much at all about the details of CPU microcode. Where the microcode comes in, and what might make this more interesting than usual, is that performance on a purely CPU-bound benchmark can vary dramatically _depending on microcode version_. In particular, we will show that the most recent Intel microcode version can significantly slow down a store heavy workload when some stores hit in the L1 data cache, and some miss.
 
@@ -101,7 +101,7 @@ So it seems that the likeliest explanation is that _the presence of an L1 hit in
 
 ### Will the real sfence please stand up
 
-Let's test the "L1 hits act as a store fence" theory. In fact, there is already an instruction that acts as a store force in the x86 ISA: [`sfence`](https://www.felixcloutier.com/x86/sfence). Repeatedly executed back-to-back this instruction only takes a [few cycles](http://uops.info/html-instr/SFENCE-1063.html) but its most interesting effect occurs when stores are in the pipeline: this instruction blocks dispatch of subsequent stores until all earlier stores have committed to the L1 cache, implying that stores on different sides of the fence cannot overlap[^sfence-note].
+Let's test the "L1 hits act as a store fence" theory. In fact, there is already an instruction that acts as a store force in the x86 ISA: [`sfence`](https://www.felixcloutier.com/x86/sfence). Repeatedly executed back-to-back this instruction only takes a [few cycles](https://uops.info/html-instr/SFENCE.html) but its most interesting effect occurs when stores are in the pipeline: this instruction blocks dispatch of subsequent stores until all earlier stores have committed to the L1 cache, implying that stores on different sides of the fence cannot overlap[^sfence-note].
 
 We will look at two version of the interleaved loop with `sfence`: one with `sfence` inserted right after the store to the first region (fixed 128 KiB), and the other inserted after the store to the second region - let's call them sfenceA and sfenceB respectively. Both have the same number of fences (one per iteration, i.e., per pair of stores) and only differ in what store happens to be last in the store buffer when the `sfence` executes. Here's the result on the new microcode (the results on the old microcode are [over here]({{page.assets}}/skl/i-sfence-old.svg)):
 
@@ -231,7 +231,7 @@ On Skylake-X (Xeon W-2401), the behavior is _always fast_. That is, even with th
 
 On Cannonlake I did not observe the slow behavior. I don't know if I was using an "old" or "new" microcode as Intel does not publish microcode guidance for Cannonlake (and it isn't clear to me if any Cannonlake microcodes have been released at all as very few chips were ever shipped).
 
-You can look at the results for all the platforms I tested in the [assets directory]({{page.assets}}). The plots are the same as described above for Skylake plus some variants not show but which should be obvious from the title or filename.
+You can look at the results for all the platforms I tested in the [assets directory]({{ page.assets | relative_url }}). The plots are the same as described above for Skylake plus some variants not show but which should be obvious from the title or filename.
 
 ## The Source
 

@@ -2,7 +2,7 @@ _id: 0666b590-4ab2-11ea-8211-4b02c05d3f92
 _parent: 'http://localhost:4000/blog/2020/02/05/now-with-comments.html'
 replying_to: ''
 replying_to_uid: ''
-message: "Testing a kramdown comment with a [link](www.example.com), a footnote[^fn], `some code`.\r\n\r\n### A heading\r\n\r\nSome javacscript:\r\n\r\n<script>\r\nwindow.alert(\"a scam\");\r\n</script>\r\n\r\n[^fn]: footnote text"
+message: "Testing a kramdown comment with a [link](http://www.example.com), a footnote[^fn], `some code`.\r\n\r\n### A heading\r\n\r\nSome javacscript:\r\n\r\n<script>\r\nwindow.alert(\"a scam\");\r\n</script>\r\n\r\n[^fn]: footnote text"
 name: Travis Downs
 email: c6937532928911c0dae3c9c89b658c09
 hp: ''

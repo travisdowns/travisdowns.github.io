@@ -1,0 +1,10 @@
+---
+layout: default
+---
+<table>
+{%- for page in site.static_files -%}
+    {% if page.path contains '/assets/2019-03-19/' %}
+    <tr><td><a href="{{ page.path | relative_url }}">{{ page.path }}</a></td></tr>        
+    {% endif %}
+{%- endfor -%}
+</table>
