@@ -1,5 +1,9 @@
 name: build
-on: [push]
+on:
+  push:
+  schedule:
+    - cron:  '42 1 * * *' # run at 1:42 AM every day
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
