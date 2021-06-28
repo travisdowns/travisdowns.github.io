@@ -1,0 +1,22 @@
+name: build
+on: [push]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.3
+          bundler-cache: true
+      - name: Build site
+        run: bundle exec jekyll build
+      - name: Install htmlproofer
+        run: sudo gem install html-proofer
+      - name: Run htmlproofer
+        run: ./_scripts/check-html.sh
