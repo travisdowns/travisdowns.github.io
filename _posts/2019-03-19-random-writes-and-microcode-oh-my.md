@@ -57,7 +57,7 @@ Let's say we fix the size of the first array, `size1`, to something like half th
 
 Let's try it! Here's a test of single stores vs interleaved stores (with one of the interleaved stores accessing a fixed 128 KiB region), varying the size of the other region, run on my Skylake i7-6700HQ.
 
-![Interleaved vs Single stores]({{page.assets}}/skl/i-vs-s-old.svg)
+![Interleaved vs Single stores]({% link {{page.assets}}/skl/i-vs-s-old.svg %})
 
 Overall we see that behavior of the two benchmarks roughly track each other, with the interleaved version (twice as many stores) taking longer than the single store version, as expected.
 
@@ -75,7 +75,7 @@ Recently, I returned to the benchmark to check the performance on newer CPU arch
 
 With some help from user Adrian on the [RWT forums](https://www.realworldtech.com/forum/?roomid=1) I was able to bisect the difference down to a CPU microcode update. In particular, with newest microcode version [^7], `0xc6` the interleaved stores scenario runs _much_ slower. For example, the same benchmark as above now looks like this, every time you run it:
 
-![Interleaved vs Single Stores (New Microcode)]({{page.assets}}/skl/i-vs-s-new.svg)
+![Interleaved vs Single Stores (New Microcode)]({% link {{page.assets}}/skl/i-vs-s-new.svg %})
 
 The behavior of interleaved for small regions (left hand side of chart) is drastically different - the throughput is less than half of the old microcode. It is not obvious just by visual comparison it, but performance is actually reduced across the range of tested sizes for the interleaved case, albeit by only a few cycles as the region size becomes large. I tested various microcode versions and found that only the most recent SKL microcode, revision `0xc6` and released in August 2018 exhibits the "always slow" behavior shown above. The preceding version `0xc2` usually results in the fast behavior.
 
@@ -87,11 +87,11 @@ We can check the performance counters to see if they reveal anything. We'll use 
 
 Here's the old microcode:
 
-![Interleaved Stores w/ Perf Counters (old microcode)]({{page.assets}}/skl/i-plus-counters-old.svg)
+![Interleaved Stores w/ Perf Counters (old microcode)]({% link {{page.assets}}/skl/i-plus-counters-old.svg %})
 
 ... and with the new microcode (note the change in the y axis, it's about 3x slower for the L1 hit region):
 
-![Interleaved Stores w/ Perf Counters (new microcode)]({{page.assets}}/skl/i-plus-counters-new.svg)
+![Interleaved Stores w/ Perf Counters (new microcode)]({% link {{page.assets}}/skl/i-plus-counters-new.svg %})
 
 Despite the large difference in performance, there is very little to no difference in the relevant performance counters. In both cases, the number of L1 misses (i.e., L2 references) approaches 0.75 as the second region size approaches zero as we'd expect (all L1 hits in the second region, and about 25% L1 hits in the 128 KiB fixed region as the L1D is 25% of the size of L2). On the right side, the number of L1 misses approaches something like 1.875, as the L1 hits in the 128 KiB region are cut in half by competition with with the other large region.
 
@@ -103,9 +103,9 @@ So it seems that the likeliest explanation is that _the presence of an L1 hit in
 
 Let's test the "L1 hits act as a store fence" theory. In fact, there is already an instruction that acts as a store force in the x86 ISA: [`sfence`](https://www.felixcloutier.com/x86/sfence). Repeatedly executed back-to-back this instruction only takes a [few cycles](https://uops.info/html-instr/SFENCE.html) but its most interesting effect occurs when stores are in the pipeline: this instruction blocks dispatch of subsequent stores until all earlier stores have committed to the L1 cache, implying that stores on different sides of the fence cannot overlap[^sfence-note].
 
-We will look at two version of the interleaved loop with `sfence`: one with `sfence` inserted right after the store to the first region (fixed 128 KiB), and the other inserted after the store to the second region - let's call them sfenceA and sfenceB respectively. Both have the same number of fences (one per iteration, i.e., per pair of stores) and only differ in what store happens to be last in the store buffer when the `sfence` executes. Here's the result on the new microcode (the results on the old microcode are [over here]({{page.assets}}/skl/i-sfence-old.svg)):
+We will look at two version of the interleaved loop with `sfence`: one with `sfence` inserted right after the store to the first region (fixed 128 KiB), and the other inserted after the store to the second region - let's call them sfenceA and sfenceB respectively. Both have the same number of fences (one per iteration, i.e., per pair of stores) and only differ in what store happens to be last in the store buffer when the `sfence` executes. Here's the result on the new microcode (the results on the old microcode are [over here]({% link {{page.assets}}/skl/i-sfence-old.svg %})):
 
-![Interleaved Stores w/ SFENCE]({{page.assets}}/skl/i-sfence-new.svg)
+![Interleaved Stores w/ SFENCE]({% link {{page.assets}}/skl/i-sfence-new.svg %})
 
 The right side of the graph is fairly unremarkable: both versions with sfence perform roughly at the latency for the associated cache level because there is zero memory level parallelism (no, I don't know why one performs better than other or why the performance crosses over near 64 KiB). The left part is pretty amazing though: one of the sfence configurations is _faster than the same code without sfence_. That's right, adding a store serializing instruction like sfence, can speed up the code by several cycles. It doesn't come close to the fast performance of the old microcode versions, but the behavior is very surprising nonetheless.
 
@@ -117,11 +117,11 @@ To this point we've been we've been looking at the scenario where a write to a 1
 
 What's the behavior? Here's the old microcode:
 
-![Interleaved Stores w/ 2048 KiB Fixed Region]({{page.assets}}/skl/i-vs-s-2mib-old.svg)
+![Interleaved Stores w/ 2048 KiB Fixed Region]({% link {{page.assets}}/skl/i-vs-s-2mib-old.svg %})
 
 ... and the new:
 
-![Interleaved Stores w/ 2048 KiB Fixed Region]({{page.assets}}/skl/i-vs-s-2mib-new.svg)
+![Interleaved Stores w/ 2048 KiB Fixed Region]({% link {{page.assets}}/skl/i-vs-s-2mib-new.svg %})
 
 Again we see a large performance impact with the new microcode, and the results are consistent with the theory that L1 hits in the store stream prevent overlapping of store misses on either side. In particular we see that the region with L1 hits takes about 37 cycles, almost exactly the L3 latency on this CPU. In this scenario, it is _slower to have L1 hits mixed in to the stream of accesses than to replace those L1 hits with misses to DRAM_. That's a remarkable demonstration of the power of memory level parallelism and of the potential impact of this change.
 
@@ -174,7 +174,7 @@ do {
 
 Here's is the performance with a fixed array size of 2048 KiB (since the performance degradation is more dramatic with large fixed region sizes):
 
-![Interleaved Stores with Unrolling]({{page.assets}}/skl/i-unrolled-2mib-new.svg)
+![Interleaved Stores with Unrolling]({% link {{page.assets}}/skl/i-unrolled-2mib-new.svg %})
 
 For the region where L1 hits occur, the unroll by gives a 1.6x speedup, and the unroll by 4 a 2.5x speed. Even when unrolling by 4 we still see an impact from this issue (performance still improves once almost every store is an L1 miss) - but we are much closer to the expected the baseline performance before the microcode update.
 
@@ -198,7 +198,7 @@ We don't even really have to **pre**-fetch: that is, we don't need to issue the 
 
 One question is which of the two regions to prefetch? The fixed region, the variable region or both? It turns out that "both" is a fine strategy and is often the sole fastest approach and is generally tied in the remaining cases. Here's a look at all three approaches against no prefetching at all on the new microcode (128 KiB fixed region size):
 
-![Interleaved Stores with Prefetching]({{page.assets}}/skl/i-prefetch-new.svg)
+![Interleaved Stores with Prefetching]({% link {{page.assets}}/skl/i-prefetch-new.svg %})
 
 A key observation is that if you had decided to only prefetch one _or_ the other of the two stores, you'd be slower than no prefetching at all over most of the range. It isn't exactly clear to me why this is the case: perhaps the prefetches compete for fill buffers or otherwise result in a worse allocation of fill buffers to requests.
 
@@ -266,7 +266,7 @@ I don't have a comment system, but I'll reply to stuff posted in the [Hacker New
 
 [^9]: I used the weasel word "contributes" here rather than "ultimately results in an L1 miss" to cover the case where two stores occur to the same line in short succession and that line is not in L1. In this case, both stores will miss, but there will generally only be one reference to L2 since the fill buffers operate on whole cache lines, so both stores will be satisfied by the same miss. The same effect occurs for loads and can be measured explicitly by the `mem_load_retired.fb_hit` event: those are loads that missed in L1, but subsequently hit the _fill buffer_ (aka miss status handling register) allocated for an earlier access to the same cache line that also missed.
 
-[^sfence-note]: Actually, this doesn't seem to be strictly true. The results on some CPUs are too good to represent zero overlapping between stores. E.g., the [old microcode results]({{page.assets}}/skl/i-sfence-old.svg)) show the sfenceB results staying under 30 cycles even for main-memory sized regions (and quite close to the no sfence results), which is only possible with a lot of store overlapping. So something remains to be discovered about sfence behavior.
+[^sfence-note]: Actually, this doesn't seem to be strictly true. The results on some CPUs are too good to represent zero overlapping between stores. E.g., the [old microcode results]({% link {{page.assets}}/skl/i-sfence-old.svg %})) show the sfenceB results staying under 30 cycles even for main-memory sized regions (and quite close to the no sfence results), which is only possible with a lot of store overlapping. So something remains to be discovered about sfence behavior.
 
 [^11]: I did notice _some_ differences when removing the aliasing: for example, sfenceA and sfenceB converged and finally performed the same as the region size increased, rather than sfenceB crossing over and being several cycles faster than sfenceA.
 

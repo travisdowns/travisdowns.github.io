@@ -17,7 +17,7 @@ Sometimes you just want to know how fast your code *can* go, without benchmarkin
 Well this post is about that determining that _speed limit_[^speedlemire]. It's not a comprehensive performance evaluation methodology, but for many *small* pieces of code it will work very well.
 
 {:refdef: style="text-align: center;"}
-![Speed Limit]({{ page.assets }}/speed-limit-50-ns.svg){:width="300px"}
+![Speed Limit]({% link {{page.assets}}/speed-limit-50-ns.svg %}){:width="300px"}
 {: refdef}
 
 ## Table of Contents
@@ -177,11 +177,11 @@ What gives? As it turns out, the limitation is the `imul` instructions. Although
 
 On modern chips all operations execute only through a limited number of ports[^ports] and for multiplications that is always only p1. You can get this information from Agner's [instruction tables](https://www.agner.org/optimize/#manual_instr_tab):
 
-![Agner's port usage info]({{page.assets}}/agner-imul.png)
+![Agner's port usage info]({% link {{page.assets}}/agner-imul.png %})
 
 ... or from [uops.info](http://uops.info/html-instr/IMUL_R32_R32.html):
 
-![uops-info port usage info]({{page.assets}}/uops-info-imul.png)
+![uops-info port usage info]({% link {{page.assets}}/uops-info-imul.png %})
 
 On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise operation (`or`, `and`, `xor`) and flag setting tests (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations compete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` execute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
 
@@ -1196,7 +1196,7 @@ This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hac
 
 [^robgen]: Well this is at least true on Intel. Recent chips from AMD, Apple and others seem to use _nop compression_ to pack several nops into one ROB slot: so in this case we can imagine that each nop takes only a _fraction_ of a slot. It is not impossible to imagine an microarchitecture that entire avoids putting nops in the ROB. 
 
-[^g2buffers]: These numbers I measured myself using a modified version of Veerdac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on [robsize](https://github.com/travisdowns/robsize) (but unlike robsize supports Arm 64-bit platforms). My results for ROB size are [here]({{page.assets}}/g2results/generic-aarch64.svg) and [here]({{page.assets}}/g2results/nop.svg) (the latter test indicating that _nop compression_ does not appear to be present on Graviton 2). Scheduler size results, using instructions which are dependent on the fencing loads are [here]({{page.assets}}/g2results/depadd-aarch64.svg). There are also [load]({{page.assets}}/g2results/load-aarch64.svg) and [store]({{page.assets}}/g2results/store-aarch64.svg) buffer results, as well as [integer PRF]({{page.assets}}/g2results/add-aarch64.svg) and [SIMD PRF]({{page.assets}}/g2results/fmla-aarch64.svg) results. [This test]({{page.assets}}/g2results/movz-fmla-aarch64.svg) indicates that the integer and SIMD PRFs are not shared. It isn't shown in the table, but [this result testing `cmp`]({{page.assets}}/g2results/cmp.svg) indicates that there is a separate set of renamed flag registers with ~36 entries. [These results]({{page.assets}}/g2results/branch-aarch64.svg) indicate that up to 46 calls can be in flight at once. There are [even more](https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results) results not mentioned here.
+[^g2buffers]: These numbers I measured myself using a modified version of Veerdac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on [robsize](https://github.com/travisdowns/robsize) (but unlike robsize supports Arm 64-bit platforms). My results for ROB size are [here]({% link {{page.assets}}/g2results/generic-aarch64.svg %}) and [here]({% link {{page.assets}}/g2results/nop.svg %}) (the latter test indicating that _nop compression_ does not appear to be present on Graviton 2). Scheduler size results, using instructions which are dependent on the fencing loads are [here]({% link {{page.assets}}/g2results/depadd-aarch64.svg %}). There are also [load]({% link {{page.assets}}/g2results/load-aarch64.svg %}) and [store]({% link {{page.assets}}/g2results/store-aarch64.svg %}) buffer results, as well as [integer PRF]({% link {{page.assets}}/g2results/add-aarch64.svg %}) and [SIMD PRF]({% link {{page.assets}}/g2results/fmla-aarch64.svg %}) results. [This test]({% link {{page.assets}}/g2results/movz-fmla-aarch64.svg %}) indicates that the integer and SIMD PRFs are not shared. It isn't shown in the table, but [this result testing `cmp`]({% link {{page.assets}}/g2results/cmp.svg %}) indicates that there is a separate set of renamed flag registers with ~36 entries. [These results]({% link {{page.assets}}/g2results/branch-aarch64.svg %}) indicate that up to 46 calls can be in flight at once. There are [even more](https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results) results not mentioned here.
 
 [^memaccess]: Now _memory access_ doesn't necessarily mean that the main memory (RAM) of the system is accessed: just that the machine code contains instructions which involve memory access. For most programs the overwhelming majority of these accesses hit in cache and never get to main memory.
 

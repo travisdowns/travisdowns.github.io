@@ -6,4 +6,4 @@ permalink: /about/
 
 A blog about software performance.
 
-![Fast Rabbit](/assets/rabbit3.png)
+![Fast Rabbit]({% link /assets/rabbit3.png %})

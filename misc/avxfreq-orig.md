@@ -46,7 +46,7 @@ The basic idea is that the test has a _duty period_ and every time this period e
 
 Visually, it is something like this (showing a single duty period: one benchmark is composed of multiple duty cycles back to back):
 
-![Test Structure]({{page.assets}}/test-structure.png)
+![Test Structure]({% link {{page.assets}}/test-structure.png %})
 
 This diagram shows the payload period as occupying a non-negligible amount of time. However, in the first few first tests, the payload period is essentially zero: we run the payload function (which consists of only a couple instructions) only once, so it is really a payload _moment_ rather than period.
 
@@ -81,7 +81,7 @@ We call the payload function only once at the start of each duty period[^pperiod
 
 Here's the result (plot notes[^plotnotes]), with time along the x axis[^falk], showing the measured frequency at each sample (there are three separate test runs shown[^threerun]):
 
-![256-bit vpor transitions]({{page.assets}}/fig-vporvz256.svg)
+![256-bit vpor transitions]({% link {{page.assets}}/fig-vporvz256.svg %})
 
 Well that's really boring. The entire test runs consistently at 3.2 GHz, the nominal (L0 license) frequency, if we ignore the a few uninteresting outliers[^outlie].
 
@@ -98,7 +98,7 @@ vporzmm_vz:
 
 Here is the result:
 
-![512-bit vpor transitions]({{page.assets}}/fig-vporvz512.svg)
+![512-bit vpor transitions]({% link {{page.assets}}/fig-vporvz512.svg %})
 
 We've got something to sink our teeth into!
 
@@ -106,7 +106,7 @@ Remember that the duty cycle is 5000 μs, so at each x-axis tick we execute the 
 
 Let's zoom in on one of the transition points at 15,000 μs:
 
-![512-bit vpor transitions (zoomed)]({{page.assets}}/fig-vpor-zoomed.svg)
+![512-bit vpor transitions (zoomed)]({% link {{page.assets}}/fig-vpor-zoomed.svg %})
 
 We can make the following observations:
 
@@ -139,7 +139,7 @@ We [know](https://uops.info/table.html?search=vpord%20(zmm%2C%20zmm%2C%20zmm)&cb
 
 Here's what a the same zoomed transition point for this looks like, with IPC plotted on the secondary axis:
 
-![512-bit vpor transitions (with IPC)]({{page.assets}}/fig-ipc-zoomed-zmm.svg)
+![512-bit vpor transitions (with IPC)]({% link {{page.assets}}/fig-ipc-zoomed-zmm.svg %})
 
 First, note that in the unshaded regions on the left (before 15,000 μs) and right (after 15,100 μs), the IPC is basically irrelevant: no payload instructions are being executed, so the IPC there is just the whatever the measurement code happens to net out to. We only care about the IPC in the shaded regions, where the payload is executing.
 
@@ -157,13 +157,13 @@ Here, we see that the payload executes _much_ more slowly, with an IPC of ~0.25.
 
 Perhaps surprisingly, this same slowdown occurs for 256-bit `ymm` instructions as well. This contradicts the conventional wisdom that on AVX-512 chips there is no penalty to using light 256-bit instructions:
 
-![256-bit vpor transitions (with IPC)]({{page.assets}}/fig-ipc-zoomed-ymm.svg)
+![256-bit vpor transitions (with IPC)]({% link {{page.assets}}/fig-ipc-zoomed-ymm.svg %})
 
 The results shown above are for a test identical to the 512-version except that it uses 256-bit `vpor ymm0, ymm0, ymm0` as the payload. It shows the same slowdown for ~9 μs after the payload starts executing, but no subsequent halt and no frequency transition. That is, it shows a voltage-only transition (lack of frequency transition is expected because we don't expect a turbo license change for light 256-bit instructions).
 
 <a name="xmmeffect"></a>By now, you are probably wondering about 128-bit `xmm` registers. The good news is that these show no effect at all:
 
-![128-bit vpor transitions (with IPC)]({{page.assets}}/fig-ipc-zoomed-xmm.svg)
+![128-bit vpor transitions (with IPC)]({% link {{page.assets}}/fig-ipc-zoomed-xmm.svg %})
 
 Here, the IPC jumps immediately to the expected value. So it appears that the CPU runs in a state where the 128-bit lanes are ready to go at all times[^orisit].
 
@@ -232,11 +232,11 @@ The transition to fast mode when the `vpor` instructions are spread sufficiently
 
 We can actually test the theory that this transition is associated with waiting for a change in power delivery configuration. Specifically, we can observe the CPU core voltage, using bits 47:32 of the `MSR_PERF_STATUS` MSR. Volume 4 of the Intel Software Development Manual let's us on a secret: these bits expose the _core voltage[^vcc]_:
 
-![Intel SDM Volume 4: Table 2-20]({{page.assets}}/msr_198h.png)
+![Intel SDM Volume 4: Table 2-20]({% link {{page.assets}}/msr_198h.png %})
 
 Let's zoom as usual on a transition point, in this case using a 256-bit (ymm) payload of 1000 dependent `vpor` instructions. This 256-bit payload means no frequency transition, only a dispatch throttling period associated with running 256-bit instructions for the first time in a while. We plot the time it takes to run an iteration of the payload[^whyp], along with the measured voltage:
 
-![Voltage Changes]({{page.assets}}/fig-volts256-1.svg)
+![Voltage Changes]({% link {{page.assets}}/fig-volts256-1.svg %})
 
 The length of the throttling period is around 10 μs as usual, as shown by the period where the payload takes ~4,000 cycles (the usual 4x throttling), and the voltage is unchanged from the pre-transition period (at about 0.951 V) during the throttling period. At the moment the throttling stops, the voltage jumps to about 0.957, a change of about 6 mV. This happens at 2.6 GHz, the nominal non-turbo speed of my i7-6700HQ. At 3.5 GHz, the transition is from 1.167 to 1.182, so both the absolute voltages and the difference (about 15 mV) are larger, consistent the basic idea that higher frequencies need higher voltages.
 
@@ -248,7 +248,7 @@ We might check if there is any _attenuation_ of either type of transition. By _a
 
 We check this by setting a duty period which is just above the observed recovery time from 2.8 to 3.2 GHz, to see if we still see transitions. Here's a duty cycle of 760 μs, about 10 μs more than the observed recovery period for this test[^recovery]:
 
-![760 μs period closeup]({{page.assets}}/fig-vporvz512-ipc-p760.svg)
+![760 μs period closeup]({% link {{page.assets}}/fig-vporvz512-ipc-p760.svg %})
 
 I'm not going to color the regions here, as by now I think you are probably (over?) familiar with them. The key points are:
 
@@ -322,7 +322,7 @@ Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a
 
 [^speriod]: In fact, we generally want the sample period to be as small as possible, to give the best resolution and insight into short-lived events. We can't make it _too_ short though as the samples themselves have a minimum time to capture, and very short samples tend to be noisy due to non-atomicity, quantization effects, etc.
 
-[^f2104]: The CPU is an [Intel W-2104](https://en.wikichip.org/wiki/intel/xeon_w/w-2104), a Xeon-W chip based on the SKX uarch. It has no turbo and an on-the-box speed of 3200 MHz, but accurate tools will probably report it running at 3192 MHz due to _[spread spectrum clocking](https://twitter.com/JeffSmith888/status/1211821823035351043)_ (SSC). In fact, we can see the typical 0.5% spread spectrum triangle wave on almost any of the plots in this post, at the right zoom level, [like this one]({{page.assets}}/fig-ssc.svg). This occurs because we measure time (the x-axis) based on `rdtsc` which is based off of a different clock not subject to SSC, while the unhalted cycles counter counts CPU cycles, which are based off of the 100 MHz BLCK which is subject to SSC.
+[^f2104]: The CPU is an [Intel W-2104](https://en.wikichip.org/wiki/intel/xeon_w/w-2104), a Xeon-W chip based on the SKX uarch. It has no turbo and an on-the-box speed of 3200 MHz, but accurate tools will probably report it running at 3192 MHz due to _[spread spectrum clocking](https://twitter.com/JeffSmith888/status/1211821823035351043)_ (SSC). In fact, we can see the typical 0.5% spread spectrum triangle wave on almost any of the plots in this post, at the right zoom level, [like this one]({% link {{page.assets}}/fig-ssc.svg %}). This occurs because we measure time (the x-axis) based on `rdtsc` which is based off of a different clock not subject to SSC, while the unhalted cycles counter counts CPU cycles, which are based off of the 100 MHz BLCK which is subject to SSC.
 
 [^plotnotes]: All of the plots in this post are SVG images, meaning they can be zoomed arbitrarily: so if you want to zoom in on any region feel free (the browser limits the zoom amount, but just save as a file and open it with any SVG viewer).
 
@@ -359,9 +359,9 @@ Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a
 
     Incidentally, this also explains the oscillating pattern you see in the blue region: the ideal number of payload calls to get a 1 μs sample rate is ~2.5, so the sampling strategy tends to alternative between two and three calls: more calls means IPC closer to 1: so the peaks of the oscillating are two calls and the valleys, three.
 
-[^tput]: I'm not going to fully analyze the throughput case, but the thorough among us can find the chart is [here]({{page.assets}}/fig-ipc-zoomed-zmm-tput.svg). Note that the overhead here cuts the other way: pushing the IPC below the expected value of 2.0 (there are 2 512-bit vector units capable of executing `vpord`) because here the throughput limited instructions compete for ports with the overhead instructions.
+[^tput]: I'm not going to fully analyze the throughput case, but the thorough among us can find the chart is [here]({% link {{page.assets}}/fig-ipc-zoomed-zmm-tput.svg %}). Note that the overhead here cuts the other way: pushing the IPC below the expected value of 2.0 (there are 2 512-bit vector units capable of executing `vpord`) because here the throughput limited instructions compete for ports with the overhead instructions.
 
-[^eightus]: For example, if we reduce the sample resolution to a period of 8 μs from 1 μs, we get [these results]({{page.assets}}/fig-ipc-zoomed-zmm-10us.svg) showing an IPC of almost exactly 1.00.
+[^eightus]: For example, if we reduce the sample resolution to a period of 8 μs from 1 μs, we get [these results]({% link {{page.assets}}/fig-ipc-zoomed-zmm-10us.svg %}) showing an IPC of almost exactly 1.00.
 
 [^orisit]: Of course, another possibility is that something in the rest of the test loop uses `xmm` registers so they remain "hot": they are "baseline" for x86-64 after all, so the compiler is free to use them without any special flags. We could test this theory with a more compact test loop audited to be free of any `xmm` use... but I'm not going to bother. I'm pretty sure these guys are powered up all the time as their use is pervasive in most x86-64 code.
 

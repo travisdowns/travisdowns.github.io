@@ -23,7 +23,7 @@ If that single sentence doesn't immediately indoctrinate you into the mask regis
 
 So mask registers[^kreg] are important, but are not household names unlike say general purpose registers (`eax`, `rsi` and friends) or SIMD registers (`xmm0`, `ymm5`, etc). They certainly aren't going to show up on Intel slides disclosing the size of uarch resources, like these:
 
-![Intel Slide]({{page.assetsmin}}/intel-skx-slide.png)
+![Intel Slide]({% link {{page.assetsmin}}/intel-skx-slide.png %})
 
 <br>
 
@@ -74,11 +74,11 @@ Each `kaddd` instruction consumes one physical mask register. If number of fille
 
 That's exactly what we see:
 
-![Test 27 kaddd instructions]({{page.assetsmin}}/skx-27.svg)
+![Test 27 kaddd instructions]({% link {{page.assetsmin}}/skx-27.svg %})
 
 Let's zoom in on the critical region, where the spike occurs:
 
-![Test 27 zoomed]({{page.assetsmin}}/skx-27-zoomed.svg)
+![Test 27 zoomed]({% link {{page.assetsmin}}/skx-27-zoomed.svg %})
 
 Here we clearly see that the transition isn't _sharp_ -- when the filler instruction count is between 130 and 134, we the runtime is intermediate: falling between the low and high levels. Henry calls this _non ideal_ behavior and I have seen it repeatedly across many but not all of these resource size tests. The idea is that the hardware implementation doesn't always allow all of the resources to be used as you approach the limit[^nonideal] - sometimes you get to use every last resource, but in other cases you may hit the limit a few filler instructions before the theoretical limit.
 
@@ -119,7 +119,7 @@ lfence
 
 Here's the chart:
 
-![Test 29: alternating kaddd and scalar add]({{page.assetsmin}}/skx-29.svg)
+![Test 29: alternating kaddd and scalar add]({% link {{page.assetsmin}}/skx-29.svg %})
 
 We see that the spike is at a filler count larger than the GP and PRF sizes. So we can conclude that the mask and GP PRFs are not shared.
 
@@ -149,7 +149,7 @@ lfence
 
 Here's the corresponding chart:
 
-![Test 35: alternating kaddd and SIMD xor]({{page.assetsmin}}/skx-35.svg)
+![Test 35: alternating kaddd and SIMD xor]({% link {{page.assetsmin}}/skx-35.svg %})
 
 The behavior is basically identical to the prior test, so we conclude that there is no direct sharing between the mask register and SIMD PRFs either.
 
@@ -160,11 +160,11 @@ This turned out not to be the end of the story. The mask registers _are_ shared,
 
 Something we notice in both of the above tests, however, is that the spike seems to finish around 212 filler instructions. However, the ROB size for this microarchtiecture is 224. Is this just _non ideal behavior_ as we saw earlier? Well we can test this by comparing against Test 4, which just uses `nop` instructions as the filler: these shouldn't consume almost any resources beyond ROB entries. Here's Test 4 (`nop` filer) versus Test 29 (alternating `kaddd` and scalar `add`):
 
-![Test 4 vs 29]({{page.assetsmin}}/skx-4-29.svg)
+![Test 4 vs 29]({% link {{page.assetsmin}}/skx-4-29.svg %})
 
 The `nop`-using [Test 4](https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-4.asm) _nails_ the ROB size at exactly 224 (these charts are SVG so feel free to "View Image" and zoom in confirm). So it seems that we hit some other limit around 212 when we mix mask and GP registers, or when we mix mask and SIMD registers. In fact the same limit applies even between GP and SIMD registers, if we compare Test 4 and [Test 21](https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-21.asm) (which mixes GP adds with SIMD `vxorps`):
 
-![Test 4 vs 21]({{page.assetsmin}}/skx-4-21.svg)
+![Test 4 vs 21]({% link {{page.assetsmin}}/skx-4-21.svg %})
 
 Henry mentions a more extreme version of the same thing in the original [blog entry](http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/), in the section also headed **Unresolved Puzzle**:
 
@@ -180,7 +180,7 @@ Both GP and SIMD registers are eligible for so-called _move elimination_. This m
 
 Let's check if something like `kmov k1, k2` also qualifies for move elimination. First, we check the chart for [Test 28](https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-28.asm), where the filler instruction is `kmovd k1, k2`:
 
-![Test 28]({{page.assetsmin}}/skx-28.svg)
+![Test 28]({% link {{page.assetsmin}}/skx-28.svg %})
 
 It looks exactly like Test 27 we saw earlier with `kaddd`. So we would suspect that physical registers are being consumed, unless we have happened to hit a different move-elimination related limit with exactly the same size and limiting behavior[^moves].
 
