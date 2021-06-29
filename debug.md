@@ -1,4 +1,5 @@
 ---
+layout: default
 ---
 
 relative foo: {{ '/foo' | relative_url }}
