@@ -2,13 +2,16 @@
 layout: default
 ---
 
+| Property | Value |
+| -----------------|
+| jekyll.environment  | {{ jekyll.environment }} |
+| site.url | {{ site.url }} |
+| site.baseurl  | {{ site.baseurl }} |
+
 relative foo: {{ '/foo' | relative_url }}
 
 [link](http://www.example.com)
 
-url: {{ site.url }}
-
-baseurl: {{ site.baseurl }}
 
 [bad link]({{ 'notexist.html' | relative_url}})  
 [self link]({{ 'debug.html' | relative_url}})
