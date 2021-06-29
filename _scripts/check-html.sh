@@ -5,4 +5,4 @@
 
 set -euo pipefail
 
-htmlproofer --assume-extension --url-ignore '/notexist.html' _site
+htmlproofer --assume-extension --url-ignore /notexist.html "$@" _site
