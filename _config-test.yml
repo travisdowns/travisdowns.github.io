@@ -1,0 +1,6 @@
+# this is an add-on configuration file for 
+# running the blog from the /blog-test repository
+# you add it to the existing config like so:
+# --config _config.yml,_config-test.yml
+
+baseurl: /blog-test
