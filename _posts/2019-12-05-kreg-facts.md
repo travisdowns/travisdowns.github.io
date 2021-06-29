@@ -84,7 +84,7 @@ Here we clearly see that the transition isn't _sharp_ -- when the filler instruc
 
 Under this assumption, we want to look at the last (rightmost) point which is still faster than the slow performance level, since it indicates that _sometimes_ that many resources are available, implying that at least that many are physically present. Here, we see that final point occurs at 134 filler instructions.
 
-So we conclude that _SKX has 134 physical registers available to hold speculative mask register values_. As Henry indicates on the original post, it is likely that there are 8 physical registers dedicated to holding the non-speculative architectural state of the 8 mask registers, so our best guess at the total size of the mask register PRF is 142. That's somewhat smaller than the GP PRF (180 entires) or the SIMD PRF (168 entries), but still quite large (see [this table of out of order resource sizes]({{ site.baseurl }}{% post_url 2019-06-11-speed-limits %}#ooo-table) for sizes on other platforms).
+So we conclude that _SKX has 134 physical registers available to hold speculative mask register values_. As Henry indicates on the original post, it is likely that there are 8 physical registers dedicated to holding the non-speculative architectural state of the 8 mask registers, so our best guess at the total size of the mask register PRF is 142. That's somewhat smaller than the GP PRF (180 entires) or the SIMD PRF (168 entries), but still quite large (see [this table of out of order resource sizes]({% post_url 2019-06-11-speed-limits %}#ooo-table) for sizes on other platforms).
 
 In particular, it is definitely large enough that you aren't likely to run into this limit in practical code: it's hard to imagine non-contrived code where almost 60%[^twothirds] of the instructions _write_[^write] to mask registers, because that's what you'd need to hit this limit.
 
@@ -153,7 +153,7 @@ Here's the corresponding chart:
 
 The behavior is basically identical to the prior test, so we conclude that there is no direct sharing between the mask register and SIMD PRFs either.
 
-This turned out not to be the end of the story. The mask registers _are_ shared, just not with the general purpose or SSE/AVX register file. For all the details, see this [follow up post]({{ site.baseurl }}{% post_url 2020-05-26-kreg2 %}).
+This turned out not to be the end of the story. The mask registers _are_ shared, just not with the general purpose or SSE/AVX register file. For all the details, see this [follow up post]({% post_url 2020-05-26-kreg2 %}).
 {: .warning}
 
 #### An Unresolved Puzzle
@@ -217,7 +217,7 @@ Well maybe zeroing kxors are dependency breaking, even though they require an ex
 
 In this case, we can't simply check uops.info. `kxor` is a one cycle latency instruction that runs only on a single execution port (p0), so we hit the interesting (?) case where a chain of `kxor` runs at the same speed regardless of whether the are dependent or independent: the throughput bottleneck of 1/cycle is the same as the latency bottleneck of 1/cycle!
 
-Don't worry, we've got other tricks up our sleeve. We can test this by constructing a tests which involve a `kxor` in a carried dependency chain with enough total latency so that the chain latency is the bottleneck. If the `kxor` carries a dependency, the runtime will be equal to the sum of the latencies in the chain. If the instruction is dependency breaking, the chain is broken and the different disconnected chains can overlap and performance will likely be limited by some throughput restriction (e.g., [port contention]({{ site.baseurl }}{% post_url 2019-06-11-speed-limits %}#portexecution-unit-limits)). This could use a good diagram, but I'm not good at diagrams.
+Don't worry, we've got other tricks up our sleeve. We can test this by constructing a tests which involve a `kxor` in a carried dependency chain with enough total latency so that the chain latency is the bottleneck. If the `kxor` carries a dependency, the runtime will be equal to the sum of the latencies in the chain. If the instruction is dependency breaking, the chain is broken and the different disconnected chains can overlap and performance will likely be limited by some throughput restriction (e.g., [port contention]({% post_url 2019-06-11-speed-limits %}#portexecution-unit-limits)). This could use a good diagram, but I'm not good at diagrams.
 
 All the tests are in [uarch bench](https://github.com/travisdowns/uarch-bench/blob/ccbebbec39ab02d6460a1837857d052e120c0946/x86_avx512.asm#L20), but I'll show the key parts here.
 
@@ -309,7 +309,7 @@ You can reproduce these results yourself with the [robsize](https://github.com/t
 
 ### Part II
 
-I didn't expect it to happen, but it did: there is a [follow up post]({{ site.baseurl }}{% post_url 2020-05-26-kreg2 %}) about mask registers, where we (roughly) confirm the register file size by looking at an image of a SKX CPU captured via microcope, and make an interesting discovery regarding sharing.
+I didn't expect it to happen, but it did: there is a [follow up post]({% post_url 2020-05-26-kreg2 %}) about mask registers, where we (roughly) confirm the register file size by looking at an image of a SKX CPU captured via microcope, and make an interesting discovery regarding sharing.
 
 ### Comments
 

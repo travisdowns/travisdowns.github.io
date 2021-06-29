@@ -16,9 +16,9 @@ excerpt: We look at the zero store optimization as it applies to Intel's newest 
 
 ## Introduction
 
-If you made it down to the [hardware survey]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}#hardware-survey) on the last post, you might have [wondered](https://twitter.com/tarlinian/status/1260629853000265728) where Intel's newest mainstream architecture was. _Ice Lake was missing!_
+If you made it down to the [hardware survey]({% post_url 2020-05-13-intel-zero-opt %}#hardware-survey) on the last post, you might have [wondered](https://twitter.com/tarlinian/status/1260629853000265728) where Intel's newest mainstream architecture was. _Ice Lake was missing!_
 
-Well good news: it's here... and it's interesting. We'll jump right into the same analysis we did last time for Skylake client. If you haven't read the [first article]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}) you'll probably want to start there, because we'll refer to concepts introduced there without reexplaining them here.
+Well good news: it's here... and it's interesting. We'll jump right into the same analysis we did last time for Skylake client. If you haven't read the [first article]({% post_url 2020-05-13-intel-zero-opt %}) you'll probably want to start there, because we'll refer to concepts introduced there without reexplaining them here.
 
 As usual, you can skip to the [summary](#summary) for the bite sized version of the findings.
 
@@ -224,7 +224,7 @@ Here's the raw data for the 17 samples at a buffer size of 9864:
   </tbody>
 </table>
 
-The performance follows a specific pattern with respect to the trials for both `fill0` and `fill1`: it starts out slow (about 90 GB/s) for the first 9-10 samples then suddenly jumps up the higher performance level (close to 200 GB/s). It turns out this is just [voltage and frequency management]({{ site.baseurl }}{% post_url 2020-01-17-avxfreq1 %}) biting us again. In this case there is no frequency change: the [raw data](https://github.com/travisdowns/zero-fill-bench/blob/post2/results/icl512/overall-warm.csv#L546) has a frequency column that shows the trials always run at 3.5 GHz. There is only a voltage change, and while the voltage is changing, the CPU runs with reduced dispatch throughput[^iclbetter].
+The performance follows a specific pattern with respect to the trials for both `fill0` and `fill1`: it starts out slow (about 90 GB/s) for the first 9-10 samples then suddenly jumps up the higher performance level (close to 200 GB/s). It turns out this is just [voltage and frequency management]({% post_url 2020-01-17-avxfreq1 %}) biting us again. In this case there is no frequency change: the [raw data](https://github.com/travisdowns/zero-fill-bench/blob/post2/results/icl512/overall-warm.csv#L546) has a frequency column that shows the trials always run at 3.5 GHz. There is only a voltage change, and while the voltage is changing, the CPU runs with reduced dispatch throughput[^iclbetter].
 
 The reason this effect repeats for every new set of trials (new buffer size value) is that each new set of trials is preceded by a 100 ms spin wait: this spin wait doesn't run any AVX-512 instructions, so the CPU drops back to the lower voltage level and this process repeats. The effect stops when the benchmark moves into the L2 region, because there it is slow enough that the 10 discarded warmup trials are enough to absorb the time to switch to the higher voltage level.
 
@@ -322,7 +322,7 @@ It is an interesting open question whether the as-yet-unreleased Sunny Cove serv
 
 Unless you are developing only for your own laptop, as of May 2020 Ice Lake is deployed on a microscopic fraction of total hosts you would care about, so the headline advice in the previous post applies: this optimization doesn't apply to enough hardware for you to target it specifically. This might change in the future as Ice Lake and sequels roll out in force. In that case, the magnitude of the effect might make it worth optimizing for in some cases.
 
-For fine-grained advice, see the [list in the previous post]({{ site.baseurl }}{% post_url 2020-05-13-intel-zero-opt %}#tuning-advice).
+For fine-grained advice, see the [list in the previous post]({% post_url 2020-05-13-intel-zero-opt %}#tuning-advice).
 
 ## Thanks
 
