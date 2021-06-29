@@ -5,4 +5,6 @@
 
 set -euo pipefail
 
-htmlproofer --assume-extension --url-ignore /notexist.html "$@" _site
+echo "Checking ${SITE:=_site}"
+
+htmlproofer --assume-extension --url-ignore /notexist.html "$@" "$SITE"
