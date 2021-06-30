@@ -2,6 +2,8 @@
 layout: default
 ---
 
+Last rebuild (`site.time`): {{ site.time }}
+
 | Property | Value |
 | -----------------|
 | jekyll.environment  | {{ jekyll.environment }} |
