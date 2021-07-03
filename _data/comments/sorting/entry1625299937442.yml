@@ -1,0 +1,11 @@
+_id: 61b331b0-dbd6-11eb-9689-b9e2acca48b3
+_parent: 'https://travisdowns.github.io/blog/2019/05/22/sorting.html'
+replying_to_uid: 731b4010-555c-11eb-bfb5-01430c7bddbd
+message: >-
+  You might even be interested in
+  https://github.com/simd-sorting/fast-and-robust which is a Quicksort
+  implementation using vectorized sorting networks for small arrays.
+name: ‍
+email: ''
+hp: ''
+date: 1625299937
