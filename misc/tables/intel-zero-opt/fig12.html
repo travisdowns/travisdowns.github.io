@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Performance Matters | A blog about low-level software and hardware performance.</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Performance Matters" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A blog about low-level software and hardware performance." />
+<meta property="og:description" content="A blog about low-level software and hardware performance." />
+<link rel="canonical" href="https://travisdowns.github.io/misc/tables/intel-zero-opt/fig12.html" />
+<meta property="og:url" content="https://travisdowns.github.io/misc/tables/intel-zero-opt/fig12.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Performance Matters" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"description":"A blog about low-level software and hardware performance.","url":"https://travisdowns.github.io/misc/tables/intel-zero-opt/fig12.html","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"headline":"Performance Matters","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script>
+if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-136594956-1', 'auto');
+  ga('send', 'pageview');
+}
+</script>
+  
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Size</th>
+      <th>fill256_0</th>
+      <th>fill512_0</th>
+      <th>fill256_0 : L2 Silent</th>
+      <th>fill512_0 : L2 Silent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>60000</td>
+      <td>62.8</td>
+      <td>61.3</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>66000</td>
+      <td>62.8</td>
+      <td>61.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>72600</td>
+      <td>58.6</td>
+      <td>60.9</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>79860</td>
+      <td>63.7</td>
+      <td>61.7</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>87844</td>
+      <td>63.2</td>
+      <td>61.5</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>96628</td>
+      <td>62.8</td>
+      <td>62.1</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>106292</td>
+      <td>65.8</td>
+      <td>62.4</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>116920</td>
+      <td>65.5</td>
+      <td>62.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>128612</td>
+      <td>68.1</td>
+      <td>61.7</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>141472</td>
+      <td>65.0</td>
+      <td>63.5</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>155620</td>
+      <td>67.0</td>
+      <td>62.4</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>171184</td>
+      <td>67.6</td>
+      <td>62.5</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>188300</td>
+      <td>67.9</td>
+      <td>61.8</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>207132</td>
+      <td>68.0</td>
+      <td>62.4</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>227844</td>
+      <td>68.9</td>
+      <td>62.5</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>250628</td>
+      <td>68.9</td>
+      <td>62.6</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>275688</td>
+      <td>69.5</td>
+      <td>63.9</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>303260</td>
+      <td>69.9</td>
+      <td>61.9</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>333584</td>
+      <td>70.1</td>
+      <td>63.2</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>366944</td>
+      <td>69.0</td>
+      <td>63.5</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>403636</td>
+      <td>69.5</td>
+      <td>64.2</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>444000</td>
+      <td>69.7</td>
+      <td>62.5</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>488400</td>
+      <td>70.8</td>
+      <td>62.9</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>537240</td>
+      <td>74.6</td>
+      <td>64.6</td>
+      <td>0.12</td>
+      <td>0.07</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>590964</td>
+      <td>68.7</td>
+      <td>53.5</td>
+      <td>0.46</td>
+      <td>0.21</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>650060</td>
+      <td>64.1</td>
+      <td>52.1</td>
+      <td>0.67</td>
+      <td>0.33</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>715064</td>
+      <td>62.3</td>
+      <td>47.9</td>
+      <td>0.81</td>
+      <td>0.46</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>786572</td>
+      <td>60.0</td>
+      <td>47.1</td>
+      <td>0.90</td>
+      <td>0.53</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>865228</td>
+      <td>59.3</td>
+      <td>48.6</td>
+      <td>0.93</td>
+      <td>0.52</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>951752</td>
+      <td>59.2</td>
+      <td>47.2</td>
+      <td>0.94</td>
+      <td>0.52</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>1046928</td>
+      <td>59.2</td>
+      <td>46.7</td>
+      <td>0.95</td>
+      <td>0.56</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>1151620</td>
+      <td>59.1</td>
+      <td>47.7</td>
+      <td>0.96</td>
+      <td>0.57</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>1266780</td>
+      <td>59.1</td>
+      <td>47.2</td>
+      <td>0.96</td>
+      <td>0.54</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>1393460</td>
+      <td>59.1</td>
+      <td>46.1</td>
+      <td>0.96</td>
+      <td>0.55</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>1532804</td>
+      <td>59.1</td>
+      <td>46.9</td>
+      <td>0.96</td>
+      <td>0.56</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>1686084</td>
+      <td>59.2</td>
+      <td>47.5</td>
+      <td>0.96</td>
+      <td>0.55</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>1854692</td>
+      <td>59.2</td>
+      <td>48.1</td>
+      <td>0.96</td>
+      <td>0.56</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>2040160</td>
+      <td>59.2</td>
+      <td>46.9</td>
+      <td>0.96</td>
+      <td>0.54</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>2244176</td>
+      <td>59.3</td>
+      <td>47.6</td>
+      <td>0.96</td>
+      <td>0.56</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>2468596</td>
+      <td>59.3</td>
+      <td>48.5</td>
+      <td>0.96</td>
+      <td>0.57</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>2715452</td>
+      <td>59.3</td>
+      <td>47.1</td>
+      <td>0.96</td>
+      <td>0.56</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>2987000</td>
+      <td>59.2</td>
+      <td>48.0</td>
+      <td>0.96</td>
+      <td>0.57</td>
+    </tr>
+    <tr>
+      <th>42</th>
+      <td>3285700</td>
+      <td>59.3</td>
+      <td>48.3</td>
+      <td>0.96</td>
+      <td>0.58</td>
+    </tr>
+    <tr>
+      <th>43</th>
+      <td>3614268</td>
+      <td>56.8</td>
+      <td>45.7</td>
+      <td>0.94</td>
+      <td>0.56</td>
+    </tr>
+    <tr>
+      <th>44</th>
+      <td>3975696</td>
+      <td>56.4</td>
+      <td>44.9</td>
+      <td>0.94</td>
+      <td>0.55</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>4373264</td>
+      <td>54.2</td>
+      <td>44.3</td>
+      <td>0.93</td>
+      <td>0.55</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>4810592</td>
+      <td>50.9</td>
+      <td>42.8</td>
+      <td>0.90</td>
+      <td>0.54</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>5291648</td>
+      <td>47.7</td>
+      <td>40.4</td>
+      <td>0.87</td>
+      <td>0.53</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>5820816</td>
+      <td>43.8</td>
+      <td>37.6</td>
+      <td>0.84</td>
+      <td>0.51</td>
+    </tr>
+    <tr>
+      <th>49</th>
+      <td>6402896</td>
+      <td>38.6</td>
+      <td>34.1</td>
+      <td>0.77</td>
+      <td>0.47</td>
+    </tr>
+    <tr>
+      <th>50</th>
+      <td>7043184</td>
+      <td>33.7</td>
+      <td>30.3</td>
+      <td>0.70</td>
+      <td>0.43</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>7747504</td>
+      <td>29.6</td>
+      <td>26.9</td>
+      <td>0.63</td>
+      <td>0.39</td>
+    </tr>
+    <tr>
+      <th>52</th>
+      <td>8522252</td>
+      <td>26.3</td>
+      <td>24.0</td>
+      <td>0.56</td>
+      <td>0.35</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>9374476</td>
+      <td>23.6</td>
+      <td>21.6</td>
+      <td>0.49</td>
+      <td>0.31</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Performance Matters</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li><li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/travisdowns"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">travisdowns</span></a></li><li><a href="https://www.twitter.com/trav_downs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">trav_downs</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Incrementing Vectors | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Incrementing Vectors" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Incrementing vector&lt;T&gt; for various T may not perform as you’d expect." />
+<meta property="og:description" content="Incrementing vector&lt;T&gt; for various T may not perform as you’d expect." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2019/08/26/vector-inc.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2019/08/26/vector-inc.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/vector-inc/cpp_logo.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-08-26T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/vector-inc/cpp_logo.png" />
+<meta property="twitter:title" content="Incrementing Vectors" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"datePublished":"2019-08-26T00:00:00+00:00","description":"Incrementing vector&lt;T&gt; for various T may not perform as you’d expect.","url":"https://travisdowns.github.io/blog/2019/08/26/vector-inc.html","@type":"BlogPosting","dateModified":"2019-08-26T00:00:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/08/26/vector-inc.html"},"image":"https://travisdowns.github.io/assets/vector-inc/cpp_logo.png","author":{"@type":"Person","name":"Travis Downs"},"headline":"Incrementing Vectors","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script>
+if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-136594956-1', 'auto');
+  ga('send', 'pageview');
+}
+</script>
+  
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <!-- BASE:  -->
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+<!-- INSIDE -->
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Incrementing Vectors</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-08-26T00:00:00+00:00" itemprop="datePublished">Aug 26, 2019
+      </time><!-- travis override --><span>
+          •
+          <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/c++.html">c++</a></span>
+        </span><!-- end override -->
+    </p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p class="info">This article is also <a href="https://habr.com/ru/company/pvs-studio/blog/475636/">available in Russian</a>.</p>
+
+<p>What’s faster, incrementing a <code class="language-plaintext highlighter-rouge">std::vector</code> of <code class="language-plaintext highlighter-rouge">uint8_t</code> or of <code class="language-plaintext highlighter-rouge">uint32_t</code>?</p>
+
+<p>To make it concrete, let’s consider these two implementations:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">vector8_inc</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;&amp;</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">vector32_inc</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint32_t</span><span class="o">&gt;&amp;</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="lets-guess">Let’s Guess</h3>
+
+<p>It’s easy to answer this question with a benchmark, and we will get to that soon, but for now let’s take some guesses (also known as “reasoning from first principles” if you want to pretend there is a lot of science in it).</p>
+
+<p>First, we might reasonably ask: <em>How big are these vectors</em>?</p>
+
+<p>Let’s pick a number then. I’m going with 20,000 elements in each.</p>
+
+<p>Then knowing the hardware we’re testing on, Intel Skylake, we can check the characteristics of <a href="https://uops.info/html-instr/ADD_M8_I8.html">8-bit</a> and <a href="https://uops.info/html-instr/ADD_M32_I32.html">32-bit</a> add <abbr title="When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.">immediate</abbr> instructions. It turns out that their primary performance characteristics are identical: 1 per cycle throughput and 4 cycles latency through memory<sup id="fnref:thrumem" role="doc-noteref"><a href="#fn:thrumem" class="footnote" rel="footnote">1</a></sup>. In this case, we don’t expect latency to matter since each add is independent, so we might hope this runs at 1 cycle per element, if the rest of the loop overhead can run in parallel.</p>
+
+<p>We might also note that 20,000 elements means a working set of 20 KB for the <code class="language-plaintext highlighter-rouge">uint8_t</code> vector, but 80 KB for the <code class="language-plaintext highlighter-rouge">uint32_t</code> vector. The former fits cleanly in the L1 cache of modern x86 machines, while the second doesn’t. So maybe the 8-bit version will have a leg up due to caching effects?</p>
+
+<p>Finally, we might note that this problem seems like a textbook case for <a href="https://en.wikipedia.org/wiki/Automatic_vectorization">auto-vectorization</a>: a loop with a known number of iterations doing an arithmetic operation on adjacent elements in memory. In that case, we might expect the 8-bit version to have a huge advantage over the 32-bit version, since every vector operation will process 4 times as many elements, and in general, on Intel, the byte element vector operations have the same performance as their 32-bit element counterparts.</p>
+
+<p>Enough prologue. Let’s benchmark this.</p>
+
+<h3 id="the-benchmark">The Benchmark</h3>
+
+<p>For 20,000 elements, I get the following timings with <code class="language-plaintext highlighter-rouge">gcc 8</code> and <code class="language-plaintext highlighter-rouge">clang 8</code> at various optimization levels:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Compiler</th>
+      <th>Element</th>
+      <th style="text-align: right">-O1</th>
+      <th style="text-align: right">-O2</th>
+      <th style="text-align: right">-O3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>gcc 8</td>
+      <td><code class="language-plaintext highlighter-rouge">uint8_t</code></td>
+      <td style="text-align: right">2.0</td>
+      <td style="text-align: right">2.0</td>
+      <td style="text-align: right">2.0</td>
+    </tr>
+    <tr>
+      <td>gcc 8</td>
+      <td><code class="language-plaintext highlighter-rouge">uint32_t</code></td>
+      <td style="text-align: right">2.3</td>
+      <td style="text-align: right">1.3</td>
+      <td style="text-align: right">0.2</td>
+    </tr>
+    <tr>
+      <td>clang 8</td>
+      <td><code class="language-plaintext highlighter-rouge">uint8_t</code></td>
+      <td style="text-align: right">9.2</td>
+      <td style="text-align: right">2.0</td>
+      <td style="text-align: right">2.0</td>
+    </tr>
+    <tr>
+      <td>clang 8</td>
+      <td><code class="language-plaintext highlighter-rouge">uint32_t</code></td>
+      <td style="text-align: right">9.2</td>
+      <td style="text-align: right">0.2</td>
+      <td style="text-align: right">0.2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The conclusion is that except at <code class="language-plaintext highlighter-rouge">-O1</code>, <code class="language-plaintext highlighter-rouge">uint32_t</code> is faster than <code class="language-plaintext highlighter-rouge">uint8_t</code> and sometimes dramatically so: for gcc at <code class="language-plaintext highlighter-rouge">-O3</code> the speedup was 5.4x and for clang at either <code class="language-plaintext highlighter-rouge">-O2</code> and <code class="language-plaintext highlighter-rouge">-O3</code> the speedup was 8.0x. Yes, incrementing 32-bit integers in a <code class="language-plaintext highlighter-rouge">std::vector</code> is up to <em>eight times faster</em> than incrementing 8-bits on a popular compiler with common optimization settings.</p>
+
+<p>As usual, we hope the assembly will tell us what is going on.</p>
+
+<p>Here’s gcc 8 at <code class="language-plaintext highlighter-rouge">-O2</code> where the 32-bit version was “only” 1.5x faster than the 8-bit one<sup id="fnref:looponly" role="doc-noteref"><a href="#fn:looponly" class="footnote" rel="footnote">2</a></sup>:</p>
+
+<p><strong>8-bit:</strong></p>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L3:</span>
+    <span class="nf">inc</span>     <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rax</span><span class="p">]</span>
+    <span class="nf">mov</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="p">]</span>
+    <span class="nf">inc</span>     <span class="nb">rax</span>
+    <span class="nf">mov</span>     <span class="nb">rcx</span><span class="p">,</span> <span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="mi">8</span><span class="p">]</span>
+    <span class="nf">sub</span>     <span class="nb">rcx</span><span class="p">,</span> <span class="nb">rdx</span>
+    <span class="nf">cmp</span>     <span class="nb">rax</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">jb</span>      <span class="nv">.L3</span>
+</code></pre></div></div>
+
+<p><strong>32-bit:</strong></p>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L9:</span>
+    <span class="nf">inc</span>     <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>
+    <span class="nf">add</span>     <span class="nb">rax</span><span class="p">,</span> <span class="mi">4</span>
+    <span class="nf">cmp</span>     <span class="nb">rax</span><span class="p">,</span> <span class="nb">rdx</span>
+    <span class="nf">jne</span>     <span class="nv">.L9</span>
+</code></pre></div></div>
+
+<p>The 32-bit code looks like we’d expect from a not-unrolled<sup id="fnref:unrolled" role="doc-noteref"><a href="#fn:unrolled" class="footnote" rel="footnote">3</a></sup> loop: an increment<sup id="fnref:incbad" role="doc-noteref"><a href="#fn:incbad" class="footnote" rel="footnote">4</a></sup> with a memory destination, and then three loop control instructions: <code class="language-plaintext highlighter-rouge">add rax, 4</code> to increment the induction variable<sup id="fnref:induc" role="doc-noteref"><a href="#fn:induc" class="footnote" rel="footnote">5</a></sup>, and a <code class="language-plaintext highlighter-rouge">cmp</code> <code class="language-plaintext highlighter-rouge">jne</code> pair to check and branch on the loop termination condition. It looks fine – an unroll would help to amortize the loop overhead, getting us closer to 1 cycle/element store limit<sup id="fnref:gccunroll" role="doc-noteref"><a href="#fn:gccunroll" class="footnote" rel="footnote">6</a></sup>, but good enough for open source work.</p>
+
+<p>So What’s going on with the 8-bit version? In addition to the memory-destination <code class="language-plaintext highlighter-rouge">inc</code>, you have two other loads from memory and some stuff like a <code class="language-plaintext highlighter-rouge">sub</code> that appeared out of nowhere.</p>
+
+<p>Here’s an annotated version:</p>
+
+<p><strong>8-bit:</strong></p>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L3:</span>
+    <span class="nf">inc</span>     <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rax</span><span class="p">]</span>     <span class="c1">; increment memory at v[i]</span>
+    <span class="nf">mov</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="p">]</span>   <span class="c1">; load v.begin</span>
+    <span class="nf">inc</span>     <span class="nb">rax</span>                    <span class="c1">; i++</span>
+    <span class="nf">mov</span>     <span class="nb">rcx</span><span class="p">,</span> <span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="mi">8</span><span class="p">]</span> <span class="c1">; load v.end</span>
+    <span class="nf">sub</span>     <span class="nb">rcx</span><span class="p">,</span> <span class="nb">rdx</span>               <span class="c1">; end - start (i.e., vector.size())</span>
+    <span class="nf">cmp</span>     <span class="nb">rax</span><span class="p">,</span> <span class="nb">rcx</span>               <span class="c1">; i &lt; size()</span>
+    <span class="nf">jb</span>      <span class="nv">.L3</span>                    <span class="c1">; next itr if i &lt; size()</span>
+</code></pre></div></div>
+
+<p>Here <code class="language-plaintext highlighter-rouge">vector::begin</code> and <code class="language-plaintext highlighter-rouge">vector::end</code> are the internal pointers that <code class="language-plaintext highlighter-rouge">std::vector</code> keeps to indicate the beginning and of the elements stored in its internal storage<sup id="fnref:realnames" role="doc-noteref"><a href="#fn:realnames" class="footnote" rel="footnote">7</a></sup> - basically the same values used to implement <code class="language-plaintext highlighter-rouge">vector::begin()</code> and <code class="language-plaintext highlighter-rouge">vector::end()</code> (although the type differs). So all the extra instructions appear as a consequence of calculating <code class="language-plaintext highlighter-rouge">vector.size()</code>. Maybe doesn’t seem too weird? Well maybe it does, because of course the 32-bit version uses <code class="language-plaintext highlighter-rouge">size()</code> also, but the <code class="language-plaintext highlighter-rouge">size()</code> related instructions don’t appear that loop. Instead, the <code class="language-plaintext highlighter-rouge">size()</code> calculation happens once, outside the loop.</p>
+
+<p>What’s the difference? The short answer is <a href="https://en.wikipedia.org/wiki/Pointer_aliasing"><em>pointer aliasing</em></a>. The long answer is up next.</p>
+
+<h3 id="the-long-answer">The Long Answer</h3>
+
+<p>The vector <code class="language-plaintext highlighter-rouge">v</code> is passed to the function as a reference, which boils down to a pointer under the covers. The compiler needs to use the <code class="language-plaintext highlighter-rouge">v::begin</code> and <code class="language-plaintext highlighter-rouge">v::end</code> members of the vector to calculate <code class="language-plaintext highlighter-rouge">size()</code>, and in the source we’ve written <code class="language-plaintext highlighter-rouge">size()</code> is evaluated <em>every iteration</em>. The compiler isn’t necessarily a slave to the source however: it can hoist the result of the <code class="language-plaintext highlighter-rouge">size()</code> function above the loop, but only if it can prove that this <a href="https://en.wikipedia.org/wiki/As-if_rule">doesn’t change</a> the semantics of the program. In that regard, the only problematic part of the loop is the increment <code class="language-plaintext highlighter-rouge">v[i]++</code>. This writes to some unknown memory location. The question is: <em>can that write change the value of <code class="language-plaintext highlighter-rouge">size()</code></em>?</p>
+
+<p>In the case of writes to a <code class="language-plaintext highlighter-rouge">std::vector&lt;uint32_t&gt;</code> (which boil down to writes to <code class="language-plaintext highlighter-rouge">uint32_t *</code>) the answer is <strong>no, it cannot change size()</strong>. Writes to <code class="language-plaintext highlighter-rouge">uint32_t</code> objects can only change <code class="language-plaintext highlighter-rouge">uint32_t</code> objects, and the pointers involved in the calculation of <code class="language-plaintext highlighter-rouge">size()</code> are not <code class="language-plaintext highlighter-rouge">uint32_t</code> objects<sup id="fnref:ptype" role="doc-noteref"><a href="#fn:ptype" class="footnote" rel="footnote">8</a></sup>.</p>
+
+<p>On the other hand, for <code class="language-plaintext highlighter-rouge">uint8_t</code>, at least for common compilers<sup id="fnref:commoncom" role="doc-noteref"><a href="#fn:commoncom" class="footnote" rel="footnote">9</a></sup>, the answer is <strong>yes, it could in theory change the value of <code class="language-plaintext highlighter-rouge">size()</code></strong>, because <code class="language-plaintext highlighter-rouge">uint8_t</code> is a typedef for <code class="language-plaintext highlighter-rouge">unsigned char</code>, and <code class="language-plaintext highlighter-rouge">unsigned char</code> (and <code class="language-plaintext highlighter-rouge">char</code>) arrays are allowed to <em>alias any type</em>. That means that writes through <code class="language-plaintext highlighter-rouge">uint8_t</code> pointers are treated as potentially updating any memory of unknown provenance<sup id="fnref:unp" role="doc-noteref"><a href="#fn:unp" class="footnote" rel="footnote">10</a></sup>. So the compiler assumes that every increment <code class="language-plaintext highlighter-rouge">v[i]++</code> potentially modifies <code class="language-plaintext highlighter-rouge">size()</code> and hence must recalculate it every iteration.</p>
+
+<p>Now, you and I know writes to the memory pointed to by a <code class="language-plaintext highlighter-rouge">std::vector</code> are never going modify its own <code class="language-plaintext highlighter-rouge">size()</code> - that would mean that the vector object itself has somehow been allocated <em>inside its own heap storage</em>, an almost impossible chicken-and-egg scenario<sup id="fnref:inside" role="doc-noteref"><a href="#fn:inside" class="footnote" rel="footnote">11</a></sup>. Unfortunately, the compiler doesn’t know that!</p>
+
+<h3 id="what-about-the-rest">What about the rest</h3>
+
+<p>So that explains the small performance difference between the <code class="language-plaintext highlighter-rouge">uint8_t</code> and <code class="language-plaintext highlighter-rouge">uint32_t</code> for <code class="language-plaintext highlighter-rouge">gcc -O2</code>. How about the huge, up to 8x difference, we see for clang or gcc at <code class="language-plaintext highlighter-rouge">-O3</code>?</p>
+
+<p>That’s easy - clang can autovectorize this loop in the <code class="language-plaintext highlighter-rouge">uint32_t</code> case:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.LBB1_6:</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm1</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span><span class="p">]</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm2</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">32</span><span class="p">]</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm3</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">64</span><span class="p">]</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm4</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">96</span><span class="p">]</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm1</span><span class="p">,</span> <span class="nv">ymm1</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm2</span><span class="p">,</span> <span class="nv">ymm2</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm3</span><span class="p">,</span> <span class="nv">ymm3</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm4</span><span class="p">,</span> <span class="nv">ymm4</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span><span class="p">],</span> <span class="nv">ymm1</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">32</span><span class="p">],</span> <span class="nv">ymm2</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">64</span><span class="p">],</span> <span class="nv">ymm3</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">96</span><span class="p">],</span> <span class="nv">ymm4</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm1</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">128</span><span class="p">]</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm2</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">160</span><span class="p">]</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm3</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">192</span><span class="p">]</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymm4</span><span class="p">,</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">224</span><span class="p">]</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm1</span><span class="p">,</span> <span class="nv">ymm1</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm2</span><span class="p">,</span> <span class="nv">ymm2</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm3</span><span class="p">,</span> <span class="nv">ymm3</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vpsubd</span>  <span class="nv">ymm4</span><span class="p">,</span> <span class="nv">ymm4</span><span class="p">,</span> <span class="nv">ymm0</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">128</span><span class="p">],</span> <span class="nv">ymm1</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">160</span><span class="p">],</span> <span class="nv">ymm2</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">192</span><span class="p">],</span> <span class="nv">ymm3</span>
+    <span class="nf">vmovdqu</span> <span class="nv">ymmword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="nb">rdi</span> <span class="o">+</span> <span class="mi">224</span><span class="p">],</span> <span class="nv">ymm4</span>
+    <span class="nf">add</span>     <span class="nb">rdi</span><span class="p">,</span> <span class="mi">64</span>
+    <span class="nf">add</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="nf">jne</span>     <span class="nv">.LBB1_6</span>
+</code></pre></div></div>
+
+<p>The loop as been unrolled 8x, and this is basically as fast as you’ll get, approaching one vector (8 elements) per cycle in the L1 cache (limited by one store per cycle<sup id="fnref:align" role="doc-noteref"><a href="#fn:align" class="footnote" rel="footnote">12</a></sup>).</p>
+
+<p>No vectorization happens for the <code class="language-plaintext highlighter-rouge">uint8_t</code> case, because need to recalculate <code class="language-plaintext highlighter-rouge">size()</code> check for loop termination in between every element completely inhibits it. So the ultimate cause is the same as the first case we looked at, but the impact is much bigger.</p>
+
+<p>Auto-vectorization explains all the very fast results: gcc only autovectorizes at <code class="language-plaintext highlighter-rouge">-O3</code> but clang does it at <code class="language-plaintext highlighter-rouge">-O2</code> and <code class="language-plaintext highlighter-rouge">-O3</code> by default. The <code class="language-plaintext highlighter-rouge">-O3</code> result for gcc is somewhat slower than clang because it does not unroll the autovectorized loop.</p>
+
+<h3 id="fixing-it">Fixing it</h3>
+
+<p>So now that we know what the problem is, how do we fix it?</p>
+
+<p>First, we’ll try one that doesn’t work – using a more idiomatic iterator-based loop, like this:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">)</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<p>It generates somewhat better code, compared to the <code class="language-plaintext highlighter-rouge">size()</code> version, at <code class="language-plaintext highlighter-rouge">gcc -O2</code>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L17:</span>
+    <span class="nf">add</span>     <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="p">],</span> <span class="mi">1</span>
+    <span class="nf">add</span>     <span class="nb">rax</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="nf">cmp</span>     <span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="mi">8</span><span class="p">],</span> <span class="nb">rax</span>
+    <span class="nf">jne</span>     <span class="nv">.L17</span>
+</code></pre></div></div>
+
+<p>Two extra reads have turned into one, because you just compare to the <code class="language-plaintext highlighter-rouge">end</code> pointer in the vector, rather than recalculate <code class="language-plaintext highlighter-rouge">size()</code> from both the begin and end pointers. It actually ties the <code class="language-plaintext highlighter-rouge">uint32_t</code> version in instruction count since the extra load was folded into the comparison. However, the underlying problem is still there and auto-vectorization is inhibited, so there is still a very large gap between <code class="language-plaintext highlighter-rouge">uint8_t</code> and <code class="language-plaintext highlighter-rouge">uint32_t</code> - more than 5x for both gcc and clang for build where auto-vectorization is allowed.</p>
+
+<p>Let’s try again. Again, we will fail or rather perhaps <em>succeed</em> in finding <em>another</em> way that doesn’t work.</p>
+
+<p>This is the one where we calculate <code class="language-plaintext highlighter-rouge">size()</code> only once, before the loop, and stash it in a local variable:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">s</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<p>It seems like this should work, right? The problem was <code class="language-plaintext highlighter-rouge">size()</code> and now we are saying “freeze <code class="language-plaintext highlighter-rouge">size()</code> into a local <code class="language-plaintext highlighter-rouge">s</code> at the start of the loop, and the compiler knows locals cannot overlap with anything”. Basically we manually hoist the thing the compiler couldn’t. It actually does generate better code (compared to the original version):</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L9:</span>
+    <span class="nf">mov</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="p">]</span>
+    <span class="nf">add</span>     <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rax</span><span class="p">],</span> <span class="mi">1</span>
+    <span class="nf">add</span>     <span class="nb">rax</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="nf">cmp</span>     <span class="nb">rax</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">jne</span>     <span class="nv">.L9</span>
+</code></pre></div></div>
+
+<p>There is only one extra read and no <code class="language-plaintext highlighter-rouge">sub</code>. So what is that extra read (<code class="language-plaintext highlighter-rouge">rdx, QWORD PTR [rdi]</code>) doing if it isn’t part of calculating the size? It’s loading the <code class="language-plaintext highlighter-rouge">data()</code> pointer from <code class="language-plaintext highlighter-rouge">v</code>!</p>
+
+<p>Effectively, the implementation of <code class="language-plaintext highlighter-rouge">v[i]</code> is <code class="language-plaintext highlighter-rouge">*(v.data() + i)</code> and the member underlying <code class="language-plaintext highlighter-rouge">data()</code> (which is fact just the <code class="language-plaintext highlighter-rouge">begin</code> pointer) has the same potential problem as <code class="language-plaintext highlighter-rouge">size()</code>. I just didn’t really notice it the original example because we got that read “for free” since we were loading it anyways to get the size.</p>
+
+<p>We’re almost there, I promise. We just need to remove the dependence on <em>anything</em> stored inside the <code class="language-plaintext highlighter-rouge">std::vector</code> in the loop. This is easiest if we modify the idiomatic iterator based approach like this:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">e</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">e</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">)</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<p>The results are dramatic (here we compare only <code class="language-plaintext highlighter-rouge">uint8_t</code> loops, with and without saving the end iterator before the loop):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Compiler</th>
+      <th>Loop Check</th>
+      <th style="text-align: right">-O1</th>
+      <th style="text-align: right">-O2</th>
+      <th style="text-align: right">-O3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>gcc 8</td>
+      <td><code class="language-plaintext highlighter-rouge">i != v.end()</code></td>
+      <td style="text-align: right">1.3</td>
+      <td style="text-align: right">1.3</td>
+      <td style="text-align: right">1.3</td>
+    </tr>
+    <tr>
+      <td>gcc 8</td>
+      <td><code class="language-plaintext highlighter-rouge">i != e</code></td>
+      <td style="text-align: right">1.3</td>
+      <td style="text-align: right">1.3</td>
+      <td style="text-align: right">0.06</td>
+    </tr>
+    <tr>
+      <td>gcc speedup</td>
+      <td> </td>
+      <td style="text-align: right">1x</td>
+      <td style="text-align: right">1x</td>
+      <td style="text-align: right"><strong>20x</strong></td>
+    </tr>
+    <tr>
+      <td>clang 8</td>
+      <td><code class="language-plaintext highlighter-rouge">i != v.end()</code></td>
+      <td style="text-align: right">29.9</td>
+      <td style="text-align: right">1.3</td>
+      <td style="text-align: right">1.3</td>
+    </tr>
+    <tr>
+      <td>clang 8</td>
+      <td><code class="language-plaintext highlighter-rouge">i != e</code></td>
+      <td style="text-align: right">20.3</td>
+      <td style="text-align: right">0.06</td>
+      <td style="text-align: right">0.06</td>
+    </tr>
+    <tr>
+      <td>clang speedup</td>
+      <td> </td>
+      <td style="text-align: right">1.5x</td>
+      <td style="text-align: right"><strong>20x</strong></td>
+      <td style="text-align: right"><strong>20x</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>After this small change, the speedup is a factor of <em>twenty</em> for the cases where vectorization is able to kick in. We didn’t just tie the <code class="language-plaintext highlighter-rouge">uint32_t</code> case either: for gcc <code class="language-plaintext highlighter-rouge">-O3</code> and clang <code class="language-plaintext highlighter-rouge">-O2</code> and <code class="language-plaintext highlighter-rouge">-O3</code> the speedup of the <code class="language-plaintext highlighter-rouge">uint8_t</code> code over <code class="language-plaintext highlighter-rouge">uint32_t</code> is almost exactly 4x, as we originally expected after vectorization: after all, 4 times as many elements are handled per vector, and we need 4 times less bandwidth to whatever level of cache is involved<sup id="fnref:evenbetter" role="doc-noteref"><a href="#fn:evenbetter" class="footnote" rel="footnote">13</a></sup>.</p>
+
+<p>Some of you who’ve gotten this far have probably screaming, nearly since the start:</p>
+
+<p><em>What about the <a href="https://en.cppreference.com/w/cpp/language/range-for">range-based for loop</a> introduced in C++11</em>?</p>
+
+<p>Good news! It works fine. It is syntactic sugar for almost exactly the iterator-based version above, with the end pointer captured once before the loop, and so it performs equivalently.</p>
+
+<p>At the opposite end of the scale from modern C++, if I had just summoned my inner caveman and written a C-like function, we would have also been fine:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">array_inc</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here, the array pointer <code class="language-plaintext highlighter-rouge">a</code> and the <code class="language-plaintext highlighter-rouge">size</code> are by-value function parameters, so they cannot be be modified by any writes through <code class="language-plaintext highlighter-rouge">a</code><sup id="fnref:arrayin" role="doc-noteref"><a href="#fn:arrayin" class="footnote" rel="footnote">14</a></sup>, just like local variables. It performs equivalently to the other successful options.</p>
+
+<p>Finally, for compilers that offer it, you can use <code class="language-plaintext highlighter-rouge">__restrict</code> on the vector declaration, like this<sup id="fnref:residx" role="doc-noteref"><a href="#fn:residx" class="footnote" rel="footnote">15</a></sup>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">vector8_inc_restrict</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;&amp;</span> <span class="kr">__restrict</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">__restrict</code> keyword is not standard C++, but it is in <a href="https://en.cppreference.com/w/c/language/restrict">C since C99</a> (as <code class="language-plaintext highlighter-rouge">restrict</code>). For those compilers that implement it as an extension in C++, you can reasonably expect that it follows the C semantics. Of course, C doesn’t have references at all - so you can mentally substitute the vector reference with a pointer to a vector.</p>
+
+<p>Note that restrict is not <em>transitive:</em> the <code class="language-plaintext highlighter-rouge">__restrict</code> qualifier on the <code class="language-plaintext highlighter-rouge">std::vector</code> reference doesn’t apply restrict to the heap storage backing <code class="language-plaintext highlighter-rouge">v.data()</code>, it only applies to the members of vector itself. In this case, that is enough because (as we saw above with local variables), proving to the compiler that the vector start/finish members themselves don’t overlap anything is enough. The distinction is still relevant: it means that writes to <code class="language-plaintext highlighter-rouge">v.data()</code> may still cause aliasing problems for <em>other</em> objects in your function.</p>
+
+<h3 id="disappointment">Disappointment</h3>
+
+<p>That brings us to our last, and perhaps most disappointing note: all of the ways we’ve fixed the function above really only apply directly to this specific case of a vector interfering with itself. We’ve fixed it by hoisting or isolating the state backing the <code class="language-plaintext highlighter-rouge">size()</code> or <code class="language-plaintext highlighter-rouge">end()</code> calls in the vector, and <em>not</em> by teaching the compiler that writes to the vector data don’t modify anything. That doesn’t scale well as our function grows.</p>
+
+<p>The aliasing loophole is still there, and those writes still alias “anything” - it’s just that there isn’t anything else interesting to alias in this function … yet. As soon as you add more to the function, it <em>bytes</em> us again. A <a href="https://godbolt.org/z/iQHDY5">random example</a>. You’ll be fighting the compiler to the end as long as you have writes to <code class="language-plaintext highlighter-rouge">uint8_t</code> arrays in your core loops<sup id="fnref:extreme" role="doc-noteref"><a href="#fn:extreme" class="footnote" rel="footnote">16</a></sup>.</p>
+
+<h3 id="comments">Comments</h3>
+
+<p>Feedback of any type is welcome. I don’t have a comments system<sup id="fnref:comments" role="doc-noteref"><a href="#fn:comments" class="footnote" rel="footnote">17</a></sup> yet, so as usual I’ll outsource discussion to <a href="https://news.ycombinator.com/item?id=20800076">this HackerNews thread</a>.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:thrumem" role="doc-endnote">
+      <p><em>Through memory</em> here means that the dependency chain is through memory: writes to the same location need to read the last value written and hence are dependent (in practice, store-to-load forwarding will be involved if the writes are close in time). There are other ways that <code class="language-plaintext highlighter-rouge">add</code> to memory might be dependent, such as through the addressing calculation, but these don’t apply here. <a href="#fnref:thrumem" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:looponly" role="doc-endnote">
+      <p>Only the core loop is shown, the setup code is simple and fast. <a href="https://godbolt.org/z/pZ5FKz">Plug it into godbolt</a> if you want to see everything. <a href="#fnref:looponly" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:unrolled" role="doc-endnote">
+      <p>Is <em>not-unrolled</em> a double negative? Should it simply be a <em>rolled</em> loop? Anyway, gcc generally doesn’t unroll loops even at <code class="language-plaintext highlighter-rouge">-O2</code> or <code class="language-plaintext highlighter-rouge">-O3</code> except in some special cases like small <em>compile-time known</em> iteration counts. This often hurts it benchmarks versus clang, but helps a lot for code size. gcc will unroll loops if you use profile guided optimization, or you can request it on the command using <code class="language-plaintext highlighter-rouge">-funroll-loops</code>. <a href="#fnref:unrolled" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:incbad" role="doc-endnote">
+      <p>Actually gcc using <code class="language-plaintext highlighter-rouge">inc DWORD PTR [rax]</code> is a missed optimization: <code class="language-plaintext highlighter-rouge">add [rax], 1</code> is almost always better since it is only 2 uops in the fused domain, compared to 3 for <code class="language-plaintext highlighter-rouge">inc</code>. In this case it makes only a difference of about 6%, but with a slightly unrolled loop where the store was the only repeated element it could make a bigger difference (for a loop unrolled even more it would probably stop mattering as you hit the 1 store/cycle limit, not any total <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> limit). <a href="#fnref:incbad" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:induc" role="doc-endnote">
+      <p>I call it the <em>induction</em> variable rather than simply <code class="language-plaintext highlighter-rouge">i</code> as in the source, because the compiler has transformed single increments of <code class="language-plaintext highlighter-rouge">i</code> in the original code into 4-byte increments of a pointer stored in <code class="language-plaintext highlighter-rouge">rax</code> and adjusted the loop condition appropriately. Basically our vector-indexing loop has been re-written as a pointer/iterator incrementing one, a form of <em>strength reduction</em>. <a href="#fnref:induc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:gccunroll" role="doc-endnote">
+      <p>In fact, if you add <code class="language-plaintext highlighter-rouge">-funroll-loops</code> you get to 1.08 cycles per element with gcc’s 8x unroll. Even with this flag, gcc <em>doesn’t</em> unroll the 8-bit version, so the gap between the two grows a lot! <a href="#fnref:gccunroll" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:realnames" role="doc-endnote">
+      <p>These are private members and their names will be implementation specific, but they aren’t actually called <code class="language-plaintext highlighter-rouge">start</code> and <code class="language-plaintext highlighter-rouge">finish</code> in stdlibc++ as used by gcc, rather they are <code class="language-plaintext highlighter-rouge">_Vector_base::_Vector_impl::_M_start</code> and <code class="language-plaintext highlighter-rouge">_Vector_base::_Vector_impl::_M_finish</code>, i.e., they live in a structure <code class="language-plaintext highlighter-rouge">_Vector_impl</code> which is a member <code class="language-plaintext highlighter-rouge">_M_impl</code> (in fact the only member) of <code class="language-plaintext highlighter-rouge">_Vector_base</code>, which is the base class of <code class="language-plaintext highlighter-rouge">std::vector</code>. Whew! Luckily the compiler removes all this abstraction just fine. <a href="#fnref:realnames" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:ptype" role="doc-endnote">
+      <p>The standard makes no guarantees about what the internal types of <code class="language-plaintext highlighter-rouge">std::vector</code> members will be, but in libstdc++’s implementation they are simply <code class="language-plaintext highlighter-rouge">Alloc::pointer</code> where <code class="language-plaintext highlighter-rouge">Alloc</code> is the allocator for the vector, which for the default <code class="language-plaintext highlighter-rouge">std::allocated</code> is simply <code class="language-plaintext highlighter-rouge">T*</code>, i.e., a raw pointer to object, in this case <code class="language-plaintext highlighter-rouge">uint32_t *</code>. <a href="#fnref:ptype" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:commoncom" role="doc-endnote">
+      <p>The caveat <em>at least for common compilers</em> appears because it seems to be the case that <code class="language-plaintext highlighter-rouge">uint8_t</code> could be treated as a type distinct from <code class="language-plaintext highlighter-rouge">char</code>, <code class="language-plaintext highlighter-rouge">signed char</code> and <code class="language-plaintext highlighter-rouge">unsigned char</code>. Because the aliasing loophole only applies to <em>character types</em>, this would presumably mean that the rule wouldn’t apply to <code class="language-plaintext highlighter-rouge">uint8_t</code> and so they would behave like any other non-char type. No compiler I’m aware of actually implement this: they all <code class="language-plaintext highlighter-rouge">typedef</code> <code class="language-plaintext highlighter-rouge">uint8_t</code> to <code class="language-plaintext highlighter-rouge">unsigned char</code>, so the distinction is invisible to the compiler even if it wanted to act on it. <a href="#fnref:commoncom" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:unp" role="doc-endnote">
+      <p><em>Unknown provenance</em> here just means that the compiler doesn’t know where the memory points to or how it was created. Arbitrary pointers passed in to a function qualify, global and static member variables qualify. Local variables, on the other hand, have a known storage location that doesn’t overlap with anything else, so those are usually safe from aliasing issues (assuming you don’t allow the local to escape somehow). Pointers created from <code class="language-plaintext highlighter-rouge">malloc</code> or <code class="language-plaintext highlighter-rouge">new</code> calls that the compiler can <em>see</em> at the point of use behave a lot like local variables, at least for some compilers: the compiler knows these calls return regions of memory that don’t overlap with anything else. Usually the compiler cannot see the originating <code class="language-plaintext highlighter-rouge">malloc</code> or <code class="language-plaintext highlighter-rouge">new</code> call, however. <a href="#fnref:unp" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:inside" role="doc-endnote">
+      <p>Maybe it is <em>possible</em> for <code class="language-plaintext highlighter-rouge">std::vector</code>? E.g., create a <code class="language-plaintext highlighter-rouge">std::vector&lt;uint8_t&gt; a</code> of a suitable size, then placement-new a new vector <code class="language-plaintext highlighter-rouge">b</code> <em>inside</em> the <code class="language-plaintext highlighter-rouge">a.data()</code> array, at a suitably aligned location. Then <code class="language-plaintext highlighter-rouge">std::swap(a, b)</code> which will just swap the underlying storage, so now <code class="language-plaintext highlighter-rouge">b</code> lives inside its own storage? Or skip the swap and use the move constructor directly when placement-new constructing <code class="language-plaintext highlighter-rouge">b</code>. Such a vector has no practical purpose and will break when you do pretty much anything (e.g., adding an element may expand the vector), destroying the original backing storage and hence the vector itself. <a href="#fnref:inside" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:align" role="doc-endnote">
+      <p>It only gets 8 element per cycle suitably aligned: i.e., aligned by 32. In this test my <code class="language-plaintext highlighter-rouge">std::vector</code> instances were lucky enough to get that alignment by default. <a href="#fnref:align" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:evenbetter" role="doc-endnote">
+      <p>In fact, you could get a better than 4x speedup in the case that the smaller element case fit in a inner cache level but the larger one didn’t. That is actually the case here, with the 8-bit case fitting in the L1 cache, but the 32-bit case being more than 2x as large as the L1 - but there is no additional speedup because the L2 cache is apparently able to sustain the required bandwidth. <a href="#fnref:evenbetter" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:arrayin" role="doc-endnote">
+      <p>Although a <code class="language-plaintext highlighter-rouge">vector</code> can conceptually live inside its own heap storage, the same is not true of a pointer: a write through a pointer cannot modify the pointer. <code class="language-plaintext highlighter-rouge">vector</code> has an extra level of indirection which makes this inception-style stuff possible. <a href="#fnref:arrayin" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:residx" role="doc-endnote">
+      <p>It is show here with the indexing based approach <code class="language-plaintext highlighter-rouge">v[i]</code> but it works with the iterator-based approach as well. <a href="#fnref:residx" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:extreme" role="doc-endnote">
+      <p>There are more extreme solutions out there, e.g., you can create an <em>opaque typedef</em>, which is basically just a <code class="language-plaintext highlighter-rouge">struct</code> wrapping a <code class="language-plaintext highlighter-rouge">uint8_t</code> value, combined with operator overloading and perhaps implicit conversions to make it act like a <code class="language-plaintext highlighter-rouge">uint8_t</code> while being a totally different type as far as the compiler is concerned. Surprisingly, while this <a href="https://godbolt.org/z/IhyTTM">works great in clang, it doesn’t work at all gcc</a>, producing the same code as <code class="language-plaintext highlighter-rouge">uint8_t</code>. Somewhere in the guts of its optimizer, <code class="language-plaintext highlighter-rouge">gcc</code> ends up treating this type as a character type along with all the aliasing implications. Another extreme solution would be to create your own <code class="language-plaintext highlighter-rouge">vector</code>-alike type, but whose pointer member(s) are declared <code class="language-plaintext highlighter-rouge">__restrict</code>. <a href="#fnref:extreme" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:comments" role="doc-endnote">
+      <p>If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears. <a href="#fnref:comments" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-2d15c840-d470-11eb-a781-93a616abab19" class="js-comment comment" uid="2d15c840-d470-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+    Jay
+    <span class="comment__date">•
+        <a href="#comment-2d15c840-d470-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 22:13</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks. Really nice post</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-2d15c840-d470-11eb-a781-93a616abab19', 'respond', 'vector-inc', '2d15c840-d470-11eb-a781-93a616abab19')">↪&#xFE0E; Reply to Jay</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/08/26/vector-inc.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/08/26/vector-inc.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="vector-inc">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/08/26/vector-inc.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2019/08/26/vector-inc.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Performance Matters</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li><li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/travisdowns"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">travisdowns</span></a></li><li><a href="https://www.twitter.com/trav_downs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">trav_downs</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>AVX-512 Mask Registers, Again | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="AVX-512 Mask Registers, Again" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Taking a second look at the newly introduced mask registers, this time with the benefit of a SKX die shot from Fritzchens Fritz." />
+<meta property="og:description" content="Taking a second look at the newly introduced mask registers, this time with the benefit of a SKX die shot from Fritzchens Fritz." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2020/05/26/kreg2.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2020/05/26/kreg2.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/kreg2/zoomed.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-26T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/kreg2/zoomed.png" />
+<meta property="twitter:title" content="AVX-512 Mask Registers, Again" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"datePublished":"2020-05-26T00:00:00+00:00","description":"Taking a second look at the newly introduced mask registers, this time with the benefit of a SKX die shot from Fritzchens Fritz.","url":"https://travisdowns.github.io/blog/2020/05/26/kreg2.html","@type":"BlogPosting","dateModified":"2020-05-26T00:00:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2020/05/26/kreg2.html"},"image":"https://travisdowns.github.io/assets/kreg2/zoomed.png","author":{"@type":"Person","name":"Travis Downs"},"headline":"AVX-512 Mask Registers, Again","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script>
+if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-136594956-1', 'auto');
+  ga('send', 'pageview');
+}
+</script>
+  
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <!-- BASE:  -->
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+<!-- INSIDE -->
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">AVX-512 Mask Registers, Again</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-05-26T00:00:00+00:00" itemprop="datePublished">May 26, 2020
+      </time><!-- travis override --><span>
+          •
+          <span class="tag-link"><a href="/tags/Intel.html">Intel</a></span><span class="tag-link"><a href="/tags/x86.html">x86</a></span><span class="tag-link"><a href="/tags/uarch.html">uarch</a></span><span class="tag-link"><a href="/tags/avx512.html">avx512</a></span>
+        </span><!-- end override -->
+    </p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    
+<!-- boilerplate 
+page.assets: /assets/kreg2
+assetpath: /assets/kreg2
+tablepath: /misc/tables/kreg2
+-->
+
+<h2 id="exposition">Exposition</h2>
+
+<p><a href="/blog/2019/12/05/kreg-facts.html">Not that long ago</a> we looked at the AVX-512 mask registers. Specifically, the number of physical registers underlying the eight architectural ones, and some other behaviors such as zeroing idioms. Recently, a high resolution die shot of <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> appeared, and I thought it would be cool to verify our register count by visual inspection.</p>
+
+<p>After all, rather than writing some complex software to test hardware, why not <em>simply</em> use a series of noxious chemicals and manual labor to painstakingly expose the CPU, then carefully photograph it with a microscope and stitch the photos together and finally, <em>just use our eyes</em> to count the register? If that doesn’t sound all that easy, you are not alone, but as luck would have it someone else has already done that part.</p>
+
+<p>While trying to simply count the mask registers, I ran across something else even more interesting<sup id="fnref:bar" role="doc-noteref"><a href="#fn:bar" class="footnote" rel="footnote">1</a></sup> instead…</p>
+
+<ul id="markdown-toc">
+  <li><a href="#exposition" id="markdown-toc-exposition">Exposition</a></li>
+  <li><a href="#rising-action" id="markdown-toc-rising-action">Rising Action</a>    <ul>
+      <li><a href="#the-die-shot" id="markdown-toc-the-die-shot">The Die Shot</a></li>
+      <li><a href="#the-register-files" id="markdown-toc-the-register-files">The Register Files</a></li>
+      <li><a href="#the-mystery-block" id="markdown-toc-the-mystery-block">The Mystery Block</a></li>
+      <li><a href="#lets-get-legacy" id="markdown-toc-lets-get-legacy">Let’s Get Legacy</a></li>
+      <li><a href="#testing-our-theory" id="markdown-toc-testing-our-theory">Testing Our Theory</a></li>
+    </ul>
+  </li>
+  <li><a href="#some-missing-pieces" id="markdown-toc-some-missing-pieces">Some Missing Pieces</a></li>
+  <li><a href="#thanks" id="markdown-toc-thanks">Thanks</a></li>
+  <li><a href="#discussion-and-feedback" id="markdown-toc-discussion-and-feedback">Discussion and Feedback</a></li>
+</ul>
+
+<h2 id="rising-action">Rising Action</h2>
+
+<h3 id="the-die-shot">The Die Shot</h3>
+
+<p>We’re interested in this die shot, recently released by <a href="https://twitter.com/FritzchensFritz">Fritzchens Fritz</a> on <a href="https://www.flickr.com/photos/130561288@N04/49825363402/in/photostream/">Flickr</a>. We’ll be focusing on the highlighted area, which seems to have all the <a href="https://en.wikipedia.org/wiki/Register_file"><em>register files</em></a> on the chip. If you want a full breakdown of the core, you can check guesses <a href="https://twitter.com/GPUsAreMagic/status/1256866465577394181">here on Twitter</a>, <a href="https://www.realworldtech.com/forum/?threadid=191663&amp;curpostid=191916">on RWT</a> and on <a href="https://software.intel.com/sites/default/files/managed/5f/99/Skylake_core.jpg">Intel’s forums</a> (<a href="https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/852272">thread</a>).</p>
+
+<p><img src="/assets/kreg2/skx-full-small.jpg" alt="SKL full" /></p>
+
+<h3 id="the-register-files">The Register Files</h3>
+
+<p>Here’s a close-up of that section, with the assumed register files and their purpose labeled<sup id="fnref:xmmetc" role="doc-noteref"><a href="#fn:xmmetc" class="footnote" rel="footnote">2</a></sup>.</p>
+
+<p><img src="/assets/kreg2/zoomed.png" alt="SKL zoomed" /></p>
+
+<p>We guess the register file identities based on:</p>
+
+<ul>
+  <li>The general purpose register files are of the right relative width (64 bits), and are in the right position below the integer execution units, and seem to have <code class="language-plaintext highlighter-rouge">EFLAGS</code> nearby.</li>
+  <li>The <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers are obvious from their size and positioning underneath the vector pipes.</li>
+  <li>The upper 256 bits of the 512-bit <code class="language-plaintext highlighter-rouge">zmm</code> registers (labelled ZMM on the closeup) can be determined from comparing the <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr><sup id="fnref:kbl" role="doc-noteref"><a href="#fn:kbl" class="footnote" rel="footnote">3</a></sup> (no AVX-512) and <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> (has AVX-512) dies and noting that the bottom file is not present in <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr> (a large empty area is present at that spot in <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr>).</li>
+</ul>
+
+<h3 id="the-mystery-block">The Mystery Block</h3>
+
+<p>This leaves the mystery block in red. This block is in a prime spot below the vector execution units. Could it be the mask registers (kregs)? We found in the <a href="/blog/2019/12/05/kreg-facts.html">first post</a> that the mask aren’t shared with either the scalar or <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers, so we expect them to have their own physical register file. Maybe this is it?</p>
+
+<p>Let’s compare the mystery register file to the integer register file, since they should be similar in size and appear to be implemented similarly:</p>
+
+<p><img src="/assets/kreg2/compare.png" alt="SKL zoomed" /></p>
+
+<p>Looking at the general purpose register file on the left, each block (6 of which are numbered on the general purpose file) seems to implement 16 bits, as if you zoom in you see a repeating structure of 16 elements, and 4 blocks makes 64 bits total which is the expected width of the file. We know from published numbers that the integer register file has 180 entries, and since there are 6 rows of 4 blocks, we expect each row to implement 180 / 6 = 30 registers.</p>
+
+<p>Now we turn our attention to the mystery file, with the idea that it may be the mask register file. There are a total of 30 blocks. Looking at the general purpose registers, we determined each block can hold 16 bits (horizontally) from 30 registers (vertically, I guess). So 30 blocks gives us: 30 blocks * 30 registers/block * 16 bits / 64 bits = 225 registers. It’s too much! We calculated last time that there are ~142 physical mask registers, so this is way too high.</p>
+
+<p>There’s another problem: we only have three columns of 16-bit blocks, for a total of 48 bits, horizontally. However, we know that a mask register must hold up to 64 bits (when using a byte-wise mask for a full 512-bit vector register). Also, while our calculation above worked out to a whole number, the number of blocks (30) is not divisible by 4, so even if you assumed the arrangement of the blocks didn’t matter, there is no possible mapping from each register to 4 distinct blocks. Instead, we’d need something weird like 2 blocks providing 15 registers (instead of 30), but 64 bits wide (instead of 32). That seems very unlikely.</p>
+
+<p>So let’s look just at the two paired columns on the left for now: a total of 20 blocks. If we take the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers as an example, it is not necessary that the full width of the register is present horizontally in a single row: the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers have only 256 bits in a row (split into two 128-bit lines), and then other other 256 bits in a 512-bit zmm register appear vertically below, in the register file marked ZMM in the diagram. So there’s a kind of over-under arrangement<sup id="fnref:overunder" role="doc-noteref"><a href="#fn:overunder" class="footnote" rel="footnote">4</a></sup>.</p>
+
+<p>Since the mask registers are associated with elements of the vector registers, maybe they are split up in the same way? That is, a 64-bit mask register uses one 2x16-bit (32-bit) chunk from the top half and one from the bottom half, to make up 64 bits? This is 20 total blocks, giving 150 registers by the same calculation above. This is much closer to the 142 we found by experiment.</p>
+
+<p>Still… that nagging feeling. 142 is not equal to 150, and what about that third column of blocks? That doubt crept in: I had second thoughts that this was the mask register file after all. What could it be then?</p>
+
+<h3 id="lets-get-legacy">Let’s Get Legacy</h3>
+
+<p>I realized there was one register file unaccounted for: the file for legacy x87 floating point and MMX. We expect that x87 floating point and MMX use the the <em>same</em> physical file because MMX registers are architecturally aliased onto the x87 registers<sup id="fnref:why" role="doc-noteref"><a href="#fn:why" class="footnote" rel="footnote">5</a></sup>. So where is <em>this</em> file on the die? I looked all around<sup id="fnref:lied" role="doc-noteref"><a href="#fn:lied" class="footnote" rel="footnote">6</a></sup> the die shot. There are no good candidates.</p>
+
+<p>So maybe <em>this</em> thing we’ve been looking at is actually the x87/MMX register file? In one way it’s a better fit: the x87 FP register file needs to be ~80 bits wide, so that would explain the extra column: if we assume each row is half of a register as before, that’s 96 bits. That’s enough to hold 80 bit extended precision values, and the 16 bits left over are probably could be used to store the FPU status word accessed by <a href="https://www.felixcloutier.com/x86/fstsw:fnstsw">ftstw</a> and related instructions. This status word is updated after every operation so must <em>also</em> be renamed for reasonable performance<sup id="fnref:intflags" role="doc-noteref"><a href="#fn:intflags" class="footnote" rel="footnote">7</a></sup>.</p>
+
+<p>Additional evidence that this might be the x87/MMX register file comes from this <a href="https://flic.kr/p/YhuBWc"><abbr title="Intel's Kaby Lake client CPU architecture (7th, 8th gen): substantially identical to Skylake">KBL</abbr> die shot</a> also from Fritz:</p>
+
+<p><img src="/assets/kreg2/kbl-compare.png" alt="Kaby Lake" /></p>
+
+<p>Note that while the high 256 bits of the register file are masked out (this chip supports only AVX2, not AVX-512 so there are no <code class="language-plaintext highlighter-rouge">zmm</code> registers), the register file we are considering is present in its entirety.</p>
+
+<p>Cool theory bro, but aren’t we back to square zero? If this is the file for the x87/MMX registers, where do the mask registers live?</p>
+
+<p>There’s one possibility we haven’t discussed although some of you might be screaming it at your monitors by now: maybe the x87/MMX and the kreg register files are <em>shared</em>. That is, physically aliased<sup id="fnref:aliasing" role="doc-noteref"><a href="#fn:aliasing" class="footnote" rel="footnote">8</a></sup> to the same register file, shared competitively.</p>
+
+<h3 id="testing-our-theory">Testing Our Theory</h3>
+
+<p>The good news? We can test for this, in software. That’s good, because I was never really <em>that</em> comfortable with this die shot thing and there was the risk that I would BS more than usual. Software-based <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr> probing is a bit more my thing.</p>
+
+<p>We’ll use the test method originally <a href="http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/">described by Henry Wong</a> and which we used in the <a href="/blog/2019/12/05/kreg-facts.html">last post</a> on this topic, and implemented in the <a href="https://github.com/travisdowns/robsize">robsize</a> tool. Here’s the quick description of the technique, a straight copy/paste from that post:</p>
+
+<blockquote>
+  <p>We separate two cache miss load instructions by a variable number of <em>filler instructions</em> which vary based on the CPU resource we are &gt; probing. When the number of filler instructions is small enough, the two cache misses execute in parallel and their latencies are overlapped so the &gt; total execution time is roughly as long as a single miss.</p>
+
+  <p>However, once the number of filler instructions reaches a critical threshold, all of the targeted resource are consumed and instruction allocation &gt; stalls before the second miss is issued and so the cache misses can no longer run in parallel. This causes the runtime to spike to about twice the &gt; baseline cache miss latency.</p>
+
+  <p>Finally, we ensure that each filler instruction consumes exactly one of the resource we are interested in, so that the location of the spike indicates the size of the underlying resource. For example, regular <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> instructions usually consume one physical register from the <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> so are a good choice to measure the size of that resource.</p>
+</blockquote>
+
+<p>The trick we use to see if two register files are shared is first to use a test the size of each register file alone, using a test that uses filler that targets only that register file, then to run a third test whose filler <em>alternates</em> between instructions that use each register file. If the register files are shared, we expect all tests to produce the same results, since they are all drawing from the same pool. If the register files are not shared, the third (alternating) test should result in a much higher apparent resource limit, since two different pools are being drawn from and so it will take twice as many filler instructions to hit the RF limit.</p>
+
+<p>Enough talk, let’s do this. I implemented several new tests in robsize to probe possible register sharing. First, we look at <strong>Test 38</strong>, which uses MMX instructions<sup id="fnref:whymmx" role="doc-noteref"><a href="#fn:whymmx" class="footnote" rel="footnote">9</a></sup> to target the size of the x87/MMX register file:</p>
+
+<div class="svg-fig">
+    <a href="#skx-38" id="skx-38">[link to this chart]</a> 
+    
+    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-38.csv">[raw data]</a> 
+    <br />
+    <a>
+        <img class="figimg" src="/assets/kreg2/skx-38.svg" alt="Test 38" />
+    </a>
+</div>
+
+<p>We see a clear spike at 128 instructions, so it seems like the size of the speculative<sup id="fnref:spec" role="doc-noteref"><a href="#fn:spec" class="footnote" rel="footnote">10</a></sup> x87/MMX register file is 128 entries.</p>
+
+<p>Next, we have <strong>Test 43</strong> which follows the same pattern as <strong>Test 38</strong> but using <code class="language-plaintext highlighter-rouge">kaddd</code> as a filler instruction so targets the mask (kreg) register file:</p>
+
+<div class="svg-fig">
+    <a href="#skx-43" id="skx-43">[link to this chart]</a> 
+    
+    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-43.csv">[raw data]</a> 
+    <br />
+    <a>
+        <img class="figimg" src="/assets/kreg2/skx-43.svg" alt="Test 43" />
+    </a>
+</div>
+
+<p>This is mostly indistinguishable from the previous chart and we conclude that the size of the speculative mask register file is also 128.</p>
+
+<p>Let’s see what happens when alternate MMX and another instruction type. <strong>Test 39</strong> alternates MMX with integer <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions, and <strong>Test 40</strong> alternatives with general purpose scalar instructions:</p>
+
+<div class="svg-fig">
+    <a href="#skx-39" id="skx-39">[link to this chart]</a> 
+    
+    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-39.csv">[raw data]</a> 
+    <br />
+    <a>
+        <img class="figimg" src="/assets/kreg2/skx-39.svg" alt="Test 39" />
+    </a>
+</div>
+
+<div class="svg-fig">
+    <a href="#skx-40" id="skx-40">[link to this chart]</a> 
+    
+    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-40.csv">[raw data]</a> 
+    <br />
+    <a>
+        <img class="figimg" src="/assets/kreg2/skx-40.svg" alt="Test 40" />
+    </a>
+</div>
+
+<p>Both of these show the same effect: the effective resource limitation is much higher: around 210 filler instructions. This indicates strongly that the x87/MMX register is not shared with either the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> or scalar register files.</p>
+
+<p>Finally, we get to the end of this tale, <strong>Test 41</strong>. This test mixes MMX and mask register instructions<sup id="fnref:test41" role="doc-noteref"><a href="#fn:test41" class="footnote" rel="footnote">11</a></sup>:</p>
+
+<div class="svg-fig">
+    <a href="#skx-41" id="skx-41">[link to this chart]</a> 
+    
+    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-41.csv">[raw data]</a> 
+    <br />
+    <a>
+        <img class="figimg" src="/assets/kreg2/skx-41.svg" alt="Test 41" />
+    </a>
+</div>
+
+<p>This one is definitely not like the others. We see that the resource limit is now 128, same as for the single-type tests. We can immediately conclude that this means that mask registers and MMX registers are allocated from the same resource pool: <em>they use the same physical register file</em>.</p>
+
+<p>This resolves the mystery of the missing register file: nothing is missing but rather this one register file simply serves double duty.</p>
+
+<p>Normally a shared register file might be something to watch out for, performance-wise, but it is hard to imagine this having an impact in any non-artificial example. Who is going to be making heavy use of x87 or MMX (both obsolete) along with AVX-512 mask registers (the opposite end of the spectrum from “obsolete”)? It seems extremely unlikely. In any case, the register file is still quite large so hitting the limit is unlikely in any case.</p>
+
+<p>So sharing these register files is a neat trick to reduce power and area: the register files aren’t all that big, but they live in pretty prime real-estate close to the execution units.</p>
+
+<p>What’s cool about this one though is that is the first time that I’ve <em>looked at a chip</em> (that this is even possible is remarkable to me) and come up with a theory about the hardware we can test and confirm with a targeted microbenchmark. Here, it actually happened that way. I was already aware of the possibility of register file sharing (Henry had tests for this right in robsize from the start) – but although I considered other sharing scenarios I never considered sharing between x87/MMX and the mask registers until I tried to identify the register files on Franz’s die shots.</p>
+
+<h2 id="some-missing-pieces">Some Missing Pieces</h2>
+
+<p>It seems like we’ve wrapped everything up nicely, but there are still a few rough edges.</p>
+
+<ul>
+  <li>We calculated a total of 128 speculative registers, plus 16 non-speculative (to hold the 8 x87/MMX regs and the 8 kregs) is 144, but our ballpark estimate based on the regfile size was 150. Perhaps more importantly, with 5 rows of registers, we expect the number of registers to be a multiple of 5. Perhaps there are a handful of registers used from an unknown purpose or some other flaw in the test.</li>
+  <li>I noticed an unexplained different in results between a test that uses a single instruction like <code class="language-plaintext highlighter-rouge">kaddd k1, k2, k3</code> (test 27) and one that rotates through all the 8 registers: <code class="language-plaintext highlighter-rouge">kaddd k0, k1, k1</code> then <code class="language-plaintext highlighter-rouge">kaddd k1, k2, k2</code>, etc (test 43). The former test results in an register file size of about 5 more than the latter. Similarly for tests using the MMX registers (compare tests 37 and 38). This post uses the rotate through all registers approach, while the original post used the fixed register variant in some cases so the number vary slightly. I have some theories but no definite explanation for this behavior.</li>
+</ul>
+
+<h2 id="thanks">Thanks</h2>
+
+<p>Thanks to <a href="https://www.flickr.com/people/130561288@N04/">Fritzchens Fritz</a> who created the die shots analyzed here, and who graciously put them into the public domain.</p>
+
+<p><a href="http://www.stuffedcow.net/">Henry Wong</a> who wrote the <a href="http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/">original article</a> which introduced me to this technique and subsequently shared the code for his tool, which is now <a href="https://github.com/travisdowns/robsize">hosted on github</a>.</p>
+
+<p><a href="https://twitter.com/GPUsAreMagic">Nemez</a> who did a <a href="https://twitter.com/GPUsAreMagic/status/1256866465577394181">breakdown</a> of the die shot, noting the register file in question as some type of integer register file, which originally piqued my curiosity.</p>
+
+<p>Thanks to <a href="https://lemire.me">Daniel Lemire</a> who provided access to the <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> hardware used in this post.</p>
+
+<p>Thanks to Matt Godbolt and Vijay who pointed out typos in the text.</p>
+
+<h2 id="discussion-and-feedback">Discussion and Feedback</h2>
+
+<p>If you have something to say, leave a comment below or discuss this article on <a href="https://news.ycombinator.com/item?id=23309034">Hacker News</a>.</p>
+
+<p>Feedback is also warmly welcomed by <a href="mailto:travis.downs@gmail.com">email</a> or as <a href="https://github.com/travisdowns/travisdowns.github.io/issues">a GitHub issue</a>.</p>
+
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:bar" role="doc-endnote">
+      <p>Admittedly, “how many physical mask registers does the CPU have” is probably not a very high bar of interestingness to clear, to most people. <a href="#fnref:bar" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:xmmetc" role="doc-endnote">
+      <p>The zmm, ymm and xmm registers all overlap, architecturally. That is, <code class="language-plaintext highlighter-rouge">xmm0</code> is just the bottom 128 bits of <code class="language-plaintext highlighter-rouge">ymm0</code>, and similarly for <code class="language-plaintext highlighter-rouge">ymm0</code> and <code class="language-plaintext highlighter-rouge">zmm0</code>. Physically, there are really <em>only</em> <code class="language-plaintext highlighter-rouge">zmm</code> registers and the other two are simply specific ranges of bits of those larger register. So the area marked <strong>YMM</strong> on the die shot really means: <em>the upper parts of the <code class="language-plaintext highlighter-rouge">ymm</code> registers which are not part of the corresponding xmm register</em>. <a href="#fnref:xmmetc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:kbl" role="doc-endnote">
+      <p>Actually Kaby Lake, since the best die shots we have are from that chip, but it’s the same thing. <a href="#fnref:kbl" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:overunder" role="doc-endnote">
+      <p>Incidentally, this lines up with an inspection of the execution units, which seem to have the same over-under arrangemnet: the port 5 FMA for example, looks like it has has two rows each with 4x 64-bit FMA units, rather than say a single row with 8 units. <a href="#fnref:overunder" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:why" role="doc-endnote">
+      <p>As a trick, I guess, to allow MMX registers to be saved and restored by operating systems and other code that weren’t aware of their presence. A similar mess occurred with the transition from SSE to AVX, where code unaware of AVX could accidentally clobber the upper part of AVX registers using SSE instructions (if SSE zeroed the upper bits), so instead we get the ongoing issue with <a href="https://stackoverflow.com/questions/41303780/why-is-this-sse-code-6-times-slower-without-vzeroupper-on-skylake">legacy SSE and dirty uppers</a>. <a href="#fnref:why" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:lied" role="doc-endnote">
+      <p>This is a lie: I didn’t really look around <em>all around</em> the die: I looked near by the execution units were the register file would be with very high probability. <a href="#fnref:lied" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:intflags" role="doc-endnote">
+      <p>The integer flags (so-called <em>EFLAGS</em> register) also need to be renamed and I believe they pull a similar trick: writing their results to the same physical register allocated for the result: I’ve marked the file that I think holds the so-called <em>SPAZO</em> group on the zoomed view, and the C flag may be stored in the same place or in the thin (single bit?) file immediately to the right of the <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> file. <a href="#fnref:intflags" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:aliasing" role="doc-endnote">
+      <p>I talk of <em>physical</em> aliasing here, to distinguish it from the logical/architectural aliasing. Logical aliasing is that which is visible to software: the <code class="language-plaintext highlighter-rouge">ymm</code> and <code class="language-plaintext highlighter-rouge">xmm</code> registers are logically aliased in that writes to <code class="language-plaintext highlighter-rouge">xmm0</code> show up in the low bits of <code class="language-plaintext highlighter-rouge">ymm0</code>. Similarly, the MMX and x87 register files are aliased in that writes to MMX register modify values in the FP register stack, although the rules are more complicated. Logical aliasing usually implies physical aliasing, but not the other way around. Physical aliasing, then, means that two register sets are renamed onto the same pool of physical registers, but this is usually invisible to software (except though careful performance tests, as we do here). <a href="#fnref:aliasing" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:whymmx" role="doc-endnote">
+      <p>I use MMX rather than x87 so I don’t have to deal with the x87 FP stack abstraction and understand how that maps to renaming. <a href="#fnref:whymmx" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:spec" role="doc-endnote">
+      <p>The <em>speculative</em> register file because we expect some entries also to be used to hold the non-speculative values of the architectural registers. We’ll return to this point in a moment. <a href="#fnref:spec" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:test41" role="doc-endnote">
+      <p>Specifically, it mixes the same <code class="language-plaintext highlighter-rouge">kaddd</code> and <code class="language-plaintext highlighter-rouge">por</code> instructions we used in the single-type tests <strong>Test 38</strong> and <strong>Test 43</strong>. <a href="#fnref:test41" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca" class="js-comment comment" uid="484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca">
+
+  <div class="comment__author">
+    edison
+    <span class="comment__date">•
+        <a href="#comment-484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca" title="Permalink to this comment">August 29th, 2020 13:33</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I have try the test 41, but it failed:
+Compiled Aug 29 2020 13:55:58
+ibuf at 0x7f240c04e000
+dbuf at 0x7f23fc04c000
+Running test ID 41: alternating kaddd kN, kN+1, kN+1 and por mmN, mmN+1
+Illegal instruction (core dumped)</p>
+
+<p>my cpu is sandybridge 2600k.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca', 'respond', 'kreg2', '484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca')">↪&#xFE0E; Reply to edison</a>
+    </div>
+</article>
+  
+
+<article id="comment-fc4112b0-ea14-11ea-b566-159a22b6ac2b" class="js-comment comment admin child" uid="fc4112b0-ea14-11ea-b566-159a22b6ac2b">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-fc4112b0-ea14-11ea-b566-159a22b6ac2b" title="Permalink to this comment">August 29th, 2020 16:30</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Mask registers are a feature of AVX-512, an instruction set extension which isn’t available in Sandy Bridge. It is available starting in Skylake Xeon (SKX).</p>
+
+<p>Unfortunately, this means you won’t be able to run this test (and several other tests in robsize which use AVX-512).</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-c13b12a0-acdf-11ea-beab-bfa7389242c5" class="js-comment comment" uid="c13b12a0-acdf-11ea-beab-bfa7389242c5">
+
+  <div class="comment__author">
+    Dmitry Babokin
+    <span class="comment__date">•
+        <a href="#comment-c13b12a0-acdf-11ea-beab-bfa7389242c5" title="Permalink to this comment">June 12th, 2020 19:06</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Seems like with simple Github Actions script, which automatically approves PRs with comments, this might be a nice solution for comments on Github pages!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c13b12a0-acdf-11ea-beab-bfa7389242c5', 'respond', 'kreg2', 'c13b12a0-acdf-11ea-beab-bfa7389242c5')">↪&#xFE0E; Reply to Dmitry Babokin</a>
+    </div>
+</article>
+  
+
+<article id="comment-068b80c0-ad0c-11ea-8b39-8b8c985f0a72" class="js-comment comment admin child" uid="068b80c0-ad0c-11ea-8b39-8b8c985f0a72">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-068b80c0-ad0c-11ea-8b39-8b8c985f0a72" title="Permalink to this comment">June 13th, 2020 00:22</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>What is “this”? The comment system on this blog? It is described <a href="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html">over here</a>.</p>
+
+<p>If you want to automatically approve comments, that’s possible: it’s just a setting in staticman. I have the approval enabled as a form of moderation, but since I’ve gotten almost zero spam comments, I think maybe I could take that out and maybe let the comments be posted immediately.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-68a31570-a54b-11ea-a6c0-ebb42e4d5140" class="js-comment comment" uid="68a31570-a54b-11ea-a6c0-ebb42e4d5140">
+
+  <div class="comment__author">
+    James
+    <span class="comment__date">•
+        <a href="#comment-68a31570-a54b-11ea-a6c0-ebb42e4d5140" title="Permalink to this comment">June  3th, 2020 03:36</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Test comment. Just want to see how things look.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-68a31570-a54b-11ea-a6c0-ebb42e4d5140', 'respond', 'kreg2', '68a31570-a54b-11ea-a6c0-ebb42e4d5140')">↪&#xFE0E; Reply to James</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2020/05/26/kreg2.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2020/05/26/kreg2.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="kreg2">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/05/26/kreg2.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2020/05/26/kreg2.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Performance Matters</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li><li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/travisdowns"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">travisdowns</span></a></li><li><a href="https://www.twitter.com/trav_downs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">trav_downs</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

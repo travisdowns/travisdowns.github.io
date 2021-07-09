@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Clang-format Tanks Performance | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Clang-format Tanks Performance" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Can using clang-format make your code slower? Kind of." />
+<meta property="og:description" content="Can using clang-format make your code slower? Kind of." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2019/11/19/toupper.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2019/11/19/toupper.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/toupper/twitter-card.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-11-19T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/toupper/twitter-card.png" />
+<meta property="twitter:title" content="Clang-format Tanks Performance" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"datePublished":"2019-11-19T00:00:00+00:00","description":"Can using clang-format make your code slower? Kind of.","url":"https://travisdowns.github.io/blog/2019/11/19/toupper.html","@type":"BlogPosting","dateModified":"2019-11-19T00:00:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/11/19/toupper.html"},"image":"https://travisdowns.github.io/assets/toupper/twitter-card.png","author":{"@type":"Person","name":"Travis Downs"},"headline":"Clang-format Tanks Performance","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script>
+if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-136594956-1', 'auto');
+  ga('send', 'pageview');
+}
+</script>
+  
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <!-- BASE:  -->
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+<!-- INSIDE -->
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Clang-format Tanks Performance</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-11-19T00:00:00+00:00" itemprop="datePublished">Nov 19, 2019
+      </time><!-- travis override --><span>
+          •
+          <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/c++.html">c++</a></span><span class="tag-link"><a href="/tags/Intel.html">Intel</a></span><span class="tag-link"><a href="/tags/uarch.html">uarch</a></span>
+        </span><!-- end override -->
+    </p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p class="info">This article is also <a href="https://habr.com/ru/company/pvs-studio/blog/480012/">available in Russian</a>.</p>
+
+<p>Let’s benchmark <a href="http://man7.org/linux/man-pages/man3/toupper.3.html"><code class="language-plaintext highlighter-rouge">toupper</code></a> implementations, because that’s a thing you do on Tuesdays.</p>
+
+<p>Actually, I don’t really care about <code class="language-plaintext highlighter-rouge">toupper</code> much at all, but I was writing a different post and needed a peg to hang my narrative hat on, and hey <code class="language-plaintext highlighter-rouge">toupper</code> seems like a nice harmless benchmark. Despite my effort to choose something which should be totally straightforward and not sidetrack me, this weird thing popped out.</p>
+
+<p>This will be a pretty short one - the longer, original post on the original, maybe far more interesting, topic is coming soon. The source is <a href="https://github.com/travisdowns/toupper-bench">available on github</a> if you want to follow along.</p>
+
+<p>So let’s take a look at three implementations which perform <code class="language-plaintext highlighter-rouge">toupper</code> over an array of <code class="language-plaintext highlighter-rouge">char</code>: that is, which take an input array and modifies it in-place so any lowercase characters are converted to uppercase.</p>
+
+<p>The first simply calls the C standard library <a href="https://linux.die.net/man/3/toupper"><code class="language-plaintext highlighter-rouge">toupper</code> function</a><sup id="fnref:tubroken" role="doc-noteref"><a href="#fn:tubroken" class="footnote" rel="footnote">1</a></sup> in a C-style loop:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">toupper_rawloop</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">toupper</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The second uses the <a href="https://www.youtube.com/watch?v=2olsGf6JIkU">more modern</a> approach of using to <code class="language-plaintext highlighter-rouge">std::transform</code> to replace the raw loop:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">toupper_transform</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">transform</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">buf</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="o">::</span><span class="n">toupper</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Finally, the third one is our bespoke ASCII-specific version that checks if the character lies in the range <code class="language-plaintext highlighter-rouge">a</code> - <code class="language-plaintext highlighter-rouge">z</code> and remaps it by subtracting 32 if so<sup id="fnref:subnote" role="doc-noteref"><a href="#fn:subnote" class="footnote" rel="footnote">2</a></sup>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">toupper_branch</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">c</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">'a'</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">'z'</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="mi">32</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Seems straightforward enough, right?</p>
+
+<p>Let’s benchmark these on my Skylake i7-6700HQ laptop, with the default gcc 5.5. Here’s a JPSP<sup id="fnref:jpsp" role="doc-noteref"><a href="#fn:jpsp" class="footnote" rel="footnote">3</a></sup> :</p>
+
+<p><img src="/assets/toupper/toupper-skl.svg" alt="Skylake-S toupper performance" /></p>
+
+<p>Let’s get three observations that aren’t really part of the story out of the way.</p>
+
+<p>First, the pattern for the branchy algorithm (green). It’s the only one that varies much at all with input size - the other two are basically flat. This turns out to be just a benchmarking artifact. I use random ASCII input<sup id="fnref:randnote" role="doc-noteref"><a href="#fn:randnote" class="footnote" rel="footnote">4</a></sup>, so primary determinant of performance our branchy algorithm is branch prediction. For small input sizes, the branch predictor <em>learns the entire input sequence</em> across iterations of the benchmark and so mispredictions are low and performance is high, <a href="https://lemire.me/blog/2019/10/16/benchmarking-is-hard-processors-learn-to-predict-branches/">just like this</a>. As sequence size grows the predictor memorizes less and less of the sequence until it flatlines when it mispredicts every time there is an uppercase character (0.27 mispredicts per character).</p>
+
+<p>The second thing is this green blob of much slower samples from the <code class="language-plaintext highlighter-rouge">toupper_branch</code> in the upper left:</p>
+
+<p><img src="/assets/toupper/green-blob.png" alt="The green blob" /></p>
+
+<p>This wasn’t a one time artifact, I saw those guys hanging out up there across several runs. They don’t reproduce if you run that particular size alone however, only when the script runs to collect input across all size values. They don’t always show up. I didn’t look into it further but my best guess is some of unfortunate collision or aliasing effect perhaps in the branch predictor or in the 4k physical to virtual page mapping (VA space randomization was off, however).</p>
+
+<p>The third not interesting thing is the bimodal behavior of <code class="language-plaintext highlighter-rouge">toupper_rawloop</code> – the blue dots form two distinct lines, at just above 2 cycles per char and a faster line at 1.5 cycles per char. All performance counters that I checked were the same between the two “modes”. The fast mode, which runs at 1.57 chars/cycle is basically bottlenecked on the load ports: there are 1.54 uops/cycle going to both port 2 and port 3, so those ports are 98% occupied. The slower mode I can’t explain.</p>
+
+<p>While I was investigating it, the fast mode suddenly stopped appearing and I was stuck in slow mode. Maybe my CPU saw what I was up to and downloaded a <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> update in the background to remove the inconsistency, but I still have the SVG to prove it (for now).</p>
+
+<p>So what’s the interesting thing?</p>
+
+<p>The interesting thing is that the raw loop version runs 3x to 4x faster than the <code class="language-plaintext highlighter-rouge">std::transform</code> version: 1.5 to 2 cycles per character versus just above 7 cycles per character.</p>
+
+<p>What’s up with that? Are my standard algorithms letting me down? Does <code class="language-plaintext highlighter-rouge">std::transform</code> have some fatal flaw?</p>
+
+<p>Not really. Well, not at all.</p>
+
+<p>It turns out these results occur when the functions are compiled in <a href="https://github.com/travisdowns/toupper-bench/blob/256bb8318444faa8411ca6a9b11dcf4396f9ee81/impls-noalgo.cpp">separate</a> <a href="https://github.com/travisdowns/toupper-bench/blob/256bb8318444faa8411ca6a9b11dcf4396f9ee81/impls-algo.cpp">files</a>. If you put them into the same file, suddenly the performance is is the same: they both run slowly.</p>
+
+<p>No, it’s not an alignment thing.</p>
+
+<p>It gets weirder too: the fast raw loop version, compiled in a separate file, <em>slows down if you simply include the <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> header</em>. That’s right - including that header, which is never used and generates no code in the object file, slows down the raw loop by 3 to 4 times. Conversely, the <code class="language-plaintext highlighter-rouge">std::transform</code> version speeds up to full speed if you copy and paste the <code class="language-plaintext highlighter-rouge">std::transform</code> implementation out of <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> and stop including that file.</p>
+
+<p>It gets <em>even</em> weirder (this is the last “it gets weirder”, I promise): including <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> doesn’t always do this. The slowdown happens if <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> is included before <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code>, but not if you swap them around:</p>
+
+<p><strong>Slow:</strong></p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;algorithm&gt;
+#include &lt;ctype.h&gt;
+</span></code></pre></div></div>
+
+<p><strong>Fast:</strong></p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;ctype.h&gt;
+#include &lt;algorithm&gt;
+</span></code></pre></div></div>
+
+<p>In fact, in my case, this performance anomaly was triggered (in a different project) when clang-format sorted my headers, moving <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> to the top where it belonged (hence the clickbait title).</p>
+
+<p>Of course, we were going to end up mired in assembly at some point. Let’s not postpone the pain any longer.</p>
+
+<p>Here are are the <a href="https://godbolt.org/z/DwZBJM">fast and slow</a> versions of the functions<sup id="fnref:fsnote" role="doc-noteref"><a href="#fn:fsnote" class="footnote" rel="footnote">5</a></sup>, with the core loops annotated:</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> included first:</strong></p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">toupper_rawloop</span><span class="p">(</span><span class="nb">ch</span><span class="nv">ar</span><span class="o">*</span><span class="p">,</span> <span class="nv">unsigned</span> <span class="nv">long</span><span class="p">):</span>
+        <span class="nf">push</span>    <span class="nb">rbp</span>
+        <span class="nf">push</span>    <span class="nb">rbx</span>
+        <span class="nf">lea</span>     <span class="nb">rbp</span><span class="p">,</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rsi</span><span class="p">]</span>
+        <span class="nf">sub</span>     <span class="nb">rsp</span><span class="p">,</span> <span class="mi">8</span>
+        <span class="nf">test</span>    <span class="nb">rsi</span><span class="p">,</span> <span class="nb">rsi</span>
+        <span class="nf">je</span>      <span class="nv">.L1</span>
+        <span class="nf">mov</span>     <span class="nb">rbx</span><span class="p">,</span> <span class="nb">rdi</span>
+<span class="nl">.L5:</span>
+        <span class="nf">movsx</span>   <span class="nb">edi</span><span class="p">,</span> <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rbx</span><span class="p">]</span>  <span class="c1">; load a char from *buf</span>
+        <span class="nf">add</span>     <span class="nb">rbx</span><span class="p">,</span> <span class="mi">1</span>               <span class="c1">; buf++</span>
+        <span class="nf">call</span>    <span class="nv">toupper</span>              <span class="c1">; call toupper(c)</span>
+        <span class="nf">mov</span>     <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rbx</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">al</span> <span class="c1">; save the result to buf[-1]</span>
+        <span class="nf">cmp</span>     <span class="nb">rbp</span><span class="p">,</span> <span class="nb">rbx</span>             <span class="c1">; check for buf == buf_end</span>
+        <span class="nf">jne</span>     <span class="nv">.L5</span>                  <span class="c1">;</span>
+<span class="nl">.L1:</span>
+        <span class="nf">add</span>     <span class="nb">rsp</span><span class="p">,</span> <span class="mi">8</span>
+        <span class="nf">pop</span>     <span class="nb">rbx</span>
+        <span class="nf">pop</span>     <span class="nb">rbp</span>
+        <span class="nf">ret</span>
+</code></pre></div></div>
+
+<p><strong>With <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> second:</strong></p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">toupper_rawloop</span><span class="p">(</span><span class="nb">ch</span><span class="nv">ar</span><span class="o">*</span><span class="p">,</span> <span class="nv">unsigned</span> <span class="nv">long</span><span class="p">):</span>
+        <span class="nf">test</span>    <span class="nb">rsi</span><span class="p">,</span> <span class="nb">rsi</span>
+        <span class="nf">je</span>      <span class="nv">.L7</span>
+        <span class="nf">push</span>    <span class="nb">rbp</span>
+        <span class="nf">push</span>    <span class="nb">rbx</span>
+        <span class="nf">mov</span>     <span class="nb">rbp</span><span class="p">,</span> <span class="nb">rsi</span>
+        <span class="nf">mov</span>     <span class="nb">rbx</span><span class="p">,</span> <span class="nb">rdi</span>
+        <span class="nf">sub</span>     <span class="nb">rsp</span><span class="p">,</span> <span class="mi">8</span>
+        <span class="nf">call</span>    <span class="nv">__ctype_toupper_loc</span>
+        <span class="nf">lea</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="p">[</span><span class="nb">rbx</span><span class="o">+</span><span class="nb">rbp</span><span class="p">]</span>
+        <span class="nf">mov</span>     <span class="nb">rdi</span><span class="p">,</span> <span class="nb">rbx</span>
+<span class="nl">.L4:</span>
+        <span class="nf">movsx</span>   <span class="nb">rcx</span><span class="p">,</span> <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="p">]</span>        <span class="c1">; load a char from buf</span>
+        <span class="nf">mov</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>       <span class="c1">; load the toupper table address (pointed to by __ctype_toupper_loc)</span>
+        <span class="nf">add</span>     <span class="nb">rdi</span><span class="p">,</span> <span class="mi">1</span>                     <span class="c1">; buf++</span>
+        <span class="nf">mov</span>     <span class="nb">edx</span><span class="p">,</span> <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span> <span class="c1">; look up the toupper result by indexing into table with the char</span>
+        <span class="nf">mov</span>     <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">dl</span>       <span class="c1">; store the result</span>
+        <span class="nf">cmp</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="nb">rdi</span>                   <span class="c1">; check buf == end_buf</span>
+        <span class="nf">jne</span>     <span class="nv">.L4</span>                        <span class="c1">;</span>
+
+        <span class="nf">add</span>     <span class="nb">rsp</span><span class="p">,</span> <span class="mi">8</span>
+        <span class="nf">pop</span>     <span class="nb">rbx</span>
+        <span class="nf">pop</span>     <span class="nb">rbp</span>
+<span class="nl">.L7:</span>
+        <span class="nf">rep</span> <span class="nv">ret</span>
+</code></pre></div></div>
+
+<p>The key difference is the slow version simply calls <code class="language-plaintext highlighter-rouge">toupper</code> in the loop, while the fast version has no function calls at all, just a table lookup<sup id="fnref:aliasing" role="doc-noteref"><a href="#fn:aliasing" class="footnote" rel="footnote">6</a></sup> - the body of <code class="language-plaintext highlighter-rouge">std::toupper</code> has been inlined.</p>
+
+<p>Examining the glibc <a href="https://sourceware.org/git/?p=glibc.git;a=blob;f=ctype/ctype.h;h=d17f727cf0dc2a0f6c62fa50aff799b175dcb426;hb=2a764c6ee848dfe92cb2921ed3b14085f15d9e79#l205">source</a>, we find the implementation of <code class="language-plaintext highlighter-rouge">toupper</code>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__extern_inline</span> <span class="kt">int</span>
+<span class="nf">__NTH</span> <span class="p">(</span><span class="n">toupper</span> <span class="p">(</span><span class="kt">int</span> <span class="n">__c</span><span class="p">))</span> <span class="c1">// __NTH is a macro that indicates the function doesn't throw</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="n">__c</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">128</span> <span class="o">&amp;&amp;</span> <span class="n">__c</span> <span class="o">&lt;</span> <span class="mi">256</span> <span class="o">?</span> <span class="p">(</span><span class="o">*</span><span class="n">__ctype_toupper_loc</span> <span class="p">())[</span><span class="n">__c</span><span class="p">]</span> <span class="o">:</span> <span class="n">__c</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We see that <code class="language-plaintext highlighter-rouge">toupper</code> is implemented as an <code class="language-plaintext highlighter-rouge">extern inline</code> function that first checks that the range of the char fits within a byte<sup id="fnref:bcheck" role="doc-noteref"><a href="#fn:bcheck" class="footnote" rel="footnote">7</a></sup> and then looks up the character in the table returned by <code class="language-plaintext highlighter-rouge">__ctype_toupper_loc()</code>. That function returns a thread-local pointer (a <code class="language-plaintext highlighter-rouge">const int **</code>), which in turn points to a lookup table which given a character returns the uppercase version<sup id="fnref:nobran" role="doc-noteref"><a href="#fn:nobran" class="footnote" rel="footnote">8</a></sup>.</p>
+
+<p>So now the assembly makes sense: the fast version of the algorithm inlines the <code class="language-plaintext highlighter-rouge">toupper</code> body, but it can’t inline the <code class="language-plaintext highlighter-rouge">__ctype_toupper_loc()</code> call<sup id="fnref:inline2" role="doc-noteref"><a href="#fn:inline2" class="footnote" rel="footnote">9</a></sup>; however, this call is declared <code class="language-plaintext highlighter-rouge">__attribute__((const))</code> which means that its return value depends only on the arguments (and here there are no arguments) and so the compiler knows it returns the same value every time and so can be hoisted out of the loop, so the loop body has only a few loads associated with the lookup table, the store of the new value to the buffer, and loop control.</p>
+
+<p>The slow version, on the other hand, leaves the <code class="language-plaintext highlighter-rouge">toupper()</code> inside the loop. The loop itself is one instruction shorted, but of course you need to run all the code inside <code class="language-plaintext highlighter-rouge">toupper</code> as well. Here’s what that looks like on my system:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nf">lea</span>    <span class="nb">edx</span><span class="p">,[</span><span class="nb">rdi</span><span class="o">+</span><span class="mh">0x80</span><span class="p">]</span>                   <span class="c1">; edx = rdi + 0x80</span>
+  <span class="nf">movsxd</span> <span class="nb">rax</span><span class="p">,</span><span class="nb">edi</span>                          <span class="c1">; zero extend c</span>
+  <span class="nf">cmp</span>    <span class="nb">edx</span><span class="p">,</span><span class="mh">0x17f</span>                        <span class="c1">; check that c is in -128 to 255</span>
+  <span class="nf">ja</span>     <span class="mi">2</span><span class="nv">a</span>                               <span class="c1">; if not, we're done</span>
+  <span class="nf">mov</span>    <span class="nb">rdx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nv">rip</span><span class="o">+</span><span class="mh">0x395f30</span><span class="p">]</span>     <span class="c1">; lookup TLS index</span>
+  <span class="nf">mov</span>    <span class="nb">rdx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="nb">fs</span><span class="p">:[</span><span class="nb">rdx</span><span class="p">]</span>           <span class="c1">; access TLS at index</span>
+  <span class="nf">mov</span>    <span class="nb">rdx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="p">]</span>              <span class="c1">; dereference TLS pointer</span>
+  <span class="nf">mov</span>    <span class="nb">rdx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="mh">0x48</span><span class="p">]</span>         <span class="c1">; load current toupper lookup table</span>
+  <span class="nf">mov</span>    <span class="nb">eax</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rax</span><span class="o">*</span><span class="mi">4</span><span class="o">+</span><span class="mh">0x200</span><span class="p">]</span>  <span class="c1">; lookup c in LUT</span>
+<span class="err">2</span><span class="nl">a:</span>
+  <span class="nf">ret</span>
+</code></pre></div></div>
+
+<p>Since it’s a standalone function call, it has to do more work. There are no less than <em>five</em> chained (pointer-chasing) memory accesses. Only two of those accesses remained in the fast loop, because the rest were hoisted up and out of the loop. The input to output latency of this function is probably close to 25 cycles, so out measured throughput of ~7 cycles means that the CPU was able to run several copies in parallel, not too terrible all things considered.</p>
+
+<p>Why does this happen?</p>
+
+<p>Through a long series of includes, C++ files like <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> include <code class="language-plaintext highlighter-rouge">&lt;bits/os_defines.h&gt;</code> which has this line:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// This keeps isanum, et al from being propagated as macros.</span>
+<span class="cp">#define __NO_CTYPE 1
+</span></code></pre></div></div>
+
+<p>When <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code> is ultimately included, this prevents the block containing the <code class="language-plaintext highlighter-rouge">extern inline</code> definition of <code class="language-plaintext highlighter-rouge">toupper</code> from being included:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#if !defined __NO_CTYPE
+# ifdef __isctype_f
+</span><span class="n">__isctype_f</span> <span class="p">(</span><span class="n">alnum</span><span class="p">)</span>
+<span class="c1">// lots more like this</span>
+<span class="n">__isctype_f</span> <span class="p">(</span><span class="n">xdigit</span><span class="p">)</span>
+<span class="cp"># elif defined __isctype
+# define isalnum(c)	__isctype((c), _ISalnum)
+# define isalpha(c)	__isctype((c), _ISalpha)
+</span><span class="c1">// more like this</span>
+<span class="cp"># endif
+</span>
+<span class="c1">// the stuff we care about</span>
+<span class="cp"># ifdef __USE_EXTERN_INLINES
+</span><span class="n">__extern_inline</span> <span class="kt">int</span>
+<span class="nf">__NTH</span> <span class="p">(</span><span class="n">tolower</span> <span class="p">(</span><span class="kt">int</span> <span class="n">__c</span><span class="p">))</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="n">__c</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">128</span> <span class="o">&amp;&amp;</span> <span class="n">__c</span> <span class="o">&lt;</span> <span class="mi">256</span> <span class="o">?</span> <span class="p">(</span><span class="o">*</span><span class="n">__ctype_tolower_loc</span> <span class="p">())[</span><span class="n">__c</span><span class="p">]</span> <span class="o">:</span> <span class="n">__c</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">__extern_inline</span> <span class="kt">int</span>
+<span class="nf">__NTH</span> <span class="p">(</span><span class="n">toupper</span> <span class="p">(</span><span class="kt">int</span> <span class="n">__c</span><span class="p">))</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="n">__c</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">128</span> <span class="o">&amp;&amp;</span> <span class="n">__c</span> <span class="o">&lt;</span> <span class="mi">256</span> <span class="o">?</span> <span class="p">(</span><span class="o">*</span><span class="n">__ctype_toupper_loc</span> <span class="p">())[</span><span class="n">__c</span><span class="p">]</span> <span class="o">:</span> <span class="n">__c</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp"># endif
+</span>
+<span class="c1">// here's where tolower is defined as a macro</span>
+<span class="cp"># if __GNUC__ &gt;= 2 &amp;&amp; defined __OPTIMIZE__ &amp;&amp; !defined __cplusplus
+#  define tolower(c)	__tobody (c, tolower, *__ctype_tolower_loc (), (c))
+#  define toupper(c)	__tobody (c, toupper, *__ctype_toupper_loc (), (c))
+# endif </span><span class="cm">/* Optimizing gcc */</span><span class="cp">
+</span>
+<span class="cp">#endif </span><span class="cm">/* Not __NO_CTYPE.  */</span><span class="cp">
+</span></code></pre></div></div>
+
+<p>Note when including <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code> from C++ <code class="language-plaintext highlighter-rouge">toupper</code> is <em>never</em> defined as a macro - at most it is <code class="language-plaintext highlighter-rouge">extern inline</code> - the macro definitions below that are guarded by <code class="language-plaintext highlighter-rouge">!defined __cplusplus</code> so they’ll never take effect.</p>
+
+<p>So I’m not sure if the <code class="language-plaintext highlighter-rouge">extern inline</code> bodies of <code class="language-plaintext highlighter-rouge">tolower</code> and <code class="language-plaintext highlighter-rouge">toupper</code> are intended to be excluded by <code class="language-plaintext highlighter-rouge">__NO_CTYPE</code> in this case, but that’s what happens and this has a significant performance impact in this toy loop. As a corollary, if you include <code class="language-plaintext highlighter-rouge">&lt;cctype&gt;</code> rather than <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code> (the C++ version of the C header which puts functions in the <code class="language-plaintext highlighter-rouge">std::</code> namespace) you also get the slow behavior because <code class="language-plaintext highlighter-rouge">&lt;cctype&gt;</code> ultimately includes <code class="language-plaintext highlighter-rouge">&lt;bits/os_defines.h&gt;</code>.</p>
+
+<p><em>Does this matter?</em> Nah, not the performance bit anyway.</p>
+
+<p><code class="language-plaintext highlighter-rouge">toupper</code> is broken for serious multilingual use and, if you only care about ASCII you can write your own faster function. If you care about proper text handling, you are probably using UTF-8 and you’ll have to use something like ICU to do locale-aware text handling, or wait for C++ to get Unicode support (you might be waiting a while). It’s only interesting in clickbait sense of “clang-format can cause a 4x performance regression”.</p>
+
+<p>On the other hand, I suspect that including standard headers in different orders should <em>not</em> change the declarations like that, and there are other differences beyond <code class="language-plaintext highlighter-rouge">toupper</code> and <code class="language-plaintext highlighter-rouge">tolower</code>. That’s probably a bug, so I have filed one <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100128">against libstdc++</a>. So while we can hope this specific issue might be fixed in the future, no doubt the scourge of include order affecting semantics will be with us more or less forever.</p>
+
+<p><em>Does this happen on all libc versions?</em> Mostly yes, but it gets complicated.</p>
+
+<p>The above results apply directly to gcc 5.5 and glibc 2.23, since that’s what I used, but things get weirder on newer versions (starting around glibc 2.27). On newer versions, the issue as described above occurs between <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> and <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code>, but additionally <code class="language-plaintext highlighter-rouge">&lt;stdlib.h&gt;</code> enters the picture<sup id="fnref:anwho" role="doc-noteref"><a href="#fn:anwho" class="footnote" rel="footnote">10</a></sup>: if you include <code class="language-plaintext highlighter-rouge">&lt;stdlib.h&gt;</code> before <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code> you’ll enter slow mode, which doesn’t happen on earlier versions. So apparently <code class="language-plaintext highlighter-rouge">&lt;stdlib.h&gt;</code> also ends up defining <code class="language-plaintext highlighter-rouge">__NO_CTYPE</code> at some point on these newer versions<sup id="fnref:andy" role="doc-noteref"><a href="#fn:andy" class="footnote" rel="footnote">11</a></sup>. At least here we can’t blame clang-format sorting – it might <em>fix</em> the issue for by sorting headers (in files where you aren’t including any other problematic header).</p>
+
+<h3 id="comments">Comments</h3>
+
+<p>You can leave a comment below.</p>
+
+<p>This post was also discussed on <a href="https://news.ycombinator.com/item?id=21579333">Hacker News</a> and <a href="https://lobste.rs/s/tjxzck/clang_format_tanks_performance">lobste.rs</a>.</p>
+
+<h3 id="thanks">Thanks</h3>
+
+<p>Thanks to <abbr title="HackerNews">HN</abbr> user ufo who <a href="https://news.ycombinator.com/item?id=21579483">pointed out</a> you don’t need a lambda to adapt <code class="language-plaintext highlighter-rouge">std::toupper</code> for use in <code class="language-plaintext highlighter-rouge">std::transform</code>, and Jonathan Müller who subsequently <a href="https://twitter.com/foonathan/status/1197051249822195712">pointed out</a> that in fact you do want a lambda.</p>
+
+<p>Thanks to Andrey Semashev who pointed out <a href="#comment-05cb0120-9612-11eb-9ec2-33c79e181b6f">in the comments</a> some additional details of what’s going on and recommended re-filing the bug against libstdc++ rather than glibc.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:tubroken" role="doc-endnote">
+      <p>Yes, <code class="language-plaintext highlighter-rouge">toupper(3)</code> from <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code> is basically irreparably broken for most non-ASCII use, because it cannot handle multibyte characters, but it is good enough for our purposes. We only feed it ASCII strings. <a href="#fnref:tubroken" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:subnote" role="doc-endnote">
+      <p>ASCII conveniently locates lowercase and uppercase characters 32 positions apart, meaning that converting between then is a simple matter of adding or subtracting 32. In fact, if we were sure that all our input were ASCII letters, we could just unconditionally clear the 5th bit, e.g. <code class="language-plaintext highlighter-rouge">c &amp; 0b11011111</code>, which would lower any uppercase and leave lowercase unchanged. Of course, we can’t rely on inputs to be letters, so we need the range check to avoid clobbering non-letter <code class="language-plaintext highlighter-rouge">char</code> values. <a href="#fnref:subnote" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:jpsp" role="doc-endnote">
+      <p>Err, that would be a <em>Jittered Performance Scatter Plot</em>. This is basically a scatter plot with some interesting parameter on the x-axis (in this case, the size of the input) and performance (in this case, cycles per character, <em>lower is better</em>) on the y-axis. The main feature is that each x parameter value is sampled multiple times: here the benchmark is repeated 10 times for each size <a href="#fnref:jpsp" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:randnote" role="doc-endnote">
+      <p>In particular, characters are chosen uniformly at random in the range [32, 127], so the if statement in the function is true ~27% of the time. <a href="#fnref:randnote" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:fsnote" role="doc-endnote">
+      <p>Specifically, I’m showing the generated code in both cases for the raw loop version, the only difference being the order of include of <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> and <code class="language-plaintext highlighter-rouge">&lt;ctype.h&gt;</code>. The source generated is basically the same for all the fast and slow variants: e.g., the <code class="language-plaintext highlighter-rouge">std::transform</code> version generates basically the same slow and fast assembly as shown if you use it through <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> or “copy and paste”, respectively. <a href="#fnref:fsnote" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:aliasing" role="doc-endnote">
+      <p>Even the fast loop isn’t as fast as I could be, as the lookup table pointer is redundantly reloaded (<code class="language-plaintext highlighter-rouge">mov rdx, QWORD PTR [rax]</code>) inside the loop. That table pointer would change when the locale changes, but it is not updated during the loop so it could be hoisted. Perhaps the compiler can’t prove that because we are writing a <code class="language-plaintext highlighter-rouge">char</code> array (which could in principle alias <code class="language-plaintext highlighter-rouge">[rax]</code>, the table pointer), but even <code class="language-plaintext highlighter-rouge">__restrict__</code> doesn’t help. A different version of the loop which just sums the <code class="language-plaintext highlighter-rouge">toupper</code> values and doesn’t write to a char array <a href="https://godbolt.org/z/Kb6pc8">does receive this optimization</a> - the load of the pointer is moved outside the loop. <a href="#fnref:aliasing" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:bcheck" role="doc-endnote">
+      <p>This range check doesn’t leave in the trace in the inlined assembly, because the compiler already knows that <code class="language-plaintext highlighter-rouge">char</code> values will always fall in the range <code class="language-plaintext highlighter-rouge">[-128, 255]</code> - it is needed only because the API to <code class="language-plaintext highlighter-rouge">toupper(c)</code> takes an <code class="language-plaintext highlighter-rouge">int</code> value rather than <code class="language-plaintext highlighter-rouge">char</code> so people could pass any old <code class="language-plaintext highlighter-rouge">int</code> value but the lookup tables are only sized for <code class="language-plaintext highlighter-rouge">char</code>, so this check is needed to avoid out-of-bounds accesses. <a href="#fnref:bcheck" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:nobran" role="doc-endnote">
+      <p>Incidentally, this shows why the <code class="language-plaintext highlighter-rouge">std::toupper</code> routines don’t show any dependence on input size: they don’t use branches (except for the range-check branches which will predict perfectly), but rather a branch-free lookup table. <a href="#fnref:nobran" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:inline2" role="doc-endnote">
+      <p>This call could not be inlined even if you wanted to: its body is not available in the header. <a href="#fnref:inline2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:anwho" role="doc-endnote">
+      <p>I’m not really picking on <code class="language-plaintext highlighter-rouge">stdlib.h</code> (or <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> for that matter) - it is entirely likely that all C++ headers, and possibly many more C headers also trigger the behavior, but I didn’t test for that. I was including <code class="language-plaintext highlighter-rouge">stdlib.h</code> just to get the definition for <code class="language-plaintext highlighter-rouge">size_t</code>. <a href="#fnref:anwho" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:andy" role="doc-endnote">
+      <p>So yes, it happens because newer stdlib.h, when included from C++, actually includes not the “C” stdlib.h, but a C++ stdlib.h <em>override</em> file which includes a bunch of stuff including <code class="language-plaintext highlighter-rouge">&lt;bits/os_defines.h&gt;</code> before ultimately including the base “C” stdlib.h. <a href="#fnref:andy" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-05cb0120-9612-11eb-9ec2-33c79e181b6f" class="js-comment comment" uid="05cb0120-9612-11eb-9ec2-33c79e181b6f">
+
+  <div class="comment__author">
+    Andrey Semashev
+    <span class="comment__date">•
+        <a href="#comment-05cb0120-9612-11eb-9ec2-33c79e181b6f" title="Permalink to this comment">April  5th, 2021 13:22</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I have commented on the bug you linked (https://sourceware.org/bugzilla/show_bug.cgi?id=25214#c4). Looks like a libstdc++ issue caused by it inconsistently overriding C headers. And IMHO it is worth requesting libstdc++ to implement the same optimization glibc does in order to make locale functions inlinable.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-05cb0120-9612-11eb-9ec2-33c79e181b6f', 'respond', 'toupper', '05cb0120-9612-11eb-9ec2-33c79e181b6f')">↪&#xFE0E; Reply to Andrey Semashev</a>
+    </div>
+</article>
+  
+
+<article id="comment-2acdbc20-9efe-11eb-ae0e-d964fd7cf875" class="js-comment comment admin child" uid="2acdbc20-9efe-11eb-ae0e-d964fd7cf875">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-2acdbc20-9efe-11eb-ae0e-d964fd7cf875" title="Permalink to this comment">April 16th, 2021 21:53</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks Andrey. Yes, it looks like when you include <code class="language-plaintext highlighter-rouge">ctype.h</code> there is no override for it in libstdc++, so the usual C version is used, but things like stdlib.h do have overrides (and the override results in a different definition).</p>
+
+<p>I’ll comment further on the glibc issue.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-b3b3f390-93da-11ea-bee2-c946af820dcb" class="js-comment comment" uid="b3b3f390-93da-11ea-bee2-c946af820dcb">
+
+  <div class="comment__author">
+    Gabriel Staples
+    <span class="comment__date">•
+        <a href="#comment-b3b3f390-93da-11ea-bee2-c946af820dcb" title="Permalink to this comment">May 11th, 2020 22:56</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>It looks like you have a comment system now, no?</p>
+
+<blockquote>
+  <p>The bottom of your article says this: “I don’t have a comments system, but I’m working on it (read: occasionally complaining out loud that comments on a static site are hard).”.</p>
+</blockquote>
+
+<p>How did you get comments? Something like this maybe?</p>
+
+<p>https://jekyllcodex.org/blog/gdpr-compliant-comment/</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b3b3f390-93da-11ea-bee2-c946af820dcb', 'respond', 'toupper', 'b3b3f390-93da-11ea-bee2-c946af820dcb')">↪&#xFE0E; Reply to Gabriel Staples</a>
+    </div>
+</article>
+  
+
+<article id="comment-a4a7a190-93e3-11ea-a799-037efd70e16d" class="js-comment comment admin child" uid="a4a7a190-93e3-11ea-a799-037efd70e16d">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-a4a7a190-93e3-11ea-a799-037efd70e16d" title="Permalink to this comment">May 12th, 2020 00:00</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>You are right, since I wrote that I have added a comments system … and it was quite a chore!</p>
+
+<p>I used <a href="https://staticman.net/">staticman</a> and I documented the process in a <a href="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html">blog post</a>.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/11/19/toupper.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/11/19/toupper.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="toupper">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/11/19/toupper.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2019/11/19/toupper.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Performance Matters</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li><li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/travisdowns"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">travisdowns</span></a></li><li><a href="https://www.twitter.com/trav_downs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">trav_downs</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

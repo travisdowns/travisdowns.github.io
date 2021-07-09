@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Your CPU May Have Slowed Down on Wednesday | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Your CPU May Have Slowed Down on Wednesday" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="The death of hardware store optimization." />
+<meta property="og:description" content="The death of hardware store optimization." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/rip-zero-opt/og-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-17T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/rip-zero-opt/og-image.jpg" />
+<meta property="twitter:title" content="Your CPU May Have Slowed Down on Wednesday" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"datePublished":"2021-06-17T00:00:00+00:00","description":"The death of hardware store optimization.","url":"https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html","@type":"BlogPosting","dateModified":"2021-06-17T00:00:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html"},"image":"https://travisdowns.github.io/assets/rip-zero-opt/og-image.jpg","author":{"@type":"Person","name":"Travis Downs"},"headline":"Your CPU May Have Slowed Down on Wednesday","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script>
+if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-136594956-1', 'auto');
+  ga('send', 'pageview');
+}
+</script>
+  
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <!-- BASE:  -->
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+<!-- INSIDE -->
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Your CPU May Have Slowed Down on Wednesday</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-06-17T00:00:00+00:00" itemprop="datePublished">Jun 17, 2021
+      </time><!-- travis override --><span>
+          •
+          <span class="tag-link"><a href="/tags/Intel.html">Intel</a></span><span class="tag-link"><a href="/tags/x86.html">x86</a></span><span class="tag-link"><a href="/tags/uarch.html">uarch</a></span>
+        </span><!-- end override -->
+    </p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    
+<!-- boilerplate 
+page.assets: /assets/rip-zero-opt
+assetpath: /assets/rip-zero-opt
+tablepath: /misc/tables/rip-zero-opt
+-->
+
+<h2 id="a-strange-performance-effect">A Strange Performance Effect</h2>
+
+<p>The plot below shows the throughput of filling a region of the given size (varying on the x-axis) with zeros<sup id="fnref:stdfill" role="doc-noteref"><a href="#fn:stdfill" class="footnote" rel="footnote">1</a></sup> on Skylake (and Ice Lake in the second tab).</p>
+
+<p>The two series were generated under apparently identical conditions: the same binary on the same machine. Only the date the benchmark was run varies. That is, on Monday, June 7th, filling with zeros is substantially faster than the same benchmark on Wednesday, at least when the region no longer fits in the L2 cache<sup id="fnref:whitelie" role="doc-noteref"><a href="#fn:whitelie" class="footnote" rel="footnote">2</a></sup>.</p>
+
+<div class="tabs">
+    <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-fig1-1" name="tab-group-fig1" checked="" />
+      <label class="tab-label" for="tab-fig1-1">Skylake</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/rip-zero-opt/skl/fig1.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/skl-combined/l2-focus.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/rip-zero-opt/skl/fig1.html">
+        <img class="figimg" src="/assets/rip-zero-opt/skl/fig1.svg" alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" />
+    </a>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-fig1-2" name="tab-group-fig1" />
+      <label class="tab-label" for="tab-fig1-2">Ice Lake</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/rip-zero-opt/icl/fig1.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/icl-combined/l2-focus.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/rip-zero-opt/icl/fig1.html">
+        <img class="figimg" src="/assets/rip-zero-opt/icl/fig1.svg" alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" />
+    </a>
+</div>
+        </div>
+      </div>
+    </div>
+    
+</div>
+
+<h3 id="hump-day-strikes-back">Hump Day Strikes Back</h3>
+
+<p>What’s going on here? Are my Skylake and Ice Lake hosts simply work-weary by Wednesday and don’t put in as much effort? Is there a new crypto-coin based on who can store the most zeros and this is a countermeasure to avoid ballooning CPU prices in the face of this new workload?</p>
+
+<p>Believe it or not, it is none of the above!</p>
+
+<p>These hosts run Ubuntu 20.04 and on Wednesday June 9th an update to the <a href="https://launchpad.net/ubuntu/+source/intel-microcode">intel-<abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr></a> OS package was released. After a reboot<sup id="fnref:reboot" role="doc-noteref"><a href="#fn:reboot" class="footnote" rel="footnote">3</a></sup>, this loads the CPU with new <em><abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr></em> (released a day earlier by Intel) that causes the behavior shown above. Specifically, this <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr><sup id="fnref:versions" role="doc-noteref"><a href="#fn:versions" class="footnote" rel="footnote">4</a></sup> disables the <a href="/blog/2020/05/13/intel-zero-opt.html">hardware zero store</a> optimization we discussed in a previous post. It was disabled to mitigate <a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-24512">CVE-2020-24512</a> further described<sup id="fnref:barely" role="doc-noteref"><a href="#fn:barely" class="footnote" rel="footnote">5</a></sup> in Intel security advisory <a href="https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00464.html">INTEL-SA-00464</a>.</p>
+
+<p>To be clear, I don’t know <em>for sure</em> that the <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> disables the zero store optimization – but the evidence is rather overwhelming. After the update, performance is the same when filling zeros as for any other value, and the performance counters tracking L2 evictions suggestion that substantially all evictions are now non-silent (recall from the previous posts that silent evictions were a hallmark of the optimization).</p>
+
+<p>Although I suspect the performance impact will be minuscule on average<sup id="fnref:impact" role="doc-noteref"><a href="#fn:impact" class="footnote" rel="footnote">6</a></sup>, this surprise still serves as a reminder that raw CPU performance can <em>silently</em> change due to <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> updates and most Linux distributions and modern Windows have these updates enabled by default. We’ve <a href="/blog/2019/03/19/random-writes-and-microcode-oh-my.html">seen this before</a>. If you are trying to run reproducible benchmarks, you should always re-run your <em>entire</em> suite in order to make accurate comparisons, even on the same hardware, rather than just running the stuff you think has changed.</p>
+
+<h3 id="reproduction">Reproduction</h3>
+
+<p>The code to collect this performance data and reproduce my results is available in <a href="https://github.com/travisdowns/zero-fill-bench/tree/post3">zero-fill-bench</a>, with some <a href="https://github.com/travisdowns/zero-fill-bench#third-post-rip-zero-store-optimization">instructions</a> in the README.</p>
+
+<h3 id="mea-culpa-and-an-unsustainable-path">Mea Culpa and an Unsustainable Path</h3>
+
+<p>In writing the earlier blog entries on this topic, I was interested in the <em>performance</em> aspects of this optimization, not its potential as an attack vector. However, merely by observing (and publishing) the results, the optimization was affected: <a href="https://en.wikipedia.org/wiki/Measurement_problem">the system under measurement changed as a result of the observation</a>. Now I can’t be sure that the optimization wouldn’t have eventually been disabled anyway, but it does seem that the reason for this behavior change to occur now was my earlier post.</p>
+
+<p>I am not convinced that removing any optimization which can be used in a timing-based side channel is sustainable. I am not sure this is a thread you want to keep pulling on: practically <em>every</em> aspect of a modern CPU can vary in performance and timing based on internal state<sup id="fnref:power" role="doc-noteref"><a href="#fn:power" class="footnote" rel="footnote">7</a></sup>. Trying to draw the security boundaries tightly around co-located entities (e.g., processes on the same CPU, especially on the same core), without allowing any leaks seems destined to fail without a complete overhaul of CPU design, likely at the cost of a large amount of performance. There are just too many holes to plug.</p>
+
+<p>I hope that once the wave of vulnerabilities and disclosures that started with Meltdown and Spectre begins to recede, we can start to work on a measured approach to classifying and mitigating timing and other side-channel attacks. This could start by enumerating which performance characteristics are reasonable guaranteed to hold, and which aren’t. For example, it could be specified whether memory access timing may vary based on the <em>value</em> accessed. If it is allowed to vary, the zero store optimization would be allowed.</p>
+
+<p>In any case, I still plan to write about performance-related microarchitectural details. I just hope this outcome does not repeat itself.</p>
+
+<h3 id="thanks">Thanks</h3>
+
+<p>Thanks to JN, Chris Martin, Jonathan and m_ueberall for reporting or fixing typos in the text.</p>
+
+<p>Stone photo by <a href="https://unsplash.com/@imagefactory">Colin Watts</a> on Unsplash.</p>
+
+<h3 id="discussion-and-feedback">Discussion and Feedback</h3>
+
+<p>You can join the discussion on <a href="https://twitter.com/trav_downs/status/1407110595761950720">Twitter</a>, <a href="https://news.ycombinator.com/item?id=27588258">Hacker News</a> or <a href="https://www.reddit.com/r/intel/comments/o5b9gg/your_intel_cpu_may_have_slowed_down_on_wednesday/">r/Intel</a>.</p>
+
+<p>If you have a question or any type of feedback, you can leave a <a href="#comment-section">comment below</a>.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:stdfill" role="doc-endnote">
+
+      <p>Specifically, it uses <a href="https://en.cppreference.com/w/cpp/algorithm/fill"><code class="language-plaintext highlighter-rouge">std::fill</code></a> with a zero argument, with some inlining prevention, which ultimately results in a fill which uses a series of 32-byte vector loads and stores to store 256 bytes per unrolled iteration, with a loop body like this:</p>
+      <div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="p">],</span><span class="nv">ymm1</span>
+<span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="o">+</span><span class="mh">0x20</span><span class="p">],</span><span class="nv">ymm1</span>
+<span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="o">+</span><span class="mh">0x40</span><span class="p">],</span><span class="nv">ymm1</span>
+<span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="o">+</span><span class="mh">0x60</span><span class="p">],</span><span class="nv">ymm1</span>
+<span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="o">+</span><span class="mh">0x80</span><span class="p">],</span><span class="nv">ymm1</span>
+<span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="o">+</span><span class="mh">0xa0</span><span class="p">],</span><span class="nv">ymm1</span>
+<span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="o">+</span><span class="mh">0xc0</span><span class="p">],</span><span class="nv">ymm1</span>
+<span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="o">+</span><span class="mh">0xe0</span><span class="p">],</span><span class="nv">ymm1</span>
+</code></pre></div>      </div>
+      <p>So the compiler does a good job: you can’t ask for much better than that. <a href="#fnref:stdfill" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:whitelie" role="doc-endnote">
+      <p>I’m doing a bit of a retcon here. The effect is present as described on the gates given, and I observed and benchmarked it on Wednesday myself, but the specific data series used for the plots were generated a week later when I had time to collect the data properly in a relatively noise free environment. So the two series were collected back-to-back on the same day, varying only the hidden parameter you’ll learn about two paragraphs from now. <a href="#fnref:whitelie" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:reboot" role="doc-endnote">
+      <p>To be clear, the <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> is not persistent, so it needs to be loaded on <em>every</em> boot. If you remove or downgrade the <code class="language-plaintext highlighter-rouge">intel-microcode</code> package, you’ll be back to an older <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> after the next boot. That is, unless you also update your BIOS which can <em>also</em> come with a <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> update: this will be persistent unless you downgrade your BIOS. <a href="#fnref:reboot" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:versions" role="doc-endnote">
+      <p>The new June 8th <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> versions are <code class="language-plaintext highlighter-rouge">0xea</code> for Skylake (versus <code class="language-plaintext highlighter-rouge">0xe2</code> previously) and <code class="language-plaintext highlighter-rouge">0xa6</code> for Ice Lake (versus <code class="language-plaintext highlighter-rouge">0xa0</code> previously). <a href="#fnref:versions" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:barely" role="doc-endnote">
+      <p><em>barely</em> <a href="#fnref:barely" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:impact" role="doc-endnote">
+      <p>The performance regression shown in the plots is close to a worst case: the benchmark only fills zeros and nothing else. Real code doesn’t spend <em>that much</em> time filling zeros, although zero <em>is</em> no doubt the dominant value in large block fills, at least because the OS must zero pages before returning them to user processes and memory-safe languages like Java will zero some objects and array types in bulk. <a href="#fnref:impact" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:power" role="doc-endnote">
+      <p>This observation becomes almost universal once you consider that the <em>values</em> involved in any operation affect power use (see e.g. <a href="https://arxiv.org/pdf/1905.12468.pdf">Schöne et al</a> or <a href="https://hal.inria.fr/hal-02401760/document">Cornebize and Legrand</a>). Since power use can be directly (e.g., RAPL or external measurements) or indirectly (e.g., because of heat-dependent frequency changes) observed, it means that in theory <em>any</em> operation, even those widely considered to be constant-time, may leak information. <a href="#fnref:power" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-d7182ce0-d55e-11eb-b4ca-af5dfef9ac70" class="js-comment comment" uid="d7182ce0-d55e-11eb-b4ca-af5dfef9ac70">
+
+  <div class="comment__author">
+    anon
+    <span class="comment__date">•
+        <a href="#comment-d7182ce0-d55e-11eb-b4ca-af5dfef9ac70" title="Permalink to this comment">June 25th, 2021 02:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>The feature is both a power and a performance optimisation.  It takes effect when you write zero to an already-zeroed cache line.  In addition to the page scrubbing case given, consider also a program stack with blocks of local variables initialised to zero.</p>
+
+<p>The performance optimisation comes from reduced cache coherency overhead - the cache line doesn’t have to move out of the shared state if it doesn’t logically become modified.  The power optimisation comes from reduced DIMM traffic, and reducing DIMM traffic is a very big deal for devices running on battery.</p>
+
+<p>The problem is that it introduces data-dependent timing differences, and undermines a critical security property of hardened crypto libraries, which are designed to have timing which is invariant to the key, cypher and plaintext that they’re processing.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d7182ce0-d55e-11eb-b4ca-af5dfef9ac70', 'respond', 'rip-zero-opt', 'd7182ce0-d55e-11eb-b4ca-af5dfef9ac70')">↪&#xFE0E; Reply to anon</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-f34f24d0-d429-11eb-8cd7-c3e13a62ea8f" class="js-comment comment" uid="f34f24d0-d429-11eb-8cd7-c3e13a62ea8f">
+
+  <div class="comment__author">
+    m_ueberall
+    <span class="comment__date">•
+        <a href="#comment-f34f24d0-d429-11eb-8cd7-c3e13a62ea8f" title="Permalink to this comment">June 23th, 2021 13:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I’m sorry, but could someone point me to the calendar/point in time (read: year) where/when June 7th fell on a Tuesday? I’m confused.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f34f24d0-d429-11eb-8cd7-c3e13a62ea8f', 'respond', 'rip-zero-opt', 'f34f24d0-d429-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to m_ueberall</a>
+    </div>
+</article>
+  
+
+<article id="comment-753d82d0-d45b-11eb-a781-93a616abab19" class="js-comment comment admin child" uid="753d82d0-d45b-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-753d82d0-d45b-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 19:44</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Sorry, classic off-by-one on my part.</p>
+
+<p>The CVE was made public and the microcode was released by Intel on Tuesday the <em>8th</em>, but Ubuntu didn’t release the updated microcode package it until the next day, the 9th. So the 7th is the “last definitely fast day” and the 8th is ambiguous depending on how you get your microcode (and when you reboot). I’ve changed the comparison days to the 7th and 9th and fixed the text, and credited you.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-75864ba0-d45b-11eb-a781-93a616abab19" class="js-comment comment child" uid="75864ba0-d45b-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+    Gwyneth Llewelyn
+    <span class="comment__date">•
+        <a href="#comment-75864ba0-d45b-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 19:44</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I’m also <em>very</em> confused. There <em>was</em> an Intel microcode patch last released in 2021-06-09 at 04:23 (whatever time zone that is). On my calendar, that’s Wednesday — not the 8th nor the 7th. The last year when June 7th fell on a Tuesday was in 2016; the next year will be in 2022 (source: https://www.timeanddate.com/calendar/weekday-tuesday-7)</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-63f4d730-d429-11eb-8cd7-c3e13a62ea8f" class="js-comment comment" uid="63f4d730-d429-11eb-8cd7-c3e13a62ea8f">
+
+  <div class="comment__author">
+    FreddyFrobnicator
+    <span class="comment__date">•
+        <a href="#comment-63f4d730-d429-11eb-8cd7-c3e13a62ea8f" title="Permalink to this comment">June 23th, 2021 13:46</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>at the system level, zero fill might occur more than you expect. ex: https://stackoverflow.com/questions/18385556/does-windows-clear-memory-pages</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-63f4d730-d429-11eb-8cd7-c3e13a62ea8f', 'respond', 'rip-zero-opt', '63f4d730-d429-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to FreddyFrobnicator</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-10d61250-d427-11eb-8cd7-c3e13a62ea8f" class="js-comment comment" uid="10d61250-d427-11eb-8cd7-c3e13a62ea8f">
+
+  <div class="comment__author">
+    Jonathan
+    <span class="comment__date">•
+        <a href="#comment-10d61250-d427-11eb-8cd7-c3e13a62ea8f" title="Permalink to this comment">June 23th, 2021 13:29</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Wednesday June 8th? Not in the UK</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-10d61250-d427-11eb-8cd7-c3e13a62ea8f', 'respond', 'rip-zero-opt', '10d61250-d427-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to Jonathan</a>
+    </div>
+</article>
+  
+
+<article id="comment-5293f090-d463-11eb-a781-93a616abab19" class="js-comment comment admin child" uid="5293f090-d463-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-5293f090-d463-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 20:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes, my bad, it should be the 9th for Ubuntu users. <em>Tuesday</em> June 8th is when the microcode was released by Intel. See also my longer <a href="#comment-753d82d0-d45b-11eb-a781-93a616abab19">reply to m_ueberall</a>.</p>
+
+<p>I’ve fixed the text and credited you.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-da0ea060-d378-11eb-a28b-2b17081581e0" class="js-comment comment" uid="da0ea060-d378-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    Nick O
+    <span class="comment__date">•
+        <a href="#comment-da0ea060-d378-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 16:42</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I’m a little confused why this has <em>security</em> implications.</p>
+
+<p>If you can write to a piece of memory, in what situation would you not be allowed to read that memory too? If you can read the memory, why does it matter if you can use a timing side-channel to observe whether the data is all zero?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-da0ea060-d378-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', 'da0ea060-d378-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Nick O</a>
+    </div>
+</article>
+  
+
+<article id="comment-01901510-d464-11eb-a781-93a616abab19" class="js-comment comment admin child" uid="01901510-d464-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-01901510-d464-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 20:45</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>The concern isn’t an attacker that can read and write to the memory, but one that can’t.</p>
+
+<p>E.g., another process on the same machine could possible observe whether a cache line it cannot access is zero or not if it manages to evict it from cache and observe the timing. Or an attacker that doesn’t have access to the machine could time operations from the outside to determine if zero cache lines were involved. These are so-called “timing side channel attacks”.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-33e761f0-d36d-11eb-a28b-2b17081581e0" class="js-comment comment" uid="33e761f0-d36d-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    JN
+    <span class="comment__date">•
+        <a href="#comment-33e761f0-d36d-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 15:19</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>This phrase - which is a rather crucial one, and one that, anyway, is somewhat hard to understand - is missing a word: ‘it does seem that the proximate cause this change to the microcode was my earlier post’ (<em>sic</em>).</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-33e761f0-d36d-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '33e761f0-d36d-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to JN</a>
+    </div>
+</article>
+  
+
+<article id="comment-8b70f6d0-d376-11eb-a28b-2b17081581e0" class="js-comment comment admin child" uid="8b70f6d0-d376-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-8b70f6d0-d376-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 16:26</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks, JN, I’ve reworded this and fixed the typo.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-1de6da20-d368-11eb-a28b-2b17081581e0" class="js-comment comment" uid="1de6da20-d368-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    Cap'n O.
+    <span class="comment__date">•
+        <a href="#comment-1de6da20-d368-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 14:42</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>The solutions is “ghost parity.” For every bit-store in the CPU, create a parallel bit-store that always contains the complement bits. Thus parity is preserved.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1de6da20-d368-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '1de6da20-d368-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Cap'n O.</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-3073d720-d34e-11eb-a28b-2b17081581e0" class="js-comment comment" uid="3073d720-d34e-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    Dave O
+    <span class="comment__date">•
+        <a href="#comment-3073d720-d34e-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 11:37</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>CMOS behaves like that, but not all logic families do. ECL-based computers like the early Cray machines looked to the PSU like a giant resistor. It’s not a terribly likely direction of travel for modern computing, though.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3073d720-d34e-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '3073d720-d34e-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Dave O</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-5879dea0-d348-11eb-a28b-2b17081581e0" class="js-comment comment" uid="5879dea0-d348-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    Heretical blacksheep
+    <span class="comment__date">•
+        <a href="#comment-5879dea0-d348-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 10:55</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I think the only place this will end is where the Burroughs engineers were trying to tell the shared hardware advocates in the late 60s.  The only secure (running) hardware is hardware that never shares resources between processes.  Back then the argument was cost.  RAM and CPU time was prohibitively expensive.   Cost won over security only because all users on any particular system could be trusted and inter system networking didn’t exist as now. Now the shared resource model is breaking down in the face of an entire world of potentially hostile users aimed at any particular machine. It’s not sustainable.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5879dea0-d348-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '5879dea0-d348-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Heretical blacksheep</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-242c52a0-d324-11eb-a28b-2b17081581e0" class="js-comment comment" uid="242c52a0-d324-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    Freyaday
+    <span class="comment__date">•
+        <a href="#comment-242c52a0-d324-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 06:36</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>My (shaky) understanding is that, since modern computation is destructive and nonreversible and information is conserved, overwritten values are leaked as heat. I wonder if reversible computing would, by its inherent nature, shut a whole bunch of side channels off…</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-242c52a0-d324-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '242c52a0-d324-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Freyaday</a>
+    </div>
+</article>
+  
+
+<article id="comment-de0602d0-d337-11eb-a28b-2b17081581e0" class="js-comment comment child" uid="de0602d0-d337-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    pepe
+    <span class="comment__date">•
+        <a href="#comment-de0602d0-d337-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 08:57</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Even with reversible computing, most reasonable uses (e.g. perform irreversible computations) end up converting ancilla zero bits into “garbage”. This garbage is what gives the logical reversibility, and thus it will contain the necessary information to recompute the input. Now, you either clone output &amp; uncompute the garbage (to get zeroes again), with a huge performance overhead, or you destroy the garbage, which again dissipates/leaks the information. At least that’s the theory…</p>
+
+<p>In any case, I would also love to see research on the intersection of security &amp; reversible computing. To me any exciting future must involve NVRAM + error correction + reversible computing.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-021de260-d341-11eb-a28b-2b17081581e0" class="js-comment comment child" uid="021de260-d341-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    pepe
+    <span class="comment__date">•
+        <a href="#comment-021de260-d341-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 10:02</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>For most SCA the issue still is secret-dependent control flow and data accesses, reversibility does not prevent any of that. In fact it arguably makes them worse, if everything is an isomorphism, any given leak will contain more information?</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-76104230-d355-11eb-a28b-2b17081581e0" class="js-comment comment child" uid="76104230-d355-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    yabbadabba
+    <span class="comment__date">•
+        <a href="#comment-76104230-d355-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 12:29</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>from a closed systme heat cannot escape. if a vpu is a closed system, entropy would not change, therefore no new info would.be generated.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="rip-zero-opt">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2021/06/17/rip-zero-opt.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Performance Matters</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li><li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/travisdowns"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">travisdowns</span></a></li><li><a href="https://www.twitter.com/trav_downs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">trav_downs</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
