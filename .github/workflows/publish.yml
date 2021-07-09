@@ -1,13 +1,30 @@
 name: Publish Site
 on:
   push:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
   jekyll:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+
+    # we need to set --config based on the repository, i.e., the 
+    # test repository needs to additionally include the _config-test.yml
+    # which sets the baseurl appropriately
+    # the cleanest way I can find to do this is to conditionally set an
+    # env var which is used in the publish task below
+    - name: set vars
+      run: |
+        if [[ "$GITHUB_REPOSITORY" == */blog-test ]]; then
+          echo "Using testing config"
+          echo "EXTRA_BUILD_ARGS=--config _config.yml,_config-test.yml" >> $GITHUB_ENV
+        fi
+
+    - name: echo vars
+      run: |
+        echo "EBA=$EXTRA_BUILD_ARGS"
+        echo "EBA=${{ env.EXTRA_BUILD_ARGS }}"
 
     # Use GitHub Actions' cache to shorten build times and decrease load on servers
     - uses: actions/cache@v2
@@ -22,3 +39,4 @@ jobs:
       with:
         target_branch: gh-pages
         token: ${{ secrets.GITHUB_TOKEN }}
+        jekyll_build_options: ${{ env.EXTRA_BUILD_ARGS }}
