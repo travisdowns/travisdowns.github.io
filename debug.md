@@ -19,6 +19,21 @@ relative foo: {{ '/foo' | relative_url }}
 [self link]({{ 'debug.html' | relative_url}})
 
 <style>
+
+.color-check:after   { content: 'unset'; }
+
+@media (prefers-color-scheme: dark) {
+  .color-check:after   { content: 'dark mode'; }
+}
+
+@media (prefers-color-scheme: light) {
+  .color-check:after   { content: 'light mode'; }
+}
+</style>
+
+<p class="color-check">prefers-color-scheme: </p>
+
+<style>
 #props span, .mono {
     font-family: monospace;
     white-space: pre;
