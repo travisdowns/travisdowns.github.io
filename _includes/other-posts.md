@@ -2,5 +2,3 @@
 
 If you liked this post, check out the [homepage]({{ '/' | relative_url }}) for others you might enjoy.
 {: .info}
-
-[^noenjoy]: On the other hand, if you didn't enjoy it, I have to wonder how you made it this far! Maybe you started off liking it, then felt invested and compelled to finish it? Beware the sunk cost fallacy!
