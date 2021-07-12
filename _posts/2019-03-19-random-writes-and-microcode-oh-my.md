@@ -71,7 +71,7 @@ So far, so good and nothing too weird. However, starting now, it _is_ about to g
 
 Everything above is a reduced version of a benchmark I was using to test some *real code*[^1], about a year ago. This code had a tight loop with a table lookup and then writes to two different arrays. When I benchmarked this code, performance was usually consistent with the performance of "interleaved" benchmark plotted above.
 
-Recently, I returned to the benchmark to check the performance on newer CPU architectures. First, I went back to check the results on the original hardware (the [Skylake i7-6700HQ](https://ark.intel.com/products/88967) in my laptop). I failed to reproduce it -- I wasn't able to achieve the same performance, with the same test and on the same hardware as before: it was always running significantly slower (about half the original speed).
+Recently, I returned to the benchmark to check the performance on newer CPU architectures. First, I went back to check the results on the original hardware (the [Skylake i7-6700HQ](https://ark.intel.com/content/www/us/en/ark/products/88967/intel-core-i7-6700hq-processor-6m-cache-up-to-3-50-ghz.html) in my laptop). I failed to reproduce it -- I wasn't able to achieve the same performance, with the same test and on the same hardware as before: it was always running significantly slower (about half the original speed).
 
 With some help from user Adrian on the [RWT forums](https://www.realworldtech.com/forum/?roomid=1) I was able to bisect the difference down to a CPU microcode update. In particular, with newest microcode version [^7], `0xc6` the interleaved stores scenario runs _much_ slower. For example, the same benchmark as above now looks like this, every time you run it:
 
