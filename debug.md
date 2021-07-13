@@ -18,8 +18,13 @@ relative foo: {{ '/foo' | relative_url }}
 [bad link]({{ 'notexist.html' | relative_url}})  
 [self link]({{ 'debug.html' | relative_url}})
 
-<style>
+| Property | Value |
+| -----------------|
+| site.markdown  | {{ site.markdown }} |
+| site.kramdown  | `{{ site.kramdown }}` |
 
+
+<style>
 .color-check:after   { content: 'unset'; }
 
 @media (prefers-color-scheme: dark) {
