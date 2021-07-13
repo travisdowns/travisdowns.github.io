@@ -35,6 +35,10 @@ twitter:
 
 # global settings
 markdown: kramdown
+kramdown:
+  show_warnings: true
+
+
 theme: minima
 plugins:
   - jekyll-feed
