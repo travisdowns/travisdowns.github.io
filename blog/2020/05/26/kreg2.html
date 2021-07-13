@@ -174,9 +174,9 @@ tablepath: /misc/tables/kreg2
   <p>Finally, we ensure that each filler instruction consumes exactly one of the resource we are interested in, so that the location of the spike indicates the size of the underlying resource. For example, regular <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> instructions usually consume one physical register from the <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> so are a good choice to measure the size of that resource.</p>
 </blockquote>
 
-<p>The trick we use to see if two register files are shared is first to use a test the size of each register file alone, using a test that uses filler that targets only that register file, then to run a third test whose filler <em>alternates</em> between instructions that use each register file. If the register files are shared, we expect all tests to produce the same results, since they are all drawing from the same pool. If the register files are not shared, the third (alternating) test should result in a much higher apparent resource limit, since two different pools are being drawn from and so it will take twice as many filler instructions to hit the RF limit.</p>
+<p>The trick we use to see if two register files are shared is first to use a test the size of each register file alone, using a test that uses filler that targets only that register file, then to run a third test whose filler <em>alternates</em> between instructions that use each register file. If the register files are shared, we expect all tests to produce the same results, since they are all drawing from the same pool. If the register files are not shared, the third (alternating) test should result in a much higher apparent resource limit, since two different pools are being drawn from and so it will take twice as many<sup id="fnref:roblimit" role="doc-noteref"><a href="#fn:roblimit" class="footnote" rel="footnote">9</a></sup> filler instructions to hit the RF limit.</p>
 
-<p>Enough talk, let’s do this. I implemented several new tests in robsize to probe possible register sharing. First, we look at <strong>Test 38</strong>, which uses MMX instructions<sup id="fnref:whymmx" role="doc-noteref"><a href="#fn:whymmx" class="footnote" rel="footnote">9</a></sup> to target the size of the x87/MMX register file:</p>
+<p>Enough talk, let’s do this. I implemented several new tests in robsize to probe possible register sharing. First, we look at <strong>Test 38</strong>, which uses MMX instructions<sup id="fnref:whymmx" role="doc-noteref"><a href="#fn:whymmx" class="footnote" rel="footnote">10</a></sup> to target the size of the x87/MMX register file:</p>
 
 <div class="svg-fig">
     <a href="#skx-38" id="skx-38">[link to this chart]</a> 
@@ -188,7 +188,7 @@ tablepath: /misc/tables/kreg2
     </a>
 </div>
 
-<p>We see a clear spike at 128 instructions, so it seems like the size of the speculative<sup id="fnref:spec" role="doc-noteref"><a href="#fn:spec" class="footnote" rel="footnote">10</a></sup> x87/MMX register file is 128 entries.</p>
+<p>We see a clear spike at 128 instructions, so it seems like the size of the speculative<sup id="fnref:spec" role="doc-noteref"><a href="#fn:spec" class="footnote" rel="footnote">11</a></sup> x87/MMX register file is 128 entries.</p>
 
 <p>Next, we have <strong>Test 43</strong> which follows the same pattern as <strong>Test 38</strong> but using <code class="language-plaintext highlighter-rouge">kaddd</code> as a filler instruction so targets the mask (kreg) register file:</p>
 
@@ -228,7 +228,7 @@ tablepath: /misc/tables/kreg2
 
 <p>Both of these show the same effect: the effective resource limitation is much higher: around 210 filler instructions. This indicates strongly that the x87/MMX register is not shared with either the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> or scalar register files.</p>
 
-<p>Finally, we get to the end of this tale, <strong>Test 41</strong>. This test mixes MMX and mask register instructions<sup id="fnref:test41" role="doc-noteref"><a href="#fn:test41" class="footnote" rel="footnote">11</a></sup>:</p>
+<p>Finally, we get to the end of this tale, <strong>Test 41</strong>. This test mixes MMX and mask register instructions<sup id="fnref:test41" role="doc-noteref"><a href="#fn:test41" class="footnote" rel="footnote">12</a></sup>:</p>
 
 <div class="svg-fig">
     <a href="#skx-41" id="skx-41">[link to this chart]</a> 
@@ -305,6 +305,9 @@ tablepath: /misc/tables/kreg2
     </li>
     <li id="fn:aliasing" role="doc-endnote">
       <p>I talk of <em>physical</em> aliasing here, to distinguish it from the logical/architectural aliasing. Logical aliasing is that which is visible to software: the <code class="language-plaintext highlighter-rouge">ymm</code> and <code class="language-plaintext highlighter-rouge">xmm</code> registers are logically aliased in that writes to <code class="language-plaintext highlighter-rouge">xmm0</code> show up in the low bits of <code class="language-plaintext highlighter-rouge">ymm0</code>. Similarly, the MMX and x87 register files are aliased in that writes to MMX register modify values in the FP register stack, although the rules are more complicated. Logical aliasing usually implies physical aliasing, but not the other way around. Physical aliasing, then, means that two register sets are renamed onto the same pool of physical registers, but this is usually invisible to software (except though careful performance tests, as we do here). <a href="#fnref:aliasing" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:roblimit" role="doc-endnote">
+      <p>In practice, you don’t actually get all the way to 2x: you hit something close to the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> limit instead first. <a href="#fnref:roblimit" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
     </li>
     <li id="fn:whymmx" role="doc-endnote">
       <p>I use MMX rather than x87 so I don’t have to deal with the x87 FP stack abstraction and understand how that maps to renaming. <a href="#fnref:whymmx" class="reversefootnote" role="doc-backlink">&#8617;</a></p>

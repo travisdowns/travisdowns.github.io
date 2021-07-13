@@ -694,7 +694,7 @@ A more resource friendly design, and one that will often perform better is a <em
     
 </div>
 
-<p>You’re probably seeing the pattern now: performance is again a new level of terrible compared to the previous contenders. About an order of magnitude slower than the yielding approach, which was already slower than the earlier approaches, which are now just slivers a few pixels high on the plots. The queued version of the lock does slightly better at increasing thread counts (<em>especially</em> on Graviton [2]), as might be expected from the lack of the thundering herd effect, but is still very slow because the primary problem isn’t thundering herd, but rather a <a href="https://en.wikipedia.org/wiki/Lock_convoy"><em>lock convoy</em></a>.</p>
+<p>You’re probably seeing the pattern now: performance is again a new level of terrible compared to the previous contenders. About an order of magnitude slower than the yielding approach, which was already slower than the earlier approaches, which are now just slivers a few pixels high on the plots. The queued version of the lock does slightly better at increasing thread counts (<em>especially</em> on Graviton 2), as might be expected from the lack of the thundering herd effect, but is still very slow because the primary problem isn’t thundering herd, but rather a <a href="https://en.wikipedia.org/wiki/Lock_convoy"><em>lock convoy</em></a>.</p>
 
 <p class="info"><strong>Lock Convoy</strong><br />
 <br />

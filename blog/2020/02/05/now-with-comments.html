@@ -1027,13 +1027,13 @@ Ryan</p>
 
 <p>{% if site.data.comments.recipes[urlfilename] %}</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        {% if site.data.comments.recipes[urlfilename].size &gt; 1 %}
-          {{ site.data.comments.recipes[urlfilename] | size }}
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        {% if site.data.comments.recipes\[urlfilename\].size &gt; 1 %}
+          {{ site.data.comments.recipes\[urlfilename\] | size }}
         {% endif %}
         Comments test 1
       
-       {{ site.data.comments.recipes[urlfilename] }} 
-{% assign comments = site.data.comments.recipes[urlfilename] | sort | where_exp: 'entry', 'comment[1].replying_to_uid == blank' %}
+       {{ site.data.comments.recipes\[urlfilename\] }} 
+{% assign comments = site.data.comments.recipes\[urlfilename\] | sort | where_exp: 'entry', 'comment[1].replying_to_uid == blank' %}
 {% for comment in comments %}
   comment test 2
   {% assign index       = forloop.index %}
@@ -3467,7 +3467,7 @@ You can find my new blog at https://flamaros.github.io/.</p>
 
   <div class="comment__body">
     <p>First of all, thanks for the very details post!
-I want to mention my experience which went against footnote 8: I initially accepted the invitation from the bot account via the Github linked but kept invitation not found when trying to connect it. Then i came across [this][https://www.flyinggrizzly.io/2017/12/setting-up-staticman-server/] which says I should not accept it so after I tried removed the bot as a collaborator and tried to connect again it worked</p>
+I want to mention my experience which went against footnote 8: I initially accepted the invitation from the bot account via the Github linked but kept invitation not found when trying to connect it. Then i came across <a href="https://www.flyinggrizzly.io/2017/12/setting-up-staticman-server/">this</a> which says I should not accept it so after I tried removed the bot as a collaborator and tried to connect again it worked</p>
 
 <p>Once again thanks</p>
 
