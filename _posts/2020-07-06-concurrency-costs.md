@@ -249,7 +249,7 @@ Here's how our new locks perform against the existing crowd:
 {% include carousel-svg-fig-2.html file="more-fair" alt="Increment Cost: Fair Blocking"
 suffixes=uarches names=unames raw=uresults %}
 
-You're probably seeing the pattern now: performance is again a new level of terrible compared to the previous contenders. About an order of magnitude slower than the yielding approach, which was already slower than the earlier approaches, which are now just slivers a few pixels high on the plots. The queued version of the lock does slightly better at increasing thread counts (_especially_ on Graviton [2]), as might be expected from the lack of the thundering herd effect, but is still very slow because the primary problem isn't thundering herd, but rather a [_lock convoy_](https://en.wikipedia.org/wiki/Lock_convoy).
+You're probably seeing the pattern now: performance is again a new level of terrible compared to the previous contenders. About an order of magnitude slower than the yielding approach, which was already slower than the earlier approaches, which are now just slivers a few pixels high on the plots. The queued version of the lock does slightly better at increasing thread counts (_especially_ on Graviton 2), as might be expected from the lack of the thundering herd effect, but is still very slow because the primary problem isn't thundering herd, but rather a [_lock convoy_](https://en.wikipedia.org/wiki/Lock_convoy).
 
 
 **Lock Convoy**\\
@@ -668,8 +668,6 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 ---
 <br>
 
-{% include glossary.md %}
-
 [^hiddenbatch]: An interesting design point is a data type that implements batching internally behind an API offering single-element operations. For example, a queue might decide that added elements won't be immediately consumed (because there are already some elements in the queue), and hold them in a local staging area until several can be added as a batch, or until their absence would be noticed.
 
 [^realworld]: Well, this is quite real world: such atomic counters are used widely for a variety of purposes. I throw the _if you squint_ in there because, after all, we are using microbenchmarks which simulate a probably-unrealistic density of increments to this counter, and it is a _bit_ of a stretch to make this one example span all five levels -- but I tried!
@@ -711,8 +709,6 @@ You can leave a [comment below](#comment-section) or discuss on [Hacker News](ht
 [^notexx]: This won't always _necessarily_ be the case. You could write a primitive that always makes a system call, putting it at level 3, even if there is no contention, but here I've made sure to always have a no-syscall fast path for the no-contention case.
 
 [^perf]: In fact, you can measure this with `perf` and see that the total number of context switches is usually within a factor of 2 for both tests, when oversubscribed.
-
-[^fastest]: That's for six threads, where the atomic add runs in about 100 ns and this lock takes more than 8,000,000 ns (more than 8 milliseconds).
 
 [^once]: In fact, the _once_ scenario is the most likely, since one would assume with homogeneous threads the scheduler will approximate something like round-robin scheduling. So the thread that is descheduled is most likely the one that is also closest to the head of the lock queue, because it had been spinning the longest.
 

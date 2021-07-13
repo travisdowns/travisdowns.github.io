@@ -342,8 +342,6 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 ---
 <br>
 
-{% include glossary.md %}
-
 [^RAM]: We didn't take a close look at the effect in RAM but it persists, albeit at a lower magnitude. 256-bit zero-over-zero writes are about 10% faster than 512-bit writes of the same type.
 
 [^lied]: Well I lied. I at least have some ideas. It may be that the CPU power budget is dynamically partitioned between the core and uncore, and with 512-bit stores triggering the AVX-512 power budget, there is less power for the uncore and it runs at a lower frequency (that could be checked). This seems unlikely given that it should not obviously affect the elimination chance.

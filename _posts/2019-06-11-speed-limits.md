@@ -1120,7 +1120,7 @@ Thanks to Daniel Lemire for providing access to hardware on which I was able to 
 
 You can leave any comments or questions using the form below.
 
-This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hacker News.
+This post was [discussed](https://news.ycombinator.com/item?id=20157196) on Hacker News.
 
 {% include other-posts.md %}
 
@@ -1129,8 +1129,6 @@ This post was [discussed]](https://news.ycombinator.com/item?id=20157196) on Hac
 <br>
 
 [^fused-domain]: The distinction between fused domain and unfused domain uops applies to instructions with a memory source or destination. For example, an instruction like `add eax, [rsp]` means "add the value pointed to by `rsp` to register `eax`. During execution, two separate micro-operations are created: one for the load and for the `add` instruction, this is the so-called *unfused domain*. However, prior to execution, the uops are kept together and only count as one against the pipeline width limit, this is the so called *fused domain*. Good list of instruction characteristics like [Agner Fog's instruction tables](https://www.agner.org/optimize/#manual_instr_tab) list both values. AMD macro-operations are largely similar to Intel fused-domain ops.
-
-[^ICL]: Reported to be increased to 5 on just-released-but-not-yet-tested Sunny Cove chips.
 
 [^sum-halves]: You can this benchmark from [uarch-bench](https://github.com/travisdowns/uarch-bench):  `./uarch-bench.sh --test-name=cpp/sum-halves`
 

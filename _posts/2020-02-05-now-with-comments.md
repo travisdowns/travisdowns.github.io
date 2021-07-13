@@ -14,7 +14,7 @@ excerpt: Adding static comments to a static blog using staticman. Static.
 
 I've added comments to my blog. You can find the existing comments, if any, and the new comment form [at the bottom](#comment-section) of any post.
 
-I thought this would take a couple hours, but it actually took **[REDACTED]**. Estimates are hard.
+I thought this would take a couple hours, but it actually took **\[REDACTED\]**. Estimates are hard.
 
 Here's what I did.
 

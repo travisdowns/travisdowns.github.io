@@ -1,7 +1,7 @@
 _id: db15e530-70dd-11ea-9d39-f3a030b7010f
 _parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
 replying_to_uid: c05fc5d0-702e-11ea-9327-49e12d1c73f0
-message: "I have an issue with the display of comments, I tried to post a comment and I have it on in the _data/comments/{$my_post_file_name}/ folder but it doesn't appear.\r\nIt seems that the test site.data.comments[page.slug] in comments.html failed. May I miss something in the configuration file or maybe because I have the '+' character in the filename of the blog post?\r\n\r\nThank you."
+message: "I have an issue with the display of comments, I tried to post a comment and I have it on in the _data/comments/{$my_post_file_name}/ folder but it doesn't appear.\r\nIt seems that the test site.data.comments\\[page.slug\\] in comments.html failed. May I miss something in the configuration file or maybe because I have the '+' character in the filename of the blog post?\r\n\r\nThank you."
 name: Xavier
 email: ad311b96c529c2c3b7446ec96a456ccf
 hp: ''

@@ -361,8 +361,6 @@ Direct feedback also welcomed by [email](mailto:travis.downs@gmail.com) or as [a
 
 [^tput]: I'm not going to fully analyze the throughput case, but the thorough among us can find the chart is [here]({% link {{page.assets}}/fig-ipc-zoomed-zmm-tput.svg %}). Note that the overhead here cuts the other way: pushing the IPC below the expected value of 2.0 (there are 2 512-bit vector units capable of executing `vpord`) because here the throughput limited instructions compete for ports with the overhead instructions.
 
-[^eightus]: For example, if we reduce the sample resolution to a period of 8 μs from 1 μs, we get [these results]({% link {{page.assets}}/fig-ipc-zoomed-zmm-10us.svg %}) showing an IPC of almost exactly 1.00.
-
 [^orisit]: Of course, another possibility is that something in the rest of the test loop uses `xmm` registers so they remain "hot": they are "baseline" for x86-64 after all, so the compiler is free to use them without any special flags. We could test this theory with a more compact test loop audited to be free of any `xmm` use... but I'm not going to bother. I'm pretty sure these guys are powered up all the time as their use is pervasive in most x86-64 code.
 
 [^upper]: Specifically, the the part handing the second (bits 128:255) for the `ymm` case, and the upper 3 lanes (bits 128:511) in the `zmm` case.

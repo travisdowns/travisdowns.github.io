@@ -1,7 +1,7 @@
 _id: bec58400-8288-11ea-9c16-35d3f6bde252
 _parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
 replying_to_uid: ''
-message: "I'm unclear on the proper webhook address when I deploy Staticman at Heroku.\r\n\r\nFor the public instance the webhook was https://api.staticman.net/v1/webhook\r\n\r\nFor my instance I'm guessing https://spinningnumbers-staticmandev2.herokuapp.com/v1/webhook/, but I'm getting a 404 not found error.\r\n\r\nWhile moving to Heroku I deleted the public staticman collaborator and only have my robot as a collaborator.\r\n\r\n2020-04-18T22:56:56.155851+00:00 heroku[router]: at=info method=POST path=\"/v1/webhook/\" host=spinningnumbers-staticmandev2.herokuapp.com request_id=a8552a56-4182-415d-ba95-5cae432a7f07 fwd=\"140.82.115.241\" dyno=web.1 connect=0ms service=6ms **status=404** bytes=505 protocol=https"
+message: "I'm unclear on the proper webhook address when I deploy Staticman at Heroku.\r\n\r\nFor the public instance the webhook was https://api.staticman.net/v1/webhook\r\n\r\nFor my instance I'm guessing https://spinningnumbers-staticmandev2.herokuapp.com/v1/webhook/, but I'm getting a 404 not found error.\r\n\r\nWhile moving to Heroku I deleted the public staticman collaborator and only have my robot as a collaborator.\r\n\r\n2020-04-18T22:56:56.155851+00:00 heroku\\[router\\]: at=info method=POST path=\"/v1/webhook/\" host=spinningnumbers-staticmandev2.herokuapp.com request_id=a8552a56-4182-415d-ba95-5cae432a7f07 fwd=\"140.82.115.241\" dyno=web.1 connect=0ms service=6ms **status=404** bytes=505 protocol=https"
 name: Willy McAllister
 email: 72f6ffec6e34ab5d69f3811272b5ae97
 hp: ''

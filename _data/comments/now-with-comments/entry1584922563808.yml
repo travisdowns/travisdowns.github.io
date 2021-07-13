@@ -2,7 +2,7 @@ _id: 7b707640-6c9b-11ea-9683-37803f7596d9
 _parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
 replying_to: ''
 replying_to_uid: ''
-message: "First of all, thanks for the very details post!\r\nI want to mention my experience which went against footnote 8: I initially accepted the invitation from the bot account via the Github linked but kept invitation not found when trying to connect it. Then i came across [this][https://www.flyinggrizzly.io/2017/12/setting-up-staticman-server/] which says I should not accept it so after I tried removed the bot as a collaborator and tried to connect again it worked\r\n\r\nOnce again thanks"
+message: "First of all, thanks for the very details post!\r\nI want to mention my experience which went against footnote 8: I initially accepted the invitation from the bot account via the Github linked but kept invitation not found when trying to connect it. Then i came across [this](https://www.flyinggrizzly.io/2017/12/setting-up-staticman-server/) which says I should not accept it so after I tried removed the bot as a collaborator and tried to connect again it worked\r\n\r\nOnce again thanks"
 name: nazaal
 email: ''
 hp: ''

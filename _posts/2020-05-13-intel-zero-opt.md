@@ -362,5 +362,3 @@ Feedback is also warmly welcomed by [email](mailto:travis.downs@gmail.com) or as
 
 ---
 <br>
-
-{% include glossary.md %}
