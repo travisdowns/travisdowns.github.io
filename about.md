@@ -12,8 +12,9 @@ A blog about software performance.
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "url": "{{ site.url }}",
-      "logo": "{{ site.logo | absolute_url }}"
+      "logo": "{{ site.logo | absolute_url }}",
+      "name": "Performance Matters",
+      "url": "{{ site.url }}"
     }
 </script>
 
