@@ -38,6 +38,7 @@ jobs:
       uses:  helaili/jekyll-action@2.2.0
       with:
         target_branch: gh-pages
+        target_path: docs
         token: ${{ secrets.GITHUB_TOKEN }}
         jekyll_build_options: ${{ env.EXTRA_BUILD_ARGS }}
         keep_history: true
