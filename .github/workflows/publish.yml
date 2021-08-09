@@ -35,7 +35,7 @@ jobs:
           ${{ runner.os }}-gems-
 
     - name: Publish to GitHub
-      uses:  helaili/jekyll-action@2.2.0
+      uses:  helaili/jekyll-action@64b759fc0e18682ff47a0522072df02762a76af2
       with:
         target_branch: gh-pages
         target_path: docs
