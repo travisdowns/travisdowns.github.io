@@ -1,0 +1,39 @@
+name: Screenshot Site
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    # Use GitHub Actions' cache to shorten build times and decrease load on servers
+    - uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+
+    - name: Build Site
+      uses:  helaili/jekyll-action@64b759fc0e18682ff47a0522072df02762a76af2
+      with:
+        target_branch: gh-pages
+        target_path: ../workspace/_site
+        build_only: true
+
+    - name: Take and publish screenshots
+      run: _scripts/snapshot.sh
+      env:
+        SNAPSHOT_REPO: https://github.com/travisdowns/blog-screenshots
+        SNAPSHOT_DEST_PATH: light-1200px
+        SNAPSHOT_BRANCH: master
+        SNAPSHOT_USER: ${{ github.actor }}
+        SNAPSHOT_EMAIL: ${{ github.actor }}@users.noreply.github.com
+        SNAPSHOT_REPO_AUTH: ${{ secrets.SNAPSHOT_REPO_AUTH }}
+        SNAPSHOT_EXCLUDES: '**/debug-pages.html,misc/tables/intel-zero-opt/**'
+        SNAPSHOT_WIDTH: 1200
+        SNAPSHOT_COMMIT_MSG: "[screenshot] ${{ github.actor }}: ${{ github.event.head_commit.message }}"
