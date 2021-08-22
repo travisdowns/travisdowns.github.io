@@ -1,0 +1,8 @@
+_id: 8db5f6f0-035c-11ec-ba93-c7068a2364d0
+_parent: 'https://travisdowns.github.io/blog/2019/08/26/vector-inc.html'
+replying_to_uid: ''
+message: "Nice explanation, but with needs a couple of caveats. \r\n\r\n0. Explanations of the positive effect of TBAA always use the same loop example - which leads one to imagine there are no other clear cases.\r\n1. If the programmer cares about loop performance, she can hoist variables out of the loop or use restrict to tell the compiler not to worry about aliasing control variables (which would be, in most cases, really bad programming practice anyways).\r\n2. If the programmer does not care enough about performance to write decent code or profile, but there is, by accident or luck, a type difference in the right place, the compiler can do the same operation - but just in those cases.\r\n\r\nHowever the point that strikes me the most is that you have used the word \"prove\" where you should have used \"assume\" - at least for C code ( I don't know enough about C++ to say)."
+name: victor yodaiken
+email: 35fa6c069c012d62ecffd12e22aff459
+hp: ''
+date: 1629645659
