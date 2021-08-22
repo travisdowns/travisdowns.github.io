@@ -109,16 +109,16 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
 
 <h3 id="the-benchmark">The Benchmark</h3>
 
-<p>For 20,000 elements, I get the following timings with <code class="language-plaintext highlighter-rouge">gcc 8</code> and <code class="language-plaintext highlighter-rouge">clang 8</code> at various optimization levels:</p>
+<p>For 20,000 elements, I get the following timings in <em>cycles per element</em> with <code class="language-plaintext highlighter-rouge">gcc 8</code> and <code class="language-plaintext highlighter-rouge">clang 8</code> at optimization levels <code class="language-plaintext highlighter-rouge">-O1</code> through <code class="language-plaintext highlighter-rouge">-O3</code>:</p>
 
 <table>
   <thead>
     <tr>
       <th>Compiler</th>
       <th>Element</th>
-      <th style="text-align: right">-O1</th>
-      <th style="text-align: right">-O2</th>
-      <th style="text-align: right">-O3</th>
+      <th style="text-align: right">O1</th>
+      <th style="text-align: right">O2</th>
+      <th style="text-align: right">O3</th>
     </tr>
   </thead>
   <tbody>
