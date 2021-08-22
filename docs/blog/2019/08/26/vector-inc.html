@@ -479,6 +479,40 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
     
     
 
+<article id="comment-8db5f6f0-035c-11ec-ba93-c7068a2364d0" class="js-comment comment" uid="8db5f6f0-035c-11ec-ba93-c7068a2364d0">
+
+  <div class="comment__author">
+    victor yodaiken
+    <span class="comment__date">•
+        <a href="#comment-8db5f6f0-035c-11ec-ba93-c7068a2364d0" title="Permalink to this comment">August 22th, 2021 15:20</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice explanation, but with needs a couple of caveats.</p>
+
+<ol>
+  <li>Explanations of the positive effect of TBAA always use the same loop example - which leads one to imagine there are no other clear cases.</li>
+  <li>If the programmer cares about loop performance, she can hoist variables out of the loop or use restrict to tell the compiler not to worry about aliasing control variables (which would be, in most cases, really bad programming practice anyways).</li>
+  <li>If the programmer does not care enough about performance to write decent code or profile, but there is, by accident or luck, a type difference in the right place, the compiler can do the same operation - but just in those cases.</li>
+</ol>
+
+<p>However the point that strikes me the most is that you have used the word “prove” where you should have used “assume” - at least for C code ( I don’t know enough about C++ to say).</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8db5f6f0-035c-11ec-ba93-c7068a2364d0', 'respond', 'vector-inc', '8db5f6f0-035c-11ec-ba93-c7068a2364d0')">↪&#xFE0E; Reply to victor yodaiken</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-2d15c840-d470-11eb-a781-93a616abab19" class="js-comment comment" uid="2d15c840-d470-11eb-a781-93a616abab19">
 
   <div class="comment__author">
