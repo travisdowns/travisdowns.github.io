@@ -50,9 +50,9 @@ Enough prologue. Let's benchmark this.
 
 ### The Benchmark
 
-For 20,000 elements, I get the following timings with `gcc 8` and `clang 8` at various optimization levels:
+For 20,000 elements, I get the following timings in _cycles per element_ with `gcc 8` and `clang 8` at optimization levels `-O1` through `-O3`:
 
-| Compiler | Element | -O1 | -O2 | -O3 |
+| Compiler | Element | O1 | O2 | O3 |
 | ---------| --------| ---:| ---:| ---:|
 | gcc 8 | `uint8_t` | 2.0 | 2.0 | 2.0 |
 | gcc 8 | `uint32_t` | 2.3 | 1.3 | 0.2 |
