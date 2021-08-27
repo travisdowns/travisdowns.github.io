@@ -1,44 +1,106 @@
-name: Publish Site
+name: Everything
 on:
   push:
-    branches: [ master ]
+    branches: [ master, publish-artifact ]
 
 jobs:
-  jekyll:
+  build-publish:
+    name: Build and Publish
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - name: Main checkout (source)
+      uses: actions/checkout@v2
+      with:
+        path: main
+
+    - uses: rlespinasse/github-slug-action@3.5.1
 
     # we need to set --config based on the repository, i.e., the 
     # test repository needs to additionally include the _config-test.yml
     # which sets the baseurl appropriately
     # the cleanest way I can find to do this is to conditionally set an
     # env var which is used in the publish task below
-    - name: set vars
-      run: |
-        if [[ "$GITHUB_REPOSITORY" == */blog-test ]]; then
-          echo "Using testing config"
-          echo "EXTRA_BUILD_ARGS=--config _config.yml,_config-test.yml" >> $GITHUB_ENV
-        fi
-
-    - name: echo vars
-      run: |
-        echo "EBA=$EXTRA_BUILD_ARGS"
-        echo "EBA=${{ env.EXTRA_BUILD_ARGS }}"
+    - name: Set vars
+      run: main/_scripts/ci-vars.sh
 
     # Use GitHub Actions' cache to shorten build times and decrease load on servers
     - uses: actions/cache@v2
       with:
-        path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+        path: main/vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('main/**/Gemfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-gems-
 
-    - name: Publish to GitHub
+    - name: Build Site
       uses:  helaili/jekyll-action@64b759fc0e18682ff47a0522072df02762a76af2
       with:
-        target_branch: gh-pages
-        target_path: docs
-        token: ${{ secrets.GITHUB_TOKEN }}
+        target_branch: gh-test
+        jekyll_src: main
+        target_path: ../workspace/_site
         jekyll_build_options: ${{ env.EXTRA_BUILD_ARGS }}
-        keep_history: true
+        build_only: true
+
+    - name: Check out destination (HTML) branch
+      uses: actions/checkout@v2
+      if: env.PUBLISH_BRANCH
+      with:
+        ref: ${{ env.PUBLISH_BRANCH }}
+        path: output
+
+    - name: Publish site
+      if: env.PUBLISH_BRANCH
+      env:
+        PUB_BRANCH: ${{ env.PUBLISH_BRANCH }}
+        PUB_DEST_DIR: docs
+        PUB_COMMIT_MSG: ${{ github.event.head_commit.message }}
+      run: main/_scripts/publish-github.sh
+
+    - name: Tar site
+      run: tar czf site.tar.gz _site && du -k site.tar.gz
+
+    - name: Upload site artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: site
+        path: site.tar.gz
+
+
+  screenshots:
+    name: Take Screenshots
+    runs-on: ubuntu-20.04
+    needs: build-publish
+    if: |
+      github.event_name == 'push' && (
+      github.ref == 'refs/heads/master' ||
+      github.ref == 'refs/heads/publish-artifact'
+      )
+    steps:
+    - name: Main checkout (source)
+      uses: actions/checkout@v2
+      with:
+        path: main
+
+    - uses: rlespinasse/github-slug-action@3.5.1
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: site
+
+    - name: Untar site
+      run: |
+        tar xf site.tar.gz
+ 
+    - name: Take and publish screenshots
+      env:
+        SNAPSHOT_REPO: https://github.com/travisdowns/blog-screenshots
+        SNAPSHOT_DEST_PATH: light-1200px
+        SNAPSHOT_BRANCH: ${{ env.GITHUB_REF_SLUG }}
+        SNAPSHOT_USER: ${{ github.actor }}
+        SNAPSHOT_EMAIL: ${{ github.actor }}@users.noreply.github.com
+        SNAPSHOT_REPO_AUTH: ${{ secrets.SNAPSHOT_REPO_AUTH }}
+        SNAPSHOT_EXCLUDES: '**/debug-pages.html,misc/tables/intel-zero-opt/**'
+        SNAPSHOT_WIDTH: 1200
+        SNAPSHOT_COMMIT_MSG: >
+          [screenshot SNAPSHOT_MOD_TAG mod, SNAPSHOT_NEW_TAG new]
+          ${{ github.actor }}: ${{ github.event.head_commit.message }}
+      run: main/_scripts/snapshot.sh

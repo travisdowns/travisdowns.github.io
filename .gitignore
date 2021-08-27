@@ -4,3 +4,4 @@
 .vscode
 .jekyll-cache
 /snapshot-workdir
+gh-env.txt
