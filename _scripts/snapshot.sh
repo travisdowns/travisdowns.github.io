@@ -73,23 +73,33 @@ else
     FULL_REPO=$SNAPSHOT_REPO
 fi
 
+gitcmd="git -C dest-repo"
+
+setup_user() {
+    if [[ -n ${SNAPSHOT_USER+x} ]]; then
+    $gitcmd config user.name "$SNAPSHOT_USER"
+    fi
+    if [[ -n ${SNAPSHOT_EMAIL+x} ]]; then
+        $gitcmd config user.email "$SNAPSHOT_EMAIL"
+    fi
+}
+
 rm -rf dest-repo
-time git clone "$FULL_REPO" dest-repo --depth 1 --branch "$SNAPSHOT_BRANCH"
+if ! git clone "$FULL_REPO" dest-repo --depth 1 --branch "$SNAPSHOT_BRANCH"; then
+    echo "Clone of $SNAPSHOT_BRANCH failed, trying to create it"
+    git clone "$FULL_REPO" dest-repo --depth 1
+    setup_user
+    $gitcmd checkout --orphan "$SNAPSHOT_BRANCH"
+    $gitcmd commit --allow-empty -m "initial commit for $SNAPSHOT_BRANCH by snapshot.sh"
+else
+    setup_user
+fi
 
 outdir="dest-repo/$SNAPSHOT_DEST_PATH"
 
 if [[ "${SKIP_SNAP:-0}" -eq 0 ]]; then
     "$(npm bin)/snap-site" --site-dir="$SITE_ABS" --out-dir="$outdir" --width="$SNAPSHOT_WIDTH" \
         --host-port="localhost:$port" ${SNAPSHOT_EXCLUDES+"--exclude=$SNAPSHOT_EXCLUDES"}
-fi
-
-gitcmd="git -C dest-repo"
-
-if [[ -n ${SNAPSHOT_USER+x} ]]; then
-    $gitcmd config user.name "$SNAPSHOT_USER"
-fi
-if [[ -n ${SNAPSHOT_EMAIL+x} ]]; then
-    $gitcmd config user.email "$SNAPSHOT_EMAIL"
 fi
 
 $gitcmd add "./$SNAPSHOT_DEST_PATH"
@@ -107,7 +117,7 @@ echo "Files to commit: $total_count ($mod_count modified, $new_count new)"
 if [[ $total_count -gt 0 ]]; then
     echo "Comitting updated screenshots"
     $gitcmd commit --allow-empty -m "$SNAPSHOT_COMMIT_MSG"
-    $gitcmd push
+    $gitcmd push origin "$SNAPSHOT_BRANCH:$SNAPSHOT_BRANCH"
 else
     echo "Nothing new to commit..."
 fi
@@ -115,4 +125,4 @@ fi
 cd -
 # rm -rf "$WORKDIR"
 
-echo "Success"
+echo "snapshot.sh: success"
