@@ -1,7 +1,5 @@
 name: build
 on:
-  push:
-    branches-ignore: [publish-artifact]
   schedule:
     - cron:  '42 1 * * *' # run at 1:42 AM every day
 
