@@ -23,22 +23,20 @@ jobs:
     - name: Set vars
       run: main/_scripts/ci-vars.sh
 
-    # Use GitHub Actions' cache to shorten build times and decrease load on servers
-    - uses: actions/cache@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
       with:
-        path: main/vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('main/**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gems-
+        ruby-version: 2.7.3
+        bundler-cache: true
+        working-directory: main
+        cache-version: 42
 
-    - name: Build Site
-      uses:  helaili/jekyll-action@64b759fc0e18682ff47a0522072df02762a76af2
-      with:
-        target_branch: gh-test
-        jekyll_src: main
-        target_path: ../workspace/_site
-        jekyll_build_options: ${{ env.EXTRA_BUILD_ARGS }}
-        build_only: true
+    - name: Build site
+      env:
+        BUILD_SRC: main
+        BUILD_DEST: _site
+        BUILD_EXTRA_OPTIONS: ${{ env.EXTRA_BUILD_ARGS }}
+      run: main/_scripts/build-site.sh
 
     - name: Check out destination (HTML) branch
       uses: actions/checkout@v2

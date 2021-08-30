@@ -5,6 +5,11 @@
 
 set -euo pipefail
 
+if [[ "${BASH_VERSINFO:-0}" -lt 4 ]]; then
+    echo "ERROR: this script requires bash 4, but you're using bash ${BASH_VERSINFO:-0}" 1>&2
+    exit 1
+fi
+
 # Sets up the variables needed by the rest of the CI steps
 # including embedding some configuration about what branches
 # should do what.
