@@ -1,7 +1,8 @@
 name: Everything
 on:
   push:
-    branches: [ master, publish-artifact ]
+  schedule:
+    - cron:  '* * * * *' # run at 1:42 AM every day
 
 jobs:
   build-publish:

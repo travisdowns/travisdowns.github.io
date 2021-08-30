@@ -20,6 +20,7 @@ if [[ -z "${GITHUB_ACTIONS-}" ]]; then
     : ${GITHUB_REPOSITORY=defaultrepo}
     : ${GITHUB_REF_SLUG=x}
     : ${GITHUB_ENV="$(pwd)/gh-env.txt"}
+    : ${GITHUB_EVENT_NAME=push}
     echo "Running outside of github actions, writing to $GITHUB_ENV"
 fi
 
@@ -50,7 +51,10 @@ declare -A publish_mapping=(
 )
 
 echo "GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
-PUBLISH_BRANCH=${publish_mapping[$GITHUB_REF_SLUG]-}
+echo "GITHUB_EVENT_NAME=$GITHUB_EVENT_NAME"
+if [[ $GITHUB_EVENT_NAME == push ]]; then
+    PUBLISH_BRANCH=${publish_mapping[$GITHUB_REF_SLUG]-}
+fi
 
 echo "======== Exported Variables ========="
 export-vars EXTRA_BUILD_ARGS PUBLISH_BRANCH
