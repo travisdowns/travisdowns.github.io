@@ -129,7 +129,7 @@ jobs:
       run: main/_scripts/check-html.sh --disable-external
 
   htmlproof-external:
-    name: Internal Link Check
+    name: External Link Check
     runs-on: ubuntu-20.04
     needs: build-publish
     steps:
@@ -150,4 +150,6 @@ jobs:
       run: sudo gem install html-proofer
 
     - name: Run htmlproofer
+      env:
+        MAX_TRIES: 5
       run: main/_scripts/check-html.sh --external-only
