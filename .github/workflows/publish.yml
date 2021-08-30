@@ -2,7 +2,7 @@ name: Everything
 on:
   push:
   schedule:
-    - cron:  '* * * * *' # run at 1:42 AM every day
+    - cron:  '39 * * * *' # run at 1:42 AM every day
 
 jobs:
   build-publish:
