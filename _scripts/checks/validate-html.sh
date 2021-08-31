@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This poorly named script checks the HTML5 markup.
+# This script checks the HTML5 markup.
 #
 set -euo pipefail
 
@@ -27,4 +27,4 @@ if [[ -n $missing_args ]]; then
     exit 1
 fi
 
-"$SCRIPT_DIR/check-html.sh" --checks-to-ignore 'LinkCheck,ImageCheck,ScriptCheck' --check-html "${args[@]}"
+"$SCRIPT_DIR/call-htmlproofer.sh" --checks-to-ignore 'LinkCheck,ImageCheck,ScriptCheck' --check-html "${args[@]}"

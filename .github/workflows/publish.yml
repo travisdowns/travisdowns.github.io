@@ -121,7 +121,7 @@ jobs:
       run: sudo gem install html-proofer
 
     - name: Run htmlproofer
-      run: main/_scripts/check-html.sh --disable-external
+      run: main/_scripts/checks/internal-links.sh
 
   htmlproof-external:
     name: External Link Check
@@ -147,7 +147,7 @@ jobs:
     - name: Run htmlproofer
       env:
         MAX_TRIES: 5
-      run: main/_scripts/check-html.sh --external-only
+      run: main/_scripts/checks/external-links.sh
 
   htmlproof-html:
     name: HTML Check
@@ -171,4 +171,4 @@ jobs:
       run: sudo gem install html-proofer
 
     - name: Run htmlproofer
-      run: main/_scripts/check-tags.sh
+      run: main/_scripts/checks/validate-html.sh
