@@ -6,7 +6,7 @@
 set -euo pipefail
 
 echo "Checking ${SITE:=_site}, MAX_TRIES=${MAX_TRIES:=1}"
-
+echo "Additional arguments: $*"
 # we ignore status 429 since we get these fairly frequency from github for our site
 # pages since I guess this pounds the site pretty hard and pages is like "woah, slow down buddy"
 

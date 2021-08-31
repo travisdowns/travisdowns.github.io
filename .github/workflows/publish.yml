@@ -148,3 +148,27 @@ jobs:
       env:
         MAX_TRIES: 5
       run: main/_scripts/check-html.sh --external-only
+
+  htmlproof-html:
+    name: HTML Check
+    runs-on: ubuntu-20.04
+    needs: build-publish
+    steps:
+    - name: Main checkout (source)
+      uses: actions/checkout@v2
+      with:
+        path: main
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: site
+
+    - name: Untar site
+      run: |
+        tar xf site.tar.gz
+
+    - name: Install htmlproofer
+      run: sudo gem install html-proofer
+
+    - name: Run htmlproofer
+      run: main/_scripts/check-tags.sh
