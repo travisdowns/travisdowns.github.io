@@ -19,7 +19,7 @@ args=(
 # we created the list above
 arg_regexp="$(printf '%s|' "${args[@]}")never_match"
 
-missing_args=$(htmlproofer --help | grep -- '--report' | { grep -E -v -- "$arg_regexp"; true; })
+missing_args=$(htmlproofer --help 2>/dev/null | grep -- '--report' | { grep -E -v -- "$arg_regexp"; true; })
 
 
 if [[ -n $missing_args ]]; then
