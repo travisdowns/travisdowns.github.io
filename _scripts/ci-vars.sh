@@ -35,6 +35,11 @@ export-vars() {
     done
 }
 
+# we need to set --config based on the repository, i.e., the
+# test repository needs to additionally include the _config-test.yml
+# which sets the baseurl appropriately
+# the cleanest way I can find to do this is to conditionally set an
+# env var which is used in the publish task below
 echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
 if [[ "$GITHUB_REPOSITORY" == */blog-test ]]; then
     EXTRA_BUILD_ARGS="--config _config.yml,_config-test.yml"

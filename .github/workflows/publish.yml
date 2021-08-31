@@ -16,11 +16,6 @@ jobs:
 
     - uses: rlespinasse/github-slug-action@3.5.1
 
-    # we need to set --config based on the repository, i.e., the 
-    # test repository needs to additionally include the _config-test.yml
-    # which sets the baseurl appropriately
-    # the cleanest way I can find to do this is to conditionally set an
-    # env var which is used in the publish task below
     - name: Set vars
       run: main/_scripts/ci-vars.sh
 
