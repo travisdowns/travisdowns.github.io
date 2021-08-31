@@ -99,10 +99,19 @@ jobs:
           ${{ github.actor }}: ${{ github.event.head_commit.message }}
       run: main/_scripts/snapshot.sh
 
-  htmlproof-internal:
-    name: Internal Link Check
+  htmlproof:
+    name: ${{ matrix.script.name }}
     runs-on: ubuntu-20.04
     needs: build-publish
+    strategy:
+      matrix:
+        script:
+          - path: internal-links.sh
+            name: Internal Links
+          - path: external-links.sh
+            name: External Links
+          - path: validate-html.sh
+            name: Check HTML
     steps:
     - name: Main checkout (source)
       uses: actions/checkout@v2
@@ -121,54 +130,4 @@ jobs:
       run: sudo gem install html-proofer
 
     - name: Run htmlproofer
-      run: main/_scripts/checks/internal-links.sh
-
-  htmlproof-external:
-    name: External Link Check
-    runs-on: ubuntu-20.04
-    needs: build-publish
-    steps:
-    - name: Main checkout (source)
-      uses: actions/checkout@v2
-      with:
-        path: main
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: site
-
-    - name: Untar site
-      run: |
-        tar xf site.tar.gz
-
-    - name: Install htmlproofer
-      run: sudo gem install html-proofer
-
-    - name: Run htmlproofer
-      env:
-        MAX_TRIES: 5
-      run: main/_scripts/checks/external-links.sh
-
-  htmlproof-html:
-    name: HTML Check
-    runs-on: ubuntu-20.04
-    needs: build-publish
-    steps:
-    - name: Main checkout (source)
-      uses: actions/checkout@v2
-      with:
-        path: main
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: site
-
-    - name: Untar site
-      run: |
-        tar xf site.tar.gz
-
-    - name: Install htmlproofer
-      run: sudo gem install html-proofer
-
-    - name: Run htmlproofer
-      run: main/_scripts/checks/validate-html.sh
+      run: main/_scripts/checks/${{ matrix.script.path }}
