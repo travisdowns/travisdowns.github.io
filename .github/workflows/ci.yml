@@ -66,7 +66,8 @@ jobs:
     if: |
       github.event_name == 'push' && (
       github.ref == 'refs/heads/master' ||
-      github.ref == 'refs/heads/publish-artifact'
+      github.ref == 'refs/heads/publish-artifact' ||
+      github.ref == 'refs/heads/minima-update'
       )
     steps:
     - name: Main checkout (source)
