@@ -19,8 +19,13 @@ echo "Running miscellaenous checks on ${SRC:=.}, ${SITE:=_site}"
 # script since it will trigger the check below!
 word="TOD"O
 
-grep --exclude='*.svg' --exclude-dir='.git' -n -I -i -r $word "$SRC"
-if [[ $? -ne 1 ]]; then
-    echo "$word found in source, see above"
+{ grep --exclude='*.svg' --exclude-dir='.git' -n -I -i -r $word "$SRC"; gexit=$?; } || true
+if [[ $gexit -eq 0 ]]; then
+    echo "ERROR: $word found in source, see above (ret: $gexit)"
+    exit 1
+elif [[ $gexit -gt 1 ]]; then
+    echo "ERROR: grep failed (ret: $gexit)"
     exit 1
 fi
+
+echo "Miscellaneous checks passed, yay!"

@@ -103,6 +103,9 @@ jobs:
     name: ${{ matrix.script.name }}
     runs-on: ubuntu-20.04
     needs: build-publish
+    env:
+      SRC: main
+      SITE: _site
     strategy:
       matrix:
         script:
