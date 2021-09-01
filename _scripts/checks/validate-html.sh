@@ -27,4 +27,4 @@ if [[ -n $missing_args ]]; then
     exit 1
 fi
 
-"$SCRIPT_DIR/call-htmlproofer.sh" --checks-to-ignore 'LinkCheck,ImageCheck,ScriptCheck' --check-html "${args[@]}"
+"$SCRIPT_DIR/call-htmlproofer.sh" --checks-to-ignore 'LinkCheck,ImageCheck,ScriptCheck' --check-opengraph --check-html "${args[@]}"
