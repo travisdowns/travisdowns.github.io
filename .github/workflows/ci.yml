@@ -99,7 +99,7 @@ jobs:
           ${{ github.actor }}: ${{ github.event.head_commit.message }}
       run: main/_scripts/snapshot.sh
 
-  htmlproof:
+  checks:
     name: ${{ matrix.script.name }}
     runs-on: ubuntu-20.04
     needs: build-publish
@@ -117,6 +117,7 @@ jobs:
             name: Check HTML
           - path: misc.sh
             name: Miscellaneous
+            no-html-proofer: true
     steps:
     - name: Main checkout (source)
       uses: actions/checkout@v2
@@ -132,7 +133,8 @@ jobs:
         tar xf site.tar.gz
 
     - name: Install htmlproofer
+      if: ${{ ! matrix.script.no-html-proofer }}
       run: sudo gem install html-proofer
 
-    - name: Run htmlproofer
+    - name: Run ${{ matrix.script.path }}
       run: main/_scripts/checks/${{ matrix.script.path }}
