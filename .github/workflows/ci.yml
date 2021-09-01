@@ -112,6 +112,8 @@ jobs:
             name: External Links
           - path: validate-html.sh
             name: Check HTML
+          - path: misc.sh
+            name: Miscellaneous
     steps:
     - name: Main checkout (source)
       uses: actions/checkout@v2
