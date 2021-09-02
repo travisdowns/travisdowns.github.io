@@ -3,10 +3,10 @@
 	"file": "main.css",
 	"sources": [
 		"main.scss",
-		"vendor/bundle/ruby/2.7.0/gems/minima-2.5.1/_sass/minima.scss",
-		"vendor/bundle/ruby/2.7.0/gems/minima-2.5.1/_sass/minima/_base.scss",
-		"vendor/bundle/ruby/2.7.0/gems/minima-2.5.1/_sass/minima/_layout.scss",
-		"vendor/bundle/ruby/2.7.0/gems/minima-2.5.1/_sass/minima/_syntax-highlighting.scss",
+		"_minima-fork/_sass/minima.scss",
+		"_minima-fork/_sass/minima/_base.scss",
+		"_minima-fork/_sass/minima/_layout.scss",
+		"_minima-fork/_sass/minima/_syntax-highlighting.scss",
 		"_sass/comment-styles.scss",
 		"_sass/tab-styles.scss"
 	],
