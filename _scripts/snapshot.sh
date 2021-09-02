@@ -90,6 +90,7 @@ if ! git clone "$FULL_REPO" dest-repo --depth 1 --branch "$SNAPSHOT_BRANCH"; the
     git clone "$FULL_REPO" dest-repo --depth 1
     setup_user
     $gitcmd checkout --orphan "$SNAPSHOT_BRANCH"
+    $gitcmd rm -rf .
     $gitcmd commit --allow-empty -m "initial commit for $SNAPSHOT_BRANCH by snapshot.sh"
 else
     setup_user
