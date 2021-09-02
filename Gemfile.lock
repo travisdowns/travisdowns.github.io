@@ -6,6 +6,14 @@ GIT
     jekyll-seo-tag (2.7.1p)
       jekyll (>= 3.8, < 5.0)
 
+PATH
+  remote: _minima-fork
+  specs:
+    minima (2.5.1)
+      jekyll (>= 3.5, < 5.0)
+      jekyll-feed (~> 0.9)
+      jekyll-seo-tag (~> 2.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -52,10 +60,6 @@ GEM
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     mercenary (0.4.0)
-    minima (2.5.1)
-      jekyll (>= 3.5, < 5.0)
-      jekyll-feed (~> 0.9)
-      jekyll-seo-tag (~> 2.1)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
     public_suffix (4.0.6)
@@ -79,7 +83,7 @@ DEPENDENCIES
   jekyll-feed
   jekyll-seo-tag (= 2.7.1p)!
   kramdown-parser-gfm (= 1.1.0)
-  minima (= 2.5.1)
+  minima (= 2.5.1)!
 
 BUNDLED WITH
    2.1.4

@@ -40,10 +40,15 @@ markdown: kramdown
 kramdown:
   show_warnings: true
 
-
 theme: minima
 plugins:
   - jekyll-feed
+
+# when using a local theme gem, the _config.yml may be picked
+# from the local dir, when it wouldn't be when used as a packaged
+# gem unless the gemspec also includes the file
+# see https://github.com/jekyll/minima/issues/603
+ignore_theme_config: true
 
 # staticman (comments) configuration
 staticman_url: https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments
