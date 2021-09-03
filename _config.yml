@@ -30,6 +30,12 @@ author:
 twitter_username: trav_downs
 github_username:  travisdowns
 
+# minima-specific social links
+minima:
+  social_links:
+    twitter: trav_downs
+    github:  travisdowns
+
 # jekyll-seo-tag
 # wants different format from minima
 twitter:
