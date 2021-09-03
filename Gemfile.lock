@@ -7,7 +7,7 @@ GIT
       jekyll (>= 3.8, < 5.0)
 
 PATH
-  remote: _minima-fork
+  remote: _minima-fork-v3
   specs:
     minima (2.5.1)
       jekyll (>= 3.5, < 5.0)
