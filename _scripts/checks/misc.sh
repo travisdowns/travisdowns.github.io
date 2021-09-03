@@ -19,7 +19,7 @@ echo "Running miscellaenous checks on ${SRC:=.}, ${SITE:=_site}"
 # script since it will trigger the check below!
 word="TOD"O
 
-{ grep --exclude='*.svg' --exclude-dir=.git --exclude-dir=_minima-fork -n -I -i -r $word "$SRC"; gexit=$?; } || true
+{ grep --exclude='*.svg' --exclude-dir=.git --exclude-dir='_minima-fork*' -n -I -i -r $word "$SRC"; gexit=$?; } || true
 if [[ $gexit -eq 0 ]]; then
     echo "ERROR: $word found in source, see above (ret: $gexit)"
     exit 1
