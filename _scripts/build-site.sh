@@ -17,5 +17,6 @@ bundle install
 
 # shellcheck disable=2086
 JEKYLL_ENV=production bundle exec jekyll build \
+    --strict \
     --destination "$dest_abs" \
     $BUILD_EXTRA_OPTIONS
