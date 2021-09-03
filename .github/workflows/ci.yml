@@ -108,6 +108,7 @@ jobs:
       SRC: main
       SITE: _site
     strategy:
+      fail-fast: false
       matrix:
         script:
           - path: internal-links.sh
