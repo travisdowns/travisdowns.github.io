@@ -67,7 +67,7 @@ textarea {
     margin: 4px 0px 0px 0px;
 }
 button:hover {
-    background-color: $grey-color;
+    background-color: $brand-color;
     color: white;
 }
 
@@ -80,7 +80,7 @@ button:hover {
     padding: 0px 0px 14px 0px;
 }
 .comment__author {
-    color: $grey-color;
+    color: $brand-color;
 }
 .comment__admin_tag {
     background-color: rgb(187, 255, 187);
@@ -95,14 +95,14 @@ button:hover {
 }
 .comment__meta {
     text-align: left;
-    color: $grey-color;
+    color: $brand-color;
     font-size: $small-font-size;
 }
 .comments__existing {
     padding: 8px 0px 0px 0px;
 }
 .comment {
-    border-top: 0px solid $grey-color-light;
+    border-top: 0px solid $brand-color-light;
     padding: 0px 0px 0px 0px;
     margin-bottom: 1em;
 }
@@ -110,7 +110,7 @@ button:hover {
     margin-left: 3em;
 }
 .comment__reply-link {
-    color: $grey-color;
+    color: $brand-color;
     font-size: $small-font-size;
     cursor: pointer;
 }
