@@ -4,7 +4,7 @@
 #
 set -euo pipefail
 
-echo "Running miscellaenous checks on ${SRC:=.}, ${SITE:=_site}"
+echo "Running miscellaenous checks with SRC=${SRC:=.}, SITE=${SITE:=_site}"
 
 # https://stackoverflow.com/a/7170782
 # exts=$(find . -type f -printf "%f\n" | grep -F '.' | awk -F. '!a[$NF]++{print $NF}' | sort)
