@@ -23,7 +23,16 @@ layout: default
             <span class="p-author h-card" itemprop="name">{{ author }}</span></span>
             {%- if forloop.last == false %}, {% endif -%}
         {% endfor %}
-      {%- endif -%}</p>
+      <!-- travis override -->
+      {%- endif -%}
+      {%- if page.tags -%}
+        <span>
+          •
+          {% for tag in page.tags %}<span class="tag-link"><a href="{{ tag | prepend: 'tags/' | relative_url }}.html">{{ tag }}</a></span>{% endfor %}
+        </span>
+      {%- endif -%}
+    </p>
+    <!-- end override -->
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
@@ -33,6 +42,12 @@ layout: default
   {%- if site.disqus.shortname -%}
     {%- include disqus_comments.html -%}
   {%- endif -%}
+
+  <!-- travis override -->
+  {% if page.comments == true %}
+    {% include comments.html %}
+  {% endif %}
+  <!-- end override -->
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
