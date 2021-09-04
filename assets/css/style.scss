@@ -104,3 +104,10 @@ sup[id^='fnref'] {
   text-align:center;
   border-radius:10%;
 }
+
+// work around
+// https://github.com/jekyll/minima/issues/604
+pre,
+code {
+  @include relative-font-size(0.9375);
+}
