@@ -1,0 +1,8 @@
+// overrides for variables defined by minima
+
+// Remove Ubuntu Mono because it is too small
+// https://bugs.launchpad.net/ubuntu-font-family/+bug/1860251
+// Remove Courier New, because.
+// Minima default:
+// $code-font-family: "Menlo", "Inconsolata", "Consolas", "Roboto Mono", "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
+$code-font-family: "Menlo", "Inconsolata", "Consolas", "Roboto Mono", "Liberation Mono", monospace;
