@@ -24,20 +24,18 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2019-06-11T00:00:00+00:00","datePublished":"2019-06-11T00:00:00+00:00","description":"A laundry list of speed limits that your code can’t exceed.","headline":"Performance Speed Limits","image":"https://travisdowns.github.io/assets/speed-limits/speed-limit-50-ns.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/06/11/speed-limits.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2019/06/11/speed-limits.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script>
-if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-136594956-1', 'auto');
-  ga('send', 'pageview');
-}
+  gtag('config', 'UA-136594956-1');
 </script>
-  
+
 </head>
-<body><header class="site-header" role="banner">
+<body><header class="site-header">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
@@ -54,21 +52,17 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <!-- BASE:  -->
-
-<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
-
-<!-- INSIDE -->
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">Performance Speed Limits</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2019-06-11T00:00:00+00:00" itemprop="datePublished">Jun 11, 2019
-      </time><!-- travis override --><span>
+    <p class="post-meta"><time class="dt-published" datetime="2019-06-11T00:00:00+00:00" itemprop="datePublished">
+        Jun 11, 2019
+      </time><span>
           •
           <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/benchmarking.html">benchmarking</a></span>
-        </span><!-- end override -->
-    </p>
+        </span></p>
+    <!-- end override -->
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
@@ -1868,21 +1862,27 @@ https://community.intel.com/t5/Software-Tuning-Performance/Haswell-L2-cache-band
 
   <div class="wrapper">
 
-    <h2 class="footer-heading">Performance Matters</h2>
-
     <div class="footer-col-wrapper">
-      <div class="footer-col footer-col-1">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
         <ul class="contact-list">
-          <li class="p-name">Travis Downs</li><li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li></ul>
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
       </div>
-
-      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/travisdowns"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">travisdowns</span></a></li><li><a href="https://www.twitter.com/trav_downs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">trav_downs</span></a></li></ul>
-</div>
-
-      <div class="footer-col footer-col-3">
+      <div class="footer-col">
         <p>A blog about low-level software and hardware performance.</p>
       </div>
     </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
 
   </div>
 
