@@ -9,6 +9,10 @@ Last rebuild (`site.time`): {{ site.time }}
 | jekyll.environment  | {{ jekyll.environment }} |
 | site.url | {{ site.url }} |
 | site.baseurl  | {{ site.baseurl }} |
+| site.markdown  | {{ site.markdown }} |
+| site.kramdown  | `{{ site.kramdown }}` |
+| site.rss | {{ site.rss }} |
+
 
 relative foo: {{ '/foo' | relative_url }}
 
@@ -17,11 +21,6 @@ relative foo: {{ '/foo' | relative_url }}
 
 [bad link]({{ 'notexist.html' | relative_url}})  
 [self link]({{ 'misc/debug.html' | relative_url}})
-
-| Property | Value |
-| -----------------|
-| site.markdown  | {{ site.markdown }} |
-| site.kramdown  | `{{ site.kramdown }}` |
 
 
 <style>
