@@ -127,7 +127,10 @@ if [[ $total_count -gt 0 ]]; then
     # commit v1, take their screenshots, one commits v2 and the second fails to push because their head
     # is now stale wrt the remote.
     $gitcmd pull --rebase --strategy-option=theirs origin || echo "Pull failed (expected for new branches)"
+    $gitcmd log --oneline --max-count=5
+    echo "Time before push: $(date +"%T")"
     $gitcmd push origin "$SNAPSHOT_BRANCH:$SNAPSHOT_BRANCH"
+    echo "Time after  push: $(date +"%T")"
 else
     echo "Nothing new to commit..."
 fi
