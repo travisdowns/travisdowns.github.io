@@ -120,7 +120,13 @@ SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_NEW_TAG/$new_count}
 
 if [[ $total_count -gt 0 ]]; then
     echo "Comitting updated screenshots"
-    $gitcmd commit --allow-empty -m "$SNAPSHOT_COMMIT_MSG"
+    $gitcmd commit -m "$SNAPSHOT_COMMIT_MSG"
+    # We do this last-second rebase in case some other publish job has come in and created a new commit
+    # which is a common occurence when two commits arrive close together in time: since the repo clone
+    # occurs before the screenshot there is a large window for a race to occur where both CI jobs clone
+    # commit v1, take their screenshots, one commits v2 and the second fails to push because their head
+    # is now stale wrt the remote.
+    $gitcmd pull --rebase --strategy-option=theirs origin || echo "Pull failed (expected for new branches)"
     $gitcmd push origin "$SNAPSHOT_BRANCH:$SNAPSHOT_BRANCH"
 else
     echo "Nothing new to commit..."
