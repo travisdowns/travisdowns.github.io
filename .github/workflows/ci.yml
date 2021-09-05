@@ -63,12 +63,7 @@ jobs:
     name: Take Screenshots
     runs-on: ubuntu-20.04
     needs: build-publish
-    if: |
-      github.event_name == 'push' && (
-      github.ref == 'refs/heads/master' ||
-      github.ref == 'refs/heads/publish-artifact' ||
-      github.ref == 'refs/heads/minima-update'
-      )
+    if: github.event_name == 'push'
     steps:
     - name: Main checkout (source)
       uses: actions/checkout@v2
