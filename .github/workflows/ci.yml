@@ -64,6 +64,10 @@ jobs:
     runs-on: ubuntu-20.04
     needs: build-publish
     if: github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [414, 1200]
     steps:
     - name: Main checkout (source)
       uses: actions/checkout@v2
@@ -83,13 +87,13 @@ jobs:
     - name: Take and publish screenshots
       env:
         SNAPSHOT_REPO: https://github.com/travisdowns/blog-screenshots
-        SNAPSHOT_DEST_PATH: light-1200px
+        SNAPSHOT_DEST_PATH: light-${{ matrix.width }}px
         SNAPSHOT_BRANCH: ${{ env.GITHUB_REF_SLUG }}
         SNAPSHOT_USER: ${{ github.actor }}
         SNAPSHOT_EMAIL: ${{ github.actor }}@users.noreply.github.com
         SNAPSHOT_REPO_AUTH: ${{ secrets.SNAPSHOT_REPO_AUTH }}
         SNAPSHOT_EXCLUDES: '**/debug-pages.html,misc/tables/intel-zero-opt/**'
-        SNAPSHOT_WIDTH: 1200
+        SNAPSHOT_WIDTH: ${{ matrix.width }}
         SNAPSHOT_COMMIT_MSG: >
           [screenshot SNAPSHOT_MOD_TAG mod, SNAPSHOT_NEW_TAG new]
           ${{ github.actor }}: ${{ github.event.head_commit.message }}
