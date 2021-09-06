@@ -1,0 +1,9 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+// this import contains my own local skin-dependent vars
+@import "dark-vars";
+@import "minima/skins/dark";
+@import "minima/initialize";
+
