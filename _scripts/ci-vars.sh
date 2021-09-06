@@ -59,6 +59,15 @@ echo "GITHUB_REF_SLUG=$GITHUB_REF_SLUG"
 echo "GITHUB_EVENT_NAME=$GITHUB_EVENT_NAME"
 if [[ $GITHUB_EVENT_NAME == push ]]; then
     PUBLISH_BRANCH=${publish_mapping[$GITHUB_REF_SLUG]-}
+    if [[ -z $PUBLISH_BRANCH ]]; then
+        site_branch=${GITHUB_REF_SLUG}-site
+        if git ls-remote --exit-code --heads origin $site_branch; then
+            echo "No explicit branch mapping, but $site_branch exists"
+            PUBLISH_BRANCH=$site_branch
+        else
+            echo "No explicit branch mapping and $site_branch does not exit: will not publish"
+        fi
+    fi
 fi
 
 echo "======== Exported Variables ========="

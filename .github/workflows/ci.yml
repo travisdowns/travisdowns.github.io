@@ -17,7 +17,8 @@ jobs:
     - uses: rlespinasse/github-slug-action@3.5.1
 
     - name: Set vars
-      run: main/_scripts/ci-vars.sh
+      run: _scripts/ci-vars.sh
+      working-directory: main
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1

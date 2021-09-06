@@ -28,7 +28,7 @@ pwd
 git config user.name "${GITHUB_ACTOR}"
 git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-git rm -r "./$PUB_DEST_DIR"
+git rm -r "./$PUB_DEST_DIR" || echo "deleting $PUB_DEST_DIR failed, maybe it doesn't exist yet"
 cp -r "$site_dir/." "./$PUB_DEST_DIR"
 git add "./$PUB_DEST_DIR"
 git commit -m "Site build for: ${GITHUB_SHA} $PUB_COMMIT_MSG"
