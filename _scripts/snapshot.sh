@@ -28,7 +28,7 @@ mkdir -p "$WORKDIR"
 cd "$WORKDIR"
 
 npm init -y
-npm install "github:travisdowns/snap-site#master" http-server
+npm install "github:travisdowns/snap-site#6e3b0e677d8c72a3e1b4c350a5eb544736bed60c" http-server
 
 NODEBIN=./node_modules/.bin
 
