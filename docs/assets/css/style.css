@@ -431,7 +431,7 @@ button:hover { background-color: #828282; color: white; }
 
 sup[id^='fnref'] { font-size: 0.8em; line-height: 0; }
 
-.tag-link { background-color: #dddddd; color: #fff; display: inline-block; padding-left: 8px; padding-right: 8px; margin: 0px 2px; text-align: center; border-radius: 10%; }
+.tag-link { background-color: #dddddd; display: inline-block; padding-left: 8px; padding-right: 8px; margin: 0px 2px; text-align: center; border-radius: 10%; }
 
 pre, code { font-size: 0.9375rem; }
 
