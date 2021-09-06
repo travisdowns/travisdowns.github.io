@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>Ice Lake AVX-512 Downclocking | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Ice Lake AVX-512 Downclocking" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Examining the extent of AVX related downclocking on Intel’s Ice Lake CPU" />
+<meta property="og:description" content="Examining the extent of AVX related downclocking on Intel’s Ice Lake CPU" />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/icl-avx512-freq/og-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-19T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/icl-avx512-freq/og-image.jpg" />
+<meta property="twitter:title" content="Ice Lake AVX-512 Downclocking" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2020-08-19T00:00:00+00:00","datePublished":"2020-08-19T00:00:00+00:00","description":"Examining the extent of AVX related downclocking on Intel’s Ice Lake CPU","headline":"Ice Lake AVX-512 Downclocking","image":"https://travisdowns.github.io/assets/icl-avx512-freq/og-image.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Ice Lake AVX-512 Downclocking</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2020-08-19T00:00:00+00:00" itemprop="datePublished">
+        Aug 19, 2020
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/x86.html">x86</a></span><span class="tag-link"><a href="/tags/icelake.html">icelake</a></span><span class="tag-link"><a href="/tags/avx512.html">avx512</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    
+<!-- boilerplate 
+page.assets: /assets/icl-avx512-freq
+assetpath: /assets/icl-avx512-freq
+tablepath: /misc/tables/icl-avx512-freq
+-->
+
+<p>This is a short post investigating the behavior of AVX2 and AVX-512 related <em>license-based downclocking</em> on Intel’s newest Ice Lake and Rocket Lake chips.</p>
+
+<p>license-based downclocking<sup id="fnref:tiring" role="doc-noteref"><a href="#fn:tiring" class="footnote" rel="footnote">1</a></sup> refers to the <a href="https://blog.cloudflare.com/on-the-dangers-of-intels-frequency-scaling/">semi-famous</a> effect where lower than nominal frequency limits are imposed when certain <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions are executed, especially heavy floating point instructions or 512-bit wide instructions.</p>
+
+<p>More details about this type of downclocking are available at <a href="https://stackoverflow.com/a/56861355">this StackOverflow answer</a> and we’ve already <a href="/blog/2020/01/17/avxfreq1.html">covered in somewhat exhaustive detail</a> the low level mechanics of these transitions. You can also find <a href="https://lemire.me/blog/2018/09/07/avx-512-when-and-how-to-use-these-new-instructions/">some guidelines</a> on to how make use of wide <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> given this issue<sup id="fnref:dmore" role="doc-noteref"><a href="#fn:dmore" class="footnote" rel="footnote">2</a></sup>.</p>
+
+<p>All of those were written in the context of Skylake-SP (<abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr>) which were the first generation of chips to support AVX-512.</p>
+
+<p>So what about Ice Lake, the newest chips which support both the <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> flavor of AVX-512 and also have a <a href="https://branchfree.org/2019/05/29/why-ice-lake-is-important-a-bit-bashers-perspective/">whole host of new AVX-512 instructions</a>? Will we be stuck gazing longly at these new instructions from afar while never being allowed to actually use them due to downclocking?</p>
+
+<p>Read on to find out, or just skip to the <a href="#summary">end</a>. The original version of this post included only Ice Lake is the primary focus. On March 28th, 2020 I updated it with a <a href="#rocket-lake">Rocket Lake section</a>.</p>
+
+<h2 id="ice-lake-frequency-behavior">Ice Lake Frequency Behavior</h2>
+
+<h3 id="avx-turbo">AVX-Turbo</h3>
+
+<p>We will use the <a href="https://github.com/travisdowns/avx-turbo">avx-turbo</a> utility to measure the core count and instruction mix dependent frequencies for a CPU. This tools works in a straightforward way: run a given mix of instructions on the given number of cores, while measuring the frequency achieved during the test.</p>
+
+<p>For example, the <code class="language-plaintext highlighter-rouge">avx256_fma_t</code> test – which measures the cost of <em>heavy</em> 256-bit instructions with high <abbr title="Instruction level parallelism: a measure of inter-instruction parallelism on a superscalar CPU">ILP</abbr> – runs the following sequence of FMAs:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="nf">vfmadd132pd</span> <span class="nv">ymm0</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm1</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm2</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm3</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm4</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm5</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm6</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm7</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm8</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="nf">vfmadd132pd</span> <span class="nv">ymm9</span><span class="p">,</span><span class="nv">ymm10</span><span class="p">,</span><span class="nv">ymm11</span>
+	<span class="c1">; repeat 10x for a total of 100 FMAs</span>
+</code></pre></div></div>
+
+<p>In total, we’ll use five tests to test every combination of light and heavy 256-bit and 512-bit instructions, as well as scalar instructions (128-bit <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> behaves the same as scalar), using this command line:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./avx-turbo --test=scalar_iadd,avx256_iadd,avx512_iadd,avx256_fma_t,avx512_fma_t
+</code></pre></div></div>
+
+<h3 id="ice-lake-results">Ice Lake Results</h3>
+
+<p>I ran avx-turbo as described above on an Ice Lake i5-1035G4, which is the middle-of-the-range Ice Lake client CPU running at up to 3.7 GHz. The full output is <a href="https://gist.github.com/travisdowns/c53f40fc4dbbd944f5613eaab78f3189#file-icl-turbo-results-txt">hidden away in a gist</a>, but here are the all-important frequency results (all values in GHz):</p>
+
+<table class="td-right">
+	<tbody>
+		<tr>
+			<th rowspan="2">Instruction Mix</th>
+			<th colspan="4">Active Cores</th>
+		</tr>
+		<tr>
+			<th>1</th>
+			<th>2</th>
+			<th>3</th>
+			<th>4</th>
+		</tr>
+		<tr>
+			<th>Scalar/128-bit</th>
+			<td>3.7</td>
+			<td>3.6</td>
+			<td>3.3</td>
+			<td>3.3</td>
+		</tr>
+		<tr>
+			<th>Light 256-bit</th>
+			<td>3.7</td>
+			<td>3.6</td>
+			<td>3.3</td>
+			<td>3.3</td>
+		</tr>
+		<tr>
+			<th>Heavy 256-bit</th>
+			<td>3.7</td>
+			<td>3.6</td>
+			<td>3.3</td>
+			<td>3.3</td>
+		</tr>
+		<tr>
+			<th>Light 512-bit</th>
+			<td>3.6</td>
+			<td>3.6</td>
+			<td>3.3</td>
+			<td>3.3</td>
+		</tr>
+    	<tr>
+			<th>Heavy 512-bit</th>
+			<td>3.6</td>
+			<td>3.6</td>
+			<td>3.3</td>
+			<td>3.3</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>As expected, maximum frequency decreases with active core count, but scan down each column to see the effect of instruction category. Along this axis, there is almost no downclocking at all! Only for a single active core count is there any decrease with wider instructions, and it is a paltry only 100 MHz: from 3,700 MHz to 3,600 MHz when any 512-bit instructions are used.</p>
+
+<p>In any other scenario, including any time more than one core is active, or for heavy 256-bit instructions, there is <em>zero</em> license-based downclocking: everything runs as fast as scalar.</p>
+
+<h4 id="license-mapping">license Mapping</h4>
+
+<p>There another change here too. In <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr>, there are three licenses, or categories of instructions with respect to downclocking: L0, L1 and L2. Here, in client ICL, there are only two<sup id="fnref:visible" role="doc-noteref"><a href="#fn:visible" class="footnote" rel="footnote">3</a></sup> and those don’t line up exactly with the three in <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr>.</p>
+
+<p>To be clearer, in <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> the licenses mapped to instruction width and weight as follows:</p>
+
+<style>
+.l0 {
+    background-color: #79fc74;
+}
+.l1 {
+    background-color: #f8ff7a;
+}
+.l2 {
+    background-color: #fa8884;
+}
+</style>
+
+<table>
+	<tbody>
+		<tr>
+			<th>Width</th>
+			<th>Light</th>
+			<th>Heavy</th>
+		</tr>
+		<tr>
+			<td>Scalar/128</td>
+			<td class="l0">L0</td>
+			<td class="l0">L0</td>
+		</tr>
+		<tr>
+			<td>256</td>
+			<td class="l0">L0</td>
+			<td class="l1">L1</td>
+		</tr>
+		<tr>
+			<td>512</td>
+			<td class="l1">L1</td>
+			<td class="l2">L2</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>In particular, note that 256-bit heavy instructions have the same license as 512-bit light.</p>
+
+<p>In ICL client, the mapping is:</p>
+
+<table>
+	<tbody>
+		<tr>
+			<th>Width</th>
+			<th>Light</th>
+			<th>Heavy</th>
+		</tr>
+		<tr>
+			<td>Scalar/128</td>
+			<td class="l0">L0</td>
+			<td class="l0">L0</td>
+		</tr>
+		<tr>
+			<td>256</td>
+			<td class="l0">L0</td>
+			<td class="l0">L0</td>
+		</tr>
+		<tr>
+			<td>512</td>
+			<td class="l1">L1</td>
+			<td class="l1">L1</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>Now, 256 heavy and 512 light are in different categories! In fact, the whole concept of light vs heavy doesn’t seem to apply here: the categorization is purely based on the width<sup id="fnref:onefma" role="doc-noteref"><a href="#fn:onefma" class="footnote" rel="footnote">4</a></sup>.</p>
+
+<h2 id="rocket-lake">Rocket Lake</h2>
+
+<p>Rocket Lake (shortened as <abbr title="Intel's Rocket Lake architecture, aka 11th Generation Intel Core i3,i5,i7 and i9">RKL</abbr>, see <a href="https://en.wikipedia.org/wiki/Rocket_Lake">wikipedia</a> or <a href="https://en.wikichip.org/wiki/intel/microarchitectures/rocket_lake">wikichip</a> for more) is more-or-less a backport of the 10nm <abbr title="The new 7nm microarchitecture used in Ice Lake CPUs.">Sunny Cove</abbr> microarchitecture to Intel’s highly-tuned workhorse<sup id="fnref:some" role="doc-noteref"><a href="#fn:some" class="footnote" rel="footnote">5</a></sup> 14nm process.</p>
+
+<p>Edison Chan has graciously provided the output of running avx-turbo on his Rocket Lake i9-11900K, the top of the line Rocket Lake chip. The <a href="/assets/icl-avx512-freq/11900k-avx-freq-results.txt">full results</a> are available, but I’ve summarized the achieved frequencies in the following table.</p>
+
+<p style="text-align: center"><strong>Rocket Lake i9-11900K Frequency Matrix</strong></p>
+
+<table class="td-right">
+	<tbody>
+		<tr>
+			<th rowspan="2">Active Cores</th>
+			<th colspan="5" style="text-align:center">Instruction Mix</th>
+		</tr>
+		<tr>
+			<th>Scalar and 128</th>
+			<th>Light 256</th>
+			<th>Heavy 256</th>
+			<th>Light 512</th>
+			<th>Heavy 512</th>
+		</tr>
+		<tr>
+			<th>1 Core</th>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+		</tr>
+		<tr>
+			<th>2 Cores</th>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+		</tr>
+		<tr>
+			<th>3 Cores</th>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+		</tr>
+		<tr>
+			<th>4 Cores</th>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+			<td>5.1</td>
+		</tr>
+		<tr>
+			<th>5 Cores</th>
+			<td>4.9</td>
+			<td>4.9</td>
+			<td>4.9</td>
+			<td>4.9</td>
+			<td>4.9</td>
+		</tr>
+		<tr>
+			<th>6 Cores</th>
+			<td>4.9</td>
+			<td>4.9</td>
+			<td>4.9</td>
+			<td>4.9</td>
+			<td>4.9</td>
+		</tr>
+		<tr>
+			<th>7 Cores</th>
+			<td>4.8</td>
+			<td>4.8</td>
+			<td>4.8</td>
+			<td>4.8</td>
+			<td>4.8</td>
+		</tr>
+		<tr>
+			<th>8 Cores</th>
+			<td>4.8</td>
+			<td>4.8</td>
+			<td>4.8</td>
+			<td>4.8</td>
+			<td>4.8</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>The results paint a very promising picture of Rocket Lake’s AVX-512 frequency behavior: there is <em>no</em> license-based downclocking evident at any combination of core count and frequency<sup id="fnref:rklcaveats" role="doc-noteref"><a href="#fn:rklcaveats" class="footnote" rel="footnote">6</a></sup>. Even heavy AVX-512 instructions can execute at the same frequency as lightweight scalar code.</p>
+
+<p>In fact, the frequency behavior of this chip appears very simple: the full Turbo Boost 2.0 frequency<sup id="fnref:tb2" role="doc-noteref"><a href="#fn:tb2" class="footnote" rel="footnote">7</a></sup> of 5.1 GHz is available for any instruction mix up and up to 4 active cores, then the speed drops to 4.9 for 5 and 6 active cores, and finally to 4.8 GHz for 7 or 8 active cores. This means that at 8 active cores and AVX-512, you are still achieving 94% of the frequency observed for 1 active core running light instructions.</p>
+
+<h3 id="so-what">So What?</h3>
+
+<p>Well, so what?</p>
+
+<p>At least, it means we need to adjust our mental model of the frequency related cost of AVX-512 instructions. Rather than the prior-generation verdict of “AVX-512 generally causes significant downclocking”, on these Ice Lake and Rocket Lake client chips we can say that AVX-512 causes insignificant (usually, none at all) license-based downclocking and I expect this to be true on other ICL and <abbr title="Intel's Rocket Lake architecture, aka 11th Generation Intel Core i3,i5,i7 and i9">RKL</abbr> client chips as well.</p>
+
+<p>Now, this adjustment of expectations comes with an important caveat: license-based downclocking is only <em>one</em> source of downclocking. It is also possible to hit power, thermal or current limits. Some configurations may only be able to run wide <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions on all cores for a short period of time before exceeding running power limits. In my case, the $250 laptop I’m testing this on has extremely poor cooling and rather than power limits I hit thermal limits (100°C limit) within a few seconds running anything heavy on all cores.</p>
+
+<p>However, these other limits are qualitatively different than license based limits. They apply mostly<sup id="fnref:voltage" role="doc-noteref"><a href="#fn:voltage" class="footnote" rel="footnote">8</a></sup> in a <em>pay for what you use</em> way: if you use a wide or heavy instruction or two you incur only a microscopic amount of additional power or heat cost associated with only those instructions. This is unlike some license-based transitions where a core or chip-wide transition occurs that affects unrelated subsequent execution for a significant period of time.</p>
+
+<p>Since wider operations are generally <em>cheaper</em> in power than an equivalent number of narrower operations<sup id="fnref:widenarrow" role="doc-noteref"><a href="#fn:widenarrow" class="footnote" rel="footnote">9</a></sup>, you can determine up-front that a wide operation is <em>worth it</em> – at least for cases that scale well with width. In any case, the problem is most local: not depending on the behavior of the surrounding code.</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>Here’s what we’ve learned.</p>
+
+<ul>
+  <li>The Ice Lake i5-1035 CPU exhibits only 100 MHz of license-based downclock with 1 active core when running 512-bit instructions, and <em>no</em> license downclock in any other scenario.</li>
+  <li>The Rocket Lake i9-11900K CPU doesn’t exhibit any license-based downclock in the tested scenarios.</li>
+  <li>The Ice Lake CPU has an all-core 512-bit turbo frequency of 3.3 GHz is 89% of the maximum single-core scalar frequency of 3.7 GHz, so within power and thermal limits this chip has a very “flat” frequency profile. The Rocket Lake 11900K is even flatter with an all-eight-cores frequency of 4.8 GHz clocking in at 94% of the 5.1 GHz single-core speed.</li>
+  <li>Unlike <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr>, this Ice Lake chip does not distinguish between “light” and “heavy” instructions for frequency scaling purposes: FMA operations behave the same as lighter operations.</li>
+</ul>
+
+<p>So on ICL and <abbr title="Intel's Rocket Lake architecture, aka 11th Generation Intel Core i3,i5,i7 and i9">RKL</abbr> client, you don’t have to fear the downclock. Only time will tell if this applies also to the Ice Lake Xeon server chips.</p>
+
+<h3 id="thanks">Thanks</h3>
+
+<p>Thanks to Edison Chan for the Rocket Lake i9-11900K results.</p>
+
+<p>Stopwatch photo by <a href="https://unsplash.com/@kevinandrephotography">Kevin Andre</a> on <a href="https://unsplash.com/s/photos/stopwatch">Unsplash</a>.</p>
+
+<h3 id="discussion-and-feedback">Discussion and Feedback</h3>
+
+<p>This post was discussed <a href="https://news.ycombinator.com/item?id=24215022">on Hacker News</a>.</p>
+
+<p>If you have a question or any type of feedback, you can leave a <a href="#comment-section">comment below</a>. I’m also interested in results on <em>other</em> new Intel or AMD chips, like the i3 and i7 variants: let me know if you have one of those and we can collect results.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:tiring" role="doc-endnote">
+      <p>It gets tiring to constantly repeat <em>license-based downclock</em> so I’ll often use simply “downclock” instead, but this should still be understood to refer to the license-based variety rather than other types of frequency throttling. <a href="#fnref:tiring" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:dmore" role="doc-endnote">
+      <p>Note that Daniel has <a href="https://lemire.me/blog/2018/08/25/avx-512-throttling-heavy-instructions-are-maybe-not-so-dangerous/">written</a> <a href="https://lemire.me/blog/2018/08/15/the-dangers-of-avx-512-throttling-a-3-impact/">much more</a> <a href="https://lemire.me/blog/2018/08/24/trying-harder-to-make-avx-512-look-bad-my-quantified-and-reproducible-results/">than</a> <a href="https://lemire.me/blog/2018/09/04/per-core-frequency-scaling-and-avx-512-an-experiment/">just that</a> one. <a href="#fnref:dmore" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:visible" role="doc-endnote">
+      <p>Only two <em>visible:</em> it is possible that the three (or more) categories still exist, but they cause voltage transitions only, not any frequency transitions. <a href="#fnref:visible" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:onefma" role="doc-endnote">
+      <p>One might imagine this is a consequence of ICL client having only one FMA unit on all SKUs: very heavy FP 512-bit operations aren’t possible. However, this doesn’t align with 256-bit heavy still being fast: you can still do 2x256-bit FMAs per cycle and this is the same FP intensity as 1x512-bit FMA per cycle. It’s more like, on this chip, FP operation don’t need more license based protection from other operations of the same width, and the main cost is 512-bit width. <a href="#fnref:onefma" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:some" role="doc-endnote">
+      <p>Those of a more critical bent might prefer <em>long suffering</em> or <em>very long in the tooth</em> as adjectives for this process. <a href="#fnref:some" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:rklcaveats" role="doc-endnote">
+      <p><em>Some</em> tests did show lower speeds, although these outlier results didn’t correlate well with heavy or light instructions, and the difference was generally 100 MHz or less. These likely represent <em>other</em> sources of reduced frequency, such as thermal throttling or switching to a higher active core count when a process not related to the test process has active threads. In any case, for <em>each</em> core count, we can find a test in each of the instruction categories that runs at full speed, allowing me to fill out the matrix even in the presence of these outliers. <a href="#fnref:rklcaveats" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:tb2" role="doc-endnote">
+      <p>I mention Turbo Boost 2.0 specifically because <a href="https://ark.intel.com/content/www/us/en/ark/products/212325/intel-core-i9-11900k-processor-16m-cache-up-to-5-30-ghz.html">this chip</a> also has a higher Turbo Boost 3.0 maximum frequency of 5.2 GHz, and beyond that a high <em>Thermal Velocity Boost</em> frequency of 5.3 GHz. These higher frequencies apply only to specific <em>chosen cores</em> within the CPU selected at manufacturing based on their ability to reach these higher frequencies. We don’t see any of these higher speeds during the test, possibly because the cores the test pins itself to are not the <em>chosen cores</em> on this CPU. So the frequency behavior of this chip can be characterized as “very simple” only if you ignore these additional turbo levels and other complicating factors. <a href="#fnref:tb2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:voltage" role="doc-endnote">
+      <p>I have to weasel-word with <em>mostly</em> here because even if there is no frequency transition, there may be a voltage transition which both incurs a halted period where nothing executes, and increases power for subsequent execution that may not require the elevated voltage. Also, there is the not-yet-discussed concept of <em>implicit widening</em> which may extend later narrow operations to maximum width if the upper parts of the registers are not zeroed with <code class="language-plaintext highlighter-rouge">vzeroupper</code> or <code class="language-plaintext highlighter-rouge">vzeroall</code>. <a href="#fnref:voltage" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:widenarrow" role="doc-endnote">
+      <p>For example, one 512-bit integer addition would generally be cheaper in energy use than the two 256-bit operations required to calculate the same result, because of execution overheads that don’t scale linearly with width (that’s almost everything outside of execution itself). <a href="#fnref:widenarrow" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-b91ab1d0-5b39-11eb-8312-1f521cd29d10" class="js-comment comment" uid="b91ab1d0-5b39-11eb-8312-1f521cd29d10">
+
+  <div class="comment__author">
+    YsHaNg
+    <span class="comment__date">•
+        <a href="#comment-b91ab1d0-5b39-11eb-8312-1f521cd29d10" title="Permalink to this comment">January 20th, 2021 16:08</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I tested on tiger lake 1165G7 processor, although MSR seems not working under VM. The result shows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CPU brand string: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+4 available CPUs: \[0, 1, 2, 3\]
+2 physical cores: \[0, 2\]
+Will test up to 2 CPUs
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Cores</td>
+      <td>ID</td>
+      <td>Description</td>
+      <td>OVRLP3</td>
+      <td>Mops</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>scalar_iadd</td>
+      <td>Scalar integer adds</td>
+      <td>1.000</td>
+      <td>4079</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>avx256_iadd</td>
+      <td>256-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4074</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>avx512_iadd</td>
+      <td>512-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4077</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>avx256_fma_t</td>
+      <td>256-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>8155</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>avx512_fma_t</td>
+      <td>512-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>4570</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Cores</td>
+      <td>ID</td>
+      <td>Description</td>
+      <td>OVRLP3</td>
+      <td>Mops</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>scalar_iadd</td>
+      <td>Scalar integer adds</td>
+      <td>1.000</td>
+      <td>4076, 4077</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx256_iadd</td>
+      <td>256-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4076, 4076</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx512_iadd</td>
+      <td>512-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4078, 4079</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx256_fma_t</td>
+      <td>256-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>8143, 8153</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx512_fma_t</td>
+      <td>512-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>4076, 4078</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b91ab1d0-5b39-11eb-8312-1f521cd29d10', 'respond', 'icl-avx512-freq', 'b91ab1d0-5b39-11eb-8312-1f521cd29d10')">↪&#xFE0E; Reply to YsHaNg</a>
+    </div>
+</article>
+  
+
+<article id="comment-7bddb460-5eb9-11eb-802a-d773fbbe9b0a" class="js-comment comment admin child" uid="7bddb460-5eb9-11eb-802a-d773fbbe9b0a">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-7bddb460-5eb9-11eb-802a-d773fbbe9b0a" title="Permalink to this comment">January 25th, 2021 03:00</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks, are you running this under a VM? The output indicates 2 physical cores but the 1165G7 should have 4?</p>
+
+<p>In any case, the results are strange. Most tests run at ~4.1 GHz except the 1-core FMA test which runs at ~4.6 GHz, but if anything should be slower it should that one. Perhaps virtualization is interfering, although the numbers do look fairly consistent to me (e.g., little variance around the typical Mops of 4076).</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-2b4b8b50-627c-11eb-b969-1d81369f0b1e" class="js-comment comment child" uid="2b4b8b50-627c-11eb-b969-1d81369f0b1e">
+
+  <div class="comment__author">
+    YsHaNg
+    <span class="comment__date">•
+        <a href="#comment-2b4b8b50-627c-11eb-b969-1d81369f0b1e" title="Permalink to this comment">January 29th, 2021 21:51</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>This is tested under Hyper-V. I have half CPU resources assigned to VM. (I didn’t know this is default.) My machine is Dell XPS 13 9310. Now 4 cores test:
+CPU brand string: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+8 available CPUs: [0, 1, 2, 3, 4, 5, 6, 7]
+4 physical cores: [0, 2, 4, 6]
+Will test up to 4 CPUs
+Cores | ID           | Description                 | OVRLP3 | Mops
+1     | scalar_iadd  | Scalar integer adds         |  1.000 | 4670
+1     | avx256_iadd  | 256-bit integer serial adds |  1.000 | 4670
+1     | avx512_iadd  | 512-bit integer serial adds |  1.000 | 4570
+1     | avx256_fma_t | 256-bit parallel DP FMAs    |  1.000 | 9157
+1     | avx512_fma_t | 512-bit parallel DP FMAs    |  1.000 | 4568</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Cores</td>
+      <td>ID</td>
+      <td>Description</td>
+      <td>OVRLP3</td>
+      <td>Mops</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>scalar_iadd</td>
+      <td>Scalar integer adds</td>
+      <td>1.000</td>
+      <td>4071, 4072</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx256_iadd</td>
+      <td>256-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4669, 4665</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx512_iadd</td>
+      <td>512-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4567, 4567</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx256_fma_t</td>
+      <td>256-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>8135, 8128</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>avx512_fma_t</td>
+      <td>512-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>4072, 4072</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Cores</td>
+      <td>ID</td>
+      <td>Description</td>
+      <td>OVRLP3</td>
+      <td>Mops</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>scalar_iadd</td>
+      <td>Scalar integer adds</td>
+      <td>1.000</td>
+      <td>4211, 4665, 4208</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>avx256_iadd</td>
+      <td>256-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4069, 4070, 4071</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>avx512_iadd</td>
+      <td>512-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4145, 4138, 4567</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>avx256_fma_t</td>
+      <td>256-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>8145, 8148, 8145</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>avx512_fma_t</td>
+      <td>512-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>4567, 1982, 1979</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Cores</td>
+      <td>ID</td>
+      <td>Description</td>
+      <td>OVRLP3</td>
+      <td>Mops</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>scalar_iadd</td>
+      <td>Scalar integer adds</td>
+      <td>1.000</td>
+      <td>3686, 4071, 4072, 3679</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>avx256_iadd</td>
+      <td>256-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>4072, 4072, 3549, 3552</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>avx512_iadd</td>
+      <td>512-bit integer serial adds</td>
+      <td>1.000</td>
+      <td>3698, 3699, 3703, 3694</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>avx256_fma_t</td>
+      <td>256-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>8141, 8143, 8144, 4070</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>avx512_fma_t</td>
+      <td>512-bit parallel DP FMAs</td>
+      <td>1.000</td>
+      <td>4074, 1985, 1991, 4070</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-7d9a8130-e447-11ea-9901-3b54e216015f" class="js-comment comment" uid="7d9a8130-e447-11ea-9901-3b54e216015f">
+
+  <div class="comment__author">
+    Hahem
+    <span class="comment__date">•
+        <a href="#comment-7d9a8130-e447-11ea-9901-3b54e216015f" title="Permalink to this comment">August 22th, 2020 07:17</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>5 licenses in ICL client. 128/256/512 x Light/Heavy.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-7d9a8130-e447-11ea-9901-3b54e216015f', 'respond', 'icl-avx512-freq', '7d9a8130-e447-11ea-9901-3b54e216015f')">↪&#xFE0E; Reply to Hahem</a>
+    </div>
+</article>
+  
+
+<article id="comment-fb005060-5eb7-11eb-802a-d773fbbe9b0a" class="js-comment comment admin child" uid="fb005060-5eb7-11eb-802a-d773fbbe9b0a">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-fb005060-5eb7-11eb-802a-d773fbbe9b0a" title="Permalink to this comment">January 25th, 2021 02:49</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for your comment. Just doing the multiplication naively, that would be 6, wouldn’t it?</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-e979b5e0-e309-11ea-a642-2143fc83c6f8" class="js-comment comment" uid="e979b5e0-e309-11ea-a642-2143fc83c6f8">
+
+  <div class="comment__author">
+    Meehigh
+    <span class="comment__date">•
+        <a href="#comment-e979b5e0-e309-11ea-a642-2143fc83c6f8" title="Permalink to this comment">August 20th, 2020 17:23</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi, very nice article indeed! Do you happen to know whenever the L1 transition is soft or hard?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e979b5e0-e309-11ea-a642-2143fc83c6f8', 'respond', 'icl-avx512-freq', 'e979b5e0-e309-11ea-a642-2143fc83c6f8')">↪&#xFE0E; Reply to Meehigh</a>
+    </div>
+</article>
+  
+
+<article id="comment-5fda6060-e4fc-11ea-ae80-25b8a230c3c5" class="js-comment comment admin child" uid="5fda6060-e4fc-11ea-ae80-25b8a230c3c5">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-5fda6060-e4fc-11ea-ae80-25b8a230c3c5" title="Permalink to this comment">August 23th, 2020 04:51</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>The transition is hard. Although like SKX there is a period where the instructions still execute but at reduced throughput, but a single instruction triggers the transition, just like all the “wider” transitions in SKX.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-ba922f20-e2b2-11ea-b1d3-1de31efb4871" class="js-comment comment" uid="ba922f20-e2b2-11ea-b1d3-1de31efb4871">
+
+  <div class="comment__author">
+    Aleksey Ignatenko
+    <span class="comment__date">•
+        <a href="#comment-ba922f20-e2b2-11ea-b1d3-1de31efb4871" title="Permalink to this comment">August 20th, 2020 06:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Highly expected! Thanks for the info</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ba922f20-e2b2-11ea-b1d3-1de31efb4871', 'respond', 'icl-avx512-freq', 'ba922f20-e2b2-11ea-b1d3-1de31efb4871')">↪&#xFE0E; Reply to Aleksey Ignatenko</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-42d2e670-e26a-11ea-9e9d-93acc238399a" class="js-comment comment" uid="42d2e670-e26a-11ea-9e9d-93acc238399a">
+
+  <div class="comment__author">
+    Andrew Hunter
+    <span class="comment__date">•
+        <a href="#comment-42d2e670-e26a-11ea-9e9d-93acc238399a" title="Permalink to this comment">August 19th, 2020 22:21</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>That’s great news, really!</p>
+
+<p>Did you measure the voltage-only-transitions from your Skylake post? Those are to some extent much scarier to me for some latency-sensitive cases.  I’d weakly guess you wouldn’t seen these with this improvement but I’m not confident.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-42d2e670-e26a-11ea-9e9d-93acc238399a', 'respond', 'icl-avx512-freq', '42d2e670-e26a-11ea-9e9d-93acc238399a')">↪&#xFE0E; Reply to Andrew Hunter</a>
+    </div>
+</article>
+  
+
+<article id="comment-61ded760-e295-11ea-8aaa-f36c001b6541" class="js-comment comment admin child" uid="61ded760-e295-11ea-8aaa-f36c001b6541">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-61ded760-e295-11ea-8aaa-f36c001b6541" title="Permalink to this comment">August 20th, 2020 03:29</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Andrew!</p>
+
+<p>No, I haven’t measured those but a couple of other people asked too, so I might go ahead and do it. I wouldn’t be surprised to see some V-only transitions: it is entirely possible that three or more license levels still exist, but that they just aren’t evident only by checking frequencies.</p>
+
+<p>Some information from Intel at Hot Chips also indicates that ICX (ICL server) has very low transition times, even for frequency transitions, so it would be interesting to see if this applies to ICL too and seems like something that would be good news for you if you’re concerned about latency.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-9c9651d0-e4fc-11ea-ae80-25b8a230c3c5" class="js-comment comment admin child" uid="9c9651d0-e4fc-11ea-ae80-25b8a230c3c5">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-9c9651d0-e4fc-11ea-ae80-25b8a230c3c5" title="Permalink to this comment">August 23th, 2020 04:53</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I went ahead and measured them, and I also find voltage-only transitions and I find them to be about 2x as long as SKX (this might not represent any difference between the uarches, but between the voltage levels required, or something).</p>
+
+<p>You can find some more details <a href="https://twitter.com/trav_downs/status/1297392603307167745">on Twitter</a>.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-96a24cc0-e263-11ea-9e9d-93acc238399a" class="js-comment comment" uid="96a24cc0-e263-11ea-9e9d-93acc238399a">
+
+  <div class="comment__author">
+    Non-E-Moose
+    <span class="comment__date">•
+        <a href="#comment-96a24cc0-e263-11ea-9e9d-93acc238399a" title="Permalink to this comment">August 19th, 2020 21:33</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Just like the absurd approaches taken by DEC with various VAX systems.  Firmware throttling until the customer ‘buys’ the upgrade.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-96a24cc0-e263-11ea-9e9d-93acc238399a', 'respond', 'icl-avx512-freq', '96a24cc0-e263-11ea-9e9d-93acc238399a')">↪&#xFE0E; Reply to Non-E-Moose</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="icl-avx512-freq">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2020/08/19/icl-avx512-freq.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

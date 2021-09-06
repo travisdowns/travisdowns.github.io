@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>Where Do Interrupts Happen? | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Where Do Interrupts Happen?" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Trying to determine exactly where asynchronous interrupts are delivered on Intel CPUs." />
+<meta property="og:description" content="Trying to determine exactly where asynchronous interrupts are delivered on Intel CPUs." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2019/08/20/interrupts.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2019/08/20/interrupts.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/interrupts/Intel_8259.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-08-20T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/interrupts/Intel_8259.png" />
+<meta property="twitter:title" content="Where Do Interrupts Happen?" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2019-08-20T00:00:00+00:00","datePublished":"2019-08-20T00:00:00+00:00","description":"Trying to determine exactly where asynchronous interrupts are delivered on Intel CPUs.","headline":"Where Do Interrupts Happen?","image":"https://travisdowns.github.io/assets/interrupts/Intel_8259.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/08/20/interrupts.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2019/08/20/interrupts.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Where Do Interrupts Happen?</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2019-08-20T00:00:00+00:00" itemprop="datePublished">
+        Aug 20, 2019
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/benchmarking.html">benchmarking</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <style>
+.perf-annotate {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+  background-color: Gainsboro;
+  margin-bottom: 20px;
+}
+</style>
+
+<p>On Twitter, Paul Khuong <a href="https://twitter.com/pkhuong/status/1162832557030948864">asks</a>: <em>Has anyone done a study on the distribution of interrupt points in <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OOO</abbr> processors?</em></p>
+
+<p>Personally, I’m not aware of any such study for modern x86, and I have also wondered the same thing. In particular, when a CPU receives an externally triggered<sup id="fnref:triggered" role="doc-noteref"><a href="#fn:triggered" class="footnote" rel="footnote">1</a></sup> interrupt, at what point in the instruction stream is the CPU interrupted?</p>
+
+<p>For a simple 1-wide in-order, non-pipelined CPU the answer might be as simple as: the CPU is interrupted either before or after instruction that is currently running<sup id="fnref:twoc" role="doc-noteref"><a href="#fn:twoc" class="footnote" rel="footnote">2</a></sup>. For anything more complicated it’s not going to be easy. On a modern <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> processor there may be hundreds of instructions in-flight at any time, some waiting to execute, a dozen or more currently executing, and others waiting to retire. From all these choices, which instruction will be chosen as the victim?</p>
+
+<p>Among other reasons, the answer is interesting because it helps us understand how useful the exact interrupt position is when profiling via interrupt: can we extract useful information from the instruction position, or should we only trust it at a higher level (e.g., over regions of say 100s of instructions).</p>
+
+<p>So let’s go figure out how interruption works, at least on my Skylake i7-6700HQ, by compiling a bunch of small pure-asm programs and running them. The source for all the tests is available in the associated <a href="https://github.com/travisdowns/interrupt-test">git repo</a> so you can follow along or write your own tests. All the tests are written in assembly because we want full control over the instructions and because they are all short and simple. In any case, we can’t avoid assembly-level analysis when talking about what instructions get interrupted.</p>
+
+<p>First, let’s take a look at some asm that doesn’t have any instruction that sticks out in any way at all, just a bunch of <code class="language-plaintext highlighter-rouge">mov</code> instructions<sup id="fnref:whymov" role="doc-noteref"><a href="#fn:whymov" class="footnote" rel="footnote">3</a></sup>. The key part of the <a href="https://github.com/travisdowns/interrupt-test/blob/master/indep-mov.asm">source</a> looks like this<sup id="fnref:srcnotes" role="doc-noteref"><a href="#fn:srcnotes" class="footnote" rel="footnote">4</a></sup>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.loop:</span>
+<span class="cp">
+%rep 10
+</span>	<span class="nf">mov</span>  <span class="nb">eax</span><span class="p">,</span> <span class="mi">1</span>
+	<span class="nf">mov</span>  <span class="nb">ebx</span><span class="p">,</span> <span class="mi">2</span>
+	<span class="nf">mov</span>  <span class="nb">edi</span><span class="p">,</span> <span class="mi">3</span>
+	<span class="nf">mov</span>  <span class="nb">edx</span><span class="p">,</span> <span class="mi">4</span>
+	<span class="nf">mov</span>  <span class="nb">r8d</span><span class="p">,</span> <span class="mi">5</span>
+	<span class="nf">mov</span>  <span class="nb">r9d</span><span class="p">,</span> <span class="mi">6</span>
+	<span class="nf">mov</span> <span class="nb">r10d</span><span class="p">,</span> <span class="mi">7</span>
+	<span class="nf">mov</span> <span class="nb">r11d</span><span class="p">,</span> <span class="mi">8</span>
+<span class="cp">%endrep
+</span>
+	<span class="nf">dec</span> <span class="nb">rcx</span>
+	<span class="nf">jne</span> <span class="nv">.loop</span>
+</code></pre></div></div>
+
+<p>Just constant moves into registers, 8 of them repeated 10 times. This code executes with an expected and measured<sup id="fnref:ipc" role="doc-noteref"><a href="#fn:ipc" class="footnote" rel="footnote">5</a></sup> <abbr title="Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.">IPC</abbr> of 4.</p>
+
+<p>Next, we get to the meat of the investigation. We run the binary using <code class="language-plaintext highlighter-rouge">perf record -e task-clock ./indep-mov</code>, which will periodically interrupt the process and record the <abbr title="Instruction pointer">IP</abbr>. Next, we examine the interrupted locations with <code class="language-plaintext highlighter-rouge">perf report</code><sup id="fnref:acommand" role="doc-noteref"><a href="#fn:acommand" class="footnote" rel="footnote">6</a></sup>. Here’s the output (hereafter, I’m going to cut out the header and just show the samples):</p>
+
+<div class="perf-annotate">
+ Samples |	Source code &amp; Disassembly of indep-mov for task-clock (1769 samples, percent: local period)
+-----------------------------------------------------------------------------------------------------------
+         :
+         :            Disassembly of section .text:
+         :
+         :            00000000004000ae &lt;_start.loop&gt;:
+         :            _start.loop():
+         :            indep-mov.asm:15
+<span style="color:green;">      16</span> : <span style="color:purple;">  4000ae:</span><span style="color:blue;">       mov    eax,0x1</span>
+<span style="color:green;">      15</span> : <span style="color:purple;">  4000b3:</span><span style="color:blue;">       mov    ebx,0x2</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000b8:</span><span style="color:blue;">       mov    edi,0x3</span>
+<span style="color:green;">      25</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       mov    edx,0x4</span>
+<span style="color:green;">      14</span> : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       mov    r8d,0x5</span>
+<span style="color:green;">      19</span> : <span style="color:purple;">  4000c8:</span><span style="color:blue;">       mov    r9d,0x6</span>
+<span style="color:green;">      25</span> : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       mov    r10d,0x7</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  4000d4:</span><span style="color:blue;">       mov    r11d,0x8</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000da:</span><span style="color:blue;">       mov    eax,0x1</span>
+<span style="color:green;">      24</span> : <span style="color:purple;">  4000df:</span><span style="color:blue;">       mov    ebx,0x2</span>
+<span style="color:green;">      20</span> : <span style="color:purple;">  4000e4:</span><span style="color:blue;">       mov    edi,0x3</span>
+<span style="color:green;">      29</span> : <span style="color:purple;">  4000e9:</span><span style="color:blue;">       mov    edx,0x4</span>
+<span style="color:green;">      28</span> : <span style="color:purple;">  4000ee:</span><span style="color:blue;">       mov    r8d,0x5</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  4000f4:</span><span style="color:blue;">       mov    r9d,0x6</span>
+<span style="color:green;">      21</span> : <span style="color:purple;">  4000fa:</span><span style="color:blue;">       mov    r10d,0x7</span>
+<span style="color:green;">      19</span> : <span style="color:purple;">  400100:</span><span style="color:blue;">       mov    r11d,0x8</span>
+<span style="color:green;">      26</span> : <span style="color:purple;">  400106:</span><span style="color:blue;">       mov    eax,0x1</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  40010b:</span><span style="color:blue;">       mov    ebx,0x2</span>
+<span style="color:green;">      29</span> : <span style="color:purple;">  400110:</span><span style="color:blue;">       mov    edi,0x3</span>
+<span style="color:green;">      19</span> : <span style="color:purple;">  400115:</span><span style="color:blue;">       mov    edx,0x4</span>
+</div>
+
+<p>The first column shows the number of interrupts received for each instruction. Specially, the number of times an instruction would be the next instruction to execute following the interrupt.</p>
+
+<p>Without doing any deep statistical analysis, I don’t see any particular pattern here. Every instruction gets its time in the sun. Some columns have somewhat higher values than others, but if you repeat the measurements, the columns with higher values don’t necessarily repeat.</p>
+
+<p>We can try the exact same thing, but with <code class="language-plaintext highlighter-rouge">add</code> instructions <a href="https://github.com/travisdowns/interrupt-test/blob/master/indep-add.asm">like this</a>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="nf">add</span>  <span class="nb">eax</span><span class="p">,</span> <span class="mi">1</span>
+	<span class="nf">add</span>  <span class="nb">ebx</span><span class="p">,</span> <span class="mi">2</span>
+	<span class="nf">add</span>  <span class="nb">edi</span><span class="p">,</span> <span class="mi">3</span>
+	<span class="nf">add</span>  <span class="nb">edx</span><span class="p">,</span> <span class="mi">4</span>
+	<span class="nf">add</span>  <span class="nb">r8d</span><span class="p">,</span> <span class="mi">5</span>
+	<span class="nf">add</span>  <span class="nb">r9d</span><span class="p">,</span> <span class="mi">6</span>
+	<span class="nf">add</span> <span class="nb">r10d</span><span class="p">,</span> <span class="mi">7</span>
+	<span class="nf">add</span> <span class="nb">r11d</span><span class="p">,</span> <span class="mi">8</span>
+</code></pre></div></div>
+
+<p>We expect the execution behavior to be similar to the <code class="language-plaintext highlighter-rouge">mov</code> case: we <em>do</em> have dependency chains here but 8 separate ones (for each destination register) for a 1 cycle instruction so there should be little practical impact. Indeed, the results are basically identical to the last experiment so I won’t show them here (you can see them yourself with the <code class="language-plaintext highlighter-rouge">indep-add</code> test).</p>
+
+<p>Let’s get moving here and try something more interesting. This time we will again use all <code class="language-plaintext highlighter-rouge">add</code> instructions, but two of the adds will depend on each other, while the other two will be independent. So the chain shared by those two adds will be twice as long (2 cycles) as the other chains (1 cycle each). <a href="https://github.com/travisdowns/interrupt-test/blob/master/add-2-1-1.asm">Like this</a>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">1</span> <span class="c1">; 2-cycle chain</span>
+    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">2</span> <span class="c1">; 2-cycle chain</span>
+    <span class="nf">add</span>  <span class="nb">rsi</span><span class="p">,</span> <span class="mi">3</span>
+    <span class="nf">add</span>  <span class="nb">rdi</span><span class="p">,</span> <span class="mi">4</span>
+</code></pre></div></div>
+
+<p>Here the chain through <code class="language-plaintext highlighter-rouge">rax</code> should limit the throughput of the above repeated block to 1 per 2 cycles, and indeed I measure an <abbr title="Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.">IPC</abbr> of 2 (4 instructions / 2 cycles = 2 <abbr title="Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.">IPC</abbr>).</p>
+
+<p>Here’s the interrupt distribution:</p>
+<div class="perf-annotate">
+       0 : <span style="color:purple;">  4000ae:</span><span style="color:blue;">       add    rax,0x1</span>
+<span style="color:green;">      82</span> : <span style="color:purple;">  4000b2:</span><span style="color:blue;">       add    rax,0x2</span>
+<span style="color:green;">     112</span> : <span style="color:purple;">  4000b6:</span><span style="color:blue;">       add    rsi,0x3</span>
+       0 : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       add    rdi,0x4</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       add    rax,0x1</span>
+<span style="color:green;">      45</span> : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       add    rax,0x2</span>
+<span style="color:green;">     144</span> : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       add    rsi,0x3</span>
+       0 : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       add    rdi,0x4</span>
+       0 : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       add    rax,0x1</span>
+<span style="color:green;">      44</span> : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       add    rax,0x2</span>
+<span style="color:green;">     107</span> : <span style="color:purple;">  4000d6:</span><span style="color:blue;">       add    rsi,0x3</span>
+
+(pattern repeats...)
+</div>
+
+<p>This is certainly something new. We see that <em>all</em> the interrupts fall on the middle two instructions, one of which is part of the addition chain and one which is not. The second of the two locations also gets about 2-3 times as many interrupts as the first.</p>
+
+<h3 id="a-hypothesis">A Hypothesis</h3>
+
+<p>Let’s make a hypothesis now so we can design more tests.</p>
+
+<p>Let’s guess that interrupts <em>select</em> instructions which are the oldest unretired instruction, and that this <em>selected</em> instruction is allowed to complete hence samples fall on the next instruction (let us call this next instruction the <em>sampled</em> instruction). I am making the distinction between <em>selected</em> and <em>sampled</em> instructions rather than just saying “interrupts sample instructions that follow the oldest unretired instruction” because we are going to build our model almost entirely around the <em>selected</em> instructions, so we want to name them. The characteristics of the ultimately sampled instructions (except their positioning after <em>selected</em> instructions) hardly matters<sup id="fnref:untrue" role="doc-noteref"><a href="#fn:untrue" class="footnote" rel="footnote">7</a></sup>.</p>
+
+<p>Without a more detailed model of instruction retirement, we can’t yet explain everything we see - but the basic idea is instructions that take longer, hence are more likely to be the oldest unretired instruction, are the ones that get sampled. In particular, if there is a critical dependency chain, instructions in that chain are likely<sup id="fnref:likely" role="doc-noteref"><a href="#fn:likely" class="footnote" rel="footnote">8</a></sup> be sampled at some point<sup id="fnref:notonly" role="doc-noteref"><a href="#fn:notonly" class="footnote" rel="footnote">9</a></sup>.</p>
+
+<p>Let’s take a look at some more examples. I’m going to switch using <code class="language-plaintext highlighter-rouge">mov rax, [rax]</code> as my long latency instruction (4 cycles latency) and <code class="language-plaintext highlighter-rouge">nop</code> as the filler instruction not part of any chain. Don’t worry, <code class="language-plaintext highlighter-rouge">nop</code> has to allocate and retire just like any other instruction: it simply gets to skip execution. You can build all these examples with a real instruction like <code class="language-plaintext highlighter-rouge">add</code> and they’ll work in the same way<sup id="fnref:whynop" role="doc-noteref"><a href="#fn:whynop" class="footnote" rel="footnote">10</a></sup>.</p>
+
+<p>Let’s <a href="https://github.com/travisdowns/interrupt-test/blob/master/load-nop10.asm">take a look</a> at a load followed by 10 <code class="language-plaintext highlighter-rouge">nops</code>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.loop:</span>
+<span class="cp">
+%rep 10
+</span>    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>
+    <span class="kd">times</span> <span class="mi">10</span> <span class="nv">nop</span>
+<span class="cp">%endrep
+</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jne</span> <span class="nv">.loop</span>
+</code></pre></div></div>
+
+<p>The result:</p>
+
+<div class="perf-annotate">
+       0 : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      33</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000bf:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c0:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      11</span> : <span style="color:purple;">  4000c1:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c3:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c4:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000c5:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c7:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:green;">      15</span> : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000cb:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000cc:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      13</span> : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       nop</span>
+       1 : <span style="color:purple;">  4000cf:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d0:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d1:</span><span style="color:blue;">       nop</span>
+<span style="color:red;">      35</span> : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d3:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d4:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:green;">      16</span> : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d8:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d9:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000da:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      14</span> : <span style="color:purple;">  4000db:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000dc:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000dd:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000de:</span><span style="color:blue;">       nop</span>
+<span style="color:red;">      31</span> : <span style="color:purple;">  4000df:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000e0:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000e1:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000e4:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000e5:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000e6:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000e7:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      16</span> : <span style="color:purple;">  4000e8:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000e9:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000ea:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000eb:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      24</span> : <span style="color:purple;">  4000ec:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000ed:</span><span style="color:blue;">       nop</span>
+</div>
+
+<p>The <em>selected</em> instructions are the long-latency <code class="language-plaintext highlighter-rouge">mov</code>-chain, but also two specific <code class="language-plaintext highlighter-rouge">nop</code> instructions out of the 10 that follow: those which fall 4 and 8 instructions after the <code class="language-plaintext highlighter-rouge">mov</code>. Here we can see the impact of retirement throughput. Although the <code class="language-plaintext highlighter-rouge">mov</code>-chain is the only thing that contributes to <em>execution</em> latency, this Skylake CPU can <a href="https://www.realworldtech.com/forum/?threadid=161978&amp;curpostid=162222">only retire</a> up to 4 instructions per cycle (per thread). So when the <code class="language-plaintext highlighter-rouge">mov</code> finally retires, there will be two cycles of retiring blocks of 4 <code class="language-plaintext highlighter-rouge">nop</code> instructions before we get to the next <code class="language-plaintext highlighter-rouge">mov</code>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;                            retire cycle</span>
+<span class="nf">mov</span>    <span class="nb">rax</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span> <span class="c1">; 0 (execution limited)</span>
+<span class="nf">nop</span>                        <span class="c1">; 0</span>
+<span class="nf">nop</span>                        <span class="c1">; 0</span>
+<span class="nf">nop</span>                        <span class="c1">; 0</span>
+<span class="nf">nop</span>                        <span class="c1">; 1 &lt;-- selected nop</span>
+<span class="nf">nop</span>                        <span class="c1">; 1</span>
+<span class="nf">nop</span>                        <span class="c1">; 1</span>
+<span class="nf">nop</span>                        <span class="c1">; 1</span>
+<span class="nf">nop</span>                        <span class="c1">; 2 &lt;-- selected nop</span>
+<span class="nf">nop</span>                        <span class="c1">; 2</span>
+<span class="nf">nop</span>                        <span class="c1">; 2</span>
+<span class="nf">mov</span>    <span class="nb">rax</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span> <span class="c1">; 4 (execution limited)</span>
+<span class="nf">nop</span>                        <span class="c1">; 4</span>
+<span class="nf">nop</span>                        <span class="c1">; 4</span>
+</code></pre></div></div>
+
+<p>In this example, the retirement of <code class="language-plaintext highlighter-rouge">mov</code> instructions are “execution limited” - i.e., their retirement cycle is determined by when they are done executing, not by any details of the retirement engine. The retirement of the other instructions, on the other hand, is determined by the retirement behavior: they are “ready” early but cannot retire because the in-order retirement pointer hasn’t reached them yet (it is held up waiting for the <code class="language-plaintext highlighter-rouge">mov</code> to execute).</p>
+
+<p>So those selected <code class="language-plaintext highlighter-rouge">nop</code> instructions aren’t particularly special: they aren’t slower than the rest or causing any bottleneck. They are simply selected because the pattern of retirement following the <code class="language-plaintext highlighter-rouge">mov</code> is predictable. Note also that it is the <em>first</em> <code class="language-plaintext highlighter-rouge">nop</code> that in the group of 4 that would otherwise retire that is selected<sup id="fnref:already" role="doc-noteref"><a href="#fn:already" class="footnote" rel="footnote">11</a></sup>.</p>
+
+<p>This means that we can construct <a href="https://github.com/travisdowns/interrupt-test/blob/master/load-add2.asm">an example</a> where an instruction on the critical path never gets selected:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">%rep 10
+</span>    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>
+    <span class="nf">nop</span>
+    <span class="nf">nop</span>
+    <span class="nf">nop</span>
+    <span class="nf">nop</span>
+    <span class="nf">nop</span>
+    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">0</span>
+<span class="cp">%endrep
+</span></code></pre></div></div>
+
+<p>The results:</p>
+
+<div class="perf-annotate">
+       0 : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      94</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000bf:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c0:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      17</span> : <span style="color:purple;">  4000c1:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       add    rax,0x0</span>
+       0 : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      78</span> : <span style="color:purple;">  4000c9:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000cb:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000cc:</span><span style="color:blue;">       nop</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       add    rax,0x0</span>
+</div>
+
+<p>The <code class="language-plaintext highlighter-rouge">add</code> instruction is on the critical path: it increases the execution time of the block from 4 cycles to 6 cycles<sup id="fnref:4to6" role="doc-noteref"><a href="#fn:4to6" class="footnote" rel="footnote">12</a></sup>, yet it is never selected. The retirement pattern looks like:
+<a name="lookhere"></a></p>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                        <span class="err">/-</span> <span class="nf">scheduled</span>
+                       <span class="err">|</span>  <span class="err">/-</span> <span class="nf">ready</span>
+                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">complete</span>
+                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">retired</span>
+    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 0  0  5  5 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 0  0  0  5 &lt;-- sample</span>
+    <span class="nf">nop</span>              <span class="c1">; 0  0  0  5</span>
+    <span class="nf">nop</span>              <span class="c1">; 0  0  0  5</span>
+    <span class="nf">nop</span>              <span class="c1">; 1  1  1  6 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 1  1  1  6 &lt;-- sampled</span>
+    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">0</span>      <span class="c1">; 1  5  6  6</span>
+    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 1  6 11 11 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 2  2  2 11 &lt;-- sampled</span>
+    <span class="nf">nop</span>              <span class="c1">; 2  2  2 11</span>
+    <span class="nf">nop</span>              <span class="c1">; 2  2  2 11</span>
+    <span class="nf">nop</span>              <span class="c1">; 2  2  2 12 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 3  3  3 12 &lt;-- sampled</span>
+    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">0</span>      <span class="c1">; 3 11 12 12</span>
+    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 3 12 17 17 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 3  3  3 17 &lt;-- sampled</span>
+</code></pre></div></div>
+
+<p>On the right hand side, I’ve annotated each instruction with several key cycle values, described below.</p>
+
+<p>The <em>scheduled</em> column indicates when the instruction enters the scheduler and hence could execute if all its dependencies were met. This column is very simple: we assume that there are no front-end bottlenecks and hence we schedule (aka “allocate”) 4 instructions every cycle. This part is in-order: instructions enter the scheduler in program order.</p>
+
+<p>The <em>ready</em> column indicates when all dependencies of a scheduled instruction have executed and hence the instruction is ready to execute. In this simple model, an instruction always begins executing when it is ready. A more complicated model would also need to model contention for execution ports, but here we don’t have any such contention. Instruction readiness occurs <em>out of order</em>: you can see that many instructions become ready before older instructions (e.g., the <code class="language-plaintext highlighter-rouge">nop</code> instructions are generally ready before the preceding <code class="language-plaintext highlighter-rouge">mov</code> or <code class="language-plaintext highlighter-rouge">add</code> instructions). To calculate this column take the maximum of the <em>ready</em> column for this instruction and the <em>completed</em> column for all previous instructions whose outputs are inputs to this instruction.</p>
+
+<p>The <em>complete</em> column indicates when an instruction finishes execution. In this model it simply takes the value of the <em>ready</em> column plus the instruction latency, which is 0 for the <code class="language-plaintext highlighter-rouge">nop</code> instructions (they don’t execute at all, so they have 0 effective latency), 1 for the <code class="language-plaintext highlighter-rouge">add</code> instruction and 5 for the <code class="language-plaintext highlighter-rouge">mov</code>. Like the <em>ready</em> column this happens out of order.</p>
+
+<p>Finally, the <em>retired</em> column, what we’re really after, shows when the instruction retires.  The rule is fairly simple: an instruction cannot retire until it is complete, and the instruction before it must be retired or retiring on this cycle. No more than 4 instructions can retire in a cycle. As a consequence of the “previous instruction must retired” part, this column is only increasing and so like the first column, retirement is <em>in order</em>.</p>
+
+<p>Once we have the <em>retired</em> column filled out, we can identify the <code class="language-plaintext highlighter-rouge">&lt;-- selected</code> instructions<sup id="fnref:possibly" role="doc-noteref"><a href="#fn:possibly" class="footnote" rel="footnote">13</a></sup>: they are the ones where the retirement cycle increases. In this case, selected instructions are always either the <code class="language-plaintext highlighter-rouge">mov</code> instruction (because of its long latency, it holds up retirement), or the fourth <code class="language-plaintext highlighter-rouge">nop</code> after the <code class="language-plaintext highlighter-rouge">mov</code> (because of the “only retire 4 per cycle” rule, this <code class="language-plaintext highlighter-rouge">nop</code> is at the head of the group that retires in the cycle after the <code class="language-plaintext highlighter-rouge">mov</code> retires). Finally, the <em>sampled</em> instructions which are those will actually show up in the interrupt report are simply the instruction following each selected instruction.</p>
+
+<p>Here, the <code class="language-plaintext highlighter-rouge">add</code> is never selected because it executes in the cycle after the <code class="language-plaintext highlighter-rouge">mov</code>, so it is eligible for retirement in the next cycle and hence doesn’t slow down retirement and so doesn’t behave much differently than a <code class="language-plaintext highlighter-rouge">nop</code> for the purposes of retirement. We can change the position of the <code class="language-plaintext highlighter-rouge">add</code> slightly, so it falls in the same 4-instruction retirement window as the <code class="language-plaintext highlighter-rouge">mov</code>, <a href="https://github.com/travisdowns/interrupt-test/blob/master/load-add3.asm">like this</a>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">%rep 10
+</span>    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>
+    <span class="nf">nop</span>
+    <span class="nf">nop</span>
+    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="nf">nop</span>
+    <span class="nf">nop</span>
+    <span class="nf">nop</span>
+<span class="cp">%endrep
+</span></code></pre></div></div>
+
+<p>We’ve only slid the <code class="language-plaintext highlighter-rouge">add</code> up a few places. The number of instructions is the same and this block executes in 6 cycles, identical to the last example. However, the <code class="language-plaintext highlighter-rouge">add</code> instruction now always gets selected:</p>
+
+<div class="perf-annotate">
+<span style="color:green;">      21</span> : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      54</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000bf:</span><span style="color:blue;">       add    rax,0x0</span>
+<span style="color:green;">      15</span> : <span style="color:purple;">  4000c3:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c4:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c5:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      88</span> : <span style="color:purple;">  4000c9:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000cb:</span><span style="color:blue;">       add    rax,0x0</span>
+<span style="color:green;">      14</span> : <span style="color:purple;">  4000cf:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d0:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d1:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      91</span> : <span style="color:purple;">  4000d5:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d6:</span><span style="color:blue;">       nop</span>
+       0 : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       add    rax,0x0</span>
+<span style="color:green;">      13</span> : <span style="color:purple;">  4000db:</span><span style="color:blue;">       nop</span>
+</div>
+
+<p>Here’s the cycle analysis and retirement pattern for this version:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                        <span class="err">/-</span> <span class="nf">scheduled</span>
+                       <span class="err">|</span>  <span class="err">/-</span> <span class="nf">ready</span>
+                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">complete</span>
+                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">retired</span>
+    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 0  0  5  5 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 0  0  0  5 &lt;-- sample</span>
+    <span class="nf">nop</span>              <span class="c1">; 0  0  0  5</span>
+    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">0</span>      <span class="c1">; 0  5  6  6 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 1  1  1  6 &lt;-- sampled</span>
+    <span class="nf">nop</span>              <span class="c1">; 1  1  1  6</span>
+    <span class="nf">nop</span>              <span class="c1">; 1  1  1  6</span>
+    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 1  6 11 11 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 2  2  2 11 &lt;-- sampled</span>
+    <span class="nf">nop</span>              <span class="c1">; 2  2  2 11</span>
+    <span class="nf">add</span>  <span class="nb">rax</span><span class="p">,</span> <span class="mi">0</span>      <span class="c1">; 2 11 12 12 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 2  2  2 12 &lt;-- sampled</span>
+    <span class="nf">nop</span>              <span class="c1">; 3  3  3 12</span>
+    <span class="nf">nop</span>              <span class="c1">; 3  3  3 12</span>
+    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 3 12 17 17 &lt;-- selected</span>
+    <span class="nf">nop</span>              <span class="c1">; 3  3  3 17 &lt;-- sampled</span>
+</code></pre></div></div>
+
+<p>Now might be a good time to note that we also care about the actual sample counts, and not just their presence or absence. Here, the samples associated with the <code class="language-plaintext highlighter-rouge">mov</code> are more frequent than the samples associated with the <code class="language-plaintext highlighter-rouge">add</code>. In fact, there are about 4.9 samples for <code class="language-plaintext highlighter-rouge">mov</code> for every sample for <code class="language-plaintext highlighter-rouge">add</code> (calculated over the full results). That lines up almost exactly with the <code class="language-plaintext highlighter-rouge">mov</code> having a latency of 5 and the <code class="language-plaintext highlighter-rouge">add</code> a latency of 1: the <code class="language-plaintext highlighter-rouge">mov</code> will be the oldest unretired instruction 5 times as often as the <code class="language-plaintext highlighter-rouge">add</code>. So the sample counts are very meaningful in this case.</p>
+
+<p>Going back to the cycle charts, we know the <em>selected</em> instructions are those where the retirement cycle increases. To that we add that the <em>size</em> of the increase determines their <em>selection weight</em>: the <code class="language-plaintext highlighter-rouge">mov</code> instruction has a weight of 5, since it jumps (for example) from 6 to 11 so it is the oldest unretired instruction for 5 cycles, while the <code class="language-plaintext highlighter-rouge">nop</code> instructions have a weight of 1.</p>
+
+<p>This lets you measure <em>in-situ</em> the latency of various instructions, as long as you have accounted for the retirement behavior. For example, measuring the following block (<code class="language-plaintext highlighter-rouge">rdx</code> is zero at runtime):</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>
+    <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="nb">rdx</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Results in samples accumulating in a 4:5 ratio for the first and second lines: reflecting the fact that the second load has a latency of 5 due to complex addressing, while the first load takes only 4 cycles.</p>
+
+<h3 id="branches">Branches</h3>
+
+<p>What about branches? I don’t find anything special about branches: whether taken or untaken they seem to retire normally and fit the pattern described above. I am not going to show the results but you can play with the <a href="https://github.com/travisdowns/interrupt-test/blob/master/branches.asm"><code class="language-plaintext highlighter-rouge">branches</code> test</a> yourself if you want.</p>
+
+<h3 id="atomic-operations">Atomic Operations</h3>
+
+<p>What about atomic operations? Here the story does get interesting.</p>
+
+<p>I’m going to use <code class="language-plaintext highlighter-rouge">lock add QWORD [rbx], 1</code> as my default atomic instruction, but the story seems similar for all of them. Alone, this instruction has a “latency”<sup id="fnref:atomiclat" role="doc-noteref"><a href="#fn:atomiclat" class="footnote" rel="footnote">14</a></sup> of 18 cycles. Let’s put it in parallel with a couple of <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions that have a total latency of 20 cycles alone:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">vpmulld</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span>
+    <span class="nf">vpmulld</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span>
+    <span class="nf">lock</span> <span class="nv">add</span> <span class="kt">QWORD</span> <span class="p">[</span><span class="nb">rbx</span><span class="p">],</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>This loop <em>still takes 20 cycles</em> to execute. That is, the atomic costs nothing in runtime: the performance is the same if you comment it out. The <code class="language-plaintext highlighter-rouge">vpmulld</code> dependency chain is long enough to hide the cost of the atomic. Let’s take a look at the interrupt distribution for this code:</p>
+
+<div class="perf-annotate">
+       0 : <span style="color:purple;">  4000c8:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+      12 : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+      10 : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     244</span> : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000dc:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      26</span> : <span style="color:purple;">  4000e1:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     299</span> : <span style="color:purple;">  4000e6:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000eb:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      35</span> : <span style="color:purple;">  4000f0:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     277</span> : <span style="color:purple;">  4000f5:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000fa:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      33</span> : <span style="color:purple;">  4000ff:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     302</span> : <span style="color:purple;">  400104:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400109:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      33</span> : <span style="color:purple;">  40010e:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     272</span> : <span style="color:purple;">  400113:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400118:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      31</span> : <span style="color:purple;">  40011d:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     280</span> : <span style="color:purple;">  400122:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400127:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      40</span> : <span style="color:purple;">  40012c:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     277</span> : <span style="color:purple;">  400131:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400136:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      21</span> : <span style="color:purple;">  40013b:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     282</span> : <span style="color:purple;">  400140:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400145:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      35</span> : <span style="color:purple;">  40014a:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     291</span> : <span style="color:purple;">  40014f:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400154:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      35</span> : <span style="color:purple;">  400159:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     270</span> : <span style="color:purple;">  40015e:</span><span style="color:blue;">       dec    rcx</span>
+       0 : <span style="color:purple;">  400161:</span><span style="color:blue;">       jne    4000c8 &lt;_start.loop&gt;</span>
+
+</div>
+
+<p>The <code class="language-plaintext highlighter-rouge">lock add</code> instructions are selected by the interrupt close to 90% of the time, despite not contributing to the execution time. Based on our mental model, these instructions should be able to run ahead of the <code class="language-plaintext highlighter-rouge">vpmulld</code> loop and hence be ready to retire as soon as they are the head of the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>. The effect that we see here is because <code class="language-plaintext highlighter-rouge">lock</code>-prefixed instructions are <em>execute at retire</em>. This is a special type of instruction that waits until it at the head of the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> before it executes<sup id="fnref:execretire" role="doc-noteref"><a href="#fn:execretire" class="footnote" rel="footnote">15</a></sup>.</p>
+
+<p>So this instruction will <em>always</em> take a certain minimum amount of time as the oldest unretired instruction: it never retires immediately regardless of the surrounding instructions. In this case, it means retirement spends most of its time waiting for the locked instructions, while execution spends most of its time waiting for the <code class="language-plaintext highlighter-rouge">vpmulld</code>. Note that the retirement time added by the locked instructions wasn’t additive with that from <code class="language-plaintext highlighter-rouge">vpmulld</code>: the time it spends waiting for retirement is subtracted from the time that would otherwise be spent waiting on the multiplication retirement. That’s why you end up with a lopsided split, not 50/50. We can see this more clearly if we double the number of multiplications to 4:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">vpmulld</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span>
+    <span class="nf">vpmulld</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span>
+    <span class="nf">vpmulld</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span>
+    <span class="nf">vpmulld</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span><span class="p">,</span> <span class="nv">xmm0</span>
+    <span class="nf">lock</span> <span class="nv">add</span> <span class="kt">QWORD</span> <span class="p">[</span><span class="nb">rbx</span><span class="p">],</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>This takes 40 cycles to execute, and the interrupt pattern looks like:</p>
+
+<div class="perf-annotate">
+       0 : <span style="color:purple;">  4000c8:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+      18 : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      49</span> : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     133</span> : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     152</span> : <span style="color:purple;">  4000dc:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     263</span> : <span style="color:purple;">  4000e1:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000e6:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      61</span> : <span style="color:purple;">  4000eb:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     160</span> : <span style="color:purple;">  4000f0:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     168</span> : <span style="color:purple;">  4000f5:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     251</span> : <span style="color:purple;">  4000fa:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000ff:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      59</span> : <span style="color:purple;">  400104:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     166</span> : <span style="color:purple;">  400109:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     162</span> : <span style="color:purple;">  40010e:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     267</span> : <span style="color:purple;">  400113:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400118:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      60</span> : <span style="color:purple;">  40011d:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     160</span> : <span style="color:purple;">  400122:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     155</span> : <span style="color:purple;">  400127:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     218</span> : <span style="color:purple;">  40012c:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400131:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      58</span> : <span style="color:purple;">  400136:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     144</span> : <span style="color:purple;">  40013b:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     154</span> : <span style="color:purple;">  400140:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+
+pattern continues...
+</div>
+
+<p>The sample counts are similar for <code class="language-plaintext highlighter-rouge">lock add</code> but they’ve now increased to a comparable amount (in total) for the <code class="language-plaintext highlighter-rouge">vmulld</code> instructions<sup id="fnref:uneven" role="doc-noteref"><a href="#fn:uneven" class="footnote" rel="footnote">16</a></sup>. In fact, we can calculate how long the <code class="language-plaintext highlighter-rouge">lock add</code> instruction takes to retire, using the ratio of the times it was selected compared to the known block throughput of 40 cycles. I get about a 38%-40% rate over a couple of runs which corresponds to a retire time of 15-16 cycles, only slightly less than then back-to-back latency<sup id="fnref:atomiclat:1" role="doc-noteref"><a href="#fn:atomiclat" class="footnote" rel="footnote">14</a></sup> of this instruction.</p>
+
+<p>Can we do anything with this information?</p>
+
+<p>Well one idea is that it lets us fairly precisely map out the retirement timing of instructions. For example, we can set up an instruction to test, and a parallel series of instructions with a known latency. Then we observe what is selected by interrupts: the instruction under test or the end of the known-latency chain. Whichever is selected has longer retirement latency and the known-latency chain can be adjusted to narrow it down exactly.</p>
+
+<p>Of course, this sounds way harder than the usual way of measuring latency: a long series of back-to-back instructions, but it does let us measure some things <em>in situ</em> without a long chain, and we can measure instructions that don’t have an obvious way to chain (e.g,. have no output like stores or different-domain instructions).</p>
+
+<h3 id="some-things-that-i-didnt-get-to">Some Things That I Didn’t Get To</h3>
+
+<ul>
+  <li>Explain the variable (non-self synchronizing) results in terms of retire window patterns</li>
+  <li>Check interruptible instructions</li>
+  <li>Check <code class="language-plaintext highlighter-rouge">mfence</code> and friends</li>
+  <li>Check the execution effect of atomic instructions (e.g., blocking load ports)</li>
+</ul>
+
+<h3 id="comments">Comments</h3>
+
+<p>Feedback of any type is welcome. I don’t have a comments system<sup id="fnref:comments" role="doc-noteref"><a href="#fn:comments" class="footnote" rel="footnote">17</a></sup> yet, so as usual I’ll outsource discussion to <a href="https://news.ycombinator.com/item?id=20751186">this HackerNews thread</a>.</p>
+
+<h3 id="thanks-and-attribution">Thanks and Attribution</h3>
+
+<p>Thanks to <abbr title="HackerNews">HN</abbr> user rrss for pointing out errors in my cycle chart.</p>
+
+<p>Thanks to Alex Dowad for pointing out a typo in the text.</p>
+
+<p><a href="https://commons.wikimedia.org/wiki/File:Intel_8259.svg">Intel 8259 image</a> by Wikipedia user German under <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a>.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:triggered" role="doc-endnote">
+      <p>By <em>externally triggered</em> I mean pretty much any interrupt that doesn’t result directly from the code currently running on the logical core (such as an <code class="language-plaintext highlighter-rouge">int</code> instruction or some fault/trap). So it includes includes timer interrupts, cross CPU inter-processor interrupts, etc. <a href="#fnref:triggered" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:twoc" role="doc-endnote">
+      <p>The two choices basically correspond to letting the current instruction finish, or aborting it in order to run the interrupt. <a href="#fnref:twoc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:whymov" role="doc-endnote">
+      <p>I use <code class="language-plaintext highlighter-rouge">mov</code> here to avoid creating any dependency chains, i.e., the destination of <code class="language-plaintext highlighter-rouge">mov</code> is <em>write-only</em> unlike most x86 integer instructions which both read and write their first operand. <a href="#fnref:whymov" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:srcnotes" role="doc-endnote">
+      <p>Here I show the full loop, and the <code class="language-plaintext highlighter-rouge">%rep</code> directive which repeats (unrolls) the contained block the specified number of times, but from this point on I may just show the inner block itself with the understanding that it is unrolled with <code class="language-plaintext highlighter-rouge">%rep</code> some number of times (to reduce the impact of the loop) and contained with a loop of ~1,000,000 iterations so we get a reasonable number of samples. For the exact code you can always refer to the <a href="https://github.com/travisdowns/interrupt-test">repo</a>. <a href="#fnref:srcnotes" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:ipc" role="doc-endnote">
+      <p>In general I’ll just say “this code executes like this” or “the bottleneck is this”, without further justification as the examples are usually simple with one obvious bottleneck. Even though I won’t always mentioned it, I <em>have</em> checked that the examples perform as expected, usually with a <code class="language-plaintext highlighter-rouge">perf stat</code> to confirm the <abbr title="Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.">IPC</abbr> or cycles per iteration or whatever. <a href="#fnref:ipc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:acommand" role="doc-endnote">
+      <p>The full command I use is something like <code class="language-plaintext highlighter-rouge">perfc annotate -Mintel --stdio --no-source --stdio-color --show-nr-samples</code>. For interactive analysis just drop the <code class="language-plaintext highlighter-rouge">--stdio</code> part to get the tui UI. <a href="#fnref:acommand" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:untrue" role="doc-endnote">
+      <p>Of course we will see that in some cases the <em>selected</em> and <em>sampled</em> instructions can actually be the same, in the case of interruptible instructions. <a href="#fnref:untrue" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:likely" role="doc-endnote">
+      <p>Originally I thought it was guaranteed that instructions on the critical path would be eligible for sampling, but it is not: later we construct an example where a critical instruction never gets selected. <a href="#fnref:likely" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:notonly" role="doc-endnote">
+      <p>Note that I am specifically <em>not</em> saying the only selected instructions will be from the chain. As we will see soon, retirement limits mean that unless the chain instructions are fairly dense (i.e., at least 1 every 4 instructions), other instructions may appear also. <a href="#fnref:notonly" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:whynop" role="doc-endnote">
+      <p>I use <code class="language-plaintext highlighter-rouge">nop</code> because it has no inputs or outputs so I don’t have to be careful not to create dependency chains (e.g., ensuring each <code class="language-plaintext highlighter-rouge">add</code> goes to a distinct register), and it doesn’t use any execution units, so we won’t steal a unit from the chain on the critical path. <a href="#fnref:whynop" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:already" role="doc-endnote">
+      <p>We have already seen this effect in all of the earlier examples: it is why the long-latency <code class="language-plaintext highlighter-rouge">add</code> is selected, even though that in the cycle that it retires the three subsequent instructions also retire. This behavior is nice because it ensures that longer latency instructions are generally selected, rather than some unrelated instruction (i.e., the usual skid is +1 not +4). <a href="#fnref:already" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:4to6" role="doc-endnote">
+      <p>The increase is from 4 to 6, rather than 4 to 5, because of +1 cycle for the <code class="language-plaintext highlighter-rouge">add</code> itself (obvious) and +1 cycle because any ALU instruction in the address computation path of a pointer chasing loop disables the 4-cycle load fast path (much less obvious). <a href="#fnref:4to6" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:possibly" role="doc-endnote">
+      <p>Of course this doesn’t mean the instruction <em>will</em> be selected, we only have a few thousand interrupts over one million or more interrupts, so usually nothign happens at all. These are just the locations that are highly likely to be chosen when an interrupt does arrive. <a href="#fnref:possibly" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:atomiclat" role="doc-endnote">
+      <p>Latency is in scare quotes here because the apparent latency of atomic operations doesn’t behave like most other instructions: if you measure the throughput of back-to-back atomic instructions you get higher performance if the instructions form a dependency chain, rather than if they don’t! The latency of atomics doesn’t fit neatly into an input-to-output model as their <em>execute at retirement</em> behavior causes other bottlenecks. <a href="#fnref:atomiclat" class="reversefootnote" role="doc-backlink">&#8617;</a> <a href="#fnref:atomiclat:1" class="reversefootnote" role="doc-backlink">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:execretire" role="doc-endnote">
+      <p>That’s the simple way of looking at it: reality is more complex as usual. Locked instructions may execute some of their instructions before they are ready to retire: e.g., loading the the required value and the ALU operation. However, the key “unlock” operation which verifies the result of the earlier operations and commits the results, in an atomic way, happens at retire and this is responsible for the majority of the cost of this instruction. <a href="#fnref:execretire" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:uneven" role="doc-endnote">
+      <p>The uneven pattern among the <code class="language-plaintext highlighter-rouge">vpmulld</code> instructions is because the <code class="language-plaintext highlighter-rouge">lock add</code> instruction eats the retire cycles of the first <code class="language-plaintext highlighter-rouge">vpmulld</code> that occur after (they can retire quickly because they are already complete), so only the later ones have a full allocation. <a href="#fnref:uneven" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:comments" role="doc-endnote">
+      <p>If anyone has a recommendation or a if anyone knows of a comments system that works with static sites, and which is not Disqus, has no ads, is free and fast, and lets me own the comment data (or at least export it in a reasonable format), I am all ears. <a href="#fnref:comments" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-d2e42b00-d3fc-11eb-b2f8-5d7287282354" class="js-comment comment" uid="d2e42b00-d3fc-11eb-b2f8-5d7287282354">
+
+  <div class="comment__author">
+    kolya
+    <span class="comment__date">•
+        <a href="#comment-d2e42b00-d3fc-11eb-b2f8-5d7287282354" title="Permalink to this comment">June 23th, 2021 08:27</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Oh, I mean “more similar to add”, not indep-add. indep-add looks like indep-mov, as I’d expect.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d2e42b00-d3fc-11eb-b2f8-5d7287282354', 'respond', 'interrupts', 'd2e42b00-d3fc-11eb-b2f8-5d7287282354')">↪&#xFE0E; Reply to kolya</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-31d13ba0-d3fb-11eb-b2f8-5d7287282354" class="js-comment comment" uid="31d13ba0-d3fb-11eb-b2f8-5d7287282354">
+
+  <div class="comment__author">
+    kolya
+    <span class="comment__date">•
+        <a href="#comment-31d13ba0-d3fb-11eb-b2f8-5d7287282354" title="Permalink to this comment">June 23th, 2021 08:15</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Running indep-mov test (#0) on my Nehalem:
+perf record -e task-clock ./indep-mov | perf annotate -Mintel –stdio –no-source –stdio-color –show-nr-samples
+shows pattern which looks more similar to indep-add but there is non-zero (but still very small compared to max/avg) values. Like 45 0 6 40 22 35 0 0 [cycle] 7 33 0 9 1 26 32 0 [cycle]…
+This is definitely not your distribution. Of course, there is an absence of any prioritized instruction (if I sum values for all cycles I will likely get the same picture), but for you it works at per-cycle basis.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-31d13ba0-d3fb-11eb-b2f8-5d7287282354', 'respond', 'interrupts', '31d13ba0-d3fb-11eb-b2f8-5d7287282354')">↪&#xFE0E; Reply to kolya</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-3ed7ab50-574a-11eb-971c-e3dfa8f2b075" class="js-comment comment" uid="3ed7ab50-574a-11eb-971c-e3dfa8f2b075">
+
+  <div class="comment__author">
+    Alex Dowad
+    <span class="comment__date">•
+        <a href="#comment-3ed7ab50-574a-11eb-971c-e3dfa8f2b075" title="Permalink to this comment">January 15th, 2021 15:56</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Typo: “instructions” -&gt; “instrucitons”</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3ed7ab50-574a-11eb-971c-e3dfa8f2b075', 'respond', 'interrupts', '3ed7ab50-574a-11eb-971c-e3dfa8f2b075')">↪&#xFE0E; Reply to Alex Dowad</a>
+    </div>
+</article>
+  
+
+<article id="comment-cdad8e30-61f4-11eb-8073-2b87c96cc065" class="js-comment comment admin child" uid="cdad8e30-61f4-11eb-8073-2b87c96cc065">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-cdad8e30-61f4-11eb-8073-2b87c96cc065" title="Permalink to this comment">January 29th, 2021 05:42</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks Alex, fixed and credited.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/08/20/interrupts.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/08/20/interrupts.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="interrupts">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/08/20/interrupts.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2019/08/20/interrupts.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

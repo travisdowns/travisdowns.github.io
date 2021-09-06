@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>Beating Up on Qsort | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Beating Up on Qsort" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Building sort functions faster than what the C and C++ standard libraries offer." />
+<meta property="og:description" content="Building sort functions faster than what the C and C++ standard libraries offer." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2019/05/22/sorting.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2019/05/22/sorting.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/2019-05-22/og-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-05-22T17:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/2019-05-22/og-image.jpg" />
+<meta property="twitter:title" content="Beating Up on Qsort" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2019-05-22T17:00:00+00:00","datePublished":"2019-05-22T17:00:00+00:00","description":"Building sort functions faster than what the C and C++ standard libraries offer.","headline":"Beating Up on Qsort","image":"https://travisdowns.github.io/assets/2019-05-22/og-image.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/05/22/sorting.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2019/05/22/sorting.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Beating Up on Qsort</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2019-05-22T17:00:00+00:00" itemprop="datePublished">
+        May 22, 2019
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/algorithms.html">algorithms</a></span><span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/perf.html">perf</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Recently, Daniel Lemire <a href="https://lemire.me/blog/2019/05/07/almost-picking-n-distinct-numbers-at-random/">tackled the topic</a> of selecting N <em>distinct</em> numbers at random. In the case we want sorted output, an obvious solution presents itself: sorting randomly chosen values and de-duplicating the list, which is easy since identical values are now adjacent.<sup id="fnref:distinct" role="doc-noteref"><a href="#fn:distinct" class="footnote" rel="footnote">1</a></sup></p>
+
+<p>While Daniel suggests a clever method of avoiding a sort entirely<sup id="fnref:danmethod" role="doc-noteref"><a href="#fn:danmethod" class="footnote" rel="footnote">2</a></sup>, I’m also interested in they <em>why</em> for the underlying performace of the sort method: it takes more than 100 ns per element, which means 100s of CPU clock cycles and usually even more instructions than that (on a superscalar processor)! As a sanity check, a quick benchmark (<code class="language-plaintext highlighter-rouge">perf record ./bench &amp;&amp; perf report</code>) shows that more than 90% of the time spent in this approach is in the sorting routine, <a href="https://devdocs.io/c/algorithm/qsort">qsort</a> - so we are right to focus on this step, rather than say the de-duplication step or the initial random number generation. This naturally, this raises the question: how fast is qsort when it comes to sorting integers and can we do better?</p>
+
+<p>All of the code for this post <a href="https://github.com/travisdowns/sort-bench">is available on GitHub</a>, so if you’d like to follow along with the code open in an editor, go right ahead (warning: there are obviously some spoilers if you dig through the code first).</p>
+
+<h2 id="benchmarking-qsort">Benchmarking Qsort</h2>
+
+<p>First, let’s take a look at what <code class="language-plaintext highlighter-rouge">qsort</code> is doing, to see if there is any delicous low-hanging performance fruit. We use <code class="language-plaintext highlighter-rouge">perf record ./bench qsort</code> to capture profiling data, and <code class="language-plaintext highlighter-rouge">perf report --stdio</code> to print a summary<sup id="fnref:long-tail" role="doc-noteref"><a href="#fn:long-tail" class="footnote" rel="footnote">3</a></sup>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Samples: 101K of event 'cycles:ppp'
+# Event count (approx.): 65312285835
+#
+# Overhead  Command  Shared Object      Symbol
+# ........  .......  .................  ..............................................
+#
+    64.90%  bench    libc-2.23.so       [.] msort_with_tmp.part.0
+    21.45%  bench    bench              [.] compare_uint64_t
+     8.65%  bench    libc-2.23.so       [.] __memcpy_sse2
+     0.87%  bench    libc-2.23.so       [.] __memcpy_avx_unaligned
+     0.83%  bench    bench              [.] main
+     0.41%  bench    [kernel.kallsyms]  [k] clear_page_erms
+     0.34%  bench    [kernel.kallsyms]  [k] native_irq_return_iret
+     0.31%  bench    bench              [.] bench_one
+</code></pre></div></div>
+
+<p>The assembly for the biggest offender, <code class="language-plaintext highlighter-rouge">msort_with_tmp</code> looks like this<sup id="fnref:annotate-command" role="doc-noteref"><a href="#fn:annotate-command" class="footnote" rel="footnote">4</a></sup> :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> Percent | Address      | Disassembly
+--------------------------------------------------
+   30.55 :   39200:       mov    rax,QWORD PTR [r15]
+    0.61 :   39203:       sub    rbp,0x1
+    0.52 :   39207:       add    r15,0x8
+    7.30 :   3920b:       mov    QWORD PTR [rbx],rax
+    0.39 :   3920e:       add    rbx,0x8
+    0.07 :   39212:       test   r12,r12
+    0.09 :   39215:       je     390e0   ; merge finished
+    1.11 :   3921b:       test   rbp,rbp
+    0.01 :   3921e:       je     390e0   ; merge finished
+    5.24 :   39224:       mov    rdx,QWORD PTR [rsp+0x8]
+    0.42 :   39229:       mov    rsi,r15
+    0.19 :   3922c:       mov    rdi,r13
+    6.08 :   3922f:       call   r14
+    0.59 :   39232:       test   eax,eax
+    3.52 :   39234:       jg     39200
+   32.69 :   39236:       mov    rax,QWORD PTR [r13+0x0]
+    1.31 :   3923a:       sub    r12,0x1
+    1.01 :   3923e:       add    r13,0x8
+    1.09 :   39242:       jmp    3920b &lt;bsearch@@GLIBC_2.2.5+0x205b&gt;
+</code></pre></div></div>
+
+<p>Depending on your level of assembly reading skill, it may not be obvious, but this is basically a classic merge routine: it is merging two lists by comparing the top elements of each list (pointed to by <code class="language-plaintext highlighter-rouge">r13</code> and <code class="language-plaintext highlighter-rouge">r15</code>), and then storing the smaller element (the line <code class="language-plaintext highlighter-rouge">QWORD PTR [rbx],rax</code>) and loading the next element from that list. There are also two checks for termination (<code class="language-plaintext highlighter-rouge">test   r12,r12</code> and <code class="language-plaintext highlighter-rouge">test   rbp,rbp</code>). This hot loop corresponds directly to this code from <code class="language-plaintext highlighter-rouge">glibc</code> (from the file<code class="language-plaintext highlighter-rouge">msort.c</code><sup id="fnref:msort-note" role="doc-noteref"><a href="#fn:msort-note" class="footnote" rel="footnote">5</a></sup>) :</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="n">n1</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">n2</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">((</span><span class="o">*</span><span class="n">cmp</span><span class="p">)</span> <span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">*</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">tmp</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">b1</span><span class="p">;</span>
+        <span class="n">b1</span> <span class="o">+=</span> <span class="k">sizeof</span> <span class="p">(</span><span class="kt">uint64_t</span><span class="p">);</span>
+        <span class="o">--</span><span class="n">n1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="o">*</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">tmp</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">b2</span><span class="p">;</span>
+        <span class="n">b2</span> <span class="o">+=</span> <span class="k">sizeof</span> <span class="p">(</span><span class="kt">uint64_t</span><span class="p">);</span>
+        <span class="o">--</span><span class="n">n2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">tmp</span> <span class="o">+=</span> <span class="k">sizeof</span> <span class="p">(</span><span class="kt">uint64_t</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This loop suffers heavily from branch mispredictions, since the “which element is larger” branch is highly unpredictable (at least for random-looking input data). Indeed, we see roughly 128 million mispredicts while sorting ~11 million elements: close to 12 mispredicts per element.</p>
+
+<p>We also note the presence of the indirect call at the <code class="language-plaintext highlighter-rouge">call r14</code> line. This corresponds to the <code class="language-plaintext highlighter-rouge">(*cmp) (b1, b2, arg)</code> expression in the source: it is calling the user provided comparator function through a function pointer. Since the <code class="language-plaintext highlighter-rouge">qsort()</code> code is compiled ahead of time and is found inside the shared libc binary, there is no chance that the comparator, passed as a function pointer, can be inlined.</p>
+
+<p>The comparator function I provide looks like:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">compare_uint64_t</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">l_</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">r_</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">uint64_t</span> <span class="n">l</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint64_t</span> <span class="o">*</span><span class="p">)</span><span class="n">l_</span><span class="p">;</span>
+    <span class="kt">uint64_t</span> <span class="n">r</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint64_t</span> <span class="o">*</span><span class="p">)</span><span class="n">r_</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="k">return</span>  <span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>which on gcc compiles to branch-free code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mov    rax,QWORD PTR [rsi]
+mov    edx,0xffffffff
+cmp    QWORD PTR [rdi],rax
+seta   al
+movzx  eax,al
+cmovb  eax,edx
+ret
+</code></pre></div></div>
+
+<p>Note that the comparator has to redundantly load from memory the two locations to compare, something the merge loop already did (the merge loop reads them because it is responsible for moving the elements).</p>
+
+<p>How much better could things get if we inline the comparator into the merge loop? That’s what we do in <code class="language-plaintext highlighter-rouge">qsort-inlined</code><sup id="fnref:inline-hard" role="doc-noteref"><a href="#fn:inline-hard" class="footnote" rel="footnote">6</a></sup>, and here’s the main loop which now includes the comparator function<sup id="fnref:cmdline1" role="doc-noteref"><a href="#fn:cmdline1" class="footnote" rel="footnote">7</a></sup> :</p>
+
+<pre><code class="language-asm"> 0.07 :   401dc8:       test   rbp,rbp
+ 0.66 :   401dcb:       je     401e0c &lt;void msort_with_tmp&lt;CompareU64&gt;(msort_param const*, void*, unsigned long, CompareU64)+0xbc&gt;
+ 3.51 :   401dcd:       mov    rax,QWORD PTR [r9]
+ 5.00 :   401dd0:       lea    rdx,[rbx+0x8]
+ 1.62 :   401dd4:       mov    rcx,QWORD PTR [rbx]
+ 0.24 :   401dd7:       lea    r8,[r9+0x8]
+ 6.96 :   401ddb:       cmp    rax,rcx
+20.83 :   401dde:       cmovbe r9,r8
+ 8.88 :   401de2:       cmova  rbx,rdx
+ 0.27 :   401de6:       cmp    rcx,rax
+ 6.23 :   401de9:       sbb    r8,r8
+ 0.74 :   401dec:       cmp    rcx,rax
+ 4.93 :   401def:       sbb    rdx,rdx
+ 0.24 :   401df2:       not    r8
+ 6.69 :   401df5:       add    rbp,rdx
+ 0.44 :   401df8:       cmp    rax,rcx
+ 5.34 :   401dfb:       cmova  rax,rcx
+ 5.96 :   401dff:       add    rdi,0x8
+ 7.48 :   401e03:       mov    QWORD PTR [rdi-0x8],rax
+ 0.00 :   401e07:       add    r15,r8
+ 0.71 :   401e0a:       jne    401dc8 &lt;void msort_with_tmp&lt;CompareU64&gt;(msort_param const*, void*, unsigned long, CompareU64)+0x78&gt;
+</code></pre>
+
+<p>A key difference is that the core of the loop is now branch free. Yes, there are still two conditional jumps, but they are both just checking for the termination condition (that one of the lists to merge is exhausted), so we expect this loop to be free of branch mispredictions other than the final iteration. Indeed, we measure with <code class="language-plaintext highlighter-rouge">perf stat</code> that the misprediction rate has dropped from to close to 12 mispredicts per element to around 0.75 per element. The loop has only two loads and one store, so the memory access redundancy between the merge code and the comparator has been eliminated<sup id="fnref:load-redundancy" role="doc-noteref"><a href="#fn:load-redundancy" class="footnote" rel="footnote">8</a></sup>. Finally, the comparator does a three-way compare (returning distrinct results for <code class="language-plaintext highlighter-rouge">&lt;</code>, <code class="language-plaintext highlighter-rouge">&gt;</code> and <code class="language-plaintext highlighter-rouge">==</code>), but the merge code only needs a two-way compare (<code class="language-plaintext highlighter-rouge">&lt;=</code> or <code class="language-plaintext highlighter-rouge">&gt;</code>) - inlining the comparator manages to remove extra code associated with distinguishing the <code class="language-plaintext highlighter-rouge">&lt;</code> and <code class="language-plaintext highlighter-rouge">==</code> cases.</p>
+
+<p>What’s the payoff? It’s pretty big:</p>
+
+<p><img src="/assets/2019-05-22/fig2.svg" alt="Effect of comparator inlining" /></p>
+
+<p>The speedup hovers right around 1.77x. Note that this is much larger than simply eliminating all the time spent in the separate comparator function in the original version (about 17% of the time implying a speedup of 1.2x if all the function time disapeared). This is a good example of how inlining isn’t just about removing function call overhead but enabling further <em>knock on</em> optimizations which can have a much larger effect than just removing the overhead associated with function calls.</p>
+
+<h2 id="what-about-c">What about C++?</h2>
+
+<p>Short of copying the existing glibc (note: LGPL licenced) sorting code to allow inlining, what else can we do to speed things up? I’m writing in C++, so how about the C++ sort functions available in the <code class="language-plaintext highlighter-rouge">&lt;algorithm&gt;</code> header? Unlike C’s <code class="language-plaintext highlighter-rouge">qsort</code> which is generic by virtue of taking a function pointer and information about the object size, the C++ sort functions use templates to achieve genericity and so are implemented directly in header files. Since the sort code and the comparator are being compiler together, we expect the comparator to be easily inlined, and perhaps other optimizations may occur.</p>
+
+<p>Without further ado, let’s just throw <code class="language-plaintext highlighter-rouge">std::sort</code>, <code class="language-plaintext highlighter-rouge">std::stable_sort</code> and <code class="language-plaintext highlighter-rouge">std::partial_sort</code> into the mix:</p>
+
+<p><img src="/assets/2019-05-22/fig3.svg" alt="C vs C++ sort functions" /></p>
+
+<p>The C++ sort functions, other than perhaps <code class="language-plaintext highlighter-rouge">std::partial_sort</code><sup id="fnref:partial-sort" role="doc-noteref"><a href="#fn:partial-sort" class="footnote" rel="footnote">9</a></sup>, put in a good showing. It is interesting that <code class="language-plaintext highlighter-rouge">std::stable_sort</code> which has <em>stricly more requirements</em> on its implementation than <code class="language-plaintext highlighter-rouge">std::sort</code> (i.e., any stable sort is also suitable for <code class="language-plaintext highlighter-rouge">std::sort</code>) ends up faster. I re-wrote this paragaph several times, since sometimes after a reboot <code class="language-plaintext highlighter-rouge">stable_sort</code> was slower and sometimes it was faster (as shown above). When it was “fast” it had less than 2% branch mispredictions, and when it was slow it was at 15%. So perhaps there was some type of aliasing issue in the branch predictor which depends on the physical addresses assigned, which can vary from run to run, I’m not sure. See <sup id="fnref:stablesort" role="doc-noteref"><a href="#fn:stablesort" class="footnote" rel="footnote">10</a></sup> for an old note from when <code class="language-plaintext highlighter-rouge">std::stable_sort</code> was slower.</p>
+
+<h2 id="can-we-do-better">Can we do better?</h2>
+
+<p>So that’s as fast as it gets, right? We aren’t going to beat <code class="language-plaintext highlighter-rouge">std::sort</code> or <code class="language-plaintext highlighter-rouge">std::stable_sort</code> without a huge amount of effort, I think? After all, these are presumably highly optimized sorting routines written by the standard library implementors. Sure, we might expect to be able to beat <code class="language-plaintext highlighter-rouge">qsort()</code>, but that’s mostly because of built-in disadvantages that <code class="language-plaintext highlighter-rouge">qsort</code> has, lacking the ability to inline the comparator, etc.</p>
+
+<h3 id="radix-sort-attempt-1">Radix Sort Attempt 1</h3>
+
+<p>Well, one thing we can try is a non-comparison sort. We know we have integer keys, so why stick to comparing numbers pairwise - maybe we can use something like <a href="https://en.wikipedia.org/wiki/Radix_sort">radix sort</a> to stick them directly in their final location.</p>
+
+<p>We can pretty much copy the description from the wikipedia article into C++ code that looks like this:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kt">size_t</span>    <span class="n">RADIX_BITS</span>   <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">size_t</span>    <span class="n">RADIX_SIZE</span>   <span class="o">=</span> <span class="p">(</span><span class="kt">size_t</span><span class="p">)</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">RADIX_BITS</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">size_t</span>    <span class="n">RADIX_LEVELS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">63</span> <span class="o">/</span> <span class="n">RADIX_BITS</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">uint64_t</span>  <span class="n">RADIX_MASK</span>   <span class="o">=</span> <span class="n">RADIX_SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="k">using</span> <span class="n">queuetype</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">radix_sort1</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">count</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">pass</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pass</span> <span class="o">&lt;</span> <span class="n">RADIX_LEVELS</span><span class="p">;</span> <span class="n">pass</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">uint64_t</span> <span class="n">shift</span> <span class="o">=</span> <span class="n">pass</span> <span class="o">*</span> <span class="n">RADIX_BITS</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="n">queuetype</span><span class="p">,</span> <span class="n">RADIX_SIZE</span><span class="o">&gt;</span> <span class="n">queues</span><span class="p">;</span>
+
+        <span class="c1">// copy each element into the appropriate queue based on the current RADIX_BITS sized</span>
+        <span class="c1">// "digit" within it</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">size_t</span> <span class="n">value</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">RADIX_MASK</span><span class="p">;</span>
+            <span class="n">queues</span><span class="p">[</span><span class="n">index</span><span class="p">].</span><span class="n">push_back</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// copy all the queues back over top of the original array in order</span>
+        <span class="kt">uint64_t</span><span class="o">*</span> <span class="n">aptr</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">queue</span> <span class="o">:</span> <span class="n">queues</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">aptr</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">copy</span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">queue</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">aptr</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>That’s about as simple as it gets. We decide to use one byte (i.e., radix-256) as the size of our “digit” (although it’s easy to change by adjusting the <code class="language-plaintext highlighter-rouge">RADIX_BITS</code> constant) and so we make 8 passes over our <code class="language-plaintext highlighter-rouge">uint64_t</code> array from the least to most significant byte. At each pass we assign the current value to one of 256 “queues” (vectors in this case) based on the value of the current byte, and once all elements have been processed we copy each queue in order back to the original array. We’re done - the list is sorted.</p>
+
+<p>How does it perform against the usual suspects?</p>
+
+<p><img src="/assets/2019-05-22/fig4.svg" alt="Radix 1" /></p>
+
+<p>Well it’s not <em>terrible</em>, and while it certainly has some issues at low element counts, it actaully squeezes into first place at 1,000,000 elements and is competitive at 100,000 and 10,000,000. Not bad for a dozen lines of code.</p>
+
+<p>A quick check of <code class="language-plaintext highlighter-rouge">time ./bench Radix1</code> shows something interesting:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>real    0m1.099s
+user    0m0.552s
+sys     0m0.548s
+</code></pre></div></div>
+
+<p>We spent about the same amount of time in the kernel (<code class="language-plaintext highlighter-rouge">sys</code> time) as in user space. The other algorithms spend only a few lonely % in the kernel, and almost most of that is in the setup code, not in the actual sort.</p>
+
+<p>A deeper look with <code class="language-plaintext highlighter-rouge">perf record &amp;&amp; perf report</code> shows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Samples: 4K of event 'cycles:ppp'
+# Event count (approx.): 2858148287
+#
+# Overhead  Command  Shared Object        Symbol
+# ........  .......  ...................  ................................................
+#
+    29.02%  bench    bench                [.] radix_sort1
+    26.16%  bench    libc-2.23.so         [.] __memmove_avx_unaligned
+     4.93%  bench    [kernel.kallsyms]    [k] clear_page_erms
+     4.46%  bench    [kernel.kallsyms]    [k] native_irq_return_iret
+     3.61%  bench    [kernel.kallsyms]    [k] error_entry
+     3.04%  bench    [kernel.kallsyms]    [k] swapgs_restore_regs_and_return_to_usermode
+     2.99%  bench    [kernel.kallsyms]    [k] sync_regs
+     1.94%  bench    bench                [.] main
+     1.91%  bench    [kernel.kallsyms]    [k] get_page_from_freelist
+     1.64%  bench    libc-2.23.so         [.] __memcpy_avx_unaligned
+     1.59%  bench    [kernel.kallsyms]    [k] release_pages
+     1.40%  bench    [kernel.kallsyms]    [k] __handle_mm_fault
+     1.37%  bench    [kernel.kallsyms]    [k] _raw_spin_lock
+     1.01%  bench    [kernel.kallsyms]    [k] __pagevec_lru_add_fn
+     0.88%  bench    [kernel.kallsyms]    [k] handle_mm_fault
+     0.86%  bench    [kernel.kallsyms]    [k] __alloc_pages_nodemask
+     0.83%  bench    [kernel.kallsyms]    [k] unmap_page_range
+     0.75%  bench    [kernel.kallsyms]    [k] try_charge
+     0.74%  bench    [kernel.kallsyms]    [k] get_mem_cgroup_from_mm
+     0.70%  bench    bench                [.] bench_one
+     0.63%  bench    [kernel.kallsyms]    [k] __do_page_fault
+     0.63%  bench    [kernel.kallsyms]    [k] __mod_zone_page_state
+     0.49%  bench    [kernel.kallsyms]    [k] free_pcppages_bulk
+     0.45%  bench    [kernel.kallsyms]    [k] page_add_new_anon_rmap
+     0.43%  bench    [kernel.kallsyms]    [k] up_read
+     0.40%  bench    [kernel.kallsyms]    [k] page_remove_rmap
+     0.36%  bench    [kernel.kallsyms]    [k] __mod_node_page_state
+</code></pre></div></div>
+
+<p>I’m not even going to try to explain what <code class="language-plaintext highlighter-rouge">__pagevec_lru_add_fn</code> does, but the basic idea here is that we are spending a lot of time in the kernel, and we are doing that because we are allocating and freeing <em>a lot</em> of memory. Every pass we <code class="language-plaintext highlighter-rouge">push_back</code> every element into one of 256 vectors, which will be constantly growing to accomodate new elements, and then finally all the now-giant vectors are freed at the end of every allocation. That’s a lot of stress on the memory allocation paths in the kernel<sup id="fnref:memalloc" role="doc-noteref"><a href="#fn:memalloc" class="footnote" rel="footnote">11</a></sup>.</p>
+
+<h3 id="radix-sort-attempt-2">Radix Sort Attempt 2</h3>
+
+<p>Let’s try the first-thing-you-do-when-vector-is-involved-and-performance-matters; that is, let us <code class="language-plaintext highlighter-rouge">reserve()</code> memory for each vector before we start adding elements. Just throw this at the start of each pass:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">queue</span> <span class="o">:</span> <span class="n">queues</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">queue</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="n">RADIX_SIZE</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here, <code class="language-plaintext highlighter-rouge">1.2</code> is an arbitrary fudge factor to account for the fact that some vectors will get more than the average number of elements. The exact value doesn’t matter much as long as it’s not too small (0.9 is a bad value, almost evey vector needs a final doubling). This gives use <a href="https://github.com/travisdowns/sort-bench/blob/master/radix2.cpp"><code class="language-plaintext highlighter-rouge">radix_sort2</code></a> and let’s jump straight to the results (I’ve removed a couple of the less interesting sorts to reduce clutter):</p>
+
+<p><img src="/assets/2019-05-22/fig5.svg" alt="Radix 2" /></p>
+
+<p>I guess it’s a bit better? It does better for small array sizes, probably because the overhead of constantly resizing the small vectors is more significant there, but it is actually a bit slower for the middle sizes. System time is lower but still quite high:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>real	0m0.904s
+user	0m0.523s
+sys	0m0.380s
+</code></pre></div></div>
+
+<p>What we really want is to stop throwing away the memory we allocated every pass. Let’s move the queues outside of the loop and just clear them every iteration:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">radix_sort3</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">count</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="n">queuetype</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="n">queuetype</span><span class="p">,</span> <span class="n">RADIX_SIZE</span><span class="o">&gt;</span> <span class="n">queues</span><span class="p">;</span>
+
+    <span class="c1">// we keep the reservation code (now outside the loop),</span>
+    <span class="c1">// although it matters less now since the resizing will</span>
+    <span class="c1">// generally only happen in the first iteration</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">queue</span> <span class="o">:</span> <span class="n">queues</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">queue</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="n">RADIX_SIZE</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">pass</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pass</span> <span class="o">&lt;</span> <span class="n">RADIX_LEVELS</span><span class="p">;</span> <span class="n">pass</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// ... as before</span>
+
+        <span class="c1">// copy all the queues back over top of the original array in order</span>
+        <span class="kt">uint64_t</span><span class="o">*</span> <span class="n">aptr</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">queue</span> <span class="o">:</span> <span class="n">queues</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">aptr</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">copy</span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">queue</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">aptr</span><span class="p">);</span>
+            <span class="n">queue</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>  <span class="c1">// &lt;--- this is new, clear the queues</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Yes another graph with Radix3 included this time:</p>
+
+<p><img src="/assets/2019-05-22/fig6.svg" alt="Radix 3" /></p>
+
+<p>That looks a lot better! This radix sort is always faster than our earlier attempts and the fastest overall for sizes 10,000 and above. It still falls behind the <code class="language-plaintext highlighter-rouge">std::</code> algorithms for the 1,000 element size, where the <code class="language-plaintext highlighter-rouge">O(n)</code> vs <code class="language-plaintext highlighter-rouge">O(n*log(n))</code> difference doesn’t play as much of a role. Despite this minor victory, and while system is reduced, we are <em>still</em> spending 30% of our time in the kernel:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>real    0m0.612s
+user    0m0.428s
+sys     0m0.184s
+</code></pre></div></div>
+
+<h3 id="pre-sizing-the-queues">Pre-sizing the Queues</h3>
+
+<p>Sorting should be about my code, not the kernel - so let’s get rid of this kernel time for good.</p>
+
+<p>To do that, we’ll move away from <code class="language-plaintext highlighter-rouge">std::vector</code> entirely and just allocate one large temporary region for all of our queues. Although we know the <em>total</em> final size of all the queues (it’s the same size as the input array), we don’t know how big any <em>particular</em> queue will be. This means we don’t know exactly how to divide up the region. A well-known solution to this problem is to first count the number of number of values that will fall into each queue so they can be sized appropriately (also known as taking the histogram of the data). As a bonus, we can count the frequencies for all radix passes in a single trip over the data, so we expect this part to be much cheaper than the radix sort proper which needs a separate pass for each “digit”.</p>
+
+<p>Knowing the size of each queue allows us to pack all the values exactly within a single temporary region. The copy at the end of each stage is just a single linear copy. The code is longer now since we need to implement the frequency counting gives us <a href="https://github.com/travisdowns/sort-bench/blob/f05c53d02f8f374486c0f445ef519c1f47be95ce/radix4.cpp#L31">radix_sort4</a>. Results:</p>
+
+<p><img src="/assets/2019-05-22/fig7.svg" alt="Radix 4" /></p>
+
+<p>It’s a significant speedup over Radix 3, especially at small sizes (speedup about 3x) but still good at large sizes (about 1.3x for 10m elements). The speedup over poor <code class="language-plaintext highlighter-rouge">qsort</code> ranges from 3.7x to 5.45x, increasing at larger sizes. Even compared to the best contented from the standard library, <code class="language-plaintext highlighter-rouge">std::stable_sort</code>, the speedup averages about 2x.</p>
+
+<h3 id="are-we-done-yet">Are We Done Yet?</h3>
+
+<p>So are we done yet? Can we squeeze out some more performance?</p>
+
+<p>One little trick is to note that the temporary “queue area” and the original array are now of the same size and type, so rather than always performing the radix passes from the original array to the temporary area (which requires a copy back to the original array each time), we can instead copy back and forth between these two areas, alternating the “from” and “to” areas each time. This saves a copy each pass.</p>
+
+<p>The results in <a href="https://github.com/travisdowns/sort-bench/blob/f05c53d02f8f374486c0f445ef519c1f47be95ce/radix5.cpp#L31">radix_sort5</a> and it provides a small but measurable benefit:</p>
+
+<p><img src="/assets/2019-05-22/fig8.svg" alt="Radix 5" /></p>
+
+<p>It’s also interesting how <em>small</em> the improvement is. This change actually cuts the memory bandwidth requirements of the algorithm almost exactly in half: rather than reading and writing each element twice during each pass (once during the sort and once in the final copy), we read them only once (it’s not <em>exactly</em> half because the single histogramming pass adds another read). Yet the overall speedup is small, in the range of 1.05x to 1.2x. From this we can conclude that we are not approaching the memory bandwidth limits in the radix passes.</p>
+
+<p>There is a catch here: at the end of the sort, if we have done an <em>odd</em> number of passes, the final sorted results will be in the temporary area, not in the original array, so we need to copy back to the original array - but 1 extra copy is better than 8! In any case, with <code class="language-plaintext highlighter-rouge">RADIX_BITS == 8</code> as we’ve chosen, there are an even number of copies, so this code never executes in our benchmark.</p>
+
+<h3 id="pointless-work-is-pointless">Pointless Work is Pointless</h3>
+
+<p>Another observation we can make is that for this input (and many inputs in the real world), many of the radix passes do nothing. All the input values are less than 40,000,000,000. In 64-bit hex that looks like <code class="language-plaintext highlighter-rouge">0x00000009502F9000</code> - the top 28 bits are always zero. Any radix pass that uses these all-zero bits is pointless: every element will be copied to the first queue entry, one by one: essentially it’s a slow, convoluted <code class="language-plaintext highlighter-rouge">memcpy</code>.</p>
+
+<p>We can simply skip these “trivial” passes by examining the frequency count: if all counts are zero except a single entry, the pass does nothing. This gives us <a href="https://github.com/travisdowns/sort-bench/blob/master/radix6.cpp">radix_sort6</a>, which ends up cutting out 3 of the 8 radix passes leading to performance like this (I’ve changed the scale to emphasize the faster algorithms as they were getting crowed down at the bottom):</p>
+
+<p><img src="/assets/2019-05-22/fig9.svg" alt="Radix 6" /></p>
+
+<p>In relative terms this provides a significant speedup ranging from 1.2x to 1.5x over <code class="language-plaintext highlighter-rouge">radix_sort5</code>. The theoretical speedup from skipping 3 of the 8 passes is 1.6x, but we don’t achieve that because there is work outside of the core passes (counting the frequencies, for example) and also because the 3 trivial passes were actually slightly faster than the non-trivial ones because of better caching behavior.</p>
+
+<h3 id="unpointless-prefetch">Unpointless Prefetch</h3>
+
+<p>So how much more juice can we squeeze from this performance orange? Will this post ever come to an end? Has anyone even made it this far?</p>
+
+<p>As it turns out we’re not done yet, and the next change is perhaps the easiest one yet, a one-liner. First, let us observe that the core radix sort loop does a linear read through the elements (very prefetch and cacheline locality friendly), and then a <em>scattered store</em> to one of 256 locations depending on the value. We might expect that those scattered stores are problematic, since we don’t expect the prefetcher to track 256 different streams. On the other hand, stores are somewhat “fire and forget”, because after we execute the store, they can just sit around in the store buffer for as long as needed while the associated cache lines are fetched: they don’t participate in any dependency chains<sup id="fnref:not-sfw" role="doc-noteref"><a href="#fn:not-sfw" class="footnote" rel="footnote">12</a></sup>. So maybe they aren’t causing a problem?</p>
+
+<p>Let’s check that theory using the <code class="language-plaintext highlighter-rouge">resource_stalls.sb</code> event, which tells us how many cycles we stalled store buffer was full, using this magical invocation:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for i in {3..8}; do s=$((10**$i)); rm -f bench.o; echo "SIZE=$s, KB=$(($s*8/1000))"; make EFLAGS=-DSIZE=$s; perf stat -e cycles,instructions,resource_stalls.any,resource_stalls.sb ./bench Radix6; done
+</code></pre></div></div>
+
+<p>This tests a variety of different sizes and here’s typical output when the array to sort has 1 million elements (8 MB):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SIZE=1000000, KB=8000
+...
+ Performance counter stats for './bench Radix6':
+
+     5,544,710,461      cycles
+     8,219,301,287      instructions              #    1.48  insn per cycle
+     2,917,340,919      resource_stalls.any
+     2,454,399,834      resource_stalls.sb
+</code></pre></div></div>
+
+<p>out of 5.54 billion cycles, we are stalled because the store buffer is full in 2.45 billion of them. So … a lot.</p>
+
+<p>One fix for this is a one-liner in the main radix-sort loop:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for (size_t i = 0; i &lt; count; i++) {
+    size_t value = from[i];
+    size_t index = (value &gt;&gt; shift) &amp; RADIX_MASK;
+    *queue_ptrs[index]++ = value;
+    __builtin_prefetch(queue_ptrs[index] + 1); // &lt;-- the magic happens here
+}
+</code></pre></div></div>
+
+<p>That’s it. We prefetch the next plus one position in the queue after writing to the queue. 87.5% of the time this does nothing, since the next position is either in the same cache line (6 out of 8 times) or we already prefetched it the last time we wrote to this queue (1 out of 8 times).</p>
+
+<p>The other 12.5% of the time it helps, producing results like this:</p>
+
+<p><img src="/assets/2019-05-22/fig10.svg" alt="Radix 7" /></p>
+
+<p>The speedup is zero at the smallest size (1000 elements, aka 8 KB) which fits in L1, but ranges between 1.31x and 1.45x as soon as the data set exceeds L1. In principle, I wouldn’t expect prefetch to help here: we expect it to help for loads if we can start the load early, but for stores, with a full store buffer the CPU can already pick from 50+ stores to start prefetching. That is, the CPU already <em>knows</em> what stores are coming becaue the store buffer is full of them. However, in practice, theory and practice are different and in particular Intel CPUs seem to struggle when loads that hit in L1 are interleaved with loads that don’t, <a href="/blog/2019/03/19/random-writes-and-microcode-oh-my.html">especially with recent <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr></a><sup id="fnref:microcode" role="doc-noteref"><a href="#fn:microcode" class="footnote" rel="footnote">13</a></sup>.</p>
+
+<p>That interleaved scenario will happen all the time with this type of scattered write pattern, and as noted in the earlier post, prefetch is one way of mitigating this. For the 8 MB working set we now have the following <code class="language-plaintext highlighter-rouge">perf stat</code> results:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SIZE=1000000, KB=8000
+...
+ Performance counter stats for './bench Radix7':
+
+     4,342,298,986      cycles
+     8,719,315,140      instructions              #    2.01  insn per cycle
+     1,555,574,009      resource_stalls.any
+       623,342,154      resource_stalls.sb
+
+       1.675302704 seconds time elapsed
+</code></pre></div></div>
+
+<p>About a four-fold reduction in store-buffer stalls. Reductions are even more dramatic for other sizes: the 100,000 element (8 KB) size has an even larger reduction, from being stalled 43% of the time down to 5% after prefetching is added.</p>
+
+<h2 id="whats-next">What’s Next?</h2>
+
+<p>What’s next is that I have to eat. So while we’re not done here yet, the remaining part of this trip down the radix sort hole will have to wait for part 2.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<p><small>Boxing photo by <a href="https://unsplash.com/@hermez777">Hermes Rivera</a> on <a href="https://unsplash.com">Unsplash</a></small>.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:distinct" role="doc-endnote">
+      <p>Note that wanting <em>distinct</em> values here is key. Without that restriction, the problem is simple: just use the output of any decent random number generator. Returning only distinct entries is trickier: you have to find a way to avoid or remove duplicate elements. Well it’s not all that tricky: you can simply remember existing elements using a <code class="language-plaintext highlighter-rouge">std::set</code> and reject any duplicate elements. What is tricky is doing it quickly. <a href="#fnref:distinct" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:danmethod" role="doc-endnote">
+      <p>In particular, the method he suggests picks random values one-at-a-time, already in sorted order, deciding on the gap to the next number by drawing randomly from a geometric distribution. Read his post for full details, but the one sentence summary is that Dan finds that the geometric distribution approach has favorable performace results compared to the sorted one (more than 2x as fast). Both this method and the sorting method have the little problem that the resulting list may be smaller than requested. For example in the case of the sorting method, the output after de-duplication is smaller if there are any collisions (and due to the <a href="https://en.wikipedia.org/wiki/Birthday_problem">Birthday Problem</a> that is a lot likelier than you might think). One could cope with this by generating slightly more numbers than required, and then removing randomly selected elements until the list reaches its desired size. <a href="#fnref:danmethod" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:long-tail" role="doc-endnote">
+      <p>There is a long tail of other functions here, but they add up to only about 2% of the runtime, so you can safely ignore them. <a href="#fnref:long-tail" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:annotate-command" role="doc-endnote">
+      <p>I get the annotated assembly with <code class="language-plaintext highlighter-rouge">perfc annotate -Mintel --stdio --symbol=msort_with_tmp.part.0</code> - this only shows assmebly because the function is in glibc and there are no debug symbols for that library on this host. In any case, assembly is probably what we want. <a href="#fnref:annotate-command" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:msort-note" role="doc-endnote">
+      <p><code class="language-plaintext highlighter-rouge">msort.c</code> implements a mergesort algoirhtm. There is also a file <code class="language-plaintext highlighter-rouge">qsort.c</code> which implements a traditional partition-around-a-pivot based quicksort, but it seems not used to implement <code class="language-plaintext highlighter-rouge">qsort()</code> on recent gcc versions. <a href="#fnref:msort-note" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:inline-hard" role="doc-endnote">
+      <p>It turns out that inlining the comparator is not simply a matter of compiling <code class="language-plaintext highlighter-rouge">msort.c</code> and the comparator in the same translation unit while still passing the comparator as a function pointer, so the compiler can see the definition. This doens’t pan out because msort (a) is a recursive function, which means unlimited inlining isn’t possible (so at some point there is an out-of-line call where the identity of the comparator will be lost) and (b) the comparator function is saved to memory (in the <code class="language-plaintext highlighter-rouge">msort_param</code> struct) and used from there, which makes it harder for compilers to prove the comparator is always the one originally passed in. Instead, I use a template version of msort which takes the comparator of arbitrary type <code class="language-plaintext highlighter-rouge">C</code>, and in the case that a functor object is passed, the comparator is built right into the signature of the function, making inlining the comparator basically automatic for any compiler. <a href="#fnref:inline-hard" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:cmdline1" role="doc-endnote">
+      <p>We obtain this output with <code class="language-plaintext highlighter-rouge">perf record ./bench qsort-inlined &amp;&amp; perfc annotate -Mintel --stdio --no-source --symbol='msort_with_tmp&lt;CompareU64&gt;'</code>, if your version of <code class="language-plaintext highlighter-rouge">perf</code> supports de-mangling names (otherwise you’ll have to use the mangled name). <a href="#fnref:cmdline1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:load-redundancy" role="doc-endnote">
+      <p>Technically, there is still some redundancy since we load <em>two</em> elements every iteration, whereas we really only need to load one: the new element from whichever list an element was removed from. You can still do that in a branch-free way, but the transformation is aparently beyond the capability of the compiler. <a href="#fnref:load-redundancy" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:partial-sort" role="doc-endnote">
+      <p>It’s hard to blame <code class="language-plaintext highlighter-rouge">std::partial_sort</code> here, after all it is a specialized sort for cases where you want need sort only a subset of the input to be sorted, e.g., the first 100 elements of a 100,000 element sequence. However, we can use it as a full sort simply by specifying that we want the full range, but one would not expect the algorithm to be optimized for that case. <a href="#fnref:partial-sort" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:stablesort" role="doc-endnote">
+      <p>I had to edit this part of the blog entry because something weird happened: originally, my results always showed that <code class="language-plaintext highlighter-rouge">std::stable_sort</code> was faster than <code class="language-plaintext highlighter-rouge">std::sort</code> across all input sizes. After installing a bunch of OS packages and restarting, however, <code class="language-plaintext highlighter-rouge">std::stable_sort</code> performance came back down to earth, around 1.4x slower than before and now slower than <code class="language-plaintext highlighter-rouge">std::sort</code> across all input sizes. I don’t know what changed. I did find that before the change <code class="language-plaintext highlighter-rouge">std::stable_sort</code> had very few (&lt; 1%) branch mispredictions, while after it had many mispredictions (about 15%). <a href="#fnref:stablesort" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:memalloc" role="doc-endnote">
+      <p>This behavior actually depends pretty heavily on your memory allocator. The default glibc allocator I’m using likes to give memory allocations above a certain size back to the OS whenever they are freed, which means this workload turns into a <code class="language-plaintext highlighter-rouge">mmap</code> and <code class="language-plaintext highlighter-rouge">munmap</code> workout for the kernel. Using an allocator that wasn’t too worried about memory use and kept these pages around for its own use would result in a very different profile. <a href="#fnref:memalloc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:not-sfw" role="doc-endnote">
+      <p>Stores <em>never</em> participate in normal “register carried” dependency chains, since they do not write any registers, but they can still participate in chains through memory, e.g., if a store is followed by a load that reads the same location, the load depends on the store (and efficiently this dependency is handled depends on a lot on the hardware). This case doesn’t apply here because we don’t read the recently written queue locations any time soon: our stores are truly “fire and forget”. <a href="#fnref:not-sfw" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:microcode" role="doc-endnote">
+      <p>In fact, if you have an older <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr> on your machine, you will see different results: there will be very little difference between Radix6 and Radix7 because Radix6 is considerably faster if you don’t update your <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr>. <a href="#fnref:microcode" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-bf577230-b030-11eb-ac11-970eadd5eac5" class="js-comment comment" uid="bf577230-b030-11eb-ac11-970eadd5eac5">
+
+  <div class="comment__author">
+    Observer
+    <span class="comment__date">•
+        <a href="#comment-bf577230-b030-11eb-ac11-970eadd5eac5" title="Permalink to this comment">May  8th, 2021 19:08</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Part 2 when?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-bf577230-b030-11eb-ac11-970eadd5eac5', 'respond', 'sorting', 'bf577230-b030-11eb-ac11-970eadd5eac5')">↪&#xFE0E; Reply to Observer</a>
+    </div>
+</article>
+  
+
+<article id="comment-5ef93a10-b20e-11eb-98b6-21cb6d5229ef" class="js-comment comment admin child" uid="5ef93a10-b20e-11eb-98b6-21cb6d5229ef">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-5ef93a10-b20e-11eb-98b6-21cb6d5229ef" title="Permalink to this comment">May 11th, 2021 04:07</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Good question. It’s half written but I haven’t made progress on it in over a year. I’ve experienced some changes in my life that means that “maybe never” might be the most realistic answer.</p>
+
+<p>I may already release an abbreviated version based mostly on what I have now, but it would be a much weaker post in that case.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-af4c2ab0-5b5e-11eb-89df-efcf6a0d3088" class="js-comment comment" uid="af4c2ab0-5b5e-11eb-89df-efcf6a0d3088">
+
+  <div class="comment__author">
+    psionl0
+    <span class="comment__date">•
+        <a href="#comment-af4c2ab0-5b5e-11eb-89df-efcf6a0d3088" title="Permalink to this comment">January 20th, 2021 20:32</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Fancy that! It’s called “qsort” but it actually does a merge sort.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-af4c2ab0-5b5e-11eb-89df-efcf6a0d3088', 'respond', 'sorting', 'af4c2ab0-5b5e-11eb-89df-efcf6a0d3088')">↪&#xFE0E; Reply to psionl0</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-731b4010-555c-11eb-bfb5-01430c7bddbd" class="js-comment comment" uid="731b4010-555c-11eb-bfb5-01430c7bddbd">
+
+  <div class="comment__author">
+    Noah Goldstein
+    <span class="comment__date">•
+        <a href="#comment-731b4010-555c-11eb-bfb5-01430c7bddbd" title="Permalink to this comment">January 13th, 2021 05:01</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>If its just sorting integers your after you might find <a href="https://github.com/goldsteinn/SIMD-sorting-network">this</a> cool</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-731b4010-555c-11eb-bfb5-01430c7bddbd', 'respond', 'sorting', '731b4010-555c-11eb-bfb5-01430c7bddbd')">↪&#xFE0E; Reply to Noah Goldstein</a>
+    </div>
+</article>
+  
+
+<article id="comment-232ebf00-61f5-11eb-8073-2b87c96cc065" class="js-comment comment admin child" uid="232ebf00-61f5-11eb-8073-2b87c96cc065">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-232ebf00-61f5-11eb-8073-2b87c96cc065" title="Permalink to this comment">January 29th, 2021 05:45</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for your comment Noah. I have looked into sorting networks and I may have more to write on this in the future. Your link is handy, I’m filing it away for when I look at this again.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-61b331b0-dbd6-11eb-9689-b9e2acca48b3" class="js-comment comment child" uid="61b331b0-dbd6-11eb-9689-b9e2acca48b3">
+
+  <div class="comment__author">
+    ‍
+    <span class="comment__date">•
+        <a href="#comment-61b331b0-dbd6-11eb-9689-b9e2acca48b3" title="Permalink to this comment">July  3th, 2021 08:12</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>You might even be interested in https://github.com/simd-sorting/fast-and-robust which is a Quicksort implementation using vectorized sorting networks for small arrays.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-fbb93340-e3ac-11ea-9955-9556da4b6cf3" class="js-comment comment" uid="fbb93340-e3ac-11ea-9955-9556da4b6cf3">
+
+  <div class="comment__author">
+    Gautham
+    <span class="comment__date">•
+        <a href="#comment-fbb93340-e3ac-11ea-9955-9556da4b6cf3" title="Permalink to this comment">August 21th, 2020 12:51</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>It is possible to do radix sort in-place, as given in <a href="https://en.wikipedia.org/wiki/Radix_sort">Wikipedia</a>. Instead of having <code class="language-plaintext highlighter-rouge">queue_ptrs</code> consist of pointers to a second array, one can just use the existing array and swap in-place, with a check to avoid out-of-bounds for each bucket.</p>
+
+<p>An additional trade-off is that the in-place algorithm is not <a href="https://en.wikipedia.org/wiki/Sorting_algorithm#Stability">stable</a>, ie “equal” elements may not end up in the same order as they were in the input (I found this out the hard way, as I wanted to speed up a sorting of <code class="language-plaintext highlighter-rouge">vector&gt;</code> after reading this post).</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-fbb93340-e3ac-11ea-9955-9556da4b6cf3', 'respond', 'sorting', 'fbb93340-e3ac-11ea-9955-9556da4b6cf3')">↪&#xFE0E; Reply to Gautham</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-c02de000-8d30-11ea-9db0-e9d644cafe33" class="js-comment comment" uid="c02de000-8d30-11ea-9db0-e9d644cafe33">
+
+  <div class="comment__author">
+    Jip
+    <span class="comment__date">•
+        <a href="#comment-c02de000-8d30-11ea-9db0-e9d644cafe33" title="Permalink to this comment">May  3th, 2020 11:25</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Very interesting article !!! You seem to suggest that qsort is indeed weak in performance because of the iterative call of the compare function. If I understood the paper well, this function could be inlined, but it’s not!! You also suggest that the C++ standard sort is better than C qsort. Now, sorry, I’m not a C++  man. I’m just trying to learn C and I find it difficult enough !!!
+What would be nice would be to publish a better qsort than the one we find in stdlib. Could you do that ?? And also (if possible) explain all the improvements.
+I read a lot of articles about qsort. Some guys say : “don’t worry ! qsort is a very good general purpose sorting algorithm. It has been done by very good programmers. Just use it and be happy!”.
+Other guys say : “qsort could be much better. It has been done many years ago and no one bothered about improving this built-in function. It’s time to do it !!”
+Who is right ???
+From what I read, you should be able to provide a better qsort function. Of course, I’m interested by the C version of it (no C++ please !!!).
+Thanks in advance. Although I didn’t understand everything, I liked the article.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c02de000-8d30-11ea-9db0-e9d644cafe33', 'respond', 'sorting', 'c02de000-8d30-11ea-9db0-e9d644cafe33')">↪&#xFE0E; Reply to Jip</a>
+    </div>
+</article>
+  
+
+<article id="comment-85e9a140-9091-11ea-9170-4181cea7519a" class="js-comment comment admin child" uid="85e9a140-9091-11ea-9170-4181cea7519a">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-85e9a140-9091-11ea-9170-4181cea7519a" title="Permalink to this comment">May  7th, 2020 18:35</a></span>
+  </div>
+
+  <div class="comment__body">
+    <blockquote>
+  <p>Very interesting article !!! You seem to suggest that qsort is indeed weak in performance because of the iterative call of the compare function. If I understood the paper well, this function could be inlined, but it’s not!! You also suggest that the C++ standard sort is better than C qsort.</p>
+</blockquote>
+
+<p>Yes, more or less. Essentially, the C sort comparator function cannot be inlined, since the C sort is implemented in a separate translation unit (C file) and compiled once and it lives in your libc shared object. So the comparator, which is called many times in the hottest part of the sort, is necessarily a function call, which adds overhead in various ways: especially because the comprands are passed by pointer so end up being loaded multiple times rather than passed in registers.</p>
+
+<p>On the other hand, C++ std::sort, by its very template nature is implemented in a header and so gets specialized for every type and every comparator function. This generally makes it faster, but also bloats code size. So it is not a pure win-win, but something of a tradeoff.</p>
+
+<blockquote>
+  <p>What would be nice would be to publish a better qsort than the one we find in stdlib.</p>
+</blockquote>
+
+<p>Well I do plan to publish some usable radix sorts when this is done, but I don’t think is is very obvious how to write a C qsort that improves significantly on the existing qsort. In relation to the inlining aspect, you could do is a qsort implementation that is implemented in a header in C, just like C++ and rely on the optimizer to inline the comparator function. This isn’t totally straightforward, as <a href="https://travisdowns.github.io/blog/2019/05/22/sorting.html#fn:inline-hard">described in a footnote</a> but I’m sure it could be done.</p>
+
+<p>This comes with all the code bloat problems of the C++ version, however.</p>
+
+<p>In any case, I don’t have specific plans to try to improve on that aspect of qsort: I’m mostly interested in improving radix sort.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-79a1afe0-56de-11eb-9052-e35cdcba2ae4" class="js-comment comment child" uid="79a1afe0-56de-11eb-9052-e35cdcba2ae4">
+
+  <div class="comment__author">
+    Nathan Myers
+    <span class="comment__date">•
+        <a href="#comment-79a1afe0-56de-11eb-9052-e35cdcba2ae4" title="Permalink to this comment">January 15th, 2021 03:05</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>C is quite a lot harder to code (correctly) in than C++. So, it is a grave error to avoid C++.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/05/22/sorting.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/05/22/sorting.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="sorting">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/05/22/sorting.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2019/05/22/sorting.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

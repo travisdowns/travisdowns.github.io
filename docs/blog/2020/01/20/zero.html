@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>The Hunt for the Fastest Zero | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="The Hunt for the Fastest Zero" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Unexpected performance deviations depending on how you spell zero." />
+<meta property="og:description" content="Unexpected performance deviations depending on how you spell zero." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2020/01/20/zero.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2020/01/20/zero.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/zero/twitter-card.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-01-20T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/zero/twitter-card.png" />
+<meta property="twitter:title" content="The Hunt for the Fastest Zero" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2020-01-20T00:00:00+00:00","datePublished":"2020-01-20T00:00:00+00:00","description":"Unexpected performance deviations depending on how you spell zero.","headline":"The Hunt for the Fastest Zero","image":"https://travisdowns.github.io/assets/zero/twitter-card.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2020/01/20/zero.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2020/01/20/zero.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">The Hunt for the Fastest Zero</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2020-01-20T00:00:00+00:00" itemprop="datePublished">
+        Jan 20, 2020
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/c++.html">c++</a></span><span class="tag-link"><a href="/tags/gcc.html">gcc</a></span><span class="tag-link"><a href="/tags/compiler-optimization.html">compiler-optimization</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Let’s say I ask you to fill a <code class="language-plaintext highlighter-rouge">char</code> array of size <code class="language-plaintext highlighter-rouge">n</code> with zeros. I don’t know why, exactly, but please play along for now.</p>
+
+<p>If this were C, we would probably reach for <code class="language-plaintext highlighter-rouge">memset</code>, but let’s pretend we are trying to write idiomatic C++ instead.</p>
+
+<p>You might come up with something like<sup id="fnref:function" role="doc-noteref"><a href="#fn:function" class="footnote" rel="footnote">1</a></sup>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">fill1</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">fill</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I’d give this solution full marks. In fact, I’d call it more or less the canonical modern C++ solution to the problem.</p>
+
+<p>What if told you there was a solution that was up to about 29 times faster? It doesn’t even require sacrificing any goats to the C++ gods, either: just adding three characters:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">fill2</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">fill</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="sc">'\0'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Yes, switching <code class="language-plaintext highlighter-rouge">0</code> to <code class="language-plaintext highlighter-rouge">'\0'</code> speeds this up by nearly a factor of <em>thirty</em> on my <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr> box<sup id="fnref:qb" role="doc-noteref"><a href="#fn:qb" class="footnote" rel="footnote">2</a></sup>, at least with my default compiler (gcc) and optimization level (-O2):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th style="text-align: right">Bytes / Cycle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>fill1</td>
+      <td style="text-align: right">1.0</td>
+    </tr>
+    <tr>
+      <td>fill2</td>
+      <td style="text-align: right">29.1</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The why is becomes obvious if you look at the <a href="https://godbolt.org/z/O_f3Jx">assembly</a>:</p>
+
+<p><strong>fill1:</strong></p>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">fill1</span><span class="p">(</span><span class="nb">ch</span><span class="nv">ar</span><span class="o">*</span><span class="p">,</span> <span class="nv">unsigned</span> <span class="nv">long</span><span class="p">):</span>
+        <span class="nf">add</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="nb">rdi</span>
+        <span class="nf">cmp</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="nb">rdi</span>
+        <span class="nf">je</span>      <span class="nv">.L1</span>
+<span class="nl">.L3:</span>
+        <span class="nf">mov</span>     <span class="kt">BYTE</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="p">],</span> <span class="mi">0</span>  <span class="c1">; store 0 into memory at [rdi]</span>
+        <span class="nf">add</span>     <span class="nb">rdi</span><span class="p">,</span> <span class="mi">1</span>             <span class="c1">; increment rdi</span>
+        <span class="nf">cmp</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="nb">rdi</span>           <span class="c1">; compare rdi to size</span>
+        <span class="nf">jne</span>     <span class="nv">.L3</span>                <span class="c1">; keep going if rdi &lt; size</span>
+<span class="nl">.L1:</span>
+        <span class="nf">ret</span>
+</code></pre></div></div>
+
+<p>This version is using a byte-by-byte copy loop, which I’ve annotated – it is more or less a 1:1 translation of how you’d imagine <code class="language-plaintext highlighter-rouge">std::fill</code> is written. The result of 1 cycle per byte is exactly what we’d expect using <a href="/blog/2019/06/11/speed-limits.html">speed limit analysis</a>: it is simultaneously limited by two different bottlenecks: 1 taken branch per cycle, and 1 store per cycle.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">fill2</code> version doesn’t have a loop at all:</p>
+
+<p><strong>fill2:</strong></p>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">fill2</span><span class="p">(</span><span class="nb">ch</span><span class="nv">ar</span><span class="o">*</span><span class="p">,</span> <span class="nv">unsigned</span> <span class="nv">long</span><span class="p">):</span>
+        <span class="nf">test</span>    <span class="nb">rsi</span><span class="p">,</span> <span class="nb">rsi</span>
+        <span class="nf">jne</span>     <span class="nv">.L8</span>                <span class="c1">; skip the memcpy call if size == 0</span>
+        <span class="nf">ret</span>
+<span class="nl">.L8:</span>
+        <span class="nf">mov</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rsi</span>
+        <span class="nf">xor</span>     <span class="nb">esi</span><span class="p">,</span> <span class="nb">esi</span>
+        <span class="nf">jmp</span>     <span class="nv">memset</span>             <span class="c1">; tailcall to memset</span>
+</code></pre></div></div>
+
+<p>Rather, it simply defers immediately to <code class="language-plaintext highlighter-rouge">memset</code>. We aren’t going to dig into the assembly for <code class="language-plaintext highlighter-rouge">memset</code> here, but the fastest possible <code class="language-plaintext highlighter-rouge">memset</code> would run at 32 bytes/cycle, limited by 1 store/cycle and maximum vector the width of 32 bytes on my machine, so the measured value of 29 bytes/cycle indicates it’s using an implementation something along those lines.</p>
+
+<p>So that’s the <em>why</em>, but what’s the <em>why of the why</em> (second order why)?</p>
+
+<p>I thought this had something to do with the optimizer. After all, at <code class="language-plaintext highlighter-rouge">-O3</code> even the <code class="language-plaintext highlighter-rouge">fill1</code> version using the plain <code class="language-plaintext highlighter-rouge">0</code> constant calls <code class="language-plaintext highlighter-rouge">memset</code>.</p>
+
+<p>I was wrong, however. The answer actually lies in the implementation of the C++ standard library (there are various, gcc is using libstdc++ in this case). Let’s take a look at the implementation of <code class="language-plaintext highlighter-rouge">std::fill</code> (I’ve reformatted the code for clarity and removed some compile-time concept checks):</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="cm">/*
+   *  ...
+   *
+   *  This function fills a range with copies of the same value.  For char
+   *  types filling contiguous areas of memory, this becomes an inline call
+   *  to @c memset or @c wmemset.
+  */</span>
+  <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">_ForwardIterator</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">_Tp</span><span class="p">&gt;</span>
+  <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">fill</span><span class="p">(</span><span class="n">_ForwardIterator</span> <span class="n">__first</span><span class="p">,</span> <span class="n">_ForwardIterator</span> <span class="n">__last</span><span class="p">,</span> <span class="k">const</span> <span class="n">_Tp</span><span class="o">&amp;</span> <span class="n">__value</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">__fill_a</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">__niter_base</span><span class="p">(</span><span class="n">__first</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">__niter_base</span><span class="p">(</span><span class="n">__last</span><span class="p">),</span> <span class="n">__value</span><span class="p">);</span>
+  <span class="p">}</span>
+</code></pre></div></div>
+
+<p>The included part of the comment<sup id="fnref:wmem" role="doc-noteref"><a href="#fn:wmem" class="footnote" rel="footnote">3</a></sup> already hints at what is to come: the implementor of <code class="language-plaintext highlighter-rouge">std::fill</code> has apparently considered specifically optimizing the call to a <code class="language-plaintext highlighter-rouge">memset</code> in some scenarios. So we keep following the trail, which brings us to the helper method <code class="language-plaintext highlighter-rouge">std::__fill_a</code>. There are two overloads that are relevant here, the general method and an overload which handles the special case:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">_ForwardIterator</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">_Tp</span><span class="p">&gt;</span>
+  <span class="kr">inline</span> <span class="k">typename</span>
+  <span class="n">__gnu_cxx</span><span class="o">::</span><span class="n">__enable_if</span><span class="o">&lt;!</span><span class="n">__is_scalar</span><span class="o">&lt;</span><span class="n">_Tp</span><span class="o">&gt;::</span><span class="n">__value</span><span class="p">,</span> <span class="kt">void</span><span class="o">&gt;::</span><span class="n">__type</span>
+  <span class="nf">__fill_a</span><span class="p">(</span><span class="n">_ForwardIterator</span> <span class="n">__first</span><span class="p">,</span> <span class="n">_ForwardIterator</span> <span class="n">__last</span><span class="p">,</span> <span class="k">const</span> <span class="n">_Tp</span><span class="o">&amp;</span> <span class="n">__value</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">__first</span> <span class="o">!=</span> <span class="n">__last</span><span class="p">;</span> <span class="o">++</span><span class="n">__first</span><span class="p">)</span>
+      <span class="o">*</span><span class="n">__first</span> <span class="o">=</span> <span class="n">__value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Specialization: for char types we can use memset.</span>
+  <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">_Tp</span><span class="p">&gt;</span>
+  <span class="kr">inline</span> <span class="k">typename</span>
+  <span class="n">__gnu_cxx</span><span class="o">::</span><span class="n">__enable_if</span><span class="o">&lt;</span><span class="n">__is_byte</span><span class="o">&lt;</span><span class="n">_Tp</span><span class="o">&gt;::</span><span class="n">__value</span><span class="p">,</span> <span class="kt">void</span><span class="o">&gt;::</span><span class="n">__type</span>
+  <span class="nf">__fill_a</span><span class="p">(</span><span class="n">_Tp</span><span class="o">*</span> <span class="n">__first</span><span class="p">,</span> <span class="n">_Tp</span><span class="o">*</span> <span class="n">__last</span><span class="p">,</span> <span class="k">const</span> <span class="n">_Tp</span><span class="o">&amp;</span> <span class="n">__c</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">const</span> <span class="n">_Tp</span> <span class="n">__tmp</span> <span class="o">=</span> <span class="n">__c</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">const</span> <span class="kt">size_t</span> <span class="n">__len</span> <span class="o">=</span> <span class="n">__last</span> <span class="o">-</span> <span class="n">__first</span><span class="p">)</span>
+      <span class="n">__builtin_memset</span><span class="p">(</span><span class="n">__first</span><span class="p">,</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">__tmp</span><span class="p">),</span> <span class="n">__len</span><span class="p">);</span>
+  <span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now we see how the <code class="language-plaintext highlighter-rouge">memset</code> appears. It is called explicitly by the second implementation shown above, selected by <code class="language-plaintext highlighter-rouge">enable_if</code> when the SFINAE condition <code class="language-plaintext highlighter-rouge">__is_byte&lt;_Tp&gt;</code> is true. Note, however, that unlike the general function, this variant has a single template argument: <code class="language-plaintext highlighter-rouge">template&lt;typename _Tp&gt;</code>, and the function signature is:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__fill_a</span><span class="p">(</span><span class="n">_Tp</span><span class="o">*</span> <span class="n">__first</span><span class="p">,</span> <span class="n">_Tp</span><span class="o">*</span> <span class="n">__last</span><span class="p">,</span> <span class="k">const</span> <span class="n">_Tp</span><span class="o">&amp;</span> <span class="n">__c</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Hence, it will only be considered when the <code class="language-plaintext highlighter-rouge">__first</code> and <code class="language-plaintext highlighter-rouge">__last</code> pointers which delimit the range have the <em>exact same type as the value being filled</em>. When when you write <code class="language-plaintext highlighter-rouge">std::fill(p, p + n, 0)</code> where <code class="language-plaintext highlighter-rouge">p</code> is <code class="language-plaintext highlighter-rouge">char *</code>, you rely on template type deduction for the parameters, which ends up deducing <code class="language-plaintext highlighter-rouge">char *</code> and <code class="language-plaintext highlighter-rouge">int</code> for the iterator type and value-to-fill type, <em>because <code class="language-plaintext highlighter-rouge">0</code> is an integer constant</em>.</p>
+
+<p>That is, it is if you had written:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">std</span><span class="o">::</span><span class="n">fill</span><span class="o">&lt;</span><span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This prevents the clever <code class="language-plaintext highlighter-rouge">memset</code> optimization from taking place: the overload that does it is never called because the iterator value type is different than the value-to-fill type.</p>
+
+<p>This suggests a fix: we can simply force the template argument types rather than rely on type deduction:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">fill3</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">fill</span><span class="o">&lt;</span><span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This way, we <a href="https://godbolt.org/z/VTssh9">get the <code class="language-plaintext highlighter-rouge">memset</code> version</a>.</p>
+
+<p>Finally, why does <code class="language-plaintext highlighter-rouge">fill2</code> using <code class="language-plaintext highlighter-rouge">'\0'</code> get the fast version, without forcing the template arguments? Well <code class="language-plaintext highlighter-rouge">'\0'</code> is a <code class="language-plaintext highlighter-rouge">char</code> constant, so the value-to-assign type is <code class="language-plaintext highlighter-rouge">char</code>. You could achieve the same effect with a cast, e.g., <code class="language-plaintext highlighter-rouge">static_cast&lt;char&gt;(0)</code> – and for buffers which have types like <code class="language-plaintext highlighter-rouge">unsigned char</code> this is necessary because <code class="language-plaintext highlighter-rouge">'\0'</code> does not have the same type as <code class="language-plaintext highlighter-rouge">unsigned char</code> (at least <a href="https://godbolt.org/z/YQKp7V">on gcc</a>).</p>
+
+<p>One might reasonably ask if this could be fixed in the standard library. I think so.</p>
+
+<p>One idea would be to keying off of <em>only</em> the type of the <code class="language-plaintext highlighter-rouge">first</code> and <code class="language-plaintext highlighter-rouge">last</code> pointers, like this:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">_Tp</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">_Tvalue</span><span class="p">&gt;</span>
+  <span class="kr">inline</span> <span class="k">typename</span>
+  <span class="n">__gnu_cxx</span><span class="o">::</span><span class="n">__enable_if</span><span class="o">&lt;</span><span class="n">__is_byte</span><span class="o">&lt;</span><span class="n">_Tp</span><span class="o">&gt;::</span><span class="n">__value</span><span class="p">,</span> <span class="kt">void</span><span class="o">&gt;::</span><span class="n">__type</span>
+  <span class="nf">__fill_a</span><span class="p">(</span><span class="n">_Tp</span><span class="o">*</span> <span class="n">__first</span><span class="p">,</span> <span class="n">_Tp</span><span class="o">*</span> <span class="n">__last</span><span class="p">,</span> <span class="k">const</span> <span class="n">_Tvalue</span><span class="o">&amp;</span> <span class="n">__c</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">const</span> <span class="n">_Tvalue</span> <span class="n">__tmp</span> <span class="o">=</span> <span class="n">__c</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">const</span> <span class="kt">size_t</span> <span class="n">__len</span> <span class="o">=</span> <span class="n">__last</span> <span class="o">-</span> <span class="n">__first</span><span class="p">)</span>
+      <span class="n">__builtin_memset</span><span class="p">(</span><span class="n">__first</span><span class="p">,</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">__tmp</span><span class="p">),</span> <span class="n">__len</span><span class="p">);</span>
+  <span class="p">}</span>
+</code></pre></div></div>
+
+<p>This says: who cares about the type of the value, it is going to get converted during assignment to the value type of the pointer anyways, so just look at the pointer type. E.g., if the type of the value-to-assign <code class="language-plaintext highlighter-rouge">_Tvalue</code> is <code class="language-plaintext highlighter-rouge">int</code>, but <code class="language-plaintext highlighter-rouge">_Tp</code> is <code class="language-plaintext highlighter-rouge">char</code> then this expands to this version, which is totally equivalent:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">__fill_a</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">__first</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">__last</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">__c</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">const</span> <span class="kt">int</span> <span class="n">__tmp</span> <span class="o">=</span> <span class="n">__c</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">const</span> <span class="kt">size_t</span> <span class="n">__len</span> <span class="o">=</span> <span class="n">__last</span> <span class="o">-</span> <span class="n">__first</span><span class="p">)</span>
+      <span class="n">__builtin_memset</span><span class="p">(</span><span class="n">__first</span><span class="p">,</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">__tmp</span><span class="p">),</span> <span class="n">__len</span><span class="p">);</span>
+  <span class="p">}</span>
+</code></pre></div></div>
+
+<p>This works … for simple types like <code class="language-plaintext highlighter-rouge">int</code>. Where it fails is if the value to fill has a tricky, non-primitive type, like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct conv_counting_int {
+    int v_;
+    mutable size_t count_ = 0;
+
+    operator char() const {
+        count_++;
+        return (char)v_;
+    }
+};
+
+size_t fill5(char *p, size_t n) {
+    conv_counting_int zero{0};
+    std::fill(p, p + n, zero);
+    return zero.count_;
+}
+</code></pre></div></div>
+
+<p>Here, the pointer type passed to <code class="language-plaintext highlighter-rouge">std::fill</code> is <code class="language-plaintext highlighter-rouge">char</code>, but you cannot safely apply the <code class="language-plaintext highlighter-rouge">memset</code> optimization above, since the <code class="language-plaintext highlighter-rouge">conv_counting_int</code> counts the number of times it is converted to <code class="language-plaintext highlighter-rouge">char</code>, and this value will be wrong (in particular, it will be <code class="language-plaintext highlighter-rouge">1</code>, not <code class="language-plaintext highlighter-rouge">n</code>) if you perform the above optimization.</p>
+
+<p>This can be fixed. You could limit the optimization to the case where the pointer type is char-like <em>and</em> the value-to-assign type is “simple” in the sense that it won’t notice how many times it has been converted. A sufficient check would be that the type is scalar, i.e. <code class="language-plaintext highlighter-rouge">std::is_scalar&lt;T&gt;</code> – although there is probably a less conservative check possible. So something like this for the SNIFAE check:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="nc">_Tpointer</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">_Tp</span><span class="p">&gt;</span>
+    <span class="kr">inline</span> <span class="k">typename</span>
+    <span class="n">__gnu_cxx</span><span class="o">::</span><span class="n">__enable_if</span><span class="o">&lt;</span><span class="n">__is_byte</span><span class="o">&lt;</span><span class="n">_Tpointer</span><span class="o">&gt;::</span><span class="n">__value</span> <span class="o">&amp;&amp;</span> <span class="n">__is_scalar</span><span class="o">&lt;</span><span class="n">_Tp</span><span class="o">&gt;::</span><span class="n">__value</span><span class="p">,</span> <span class="kt">void</span><span class="o">&gt;::</span><span class="n">__type</span>
+    <span class="nf">__fill_a</span><span class="p">(</span> <span class="n">_Tpointer</span><span class="o">*</span> <span class="n">__first</span><span class="p">,</span>  <span class="n">_Tpointer</span><span class="o">*</span> <span class="n">__last</span><span class="p">,</span> <span class="k">const</span> <span class="n">_Tp</span><span class="o">&amp;</span> <span class="n">__value</span><span class="p">)</span> <span class="p">{</span>
+      <span class="p">...</span>
+</code></pre></div></div>
+
+<p>Here’s <a href="https://godbolt.org/z/PXRWSB">an example</a> of how that would work. It’s not fully fleshed out but shows the idea.</p>
+
+<p>Finally, one might ask why <code class="language-plaintext highlighter-rouge">memset</code> <em>is</em> used when gcc is run at <code class="language-plaintext highlighter-rouge">-O3</code> or when clang is used (<a href="https://godbolt.org/z/9nhWAh">like this</a>). The answer is the optimizer. Even if the compile-time semantics of the language select what appears to a byte-by-byte copy loop, the compiler itself can transform that into <code class="language-plaintext highlighter-rouge">memset</code>, or something else like a vectorized loop, if it can prove it is <code class="language-plaintext highlighter-rouge">as-if</code> equivalent. That recognition happens at <code class="language-plaintext highlighter-rouge">-O3</code> for <code class="language-plaintext highlighter-rouge">gcc</code> but at <code class="language-plaintext highlighter-rouge">-O2</code> for clang.</p>
+
+<h3 id="what-does-it-mean">What Does It Mean</h3>
+
+<p>So what does it all mean? Is there a moral to this story?</p>
+
+<p>Some use this as evidence that the somehow C++ and/or the STL are irreparably broken. I don’t agree. Some other languages, even “fast” ones, will <em>never</em> give you the <code class="language-plaintext highlighter-rouge">memset</code> speed, although many will - but many of those that do (e.g., <code class="language-plaintext highlighter-rouge">java.util.Arrays.fill()</code>) do it via special recognition or handling of the function by the compiler or runtime. In the C++ standard library, the optimization the library writers have done is available to anyone, which is a big advantage. That the optimization fails, perhaps unexpectedly, in some cases is unfortunate but it’s nice that you can fix it yourself.</p>
+
+<p>Also, C++ gets <em>two</em> shots at this one: many other languages rely on the compiler to optimize these patterns, and this also occurs in C++. It’s just a bit of a quirk of gcc that optimization doesn’t help here: it doesn’t vectorize at -O2, nor does it do <em>idiom recognition</em>. Both of those result in much faster code: we’ve seen the effect of idiom recognition already: it results in a <code class="language-plaintext highlighter-rouge">memset</code>. Even if idiom recognition wasn’t enabled or didn’t work, vectorization would help a lot: here’s <a href="https://godbolt.org/z/53c6W5561">gcc at -O3</a>, but with idiom recognition disabled. It uses 32-byte stores (<code class="language-plaintext highlighter-rouge">vmovdqu YMMWORD PTR [rax], ymm0</code>) which will be close to <code class="language-plaintext highlighter-rouge">memset</code> speed (but a bit of unrolling woudl have helped). In many other languages it would only be up to the compiler: there wouldn’t be a chance to get <code class="language-plaintext highlighter-rouge">memset</code> even with no optimization as there is in C++.</p>
+
+<p>Do we throw out modern C++ idioms, at least where performance matters, for example by replacing <code class="language-plaintext highlighter-rouge">std::fill</code> with <code class="language-plaintext highlighter-rouge">memset</code>? I don’t think so. It is far from clear where <code class="language-plaintext highlighter-rouge">memset</code> can even be used safely in C++. Unlike say <code class="language-plaintext highlighter-rouge">memcpy</code> and <em>trivially copyable</em>, there is no type trait for “memset is equivalent to zeroing”. It’s probably OK for byte-like types, and is widely used for other primitive types (which we can be sure are trivial, but can’t always be sure of the representation), but even that may not be safe. Once you introduced even simple structures or classes, the footguns multiply. I recommend <code class="language-plaintext highlighter-rouge">std::fill</code> and more generally sticking to modern idioms, except in very rare cases where profiling has identified a hotspot, and even then you should take the safest approach that still provides the performance you need (e.g., by passing <code class="language-plaintext highlighter-rouge">(char)0</code> in this case).</p>
+
+<h3 id="source">Source</h3>
+
+<p>The source for my benchmark is <a href="https://github.com/travisdowns/fill-bench">available on GitHub</a>.</p>
+
+<h3 id="thanks">Thanks</h3>
+
+<p>Thanks to <a href="https://twitter.com/mattgodbolt">Matt Godbolt</a> for creating <a href="https://godbolt.org/">Compiler Explorer</a>, without which this type of investigation would be much more painful – to the point where it often wouldn’t happen at all.</p>
+
+<p>Matt Godbolt, tc, Nathan Kurz and Pocak for finding typos.</p>
+
+<h3 id="discuss">Discuss</h3>
+
+<p>I am <em>still</em> working on my comments system (no, I don’t want Disqus), but in the meantime you can discuss this post on <a href="https://news.ycombinator.com/item?id=22104576">Hacker News</a>, <a href="https://www.reddit.com/r/cpp/comments/erialk/the_hunt_for_the_fastest_zero/">Reddit</a> or <a href="https://lobste.rs/s/bylri4/hunt_for_fastest_zero">lobste.rs</a>.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:function" role="doc-endnote">
+      <p>Of course, you wouldn’t wrap the <code class="language-plaintext highlighter-rouge">std::fill</code> function in another <code class="language-plaintext highlighter-rouge">fill</code> function that just forwards directly to the standard function: you’d just call <code class="language-plaintext highlighter-rouge">std::fill</code> directly. We use a function here so you can see the parameter types and we can examine the disassembly easily. <a href="#fnref:function" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:qb" role="doc-endnote">
+      <p>On <a href="http://quick-bench.com/yGy2Mzlr2ZZhWVxoH7HscmbEC94">quickbench</a>, the difference varies slightly from run to run but is usually around 31 to 32 times. <a href="#fnref:qb" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:wmem" role="doc-endnote">
+      <p>Interestingly, the comment mentions <code class="language-plaintext highlighter-rouge">wmemset</code> in addition to <code class="language-plaintext highlighter-rouge">memset</code> which would presumably be applied for values of type <code class="language-plaintext highlighter-rouge">wchar_t</code> (32-bits on this platform), but I don’t find any evidence that is actually the case via experiment or by examining the code – the optimization appears to only be currently implemented for byte-like values and <code class="language-plaintext highlighter-rouge">memset</code>. <a href="#fnref:wmem" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-9f1e4290-8a62-11ea-956c-8776caf583c8" class="js-comment comment" uid="9f1e4290-8a62-11ea-956c-8776caf583c8">
+
+  <div class="comment__author">
+    PatL
+    <span class="comment__date">•
+        <a href="#comment-9f1e4290-8a62-11ea-956c-8776caf583c8" title="Permalink to this comment">April 29th, 2020 21:44</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice article. Although I would argue that</p>
+
+<p>std::fill(p, p+n, char());</p>
+
+<p>…is the “canonical” C++ form if you want the types just right.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-9f1e4290-8a62-11ea-956c-8776caf583c8', 'respond', 'zero', '9f1e4290-8a62-11ea-956c-8776caf583c8')">↪&#xFE0E; Reply to PatL</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-287e0600-60bb-11ea-b3f4-e9d388b30bb5" class="js-comment comment" uid="287e0600-60bb-11ea-b3f4-e9d388b30bb5">
+
+  <div class="comment__author">
+    A.H.
+    <span class="comment__date">•
+        <a href="#comment-287e0600-60bb-11ea-b3f4-e9d388b30bb5" title="Permalink to this comment">March  7th, 2020 21:32</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Are you aware of std::memset? If you are, you should better explain why you think using a C++ standard library function is unsafe or bad practice, exactly.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-287e0600-60bb-11ea-b3f4-e9d388b30bb5', 'respond', 'zero', '287e0600-60bb-11ea-b3f4-e9d388b30bb5')">↪&#xFE0E; Reply to A.H.</a>
+    </div>
+</article>
+  
+
+<article id="comment-86cc0170-626f-11ea-bd04-6116c010cf28" class="js-comment comment admin child" uid="86cc0170-626f-11ea-bd04-6116c010cf28">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-86cc0170-626f-11ea-bd04-6116c010cf28" title="Permalink to this comment">March 10th, 2020 01:36</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes, I am aware of it. In fact, <code class="language-plaintext highlighter-rouge">memset</code> appears more that 20 times in this post alone and it didn’t get there by accident.</p>
+
+<p><code class="language-plaintext highlighter-rouge">memset</code> would be safe to use in this specific case for <code class="language-plaintext highlighter-rouge">char</code> arrays, but it’s tough to use safely in general (even for standard layout types in some cases) in C++, so I generally prefer <code class="language-plaintext highlighter-rouge">std::fill</code> in new code (not to mention std::fill is much more general).</p>
+
+<p>BTW, <code class="language-plaintext highlighter-rouge">std::memset</code> is only part of the “standard C++ library” by virtue of its more or less wholesale inclusion of the C standard library. So it’s technically part of the library but it doesn’t play nice with much of the language, in the same way that <code class="language-plaintext highlighter-rouge">malloc</code> and <code class="language-plaintext highlighter-rouge">free</code> are technically part of the standard, but could be considered a vestigial appendage from C.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2020/01/20/zero.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2020/01/20/zero.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="zero">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/01/20/zero.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2020/01/20/zero.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

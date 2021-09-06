@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>Performance Speed Limits | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Performance Speed Limits" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A laundry list of speed limits that your code can’t exceed." />
+<meta property="og:description" content="A laundry list of speed limits that your code can’t exceed." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2019/06/11/speed-limits.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2019/06/11/speed-limits.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/speed-limits/speed-limit-50-ns.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-06-11T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/speed-limits/speed-limit-50-ns.png" />
+<meta property="twitter:title" content="Performance Speed Limits" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2019-06-11T00:00:00+00:00","datePublished":"2019-06-11T00:00:00+00:00","description":"A laundry list of speed limits that your code can’t exceed.","headline":"Performance Speed Limits","image":"https://travisdowns.github.io/assets/speed-limits/speed-limit-50-ns.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/06/11/speed-limits.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2019/06/11/speed-limits.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Performance Speed Limits</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2019-06-11T00:00:00+00:00" itemprop="datePublished">
+        Jun 11, 2019
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/benchmarking.html">benchmarking</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="how-fast-can-it-go">How fast can it go?</h2>
+
+<p>Sometimes you just want to know how fast your code <em>can</em> go, without benchmarking it. Sometimes you have benchmarked it and want to know how close you are to the maximum speed. Often you just need to know what the current limiting factor is, to guide your optimization decisions.</p>
+
+<p>Well this post is about that determining that <em>speed limit</em><sup id="fnref:speedlemire" role="doc-noteref"><a href="#fn:speedlemire" class="footnote" rel="footnote">1</a></sup>. It’s not a comprehensive performance evaluation methodology, but for many <em>small</em> pieces of code it will work very well.</p>
+
+<p style="text-align: center;"><img src="/assets/speed-limits/speed-limit-50-ns.svg" alt="Speed Limit" width="300px" /></p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<p>This post is intended to be read from top to bottom, but if it’s not your first time here or you just want to skip to a part you find interesting, here you go:</p>
+
+<ul id="markdown-toc">
+  <li><a href="#how-fast-can-it-go" id="markdown-toc-how-fast-can-it-go">How fast can it go?</a></li>
+  <li><a href="#table-of-contents" id="markdown-toc-table-of-contents">Table of Contents</a></li>
+  <li><a href="#the-limits" id="markdown-toc-the-limits">The Limits</a>    <ul>
+      <li><a href="#big-list-of-caveats" id="markdown-toc-big-list-of-caveats">Big List of Caveats</a></li>
+    </ul>
+  </li>
+  <li><a href="#pipeline-width" id="markdown-toc-pipeline-width">Pipeline Width</a>    <ul>
+      <li><a href="#remedies" id="markdown-toc-remedies">Remedies</a></li>
+    </ul>
+  </li>
+  <li><a href="#portexecution-unit-limits" id="markdown-toc-portexecution-unit-limits">Port/Execution Unit Limits</a>    <ul>
+      <li><a href="#tools" id="markdown-toc-tools">Tools</a></li>
+      <li><a href="#measuring-it" id="markdown-toc-measuring-it">Measuring It</a></li>
+      <li><a href="#remedies-1" id="markdown-toc-remedies-1">Remedies</a></li>
+    </ul>
+  </li>
+  <li><a href="#memory-related-limits" id="markdown-toc-memory-related-limits">Memory Related Limits</a>    <ul>
+      <li><a href="#load-throughput-limit" id="markdown-toc-load-throughput-limit">Load Throughput Limit</a>        <ul>
+          <li><a href="#load-split-cache-lines" id="markdown-toc-load-split-cache-lines">Load Split Cache Lines</a></li>
+          <li><a href="#remedies-2" id="markdown-toc-remedies-2">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#store-throughput-limit" id="markdown-toc-store-throughput-limit">Store Throughput Limit</a>        <ul>
+          <li><a href="#store-split-cache-lines" id="markdown-toc-store-split-cache-lines">Store Split Cache Lines</a></li>
+          <li><a href="#remedies-3" id="markdown-toc-remedies-3">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#total-accesses-limit" id="markdown-toc-total-accesses-limit">Total Accesses Limit</a>        <ul>
+          <li><a href="#remedies-4" id="markdown-toc-remedies-4">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#complex-addressing-limit" id="markdown-toc-complex-addressing-limit">Complex Addressing Limit</a>        <ul>
+          <li><a href="#remedies-5" id="markdown-toc-remedies-5">Remedies</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#memory-and-cache-bandwidth" id="markdown-toc-memory-and-cache-bandwidth">Memory and Cache Bandwidth</a>    <ul>
+      <li><a href="#remedies-6" id="markdown-toc-remedies-6">Remedies</a></li>
+    </ul>
+  </li>
+  <li><a href="#carried-dependency-chains" id="markdown-toc-carried-dependency-chains">Carried Dependency Chains</a>    <ul>
+      <li><a href="#tools-1" id="markdown-toc-tools-1">Tools</a></li>
+      <li><a href="#remedies-7" id="markdown-toc-remedies-7">Remedies</a></li>
+    </ul>
+  </li>
+  <li><a href="#front-end-effects" id="markdown-toc-front-end-effects">Front End Effects</a></li>
+  <li><a href="#taken-branches" id="markdown-toc-taken-branches">Taken Branches</a></li>
+  <li><a href="#out-of-order-limits" id="markdown-toc-out-of-order-limits">Out of Order Limits</a>    <ul>
+      <li><a href="#reorder-buffer-size" id="markdown-toc-reorder-buffer-size">Reorder Buffer Size</a>        <ul>
+          <li><a href="#remedies-8" id="markdown-toc-remedies-8">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#load-buffer" id="markdown-toc-load-buffer">Load Buffer</a>        <ul>
+          <li><a href="#remedies-9" id="markdown-toc-remedies-9">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#store-buffer" id="markdown-toc-store-buffer">Store Buffer</a>        <ul>
+          <li><a href="#remedies-10" id="markdown-toc-remedies-10">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#scheduler" id="markdown-toc-scheduler">Scheduler</a>        <ul>
+          <li><a href="#remedies-11" id="markdown-toc-remedies-11">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#register-file-size-limit" id="markdown-toc-register-file-size-limit">Register File Size Limit</a>        <ul>
+          <li><a href="#remedies-12" id="markdown-toc-remedies-12">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#branches-in-flight" id="markdown-toc-branches-in-flight">Branches in Flight</a>        <ul>
+          <li><a href="#remedies-13" id="markdown-toc-remedies-13">Remedies</a></li>
+        </ul>
+      </li>
+      <li><a href="#calls-in-flight" id="markdown-toc-calls-in-flight">Calls in Flight</a>        <ul>
+          <li><a href="#remedies-14" id="markdown-toc-remedies-14">Remedies</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#thank-you" id="markdown-toc-thank-you">Thank You</a></li>
+  <li><a href="#comments" id="markdown-toc-comments">Comments</a></li>
+</ul>
+
+<h2 id="the-limits">The Limits</h2>
+
+<p>There are many possible limits that apply to code executing on a CPU, and in principle the achieved speed will simply be determined by the lowest of all the limits that apply to the code in question. That is, the code will execute <em>only as fast as its narrowest bottleneck</em>.</p>
+
+<p>So I’ll just list some of the known bottlenecks here, starting with common factors first, down through some fairly obscure and rarely discussed ones. The real-world numbers come mostly from Intel x86 CPUs, because that’s what I know off of top of my head, but the concepts mostly apply in general as well, although often different limit values.</p>
+
+<p>Where possible I’ve included specific figures for <em>modern</em> Intel chips and sometimes AMD CPUs. I’m happy to add numbers for other non-x86 CPUs if anyone out there is interested in providing them.</p>
+
+<h3 id="big-list-of-caveats">Big List of Caveats</h3>
+
+<p>First, lets start with this list of very important caveats.</p>
+
+<ul>
+  <li>The limits discussed below generally apply to loops of any size, and also straight line or branchy code with no loops in sight. Unfortunately, it is only really possible to apply the simple analyses described to loops, since a steady state will be reached and the limit values will apply. For most straight line code, however, no steady state is reached and the actual behavior depends on many details of the architecture such as various internal buffer and queue sizes. Analyzing such code sections basically requires a detailed simulation, not a back-of-napkin estimate as we attempt here.</li>
+  <li>Similarly, even large loops may not reach a steady state, if the loop is big enough that iterations don’t completely overlap. This is discussed a bit more in the <a href="#out-of-order-limits">Out of Order Limits</a> section.</li>
+  <li>The limits below are all <em>upper bounds</em>, i.e., the CPU will never go faster than this (in a steady state) - but it doesn’t mean you can achieve these limits in every case. For each limit, I have found code that you gets you to the limit - but you can’t expect that to be the case every time. There may be inefficiencies in the implementation, or unmodeled effects that make the actual limit lower in practice. Don’t call Intel and complain that you aren’t achieving your two loads per cycle! It’s a speed <em>limit</em>, not a guaranteed maximum<sup id="fnref:thatsaid" role="doc-noteref"><a href="#fn:thatsaid" class="footnote" rel="footnote">2</a></sup>.</li>
+  <li>There are known limits not discussed below, such as instruction throughput for not-fully-pipelined instructions.</li>
+  <li>There are certainly also unknown limits or not well understood limits not discussed here.</li>
+  <li>More caveats are mentioned in the individual sections.</li>
+  <li>I simply ignore branch prediction for now: this post just got too long (it’s a problem I have). It also deserves a whole post to itself.</li>
+  <li>This methodology is unsuitable for analyzing entire applications - it works best for a small hotspot of say 1 to 50 lines of code, which hopefully produce less than about 50 assembly instructions. Trying to apply it to larger stuff may lead to madness. I highly recommend <a href="https://software.intel.com/en-us/vtune-amplifier-cookbook-top-down-microarchitecture-analysis-method">Intel’s Top-Down</a> analysis method for more complex tasks. It always starts with performance counter measurements and tries to identify the problems from there. A free implementation is available in Andi Kleen’s <a href="https://github.com/andikleen/pmu-tools">pmu-tools</a> for Linux. On Windows, free licenses of VTune are available though the 90-day community license for System Studio.</li>
+</ul>
+
+<h2 id="pipeline-width">Pipeline Width</h2>
+
+<p><strong>Intel Skylake:</strong> Maximum 4 fused uops per cycle<br />
+<strong>Intel Ice Lake:</strong> Maximum 5 fused uops per cycle<br />
+<strong>AMD Zen, Zen 2:</strong> Maximum 6 MOPs from up to 5 instructions per cycle<br />
+<strong>AMD Zen 3:</strong> Maximum 6 MOPs from up to 6 instructions per cycle<br />
+<strong>Apple <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr>:</strong> Maximum 8 ops per cycle</p>
+
+<p>At a fundamental level, every CPU can execute only a maximum number of operations per cycle. For many early CPUs, this was always less than one per cycle, but modern pipelined <a href="https://en.wikipedia.org/wiki/Superscalar_processor">superscalar</a> processors can execute more than one per cycle, up to some limit. This underlying limit is not always be imposed in the same place, e.g., some CPUs may be limited by instruction encoding, others by register renaming or retirement - but there is always a limit (sometimes more than one limit depending on what you are counting).</p>
+
+<p>For modern Intel chips this limit is 4 <em>fused-domain</em><sup id="fnref:fused-domain" role="doc-noteref"><a href="#fn:fused-domain" class="footnote" rel="footnote">3</a></sup> operations, and for modern AMD it is 5 macro-operations. So if your loop contains N fused-uops, it will never execute at more than 1 iteration per cycle.</p>
+
+<p>Consider the following simple loop, which separately adds up the top and bottom 16-bit halves of every 32-bit integer in an array:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint32_t</span> <span class="n">top</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">uint32_t</span> <span class="n">elem</span><span class="p">;</span>
+
+    <span class="n">elem</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">top</span>    <span class="o">+=</span> <span class="n">elem</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">;</span>
+    <span class="n">bottom</span> <span class="o">+=</span> <span class="n">elem</span> <span class="o">&amp;</span> <span class="mh">0xFFFF</span><span class="p">;</span>
+
+    <span class="n">elem</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="n">top</span>    <span class="o">+=</span> <span class="n">elem</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">;</span>
+    <span class="n">bottom</span> <span class="o">+=</span> <span class="n">elem</span> <span class="o">&amp;</span> <span class="mh">0xFFFF</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This compiles to the following assembly:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">top:</span>
+    <span class="nf">mov</span>    <span class="nb">r8d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>          <span class="c1">; 1</span>
+    <span class="nf">mov</span>    <span class="nb">edx</span><span class="p">,</span><span class="kt">DWORD</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="o">+</span><span class="mh">0x4</span><span class="p">]</span>      <span class="c1">; 2</span>
+    <span class="nf">add</span>    <span class="nb">rcx</span><span class="p">,</span><span class="mh">0x2</span>                        <span class="c1">; 3</span>
+    <span class="nf">mov</span>    <span class="nb">r11d</span><span class="p">,</span><span class="nb">r8d</span>                       <span class="c1">; 4</span>
+    <span class="nf">movzx</span>  <span class="nb">r8d</span><span class="p">,</span><span class="nb">r8w</span>                        <span class="c1">; 5</span>
+    <span class="nf">mov</span>    <span class="nb">r9d</span><span class="p">,</span><span class="nb">edx</span>                        <span class="c1">; 6</span>
+    <span class="nf">shr</span>    <span class="nb">r11d</span><span class="p">,</span><span class="mh">0x10</span>                      <span class="c1">; 7</span>
+    <span class="nf">movzx</span>  <span class="nb">edx</span><span class="p">,</span><span class="nb">dx</span>                         <span class="c1">; 8</span>
+    <span class="nf">shr</span>    <span class="nb">r9d</span><span class="p">,</span><span class="mh">0x10</span>                       <span class="c1">; 9</span>
+    <span class="nf">add</span>    <span class="nb">edx</span><span class="p">,</span><span class="nb">r8d</span>                        <span class="c1">; 10</span>
+    <span class="nf">add</span>    <span class="nb">r9d</span><span class="p">,</span><span class="nb">r11d</span>                       <span class="c1">; 11</span>
+    <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="nb">edx</span>                        <span class="c1">; 12</span>
+    <span class="nf">add</span>    <span class="nb">r10d</span><span class="p">,</span><span class="nb">r9d</span>                       <span class="c1">; 13</span>
+    <span class="nf">cmp</span>    <span class="nb">rcx</span><span class="p">,</span><span class="nb">rsi</span>                        <span class="c1">; (fuses w/ jb)</span>
+    <span class="nf">jb</span>     <span class="nv">top</span>                            <span class="c1">; 14</span>
+</code></pre></div></div>
+
+<p>I’ve annotated the total <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> count on each line: there is nothing tricky here as instruction is one fused <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr>, except for the <code class="language-plaintext highlighter-rouge">cmp; jb</code> pair which <abbr title="The fusing of an ALU operation and subsequent jump, such as `dec eax; jnz label` into one operation">macro-fuse</abbr> into a single <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr>. The are 14 uops in this loop, so at best, on my Intel laptop I expect this loop to take 14 / 4 = 3.5 cycles per iteration (1.75 cycles per element). Indeed, when I time this<sup id="fnref:sum-halves" role="doc-noteref"><a href="#fn:sum-halves" class="footnote" rel="footnote">4</a></sup> I get 3.51 cycles per iteration, so we are executing 3.99 fused uops per cycle, and we have certainly hit the pipeline width speed limit.</p>
+
+<p>For more complicated code where you don’t actually want to calculate the <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> count by hand, you can use performance counters - the <code class="language-plaintext highlighter-rouge">uops_issued.any</code> counter counts fused-domain uops:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./uarch-bench.sh --timer=perf --test-name=cpp/sum-halves --extra-events=uops_issued.any
+...
+Resolved and programmed event 'uops_issued.any' to 'cpu/config=0x10e/', caps: R:1 UT:1 ZT:1 index: 0x1
+Running benchmarks groups using timer perf
+
+** Running group cpp : Tests written in C++ **
+                               Benchmark    Cycles    uops_i
+        Sum 16-bit halves of array elems      3.51     14.03
+</code></pre></div></div>
+
+<p>The counter reflects the 14 uops/iteration we calculated by looking at the assembly<sup id="fnref:extra-3" role="doc-noteref"><a href="#fn:extra-3" class="footnote" rel="footnote">5</a></sup>. If you <em>calculate</em> a value very close to 4 uops per cycle using this metric, you know without examining the code that you are bumping up against this speed limit.</p>
+
+<h3 id="remedies">Remedies</h3>
+
+<p>In a way this is the simplest of the limits to understand: you simply can’t execute any more operations per cycle. You code is already maximally efficient in an operations/cycle sense: you don’t have to worry about cache misses, expensive operations, too many jumps, branch mispredictions or anything like that because they aren’t limiting you.</p>
+
+<p>Your only goal is to reduce the number of operations (in the fused domain), which usually means reducing the number of instructions. You can do that by:</p>
+
+<ul>
+  <li>Removing instructions, i.e., “classic” instruction-oriented optimization. Way too involved to cover in a bullet point, but briefly you can try to unroll loops (indeed, by unrolling the loop above, I cut execution time by ~15%), use different instructions that are more efficient, remove instructions (e.g., the <code class="language-plaintext highlighter-rouge">mov r11d,r8d</code> and <code class="language-plaintext highlighter-rouge">mov r9d,edx</code> are not necessary and could be removed with a slight reoganization), etc. If you are writing in a high level language you can’t do this <em>directly</em>, but you can try to understand the assembly the compiler is generating and make changes to the code or compiler flags that get it to do what you want.</li>
+  <li>Vectorization. Try to do more work with one instruction. This is an obvious huge win for this method. If you compile the same code with <code class="language-plaintext highlighter-rouge">-O3</code> rather than <code class="language-plaintext highlighter-rouge">-O2</code>, gcc vectorizes it (and doesn’t even do a great job<sup id="fnref:gcc-notgreat" role="doc-noteref"><a href="#fn:gcc-notgreat" class="footnote" rel="footnote">6</a></sup>) and we get a 4.6x speedup, to 0.76 cycles per iteration (0.38 cycles per element). If you vectorized it by hand or massaged the auto-vectorization a bit more I think you could get to an additional 3x speed, down to roughly 0.125 cycles per element.</li>
+  <li>Micro-fusion. Somewhat specific to x86, but you can look for opportunities to fold a load and an ALU operation together, since such micro-fused operations only count as one in the fused domain, compared to two for the separate instructions. This generally applies only for values loaded and used once, but <em>rarely</em> it may even be profitable to load the same value <em>twice</em> from memory, in two different instructions, in order to eliminate a standalone <code class="language-plaintext highlighter-rouge">mov</code> from memory. This is more complicated than I make it sound because of the <a href="https://stackoverflow.com/q/26046634">complication of de-lamination</a>, which varies by model and is not fully described<sup id="fnref:delamopt" role="doc-noteref"><a href="#fn:delamopt" class="footnote" rel="footnote">7</a></sup> in the optimization manual.</li>
+</ul>
+
+<h2 id="portexecution-unit-limits">Port/Execution Unit Limits</h2>
+
+<p><strong>Intel, AMD, Apple:</strong> One operation per port, per cycle</p>
+
+<p>Let us use our newfound knowledge of the pipeline width limitation, and tackle another example loop:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint32_t</span> <span class="nf">mul_by</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint32_t</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">uint32_t</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">uint32_t</span> <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="n">sum</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="n">m</span> <span class="o">*</span> <span class="n">i</span> <span class="o">*</span> <span class="n">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">sum</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The loop compiles to the following assembly. I’ve marked <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> counts as before.</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">930:</span>
+    <span class="nf">mov</span>    <span class="nb">r10d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="o">+</span><span class="mh">0x4</span><span class="p">]</span> <span class="c1">;  1 y = data[i + 1]</span>
+    <span class="nf">mov</span>    <span class="nb">r8d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;  2 setup up r8d to hold result of multiplies</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">ecx</span>                    <span class="c1">;  3 i * y</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">edx</span>                    <span class="c1">;  4 ↑ * m</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">ecx</span>                    <span class="c1">;  5 ↑ * i</span>
+    <span class="nf">add</span>    <span class="nb">rcx</span><span class="p">,</span><span class="mh">0x1</span>                    <span class="c1">;  6 i++</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">r9d</span>                    <span class="c1">;  7 ↑ * x</span>
+    <span class="nf">mov</span>    <span class="nb">r9d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;  8 stash y for next iteration</span>
+    <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="nb">r8d</span>                    <span class="c1">;  9 sum += ...</span>
+    <span class="nf">cmp</span>    <span class="nb">rcx</span><span class="p">,</span><span class="nb">rsi</span>                    <span class="c1">;    i &lt; len (fuses with jne)</span>
+    <span class="nf">jne</span>    <span class="mi">930</span>                        <span class="c1">; 10</span>
+</code></pre></div></div>
+
+<p>Despite the source containing two loads per iteration (<code class="language-plaintext highlighter-rouge">x = data[i]</code> and <code class="language-plaintext highlighter-rouge">y = data[i + 1]</code>), the compiler was clever enough to reduce that to one, since <code class="language-plaintext highlighter-rouge">y</code> in iteration <code class="language-plaintext highlighter-rouge">n</code> becomes <code class="language-plaintext highlighter-rouge">x</code> in iteration <code class="language-plaintext highlighter-rouge">n + 1</code>, so it saves the loaded value in a register across iterations.</p>
+
+<p>So we can just apply our pipeline width technique to this loop, right? We count 10 uops (again, the only trick is that <code class="language-plaintext highlighter-rouge">cmp; jne</code> are <abbr title="The fusing of an ALU operation and subsequent jump, such as `dec eax; jnz label` into one operation">macro-fused</abbr>). We can confirm it in <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>-bench:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./uarch-bench.sh --timer=perf --test-name=cpp/mul-4 --extra-events=uops_issued.any,uops_retired.retire_slots
+....
+** Running group cpp : Tests written in C++ **
+                               Benchmark    Cycles    uops_i    uops_r
+                    Four multiplications      ????     10.01     10.00
+</code></pre></div></div>
+
+<p>Right, 10 uops. So this should take 10 / 4 = 2.5 cycles per iteration on modern Intel then, right? No. The hidden <code class="language-plaintext highlighter-rouge">????</code> value in the benchmark output indicates that it actually takes 4.01 cycles.</p>
+
+<p>What gives? As it turns out, the limitation is the <code class="language-plaintext highlighter-rouge">imul</code> instructions. Although up to four <code class="language-plaintext highlighter-rouge">imul</code> instructions can be <em>issued<sup id="fnref:issued" role="doc-noteref"><a href="#fn:issued" class="footnote" rel="footnote">8</a></sup></em> every cycle, there is only a single scalar multiplication unit on the CPU, and so only one multiplication can begin execution every cycle. Since there are four multiplications in the loop, it takes at least four cycles to execute it, and in fact that’s exactly what we find.</p>
+
+<p>On modern chips all operations execute only through a limited number of ports<sup id="fnref:ports" role="doc-noteref"><a href="#fn:ports" class="footnote" rel="footnote">9</a></sup> and for multiplications that is always only <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr>. You can get this information from Agner’s <a href="https://www.agner.org/optimize/#manual_instr_tab">instruction tables</a>:</p>
+
+<p><img src="/assets/speed-limits/agner-imul.png" alt="Agner's port usage info" /></p>
+
+<p>… or from <a href="http://uops.info/html-instr/IMUL_R32_R32.html">uops.info</a>:</p>
+
+<p><img src="/assets/speed-limits/uops-info-imul.png" alt="uops-info port usage info" /></p>
+
+<p>On modern Intel some simple integer arithmetic (<code class="language-plaintext highlighter-rouge">add</code>, <code class="language-plaintext highlighter-rouge">sub</code>, <code class="language-plaintext highlighter-rouge">inc</code>, <code class="language-plaintext highlighter-rouge">dec</code>), bitwise operation (<code class="language-plaintext highlighter-rouge">or</code>, <code class="language-plaintext highlighter-rouge">and</code>, <code class="language-plaintext highlighter-rouge">xor</code>) and flag setting tests (<code class="language-plaintext highlighter-rouge">test</code>, <code class="language-plaintext highlighter-rouge">cmp</code>) run on four ports, so you aren’t very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations compete for only a few ports. For example, shift instructions and bit test/set operations like <code class="language-plaintext highlighter-rouge">bt</code>, <code class="language-plaintext highlighter-rouge">btr</code> and friends use only <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr> and <abbr title="port 6 (GP ALU, all branches)">p6</abbr>. More advanced bit operations like <code class="language-plaintext highlighter-rouge">popcnt</code> and <code class="language-plaintext highlighter-rouge">tzcnt</code> execute only <code class="language-plaintext highlighter-rouge">p1</code>, and so on. Note that in some cases instructions which can go to wide variety of ports, such as <code class="language-plaintext highlighter-rouge">add</code> may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is <a href="http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly">not fully understood</a>.</p>
+
+<p>One of the most common cases of port contention is with vector operations. There are only three vector ports, so the best case is three vector operations per cycle, and for AVX-512 there are only two ports so the best case is two per cycle. Furthermore, only a few operations can use all three ports (mostly simple integer arithmetic and bitwise operations and 32 and 64-bit <abbr title="When discussing assembly instructions an immediate is a value embedded in the instruction itself, e.g., the 1 in add eax, 1.">immediate</abbr> blends) - many are restricted to one or two ports. In particular, shuffles run only on <abbr title="port 5 (GP and SIMD ALU, vector shuffles)">p5</abbr> and can be a bottleneck for shuffle heavy algorithm.</p>
+
+<h3 id="tools">Tools</h3>
+
+<p>In the example above it was easy to see the port pressure because the <code class="language-plaintext highlighter-rouge">imul</code> instructions go to only a single port, and the remainder of the instructions are mostly simple instructions that can go to any of four ports, so a 4 cycle <em>solution</em> to the port assignment problem is easy to find. In more complex cases, with many instructions that go to many ports, it is less clear what the ideal solution is (and even less clear what the CPU will actually do without testing it), so you can use one of a few tools:</p>
+
+<p><strong>Intel IACA</strong></p>
+
+<p>Tries to solve for port pressure (algorithm unclear) and displays it in a table. Has reached end of life but can still be downloaded <a href="https://software.intel.com/en-us/articles/intel-architecture-code-analyzer">here</a>.</p>
+
+<p><strong>RRZE-HPC OSACA</strong></p>
+
+<p>Essnentially an open-source version if IACA. Displays cumulative port pressure in a similar way to IACA, although it simply divides each instruction evenly among the ports it can use and doesn’t look for a more ideal solution. On <a href="https://github.com/RRZE-HPC/OSACA">github</a>.</p>
+
+<p><strong>LLVM-MCA</strong></p>
+
+<p>Another tool, similar to IACA and OSACA, llvm-mca shows port pressure in a similar way and attempts to find an ideal solution (algorithm unclear, but it’s open source so someone could check). Comes with LLVM 7 or higher and documentation is <a href="https://llvm.org/docs/CommandGuide/llvm-mca.html">here</a>.</p>
+
+<h3 id="measuring-it">Measuring It</h3>
+
+<p>You can measure the actual port pressure using the <code class="language-plaintext highlighter-rouge">perf</code> and the <code class="language-plaintext highlighter-rouge">uops_dispatched_port</code> counters. For example, to measure the full port pressure across all 8 ports, you can do the following in <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>-bench:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./uarch-bench.sh --timer=perf --test-name=cpp/mul-4 --extra-events=uops_dispatched_port.port_0#p0,uops_dispatched_port.port_1#p1,uops_dispatched_port.port_2#p2,uops_dispatched_port.port_3#p3,uops_dispatched_port.port_4#p4,uops_dispatched_port.port_5#p5,uops_dispatched_port.port_6#p6,uops_dispatched_port.port_7#p7
+...
+           Benchmark       Cycles           p0           p1           p2           p3           p4           p5           p6           p7
+Four multiplications         4.00         0.86         4.00         0.50         0.50         0.00         0.90         1.58         0.00
+</code></pre></div></div>
+
+<p>While noting that that the column naming scheme is <a href="https://github.com/travisdowns/uarch-bench/issues/50">really bad</a> in this case, we see that the port1 (the 3rd numeric column) has 4 operations dispatched every iteration, and iterations take 4 cycles, so the port is active every cycle, i.e., 100% pressure. None of the other ports have significant pressure at all, they are all active less than 50% of the time.</p>
+
+<h3 id="remedies-1">Remedies</h3>
+
+<ul>
+  <li>Of course, any solution that removes instructions causing port pressure can help, so most of the same remedies that apply to the <em>pipeline width</em> limit also apply here.</li>
+  <li>Additionally, you might try replacing instructions which contend for a high-pressure port with others that use different ports, even if the replacement results in more total instructions/uops. For example, sometimes <abbr title="port 5 (GP and SIMD ALU, vector shuffles)">p5</abbr> shuffle operations can be replaced with blend operations: you need more total blends but the resulting code can be faster since the blends execute on otherwise underused <abbr title="port 0 (GP and SIMD ALU, not-taken branches)">p0</abbr> and <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr>. Some 32 and 64-bit register-to-register broadcasts that use <abbr title="port 5 (GP and SIMD ALU, vector shuffles)">p5</abbr> don’t use <abbr title="port 5 (GP and SIMD ALU, vector shuffles)">p5</abbr> at all if you instead use a memory source, a rare case where memory source can be <em>faster</em> than register source for the same operation.</li>
+</ul>
+
+<h2 id="memory-related-limits">Memory Related Limits</h2>
+
+<p>There are several limits related to the maximum number of memory accesses<sup id="fnref:memaccess" role="doc-noteref"><a href="#fn:memaccess" class="footnote" rel="footnote">10</a></sup> that can be made per cycle, summarized in the following table. The values indicated are the maximum number of load, stores and accesses (either loads or stores) the CPU can sustain <em>per cycle</em><sup id="fnref:armstp" role="doc-noteref"><a href="#fn:armstp" class="footnote" rel="footnote">11</a></sup>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>CPU</th>
+      <th style="text-align: right">Loads</th>
+      <th style="text-align: right">Stores</th>
+      <th style="text-align: right">Accesses</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Intel Sandy Bridge, Ivy Bridge</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">2</td>
+    </tr>
+    <tr>
+      <td>Intel Haswell, Skylake</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">3</td>
+    </tr>
+    <tr>
+      <td>Intel Ice Lake, Tiger Lake</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">2<sup id="fnref:iclstore" role="doc-noteref"><a href="#fn:iclstore" class="footnote" rel="footnote">12</a></sup></td>
+      <td style="text-align: right">4</td>
+    </tr>
+    <tr>
+      <td>AMD Zen, Zen 2</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">3</td>
+    </tr>
+    <tr>
+      <td>AMD Zen 3</td>
+      <td style="text-align: right">3</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">3</td>
+    </tr>
+    <tr>
+      <td>Apple <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr></td>
+      <td style="text-align: right">3</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">4</td>
+    </tr>
+    <tr>
+      <td>Amazon Graviton 2</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">2</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="load-throughput-limit">Load Throughput Limit</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Microarchitecture</th>
+      <th style="text-align: right">Loads/Cycle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Intel</td>
+      <td>All Recent<sup id="fnref:recentintel" role="doc-noteref"><a href="#fn:recentintel" class="footnote" rel="footnote">13</a></sup></td>
+      <td style="text-align: right">2</td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen, Zen 2</td>
+      <td style="text-align: right">2</td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen 3</td>
+      <td style="text-align: right">3<sup id="fnref:zen3ll" role="doc-noteref"><a href="#fn:zen3ll" class="footnote" rel="footnote">14</a></sup></td>
+    </tr>
+    <tr>
+      <td>Apple</td>
+      <td><abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr></td>
+      <td style="text-align: right">3</td>
+    </tr>
+    <tr>
+      <td>Arm/Amazon</td>
+      <td>Graviton 2</td>
+      <td style="text-align: right">2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Modern big cores from leading vendors have a limit of two or three loads per cycle, which can generally only be achieved if all the loads hit in L1. You could just consider this the same as the “port pressure” limit, since there are generally the same number of load ports as the “maximum loads” figure – but the limit is interesting enough to call out on its own.</p>
+
+<p>Of course, like all limits this is a best case scenario: you might achieve much less than the maximum number of loads if you are not hitting in L1 or even for L1-resident data due to things like bank conflicts present on some chips<sup id="fnref:bankconf" role="doc-noteref"><a href="#fn:bankconf" class="footnote" rel="footnote">15</a></sup>. Still, it is interesting to note how <em>high</em> this limit is: fully <em>half</em> of your instructions can be loads while still running at maximum speed on Intel chips (two loads out of a maximum width of four on pre-Ice Lake Intel), as well as on AMD’s Zen 3 (three loads out of a max width of six). In a throughput sense, loads that hit in cache are not all that expensive even when the point of comparison is simple ALU ops.</p>
+
+<p>Because each loaded value will usually have some computation performed on it, it is not all <em>that</em> common to this hit this limit, but you can certainly do it. The loads have to be mostly independent (not part of a carried dependency chain), since otherwise the load latency will limit you more than the throughput.</p>
+
+<p>One scenario where you might hit this limit is in an indirect load scenario (where part of the load address is itself calculated using a value from memory), or when making heavy use of lookup tables. Consider the following loop, which does an indirect access of <code class="language-plaintext highlighter-rouge">data</code> based on the an index read from the <code class="language-plaintext highlighter-rouge">offsets</code> array and which then sums the retrieved values<sup id="fnref:written-weirdly" role="doc-noteref"><a href="#fn:written-weirdly" class="footnote" rel="footnote">16</a></sup>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">do</span> <span class="p">{</span>
+    <span class="n">sum1</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">offsets</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]];</span>
+    <span class="n">sum2</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">offsets</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]];</span>
+    <span class="n">i</span> <span class="o">-=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">i</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This compiles to the following assembly:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                                          <span class="c1">; total fused uops</span>
+<span class="nl">.top:</span>                                     <span class="c1">; ↓</span>
+    <span class="nf">mov</span>    <span class="nb">r8d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rsi</span><span class="o">+</span><span class="nb">rdx</span><span class="o">*</span><span class="mi">4</span><span class="o">-</span><span class="mh">0x4</span><span class="p">]</span>  <span class="c1">; 1</span>
+    <span class="nf">add</span>    <span class="nb">ecx</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nv">r8</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>       <span class="c1">; 2</span>
+    <span class="nf">mov</span>    <span class="nb">r8d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rsi</span><span class="o">+</span><span class="nb">rdx</span><span class="o">*</span><span class="mi">4</span><span class="o">-</span><span class="mh">0x8</span><span class="p">]</span>  <span class="c1">; 3</span>
+    <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nv">r8</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>       <span class="c1">; 4</span>
+    <span class="nf">sub</span>    <span class="nb">rdx</span><span class="p">,</span><span class="mh">0x2</span>                        <span class="c1">; (fuses w/ jne)</span>
+    <span class="nf">jne</span>    <span class="nv">.top</span>                           <span class="c1">; 5</span>
+</code></pre></div></div>
+
+<p>There are only 5 fused-uops<sup id="fnref:delam2" role="doc-noteref"><a href="#fn:delam2" class="footnote" rel="footnote">17</a></sup> here, so maybe this executes in 5 / 4 = 1.25 cycles? No… it is not so fast: it takes 2 cycles because there are 4 loads and we have a speed limit of 2 loads per cycle<sup id="fnref:add-indirect" role="doc-noteref"><a href="#fn:add-indirect" class="footnote" rel="footnote">18</a></sup>.</p>
+
+<p>Note that gather instructions count “one” against this limit for <em>each</em> element they they load. <code class="language-plaintext highlighter-rouge">vpgatherdd ymm0, ...</code> for example, counts as 8 against this limit since it loads 8 32-bit elements<sup id="fnref:gatherdd" role="doc-noteref"><a href="#fn:gatherdd" class="footnote" rel="footnote">19</a></sup>.</p>
+
+<h4 id="load-split-cache-lines">Load Split Cache Lines</h4>
+
+<p>For the purposes of this speed limit, on Intel, all loads that hit in the L1 cache count as one, except loads that split a cache line, which count as two. A split cache line load is one that crosses a 64-byte boundary. Loads that are <abbr title="Naturally aligned data is data whose location in memory is a multiple of its size, e.g., a 4 byte element whose address is a multiple of 4 bytes.">naturally aligned</abbr> never split a cache line. With random alignment, how often you split a cache line depends on the load size: for a load of N bytes, you’ll split a cache line with probability (N-1)/64. Hence, 32-bit random unaligned loads split less than 5% of the time but 256-bit AVX loads split 48% of the time and AVX-512 loads more than 98% of the time.</p>
+
+<p>On AMD Zen 1, loads suffer a similar penalty when crossing a 32-byte boundary – such loads also count as two against the load limit. 32-byte (AVX/AVX2) loads also count as two on Zen 1 since the implemented vector path is only 128-bit, so two loads are needed. Any 32-byte load that is not 16-byte aligned counts as three, since in that case exactly one of the 16-byte halves will cross a 32-byte boundary.</p>
+
+<p>On Zen 2 and 3, there is no such penalty for crossing a 32-byte boundary: as on Intel, a penalty occurs only when crossing a 64-byte cache line boundary.</p>
+
+<h4 id="remedies-2">Remedies</h4>
+
+<p>If you are lucky enough to hit this limit, you just need fewer loads. Note that the limit is not expressed in terms of the number of <em>bytes</em> loaded, but rather in the number of <em>loads</em>. So sometimes you can combine two or more adjacent loads into a single load to reduce the total load count.</p>
+
+<p>An obvious application of that is vector loads: 32-byte AVX loads have the same limits byte loads (with some exceptions<sup id="fnref:simdloadex" role="doc-noteref"><a href="#fn:simdloadex" class="footnote" rel="footnote">20</a></sup>). It is difficult to use vector loads in concert with scalar code however: although you can do 8x 32-bit loads at once, if you want to feed those loads to scalar code you have trouble, because you can’t efficiently get that data into scalar registers<sup id="fnref:vector-scalar" role="doc-noteref"><a href="#fn:vector-scalar" class="footnote" rel="footnote">21</a></sup>. That is, you’ll have to work on vectorizing the code that consumes the loads as well.</p>
+
+<p>You can also sometimes use wider scalar loads in this way. In the example above, we do four 32-bit loads - two of which are scattered (the access to <code class="language-plaintext highlighter-rouge">data[]</code>), but two of which are adjacent (the accesses to <code class="language-plaintext highlighter-rouge">offsets[i - 1]</code> and <code class="language-plaintext highlighter-rouge">offsets[i - 2]</code>). We could combine those two adjacent loads into one 64-bit load, like so<sup id="fnref:portable" role="doc-noteref"><a href="#fn:portable" class="footnote" rel="footnote">22</a></sup>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">do</span> <span class="p">{</span>
+    <span class="kt">uint64_t</span> <span class="n">twooffsets</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">memcpy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">twooffsets</span><span class="p">,</span> <span class="n">offsets</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">uint64_t</span><span class="p">));</span>
+    <span class="n">sum1</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">twooffsets</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">];</span>
+    <span class="n">sum2</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">twooffsets</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">];</span>
+    <span class="n">i</span> <span class="o">-=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">i</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This compiles to:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.top:</span>                                      <span class="c1">; total fused uops</span>
+    <span class="nf">mov</span>    <span class="nb">rcx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rsi</span><span class="o">+</span><span class="nb">rdx</span><span class="o">*</span><span class="mi">4</span><span class="o">-</span><span class="mh">0x8</span><span class="p">]</span>   <span class="c1">; 1</span>
+    <span class="nf">mov</span>    <span class="nv">r9</span><span class="p">,</span><span class="nb">rcx</span>                          <span class="c1">; 2</span>
+    <span class="nf">mov</span>    <span class="nb">ecx</span><span class="p">,</span><span class="nb">ecx</span>                         <span class="c1">; 3</span>
+    <span class="nf">shr</span>    <span class="nv">r9</span><span class="p">,</span><span class="mh">0x20</span>                         <span class="c1">; 4</span>
+    <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>       <span class="c1">; 5</span>
+    <span class="nf">add</span>    <span class="nb">r8d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nv">r9</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>        <span class="c1">; 6</span>
+    <span class="nf">sub</span>    <span class="nb">rdx</span><span class="p">,</span><span class="mh">0x2</span>                         <span class="c1">; (fuses w/ jne)</span>
+    <span class="nf">jne</span>    <span class="nv">.top</span>                            <span class="c1">; 7</span>
+</code></pre></div></div>
+
+<p>We have traded ALU operations for loads: this version has seven fused-domain uops versus five in the original, yet on Skylake the new version runs in 1.81 cycles, about 10% faster. The theoretical limit based on pipeline width is 7 / 4 = 1.75 cycles, so we are probably getting collisions on <abbr title="port 6 (GP ALU, all branches)">p6</abbr> between the <code class="language-plaintext highlighter-rouge">shr</code> and the taken branch (unrolling a bit more would help).</p>
+
+<p>Clang 5.0 manages to do better, by one <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.top:</span>
+    <span class="nf">mov</span>    <span class="nv">r8</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rsi</span><span class="o">+</span><span class="nb">rdx</span><span class="o">*</span><span class="mi">4</span><span class="o">-</span><span class="mh">0x8</span><span class="p">]</span>
+    <span class="nf">mov</span>    <span class="nb">r9d</span><span class="p">,</span><span class="nb">r8d</span>
+    <span class="nf">shr</span>    <span class="nv">r8</span><span class="p">,</span><span class="mh">0x20</span>
+    <span class="nf">add</span>    <span class="nb">ecx</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nv">r8</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>
+    <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nv">r9</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>
+    <span class="nf">add</span>    <span class="nb">rdx</span><span class="p">,</span><span class="mh">0xfffffffffffffffe</span>
+    <span class="nf">jne</span>    <span class="nv">.top</span>
+</code></pre></div></div>
+
+<p>It avoided the <code class="language-plaintext highlighter-rouge">mov r9,rcx</code> instruction by combining that and the zero extension (which is effectively the <code class="language-plaintext highlighter-rouge">&amp; 0xFFFFFFFF</code>) into a single <code class="language-plaintext highlighter-rouge">mov r9d,rd8</code>. It runs at 1.67 cycles per iteration, saving 20% over the 4-load version, but still slower than the 1.5 limit implied by the 4-wide fused-domain limit.</p>
+
+<p>This code is an obvious candidate for vectorization with gather, which could in principle approach 1.25 cycles per iteration (8 gathered loads + 1 256-bit load from <code class="language-plaintext highlighter-rouge">offset</code> per 4 iterations) and newer clang versions even manage to do it, if you allow some inlining so they can see the size and alignment of the buffer. However, <a href="https://gist.github.com/travisdowns/b8294098c5082886f4a043ef8b6607bd">the result</a> is not good: it was more than twice as slow as the scalar approach.</p>
+
+<h3 id="store-throughput-limit">Store Throughput Limit</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Microarchitecture</th>
+      <th style="text-align: right">Stores/Cycle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Intel</td>
+      <td>&lt;= Skylake</td>
+      <td style="text-align: right">1</td>
+    </tr>
+    <tr>
+      <td>Intel</td>
+      <td>&gt;= Ice Lake</td>
+      <td style="text-align: right">2<sup id="fnref:iclstore:1" role="doc-noteref"><a href="#fn:iclstore" class="footnote" rel="footnote">12</a></sup></td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen, Zen 2</td>
+      <td style="text-align: right">1</td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen 3</td>
+      <td style="text-align: right">2<sup id="fnref:zen3store" role="doc-noteref"><a href="#fn:zen3store" class="footnote" rel="footnote">23</a></sup></td>
+    </tr>
+    <tr>
+      <td>Apple</td>
+      <td><abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr></td>
+      <td style="text-align: right">2</td>
+    </tr>
+    <tr>
+      <td>Arm/Amazon</td>
+      <td>Graviton 2</td>
+      <td style="text-align: right">2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Modern mainstream CPUs can perform one or two stores per cycle. For many algorithms that make a predictable number of stores, this is a useful and easy to caculate upper bound on a performance, especially on CPUs where the limit is one store per cycle. For example, a 32-bit radix sort that makes four passes and does two stores per element for each pass<sup id="fnref:radix" role="doc-noteref"><a href="#fn:radix" class="footnote" rel="footnote">24</a></sup> will never achieve performance better than eight cycles per element on a single store/cycle CPU (in most radix sort implementations, actual performance usually ends up much worse so this isn’t necessarily the dominant factor in practice, only an upper bound on throughput).</p>
+
+<p>This limit applies also to vector scatter instructions, where each element counts as one against this limit.</p>
+
+<h4 id="store-split-cache-lines">Store Split Cache Lines</h4>
+
+<p>On all recent Intel CPUs, stores that cross a cache line boundary (64 bytes) counts as two against the store limit, but other unaligned stores suffer no penalty.</p>
+
+<p>On AMD the situation is more complicated: the penalties for stores that cross a boundary are larger, and it’s not just 64-byte boundaries that matter.</p>
+
+<p>On AMD Zen, any store which crosses a 16 byte boundary suffers a significant penalty: such stores can only execute one per <em>five</em> cycles, so maybe you should count these as five for the purposes of this limit<sup id="fnref:amdunalignedstore" role="doc-noteref"><a href="#fn:amdunalignedstore" class="footnote" rel="footnote">25</a></sup>.</p>
+
+<p>On AMD Zen 2 and Zen 3, the situation is similar but applies only to stores that cross a 32-byte boundary: stores which cross a 16-byte boundary which is not also a 32-byte boundary suffer no penalty.</p>
+
+<h4 id="remedies-3">Remedies</h4>
+
+<p>Remove unnecessary stores from your core loops. Easier said than done, of course!</p>
+
+<p>If you are often storing the same value repeatedly to the same location, it can even be profitable to check that the value is different, which requires a load, and only do the store if different, since this can replace a store with a load. Most of all, you want to take advantage of vectorized stores if possible: you can do 8x 32-bit stores in one cycle with a single vectorized store. Of course, if your stores are not contiguous, this will be difficult or impossible.</p>
+
+<p>In some cases it can be profitable to merge two (or more) narrow stores into a larger one, e.g., two 32-bit stores into a 64-bit store. This trades ALU operations for stores in a similar way to the load example.</p>
+
+<p>On Intel Ice Lake and later CPUs, try to organize your data and store pattern so that the “same cache line” restriction for consecutive stores is met, allowing two rather than one store per cycle.</p>
+
+<h3 id="total-accesses-limit">Total Accesses Limit</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Microarchitecture</th>
+      <th style="text-align: right">Stores/Cycle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AMD</td>
+      <td>Zen</td>
+      <td style="text-align: right">2</td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen 3</td>
+      <td style="text-align: right">3</td>
+    </tr>
+    <tr>
+      <td>Apple</td>
+      <td><abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr></td>
+      <td style="text-align: right">4</td>
+    </tr>
+    <tr>
+      <td>Arm/Amazon</td>
+      <td>Graviton 2</td>
+      <td style="text-align: right">2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The individual limits on loads and stores were discussed above, but for the microarchitectures listed above there is a <em>combined</em> limit on both which is less than the sum of the individual limits<sup id="fnref:combinedwhy" role="doc-noteref"><a href="#fn:combinedwhy" class="footnote" rel="footnote">26</a></sup>. For example, AMD Zen 3 can do three loads per cycle, or two stores per cycle, but only has a total of three address generation units. This means it can’t do three loads <em>and</em> two stores in the <em>same</em> cycle: there is a limit of three memory accesses of any type in total, which may be (for example) three loads and no stores, or one load and two stores, etc.</p>
+
+<h4 id="remedies-4">Remedies</h4>
+
+<p>No specific remedies apply to combined limits – the fix is fewer loads and stores, as described in the remedy sections above. The only trick is you need to be aware of this limit when calculating your speed limit.</p>
+
+<h3 id="complex-addressing-limit">Complex Addressing Limit</h3>
+
+<p><strong>Intel Skylake:</strong> Maximum of one load (any addressing) concurrent with a store with complex addressing per cycle.</p>
+
+<p>Recent Intel chips have the same number of AGUs as load and store units, so don’t directly suffer the <abbr title="Address Generation Unit">AGU</abbr> limit: but they do suffer a related limitation involving complex addressing.</p>
+
+<p>Each load and store operation needs an <em>address generation</em> which happens in an <abbr title="Address Generation Unit">AGU</abbr>. There are three AGUs on modern Intel Skylake chips: <abbr title="port 2 (load/store AGU)">p2</abbr>, <abbr title="port 3 (load/store AGU)">p3</abbr> and <abbr title="port 7 (limited store AGU)">p7</abbr>. However, <abbr title="port 7 (limited store AGU)">p7</abbr> is restricted: it can <em>only</em> be used by stores, and it can only be used if the store addressing mode is simple. <a href="https://stackoverflow.com/a/51664696">Simple addressing</a> is anything that is of the form <code class="language-plaintext highlighter-rouge">[base_reg + offset]</code> where <code class="language-plaintext highlighter-rouge">offset</code> is in <code class="language-plaintext highlighter-rouge">[0, 2047]</code>. So <code class="language-plaintext highlighter-rouge">[rax + 1024]</code> is simple addressing, but all of <code class="language-plaintext highlighter-rouge">[rax + 4096]</code>, <code class="language-plaintext highlighter-rouge">[rax + rcx * 2]</code> and <code class="language-plaintext highlighter-rouge">[rax * 2]</code> are not.</p>
+
+<p>To apply this limit, count <em>all</em> load and any stores with complex addressing: these operations cannot execute at more than two per cycle.</p>
+
+<p>Since Ice Lake, this limitation no longer applies: load and store units all have a dedicated <abbr title="Address Generation Unit">AGU</abbr>.</p>
+
+<h4 id="remedies-5">Remedies</h4>
+
+<p>At the assembly level, the main remedy is make sure that your stores use simple addressing modes. Usually you do this by incrementing a pointer by the size of the element rather than using indexed addressing modes.</p>
+
+<p>That is, rather than this:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">mov</span> <span class="p">[</span><span class="nb">rdi</span> <span class="o">+</span> <span class="nb">rax</span><span class="o">*</span><span class="mi">4</span><span class="p">],</span> <span class="nb">rdx</span>
+<span class="nf">add</span> <span class="nb">rax</span><span class="p">,</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>You want this:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">mov</span> <span class="p">[</span><span class="nb">rdi</span><span class="p">],</span> <span class="nb">rdx</span>
+<span class="nf">add</span> <span class="nb">rdi</span><span class="p">,</span> <span class="mi">4</span>
+</code></pre></div></div>
+
+<p>Of course, that’s often simpler said than done: indexed addressing modes are very useful for using a single loop counter to access multiple arrays, and also when the value of the loop counter is directly used in the loop (as opposed to simply being used for addressing). For example, consider the following loop which writes the element-wise sum of two arrays to a third array:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">sum</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The loop compiles to the following assembly:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L3:</span>
+    <span class="nf">mov</span>     <span class="nb">r8d</span><span class="p">,</span> <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rsi</span><span class="o">+</span><span class="nb">rax</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>
+    <span class="nf">add</span>     <span class="nb">r8d</span><span class="p">,</span> <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rax</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>
+    <span class="nf">mov</span>     <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rax</span><span class="o">*</span><span class="mi">4</span><span class="p">],</span> <span class="nb">r8d</span>
+    <span class="nf">add</span>     <span class="nb">rax</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="nf">cmp</span>     <span class="nb">rcx</span><span class="p">,</span> <span class="nb">rax</span>
+    <span class="nf">jne</span>     <span class="nv">.L3</span>
+</code></pre></div></div>
+
+<p>This loop will be limited by the complex addressing limitation to 1.5 cycles per iteration, since there are 1 store that uses complex addressing, plus one load.</p>
+
+<p>We could use separate pointers for each array and increment all of them, like:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L3:</span>
+    <span class="nf">mov</span>     <span class="nb">r8d</span><span class="p">,</span> <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rsi</span><span class="p">]</span>
+    <span class="nf">add</span>     <span class="nb">r8d</span><span class="p">,</span> <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdi</span><span class="p">]</span>
+    <span class="nf">mov</span>     <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="p">],</span> <span class="nb">r8d</span>
+    <span class="nf">add</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="mi">4</span>
+    <span class="nf">add</span>     <span class="nb">rdi</span><span class="p">,</span> <span class="mi">4</span>
+    <span class="nf">add</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="mi">4</span>
+    <span class="nf">cmp</span>     <span class="nb">rcx</span><span class="p">,</span> <span class="nb">rdx</span>
+    <span class="nf">jne</span>     <span class="nv">.L3</span>
+</code></pre></div></div>
+
+<p>Everything uses simple addressing, great! However, we’ve added two uops and so the speed limit is pipeline width: 7/4 = 1.75, so it will probably be slower than before.</p>
+
+<p>The trick is to only use simple addressing for the store, and calculate the load addresses relative to the store address:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L3:</span>
+    <span class="nf">mov</span>     <span class="nb">eax</span><span class="p">,</span> <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rsi</span><span class="p">]</span> <span class="c1">; rsi and rdi have been adjusted so that</span>
+    <span class="nf">add</span>     <span class="nb">eax</span><span class="p">,</span> <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="o">+</span><span class="nb">rdi</span><span class="p">]</span> <span class="c1">; rsi+rdx points to a and rdi+rdx to b</span>
+    <span class="nf">mov</span>     <span class="kt">DWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="p">],</span> <span class="nb">eax</span>
+    <span class="nf">add</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="mi">4</span>
+    <span class="nf">cmp</span>     <span class="nb">rcx</span><span class="p">,</span> <span class="nb">rdx</span>
+    <span class="nf">ja</span>      <span class="nv">.L3</span>
+</code></pre></div></div>
+
+<p>When working in a higher level language, you may not always be able to convince the compiler to generate the code we want as it might simply see through our transformations. In this case, however, <a href="https://godbolt.org/z/PPutUu">we can convince</a> gcc to generate the code we want by writing out the transformation ourselves:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">sum2</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">end</span> <span class="o">=</span> <span class="n">d</span> <span class="o">+</span> <span class="n">len</span><span class="p">;</span>
+    <span class="kt">ptrdiff_t</span> <span class="n">a_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">d</span><span class="p">);</span>
+    <span class="kt">ptrdiff_t</span> <span class="n">b_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">d</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="n">d</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">*</span><span class="n">d</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="n">a_offset</span><span class="p">)</span> <span class="o">+</span> <span class="o">*</span><span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="n">b_offset</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This is UB all over the place if you pass in arbitrary arrays, because we subtract unrelated pointers (<code class="language-plaintext highlighter-rouge">a - d</code>) and use pointer arithmetic which outside of the bounds of the original array (<code class="language-plaintext highlighter-rouge">d + a_offset</code>) - but I’m not aware of any compiler that will take advantage of this (as a standalone function it seems unlikely that will ever be the case: because the arrays all <em>could</em> be related, so the function isn’t always UB). Still you should avoid stuff like this unless you have a <em>really</em> good reason to push the boundaries. You could achieve the same effect with <code class="language-plaintext highlighter-rouge">uintptr_t</code> which isn’t UB but only unspecified, and that will work on every platform I’m aware of.</p>
+
+<p>Another way to get simple addressing without adding too much overhead for separate loop pointers is to unroll the loop a little bit. The increment only needs to be done once per iteration, so every unroll reduces the cost.</p>
+
+<p>Note that even if stores have non-complex addressing, it may not be possible to sustain 2 loads/1 store, because the store may sometimes choose one of the port 2 or port 3 AGUs instead, starving a load that cycle.</p>
+
+<h2 id="memory-and-cache-bandwidth">Memory and Cache Bandwidth</h2>
+
+<p>The load and store limits discuss the ideal scenario where loads and stores hit in L1 (or hit in L1 “on average” enough to not slow things down), but there are throughput limits for other levels of the cache. If your know your loads hit primarily in a particular level of the cache you can use these limits to get a speed limit.</p>
+
+<p>The limits are listed in <em>cache lines per cycle</em> and not in bytes, because that’s how you need to count the accesses: in unique cache lines accessed. The hardware transfers full lines. You can achieve these limits, but you may not be able to consume all the bytes from each cache line, because demand accesses to the L1 cache cannot occur on the same cycle that the L1 cache receives data from the outer cache levels. So, for example, the L2 can provide 64 bytes of data to the L1 cache per cycle, but you cannot <em>also</em> access 64 bytes every cycle since the L1 cannot satisfy those reads from the core <em>and</em> the incoming data from the L2 every cycle. All the gory details are <a href="https://github.com/travisdowns/uarch-bench/wiki/How-much-bandwidth-does-the-L2-have-to-give,-anyway%3F">over here</a>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Microarchitecture</th>
+      <th>L2</th>
+      <th>L3 (Shared)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Intel</td>
+      <td><abbr title="Intel's Cannon Lake (client) architecture, the i3-8121U was the only SKU ever released">CNL</abbr></td>
+      <td>0.75</td>
+      <td>0.2 - 0.3</td>
+    </tr>
+    <tr>
+      <td>Intel</td>
+      <td><abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr></td>
+      <td>1</td>
+      <td>~0.1 (?)</td>
+    </tr>
+    <tr>
+      <td>Intel</td>
+      <td><abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr></td>
+      <td>1</td>
+      <td>0.2 - 0.3</td>
+    </tr>
+    <tr>
+      <td>Intel</td>
+      <td><abbr title="Intel's Haswell architecture, aka 4th Generation Intel Core i3,i5,i7">HSW</abbr></td>
+      <td>0.5</td>
+      <td>0.2 - 0.3</td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen</td>
+      <td>0.5</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen 2</td>
+      <td>0.5</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>AMD</td>
+      <td>Zen 3</td>
+      <td>0.5</td>
+      <td>0.5</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The very poor figure of 0.1 cache lines per cycle (about 6-7 bytes a cycle) from L3 on <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> is at odds with Intel’s manuals, but it’s what I measured on a W-2104. For architectures earlier than Haswell I think the numbers will be similar back to Sandy Bridge.</p>
+
+<p>If your accesses go to a mix of cache levels: you will probably get slightly worse bandwidth than what you’d get if you calculated the speed limit based on the assumption the cache levels can be accessed independently.</p>
+
+<p>Memory bandwidth is a bit more complicated. You can calculate your theoretical value based on your memory channel count (or look it up on ARK), but this is complicated by the fact that many chips cannot reach the maximum bandwidth from a single core since they cannot generate enough requests to saturate the DRAM bus, due to limited fill buffers. So you are better off just measuring it.</p>
+
+<h3 id="remedies-6">Remedies</h3>
+
+<p>The usual remedies to improve caching performance apply: pack your structures more tightly, try to ensure locality of reference and prefetcher friendly access patterns, use cache blocking, etc.</p>
+
+<h2 id="carried-dependency-chains">Carried Dependency Chains</h2>
+
+<p><strong>Sum of latencies in the longest carried dependency chain</strong></p>
+
+<p>Everything discussed so far is a limited based on <em>throughput</em> - the machine can only do so many things per cycle, and we count the number of things and apply those limits to determine the speed limit. We don’t care about how long each instruction takes to finish (as long as we can <em>start</em> one per cycle), or from where it gets its inputs. In practice, that can matter a lot.</p>
+
+<p>Let’s consider, for example, a modified version of the multiply loop above, one that’s a lot simpler:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">uint32_t</span> <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">product</span> <span class="o">*=</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This does only a single multiplication per iteration, and compiles to the following tight loop:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">.</span><span class="n">top</span><span class="o">:</span>
+    <span class="n">imul</span>   <span class="n">eax</span><span class="p">,</span><span class="n">DWORD</span> <span class="n">PTR</span> <span class="p">[</span><span class="n">rdi</span><span class="p">]</span>
+    <span class="n">add</span>    <span class="n">rdi</span><span class="p">,</span><span class="mh">0x4</span>
+    <span class="n">cmp</span>    <span class="n">rdi</span><span class="p">,</span><span class="n">rdx</span>
+    <span class="n">jne</span>    <span class="p">.</span><span class="n">top</span>
+</code></pre></div></div>
+
+<p>That’s only 3 fused uops, so our pipeline speed limit is 0.75 cycles/iteration. But wait, we know the imul needs <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr>, and the other two operations can go to other ports, so the <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr> pressure means a limit of 1 cycle/iteration. What does the real world have to say?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./uarch-bench.sh --timer=perf --test-name=cpp/mul-chain --extra-events=uops_dispatched_port.port_0#p0,uops_dispatched_port.port_1#p1,uops_dispatched_port.port_2#p2,uops_dispatched_port.port_3#p3,uops_dispatched_port.port_4#p4,uops_dispatched_port.port_5#p5,uops_dispatched_port.port_6#p6
+              Benchmark      Cycles          p0          p1          p2          p3          p4          p5          p6
+Chained multiplications        2.98        0.48        1.00        0.50        0.50        0.00        0.52        1.00
+</code></pre></div></div>
+
+<p>Bleh, 2.98 cycles, or 3x slower than we predicted.</p>
+
+<p>What happened? As it turns out, the <code class="language-plaintext highlighter-rouge">imul</code> instruction has a <em>latency</em> of 3 cycles. That means that the result is not available until 3 cycles after the operation starts executing. This contrasts with 1 latency cycle for most simple arithmetic operations. Since on each iteration the multiply instruction depends on the result of the result of the <em>previous</em> iteration’s multiply<sup id="fnref:srcdest" role="doc-noteref"><a href="#fn:srcdest" class="footnote" rel="footnote">27</a></sup>, every multiply can only start when the previous one finished, i.e., 3 cycles later. So 3 cycles is the speed limit for this loop.</p>
+
+<p>Note that we mostly care about <em>loop carried</em> dependencies, which are dependency chains that cross loop iterations, i.e., where some output register in one iteration is used as an input register for the same chain in the next iteration. In the example, the carried chain involves only <code class="language-plaintext highlighter-rouge">eax</code>, but more complex chains are common in practice. In the earlier example, the four <code class="language-plaintext highlighter-rouge">imul</code> instructions <em>did</em> form a chain:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.top:</span>
+    <span class="nf">mov</span>    <span class="nb">r10d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="o">+</span><span class="mh">0x4</span><span class="p">]</span> <span class="c1">; load</span>
+    <span class="nf">mov</span>    <span class="nb">r8d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">ecx</span>                    <span class="c1">; imul1</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">edx</span>                    <span class="c1">; imul2</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">ecx</span>                    <span class="c1">; imul3</span>
+    <span class="nf">add</span>    <span class="nb">rcx</span><span class="p">,</span><span class="mh">0x1</span>                    <span class="c1">;</span>
+    <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">r9d</span>                    <span class="c1">; imul4</span>
+    <span class="nf">mov</span>    <span class="nb">r9d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;</span>
+    <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="nb">r8d</span>                    <span class="c1">; add</span>
+    <span class="nf">cmp</span>    <span class="nb">rcx</span><span class="p">,</span><span class="nb">rsi</span>                    <span class="c1">;</span>
+    <span class="nf">jne</span>    <span class="nv">.top</span>                       <span class="c1">;</span>
+</code></pre></div></div>
+
+<p>Note how each <code class="language-plaintext highlighter-rouge">imul</code> depends on the previous through the input/output <code class="language-plaintext highlighter-rouge">r8d</code>. Finally, the result is added to <code class="language-plaintext highlighter-rouge">eax</code> ,and <code class="language-plaintext highlighter-rouge">eax</code> is indeed used as input in the next iteration, so do we have a loop-carried dependency chain? Yes - but a very small one involving only <code class="language-plaintext highlighter-rouge">eax</code>. The dependency chain looks like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iteration 1   load -&gt; imul1 -&gt; imul2 -&gt; imul3 -&gt; imul4 -&gt; add
+                                                           |
+                                                           v
+iteration 2   load -&gt; imul1 -&gt; imul2 -&gt; imul3 -&gt; imul4 -&gt; add
+                                                           |
+                                                           v
+iteration 3   load -&gt; imul1 -&gt; imul2 -&gt; imul3 -&gt; imul4 -&gt; add
+                                                           |
+                                                           v
+etc ...                                                    ...
+</code></pre></div></div>
+
+<p>So yes, there is a dependent chain there, and the <code class="language-plaintext highlighter-rouge">imul</code> instructions are <em>connected</em> to that chain, but they don’t participate in the carried part. Only the single-cycle latency <code class="language-plaintext highlighter-rouge">add</code> instruction participates in the carried dependency chain, so the implied speed limit is 1 cycle/iteration. In fact, all of our examples so far have had carried dependency chains, but they have all been small enough never to be the dominating factor. You may also have <em>multiple</em> carried dependency chains in a loop: the speed limit is set by the longest.</p>
+
+<p>I’ve only touched on this topic and won’t go much further here: for a deeper look check out Fabian Giesen’s <a href="https://fgiesen.wordpress.com/2018/03/05/a-whirlwind-introduction-to-dataflow-graphs/">A whirlwind introduction to dataflow graphs</a>.</p>
+
+<p>Finally, you may have noticed something interesting about the benchmark result of 2.98 cycles. In every other case, the measured time was equal or slightly <em>more</em> than the speed limit, due to test overhead. How were we able to break the speed limit in this case and come <em>under</em> 3.00 cycles, albeit by less than 1%? Maybe it’s just measurement error - the clocks aren’t precise enough to time this more precisely?</p>
+
+<p>Nope. The effect is real and is due to the structure of the test. We run the multiplication code shown above on a buffer of 4096 elements, so there are 4096 iterations. The benchmark loop that calls that function, <em>itself</em> runs 1000 iterations, each one calling the 4096-iteration inner loop. What happens to get the 2.98 is that in between each call of the inner loop, the multiplication chains <em>can</em> be overlapped. Each chain is 4096-elements long, but the start of each function starts a new chain:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint32_t</span> <span class="nf">mul_chain</span><span class="p">(</span><span class="k">const</span> <span class="kt">uint32_t</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">uint32_t</span> <span class="n">product</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// ...</span>
+</code></pre></div></div>
+
+<p>Note the <code class="language-plaintext highlighter-rouge">product = 1</code> - that’s a new chain. So some small amount of overlap is possible near the end of each loop, which shaves about 80-90 cycles off the loop time (i.e., something like ~30 multiplications get to overlap). The size of the overlap is limited by the <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> buffer structures in the CPU, in particular the <a href="https://en.wikipedia.org/wiki/Re-order_buffer">re-order buffer</a> and <a href="https://en.wikipedia.org/wiki/Reservation_station">scheduler</a>.</p>
+
+<h3 id="tools-1">Tools</h3>
+
+<p>As fun as tracing out dependency chains by hand is, you’ll eventually want a tool to do this for you. All of IACA, OSACA and llvm-mca can do this type of latency analysis and identity loop carried dependencies implicitly. For example, llvm-mca <a href="https://godbolt.org/z/tD6dd-">correctly identifies</a> that this loop will take 3 cycles/iteration.</p>
+
+<h3 id="remedies-7">Remedies</h3>
+
+<p>The basic remedy is that you have to shorten or break up the dependency chains.</p>
+
+<p>For example, maybe you can use lower latency instructions like addition or shift instead of multiplication. A more generally applicable trick is to turn one long dependency chain into several parallel ones. In the example above, the associativity property of integer multiplication<sup id="fnref:assoc" role="doc-noteref"><a href="#fn:assoc" class="footnote" rel="footnote">28</a></sup> allows us to do the multiplications in any order. In particular, we could accumulate every third element into a separate product and multiply them all at the end, like so:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kt">uint32_t</span> <span class="n">p1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">p4</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">p1</span> <span class="o">*=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">0</span><span class="p">];</span>
+        <span class="n">p2</span> <span class="o">*=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="n">p3</span> <span class="o">*=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">];</span>
+        <span class="n">p4</span> <span class="o">*=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="kt">uint32_t</span> <span class="n">product</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">*</span> <span class="n">p2</span> <span class="o">*</span> <span class="n">p3</span> <span class="o">*</span> <span class="n">p4</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>This test runs at 1.00 cycles per iteration, so the latency chain speed limit has been removed. Well, it’s still there: each iteration above takes at least 3 cycles because of the four carried dependency chains between each iteration, but since we are doing 4x as much work now, the <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr> port limit becomes the dominant limit.</p>
+
+<p>Compilers can sometimes make this transformation for you, but not always. In particular, gcc is reluctant to unroll loops at any optimization level, and unrolling loops is often a prerequisite for this transformation, so often you are stuck doing it by hand.</p>
+
+<h2 id="front-end-effects">Front End Effects</h2>
+
+<p>I’m going to largely gloss over this one. It really deserves a whole blog post, but in recent Intel and AMD architectures the prevalence of front-end effects being the limiting factor in loops has dropped a lot. The introduction of the <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> cache and better decoders means that it is not as common as it used to be. For a complete<sup id="fnref:sklfe" role="doc-noteref"><a href="#fn:sklfe" class="footnote" rel="footnote">29</a></sup> treatment see Agner’s <a href="https://www.agner.org/optimize/#manual_microarch">microarchitecture guide</a>, starting with section 9.1 through 9.7 for Sandy Bridge (and then the corresponding sections for each later <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr> you are interested in).</p>
+
+<p>If you see an effect that depends on code alignment, especially in a cyclic pattern with a period 16, 32 or 64 bytes, it is very likely to be a front-end effect. There are <a href="https://twitter.com/trav_downs/status/1124152129294409729">hacks you can use to test this</a>.</p>
+
+<p>First are simple absolute front-end limits to delivered uops/cycle depending on where the uops are coming from<sup id="fnref:lsdno" role="doc-noteref"><a href="#fn:lsdno" class="footnote" rel="footnote">30</a></sup>:</p>
+
+<p><strong>Table 1: Uops delivered per cycle</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Architecture</th>
+      <th>Microcode (<abbr title="Intel's name for the microcode engine: a component handles complex instructions which require more than 4 uops using microcode which feeds uops directly into the IDQ.">MSROM</abbr>)</th>
+      <th>Decoder (<abbr title="Intel's name for the &quot;legacy&quot; decoder, i.e., the decoder that usually decodes instructions when they are not found in the MSROM.">MITE</abbr>)</th>
+      <th>Uop cache (DSB)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>&lt;= Broadwell</td>
+      <td>4</td>
+      <td>4</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>&gt;= Skylake</td>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>These might look like important values. I even made a table, one of only two in this whole post. They aren’t very important though, because they are all equal to or larger than the pipeline limit of 4. In fact it is <a href="https://twitter.com/trav_downs/status/1106403269792788480">hard</a> to even carefully design a micro-benchmark which definitively shows the difference between the 5-wide decode on <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr> and the 4-wide on Haswell and earlier. So you can mostly ignore these numbers.</p>
+
+<p>The more important limitations are specific to the individual sources. For example:</p>
+
+<ul>
+  <li>The legacy decoder (<abbr title="Intel's name for the &quot;legacy&quot; decoder, i.e., the decoder that usually decodes instructions when they are not found in the MSROM.">MITE</abbr>) can only handle up to 16 instruction bytes per cycle, so any time instruction length averages more than four bytes decode throughput will necessarily be lower than four. Certain patterns will have worse throughput than predicted by this formula, e.g., 7 instructions in a 16 byte block will decode in a 6-1-6-1 pattern.</li>
+  <li>Only one of the 4 or 5 legacy decoders can handle instructions which generate more than one <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr>, so a series of instructions which generate 2 uops will only decode at 1 per cycle (2 uops per cycle).</li>
+  <li>Only one <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> cache entry (with up to 6 uops) can be accessed per cycle. For larger loops this is rarely a bottleneck, but it means that any loop that crosses a <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> cache boundary (32 bytes up to and including Broadwell, 64 bytes in Skylake and beyond) will always take 2 cycles, since two <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> cache entries are involved. It is not unusual to find small loops which normally take as little as 1 cycle split by such boundaries suddenly taking 2 cycles.</li>
+  <li>Instructions which use <abbr title="Internal instructions and other logic forming part of a CPU which may be used to implement user-visible instructions and control other aspects of CPU behavior and which may be modified dynamically by vendor-provided updates.">microcode</abbr>, such as gather (pre-Skylake) have additional restrictions and throughput limitations.</li>
+  <li>The <abbr title="Lysergic acid diethylamide or Loop stream detector, but in the context of this blog probably the latter: The so-called loop buffer that can cache small loops of up to ~64 uops on recent Intel architectures. Not actually a separate structure: the hardware justs locks the loop down in the IDQ.">LSD</abbr> suffers from reduced throughput at the boundary between one iteration and the next, although hardware unrolling reduces the impact of the effect. Full details <a href="https://stackoverflow.com/a/39940932">are on Stack Overflow</a>. Note that the <abbr title="Lysergic acid diethylamide or Loop stream detector, but in the context of this blog probably the latter: The so-called loop buffer that can cache small loops of up to ~64 uops on recent Intel architectures. Not actually a separate structure: the hardware justs locks the loop down in the IDQ.">LSD</abbr> is disabled on most recent CPUs due to a bug. It is re-enabled on some of the most recent chips (<abbr title="Intel's Cannon Lake (client) architecture, the i3-8121U was the only SKU ever released">CNL</abbr> and maybe Cascade Lake).</li>
+</ul>
+
+<p>Again, this is only scratching the surface - see Agner for a comprehensive treatment.</p>
+
+<h2 id="taken-branches">Taken Branches</h2>
+
+<p><strong>Intel: 1 per 2 cycles (see exception below)</strong></p>
+
+<p>If you believe the instruction tables, one taken branch can be executed per cycle, but experiments show that this is true only for very small loops with a single backwards branch. For larger loops or any forward branches, the limit is 1 per 2 cycles.</p>
+
+<p>So avoid many dense taken branches: organize the likely path instead as untaken. This is something you want to do anyways for front-end throughput and code density.</p>
+
+<h2 id="out-of-order-limits">Out of Order Limits</h2>
+
+<p>Here we will cover several limits which all affect the effective window over which the processor can reorder instructions. These limits all have the same pattern: in order to execute instructions out of order, the CPU needs to track in-flight operations in certain structures. If any of these structures becomes full, the effect is the same: no more operations are issued until space in that structure is freed. Already issued instructions can still execute, but no more operations else will enter the pool of waiting ops. In general, we talk about the <em><abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> window</em> which is roughly the number of instructions/operations that can be in progress, counting from the oldest in-progress instruction to the newest. The limits in this section put an effective limit on this window.</p>
+
+<p>While the effect is the same for each limit, the size of the structures and which operations that are tracked in them vary, so we focus on describing that.</p>
+
+<p>Note that the size of the window is not a hard performance limit in itself: you can’t use it to directly establish an upper bound on cycles per iterations or whatever (i.e., the units for the window aren’t “per cycle”) - but you can use it in concert with other analysis to refine the estimate.</p>
+
+<p>Until now, we have been implicitly assuming an <em>infinite</em> out of order window. That’s why we said, for example, that only loop carried dependencies matter when calculating dependency chains; the implicit assumption is that there is enough <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> magic to reorder different loop iterations to hide the effect of all the other chains. Of course, on real CPUs, there is a limit to the magic: if your loops have 1,000 instructions per iteration, and the <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> window is only 100 instructions, the CPU will not be able to overlap the much of each iteration at all: the different iterations are too far apart in instruction stream for significant overlap.</p>
+
+<p>All the discussion here refers to the <em>dynamic instruction stream</em> - which is the actual stream of instructions seen by the CPU. This is opposed to the static instruction stream, which is the series of instructions as they appear in the binary. Inside a <abbr title="a straight-line code sequence with no branches in except to the entry and no branches out except at the exit (Wikipedia).">basic block</abbr>, static and dynamic instruction streams are the same: the difference is that the dynamic stream follows all jumps, so it is a trace of actual execution.</p>
+
+<p>For example, take the following nested loops, with inner and outer iteration counts of 2 and 4:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">xor</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rdx</span>
+    <span class="nf">mov</span> <span class="nb">rax</span><span class="p">,</span> <span class="mi">2</span>
+
+<span class="nl">outer:</span>
+    <span class="nf">mov</span> <span class="nb">rcx</span><span class="p">,</span> <span class="mi">4</span>
+
+<span class="nl">inner:</span>
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">dec</span> <span class="nb">rax</span>
+    <span class="nf">jnz</span> <span class="nv">outer</span>
+</code></pre></div></div>
+
+<p>The static instruction stream is just want you see above, 8 instructions in total. The dynamic instruction stream traces what happens at runtime, so the inner loop appears 8 times, for example:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">xor</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rdx</span>
+    <span class="nf">mov</span> <span class="nb">rax</span><span class="p">,</span> <span class="mi">2</span>
+
+    <span class="c1">; first iteration of outer loop</span>
+    <span class="nf">mov</span> <span class="nb">rcx</span><span class="p">,</span> <span class="mi">4</span>
+
+    <span class="c1">; inner loop 4x</span>
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">jnz</span> <span class="nv">outer</span>
+
+    <span class="c1">; second iteration of outer loop</span>
+    <span class="nf">mov</span> <span class="nb">rcx</span><span class="p">,</span> <span class="mi">4</span>
+
+    <span class="c1">; inner loop 4x</span>
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">add</span> <span class="nb">rdx</span><span class="p">,</span> <span class="nb">rcx</span>
+    <span class="nf">dec</span> <span class="nb">rcx</span>
+    <span class="nf">jnz</span> <span class="nv">inner</span>
+
+    <span class="nf">jnz</span> <span class="nv">outer</span>
+
+    <span class="c1">; done!</span>
+</code></pre></div></div>
+
+<p>All that to say that when you are thinking about out of order window, you have to think about the dynamic instruction/<abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> stream, not the static one. For a loop body with no jumps or calls, you can ignore this distinction. We also talk about <em>older</em>, <em>oldest</em>, <em>youngest</em>, etc instructions - this simply refers to the relative position of instructions or operations in the dynamic stream: the first encountered instructions are the oldest (in the stream above, <code class="language-plaintext highlighter-rouge">xor rdx, rdx</code> is the oldest) and the most recently encountered instructions are the youngest.</p>
+
+<p>With that background out of the way, let’s look at the various <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OoO</abbr> limits next. Most of these limits have the same <em>effect</em> which is to limit the available <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> window, stalling issue until a resource becomes available. They differ mostly in <em>what</em> they count, and how many of that thing can be buffered.</p>
+
+<p><a name="ooo-table"></a>First, here’s a big table of all the resource sizes<sup id="fnref:snote" role="doc-noteref"><a href="#fn:snote" class="footnote" rel="footnote">31</a></sup> we’ll talk about the following sections.</p>
+
+<style>
+.outer {
+  position: relative;
+  box-sizing: border-box;
+}
+
+#ooo-inner table {
+  border: 0;
+  margin-bottom: 0;
+}
+
+#ooo-inner {
+  overflow-x: scroll;
+  overflow-y: visible;
+  margin-left: 170px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+#ooo-inner th:first-child {
+  position: absolute;
+  margin-left: -170px;
+  width: 50px;
+}
+
+#ooo-inner th:nth-child(2) {
+  position: absolute;
+  margin-left: -110px;
+  width: 100px;
+}
+
+#ooo-inner td {
+  text-align: right;
+}
+
+#ooo-inner thead th {
+  height: 3em;
+}
+
+#ooo-inner tbody th {
+  white-space: nowrap;
+}
+
+#ooo-inner th, #ooo-inner td {
+    padding: 10px 5px;
+}
+
+</style>
+
+<div id="ooo-outer">
+  <div id="ooo-inner">
+    <table>
+        <thead>
+            <tr>
+            <th>Vendor</th>
+            <th>Microarch</th>
+            <th>ROB Size</th>
+            <th>Sched (RS)</th>
+            <th>Load Buffer</th>
+            <th>Store Buffer</th>
+            <th>Integer PRF</th>
+            <th>Vector PRF</th>
+            <th>Branches</th>
+            <th>Calls</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Intel</th>
+                <th>Sandy Bridge</th>
+                <td>168</td>
+                <td>54</td>
+                <td>64</td>
+                <td>36</td>
+                <td>160</td>
+                <td>144</td>
+                <td>48</td>
+                <td>15</td>
+            </tr>
+            <tr>
+                <th>Intel</th>
+                <th>Ivy Bridge</th>
+                <td>168</td>
+                <td>54</td>
+                <td>64</td>
+                <td>36</td>
+                <td>160</td>
+                <td>144</td>
+                <td>48</td>
+                <td>15</td>
+            </tr>
+            <tr>
+                <th>Intel</th>
+                <th>Haswell</th>
+                <td>192</td>
+                <td>60</td>
+                <td>72</td>
+                <td>42</td>
+                <td>168</td>
+                <td>168</td>
+                <td>48</td>
+                <td>14</td>
+            </tr>
+            <tr>
+                <th>Intel</th>
+                <th>Broadwell</th>
+                <td>192</td>
+                <td>64</td>
+                <td>72</td>
+                <td>42</td>
+                <td>168</td>
+                <td>168</td>
+                <td>48</td>
+                <td>14</td>
+            </tr>
+            <tr>
+                <th>Intel</th>
+                <th>Skylake</th>
+                <td>224</td>
+                <td>97</td>
+                <td>72</td>
+                <td>56</td>
+                <td>180</td>
+                <td>168</td>
+                <td>48</td>
+            <td>14?</td>
+            </tr>
+            <tr>
+                <th>Intel</th>
+                <th><abbr title="The new 7nm microarchitecture used in Ice Lake CPUs.">Sunny Cove</abbr><sup id="fnref:sunnybuffers" role="doc-noteref"><a href="#fn:sunnybuffers" class="footnote" rel="footnote">32</a></sup></th>
+                <td>352</td>
+                <td>160</td>
+                <td>128</td>
+                <td>72</td>
+                <td>280</td>
+                <td>224</td>
+                <td>?</td>
+            <td>?</td>
+            </tr>
+            <tr>
+                <th>AMD</th>
+                <th>Zen</th>
+                <td>192</td>
+                <td>180<sup id="fnref:zensched" role="doc-noteref"><a href="#fn:zensched" class="footnote" rel="footnote">33</a></sup></td>
+                <td>72<sup id="fnref:zenlsq" role="doc-noteref"><a href="#fn:zenlsq" class="footnote" rel="footnote">34</a></sup></td>
+                <td>44</td>
+                <td>168</td>
+                <td>160</td>
+                <td>?</td>
+                <td>?</td>
+            </tr>
+            <tr>
+                <th>AMD</th>
+                <th>Zen 2</th>
+                <td>224</td>
+                <td>188<sup id="fnref:zen2sched" role="doc-noteref"><a href="#fn:zen2sched" class="footnote" rel="footnote">35</a></sup></td>
+                <td>72<sup id="fnref:zenlsq:1" role="doc-noteref"><a href="#fn:zenlsq" class="footnote" rel="footnote">34</a></sup></td>
+                <td>48</td>
+                <td>180</td>
+                <td>160</td>
+                <td>?</td>
+                <td>?</td>
+            </tr>
+            <tr>
+                <th>AMD</th>
+                <th>Zen 3<sup id="fnref:zen3buffers" role="doc-noteref"><a href="#fn:zen3buffers" class="footnote" rel="footnote">36</a></sup></th>
+                <td>256</td>
+                <td>&gt;192<sup id="fnref:zen3sched" role="doc-noteref"><a href="#fn:zen3sched" class="footnote" rel="footnote">37</a></sup></td>
+                <td>72<sup id="fnref:zenlsq:2" role="doc-noteref"><a href="#fn:zenlsq" class="footnote" rel="footnote">34</a></sup></td>
+                <td>64</td>
+                <td>192</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+            </tr>
+            <tr>
+                <th>Apple</th>
+                <th><abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> <abbr title="The big, high IPC cores in the Apple M1 CPU.">Firestorm</abbr><sup id="fnref:m1buffers" role="doc-noteref"><a href="#fn:m1buffers" class="footnote" rel="footnote">38</a></sup></th>
+                <td>636<sup id="fnref:m1rob" role="doc-noteref"><a href="#fn:m1rob" class="footnote" rel="footnote">39</a></sup></td> <!-- ROB size -->
+                <td>326<sup id="fnref:m1sched" role="doc-noteref"><a href="#fn:m1sched" class="footnote" rel="footnote">40</a></sup></td> <!-- sched size -->
+                <td>130</td> <!-- load buffers -->
+                <td>60</td>  <!-- store buffers -->
+                <td>~380</td> <!-- integer PRF -->
+                <td>~434</td> <!-- SIMD PRF -->
+                <td>~144</td>   <!-- BOB -->
+                <td>?</td>   <!-- max calls -->
+            </tr>
+            <tr>
+                <th>Apple</th>
+                <th><abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> <abbr title="The low power efficiency cores in the Apple M1 CPU.">Icestorm</abbr><sup id="fnref:m1buffersice" role="doc-noteref"><a href="#fn:m1buffersice" class="footnote" rel="footnote">41</a></sup></th>
+                <td>111<sup id="fnref:m1rob:1" role="doc-noteref"><a href="#fn:m1rob" class="footnote" rel="footnote">39</a></sup></td> <!-- ROB size -->
+                <td>71<sup id="fnref:m1schedice" role="doc-noteref"><a href="#fn:m1schedice" class="footnote" rel="footnote">42</a></sup></td> <!-- sched size -->
+                <td>30</td> <!-- load buffers -->
+                <td>18</td>  <!-- store buffers -->
+                <td>~79</td> <!-- integer PRF -->
+                <td>~87</td> <!-- SIMD PRF -->
+                <td>?</td>   <!-- BOB -->
+                <td>?</td>   <!-- max calls -->
+            </tr>
+            <tr>
+                <th>Amazon</th>
+                <th>Graviton 2<sup id="fnref:g2buffers" role="doc-noteref"><a href="#fn:g2buffers" class="footnote" rel="footnote">43</a></sup></th>
+                <td>~124</td> <!-- ROB size -->
+                <td>~48</td> <!-- sched size -->
+                <td>~62</td> <!-- load buffers -->
+                <td>~40</td>  <!-- store buffers -->
+                <td>~92</td> <!-- integer PRF -->
+                <td>~96</td> <!-- SIMD PRF -->
+                <td>~46</td>   <!-- BOB -->
+                <td>?</td>   <!-- max calls -->
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<h3 id="reorder-buffer-size">Reorder Buffer Size</h3>
+
+<p>The <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> is the largest and most general out of order buffer: all uops, even those that don’t execute such as <code class="language-plaintext highlighter-rouge">nop</code> or zeroing idioms, take a slot in the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr><sup id="fnref:robgen" role="doc-noteref"><a href="#fn:robgen" class="footnote" rel="footnote">44</a></sup>. This structure holds instructions from the point at which they are allocated (issued, in Intel speak) until they retire. It puts a hard upper limit on the <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OoO</abbr> window as measured from the oldest un-retired instruction to the youngest instruction that can be issued. On Intel, the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> holds micro-fused ops, so the size is measured in the fused-domain.</p>
+
+<p>As an example, a load instruction takes a cache miss which means it cannot retire until the miss is complete. Let’s say the load takes 300 cycles to finish, which is a typical latency. Then, on an Haswell machine with a <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size of 192, <em>at most</em> 191 additional instructions can execute while waiting for the load: at that point the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> window is exhausted and the core stalls. This puts an upper bound on the maximum <abbr title="Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.">IPC</abbr> of the region of 192 / 300 = 0.64. It also puts a bound on the maximum <abbr title="Memory level parallelism: having multiple misses to memory outstanding from a single core. When used as a metric, it refers to the average number of outstanding requests over some period.">MLP</abbr> achievable, since only loads that appear in the next 191 instructions can (potentially) execute in parallel with the original miss. In fact, this behavior is used by Henry Wong’s <a href="https://github.com/travisdowns/robsize">robsize tool</a> to measure the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size and other <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OoO</abbr> buffer sizes, using a missed load followed by a series of filler instructions and finally another load miss. By varying the number of filler instructions and checking whether the loads executed in parallel or serially, the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size can be <a href="http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/">determined experimentally</a>.</p>
+
+<h4 id="remedies-8">Remedies</h4>
+
+<p>If you are hitting the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size limit, you should switch from optimizing the code for the usual metrics and instead try to reduce the number of uops. For example, a slower (longer latency, less throughput) instruction can be used to replace two instructions which would otherwise be faster. Similarly, micro-fusion helps because the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> limit counts in the fused domain.</p>
+
+<p>Reorganizing the instruction stream can help too: if you hit the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> limit after a specific long-latency instruction (usually a load miss) you may want to move expensive instructions into the shadow of that instruction so they can execute while the long latency instruction executes. In this way, there will be less work to do when the instruction completes. Similarly, you may want to “jam” loads that miss together: rather than spreading them out where they would naturally occur, putting them close together allows more of them to fit in the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> window.</p>
+
+<p>In the specific case of load misses, software prefetching can help a lot: it enables you to start a load early, but prefetches can retire before the load completes, so there is no stalling. For example, if you issue the prefetch 200 instructions before the <abbr title="A true load that appears in the source code or assembly, as opposed to loads initiated by software or hardware prefetch.">demand load</abbr> instruction, you have essentially broadened the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> by 200 instructions as it applies to that load.</p>
+
+<h3 id="load-buffer">Load Buffer</h3>
+
+<p>Every load operation, needs a load buffer entry. This means the total <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OoO</abbr> window is limited by the number loads appearing in the window. Typical load buffer sizes (72 on <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr>) seem to be about one third of the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size, so if more than about one out of three operations is a load, you are more likely to be limited by the load buffer than the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>.</p>
+
+<p>Gathers need as many entries as there are loaded elements to load in the gather. Sometimes loads are hidden - remember that things like <code class="language-plaintext highlighter-rouge">pop</code> involve a load: in general anything that executes an op on <code class="language-plaintext highlighter-rouge">p2</code> or <code class="language-plaintext highlighter-rouge">p3</code> which is not a store (i.e., does not execute anything on <code class="language-plaintext highlighter-rouge">p4</code>) needs an entry in the load buffer.</p>
+
+<h4 id="remedies-9">Remedies</h4>
+
+<p>First, you should evaluate whether getting under this limit will be helpful: it may be that you will almost immediately hit another <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OoO</abbr> limit, and it also may be that increasing the <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OoO</abbr> window isn’t that useful if the extra included instructions can’t execute or aren’t a bottleneck.</p>
+
+<p>In any case, the remedy is to use fewer loads, or in some cases to reorganize loads relative to other instructions so that the window implied by the full load buffer contains the most useful instructions (in particular, contains long latency instructions like load misses). You can try to combine narrower loads into wider ones. You can ensure you keep values in registers as much as possible, and inline functions that would otherwise pass arguments through memory (e.g., certain structures) to avoid pointless loads. If you need to spill some registers, consider spilling registers to <code class="language-plaintext highlighter-rouge">xmm</code> or <code class="language-plaintext highlighter-rouge">ymm</code> vector registers rather than the stack.</p>
+
+<h3 id="store-buffer">Store Buffer</h3>
+
+<p>Similarly to the load buffer, the store buffer is required for every operation that involves a store. In fact, filling up the store buffer is pretty much the only way stores can bottleneck performance. Unlike loads, nobody is waiting for a store to complete, except in the case of store-to-load forwarding - but there, by definition, the value is sitting inside the store queue ready to use, so there is no equivalent of the long load miss which blocks dependent operations. You can have long store misses, but they happen after the store has already retired and is sitting in the store buffer (or write-combining buffer). So stores primarily cause a problem if there are enough of them such that the store buffer fill up.</p>
+
+<p>Store buffers are usually smaller than load buffers, about two thirds the size, typically. This reflects the fact that most programs have more loads than stores.</p>
+
+<h4 id="remedies-10">Remedies</h4>
+
+<p>Similar to the load buffer, you want less stores. Ensure you aren’t doing unnecessary spilling to the stack, that you merge stores where possible, that you aren’t doing dead stores (e.g., zeroing a structure before immediately overwriting it anyways) and so on. On some platform giving the compiler more information about array of structure alignment helps it merge stores.</p>
+
+<p>Vectorization of loops with consecutive stores helps a lot since it can turn (for example) 8 32-bit stores into a single 256-bit store, which only takes one entry in the store buffer.</p>
+
+<p>Scatter operations available in AVX-512 don’t really help: they take one store buffer entry per element stored.</p>
+
+<h3 id="scheduler">Scheduler</h3>
+
+<p>After an op is issued, it sits in the reservation station (scheduler) until it is able to execute. This structure is generally much smaller than the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>, about 40-90 entries on modern chips. If this structure fills up, no more operations can issue, even if the other structures have plenty of room. This will occur if there are too many instructions dependent on earlier instructions which haven’t completed yet. A typical example is a load which misses in the cache, followed by many instructions which depend on that load. Those instructions won’t leave the scheduler until the load completes, and if they are enough to fill the structure no further instructions will be evaluated.</p>
+
+<h4 id="remedies-11">Remedies</h4>
+
+<p>Organize your code so that there are some independent instructions to execute following long latency operations, which don’t depend on the result of those operations.</p>
+
+<p>Consider replacing data dependencies (e.g., conditional moves or other arithmetic) with control dependencies, since the latter are predicted and don’t cause a dependency. This also has the advantage of executing many more instructions in parallel, but may lead to branch mispredictions.</p>
+
+<h3 id="register-file-size-limit">Register File Size Limit</h3>
+
+<p>Every instruction with a destination register requires a renamed physical register, which is only reclaimed when the instruction is retired. These registers come from the <em>physical regsiter file</em> (<abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr>). So to fill the entire <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> with operations that require a destination register, you’ll need a <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> as large as the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>. In practice, there are two separate register files on Intel and AMD chips: the integer registers file used for scalar registers such as <code class="language-plaintext highlighter-rouge">rax</code> and the vector register file used for <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers such as <code class="language-plaintext highlighter-rouge">xmm0</code>, <code class="language-plaintext highlighter-rouge">ymm0</code> and <code class="language-plaintext highlighter-rouge">zmm0</code>, and the sizes of these register files as shown above are somewhat smaller than the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size.</p>
+
+<p>Not all of the registers are actually available for renaming: some are used to store the non-speculative values of the architectural registers, or for other purposes, so the available number of register is about 16 to 32 less than the values shown above. Henry Wong has a great description of observed available registers on the <a href="http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/">article</a> I linked earlier, including some non-ideal behaviors that I’ve glossed over here. You can calculate the number of available registers on new architectures using the <a href="https://github.com/travisdowns/robsize">robsize tool</a>.</p>
+
+<p>The upshot is that for given <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> sizes, there are only enough registers available in each file for about 75% of the entries.</p>
+
+<p>In practice, some instructions such as branches, zeroing idioms<sup id="fnref:rmwnote" role="doc-noteref"><a href="#fn:rmwnote" class="footnote" rel="footnote">45</a></sup> don’t consume <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> entries, which limit you hit depends on that ratio. Since integer and FP PRFs are distinct on recent Intel, you can consume from each <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> independently: meaning that vectorized code mixed with at least some <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> code is unlikely to hit the <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> limit before it hits the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> limit.</p>
+
+<p>The effect of hitting the <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> limit is the same as the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size limit.</p>
+
+<h4 id="remedies-12">Remedies</h4>
+
+<p>There’s not all much you can do for this one beyond the stuff discussed in the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> limit entry section. Maybe try to mix integer and vector code so you consume from each register file. Make sure you are using zeroing idioms like <code class="language-plaintext highlighter-rouge">xor eax,eax</code> rather than <code class="language-plaintext highlighter-rouge">mov eax, 0</code> but you should already be doing that.</p>
+
+<h3 id="branches-in-flight">Branches in Flight</h3>
+
+<p><strong>Intel: Maximum of 48 branches in flight</strong></p>
+
+<p>Modern Intel chips seem to have a limit of branches <em>in flight</em>, where <em>in flight</em> refers to branches that have not yet retired, usually because some older operation hasn’t yet completed. I first saw this limit described and measured <a href="http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight">here</a>, although it seems like <a href="https://www.realworldtech.com/haswell-cpu/3/">David Kanter had the scoop</a> way back in 2012:</p>
+
+<blockquote>
+  <p>The branch order buffer, which is used to rollback to known good architectural state in the case of a misprediction is still 48 entries, as with Sandy Bridge.</p>
+</blockquote>
+
+<p>The effects of exceeding the branch order buffer limit are the same as for the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> limit.</p>
+
+<p><em>Branches</em> here refers to both conditional jumps (<code class="language-plaintext highlighter-rouge">jcc</code> where <code class="language-plaintext highlighter-rouge">cc</code> is some conditional code) and indirect jumps (things like <code class="language-plaintext highlighter-rouge">jmp [rax]</code>).</p>
+
+<h4 id="remedies-13">Remedies</h4>
+
+<p>Although you will rarely hit this limit, the solution is fewer branches. Try to move unnecessary checks out of the hot path, or combine several checks into one. Try to organize multi-predicate conditions such that you can short-circuit the evaluation after the first check (so the subsequent checks don’t appear in the dynamic instruction stream). Consider replacing N 2-way (true/false) conditional jumps with one indirect jump with N^2 targets as this counts as only “one” instead of N against the branch limit. Consider conditional moves or other branch-free techniques.</p>
+
+<p>Ensure that branches can retire as soon as possible, although in practice there often isn’t much opportunity to do this when dealing with already well-compiled code.</p>
+
+<p>Note that many of these are the same things you might consider to reduce branch mispredictions, although they apply here even if there are no mispredictions.</p>
+
+<h3 id="calls-in-flight">Calls in Flight</h3>
+
+<p><strong>Intel: 14-15</strong></p>
+
+<p>Only 14-15 calls can be in-flight at once, exactly analogous to the limitation on in-flight branches described above, except it applies to the <code class="language-plaintext highlighter-rouge">call</code> instruction rather than branches. As with the branches in-flight restriction, this comes from <a href="http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight">testing</a> by Henry Wong, and in this case I am not aware of an earlier source.</p>
+
+<h4 id="remedies-14">Remedies</h4>
+
+<p>Reduce the number of call instructions you make. Consider ensuring the calls can be inlined, or partial inlining (a fast path that can be inlined combined with a slow path that isn’t). In extreme cases you might want to replace <code class="language-plaintext highlighter-rouge">call</code> + <code class="language-plaintext highlighter-rouge">ret</code> pairs with unconditional <code class="language-plaintext highlighter-rouge">jmp</code>, saving the return address in a register, plus indirect branch to return to the saved address. I.e. replace the following:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">callee:</span>
+    <span class="c1">; function code goes here</span>
+    <span class="nf">ret</span>
+
+<span class="c1">; caller code</span>
+    <span class="nf">call</span> <span class="nv">callee</span>
+</code></pre></div></div>
+
+<p>With the following (which is essentially emulating the <a href="https://en.wikibooks.org/wiki/MIPS_Assembly/Control_Flow_Instructions#Jump_and_Link">JAL instruction</a>:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">callee:</span>
+  <span class="c1">; function code goes here</span>
+  <span class="nf">jmp</span> <span class="p">[</span><span class="nv">r15</span><span class="p">]</span> <span class="c1">; return to address stashed in r15</span>
+
+<span class="c1">; caller code</span>
+    <span class="nf">movabs</span> <span class="nv">r15</span><span class="p">,</span> <span class="nv">next</span>
+    <span class="nf">jmp</span> <span class="nv">callee</span>
+<span class="nl">next:</span>
+</code></pre></div></div>
+
+<p>This pattern is hard to achieve in practice in a high level language, although you might have luck emulating it with gcc’s <a href="https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html">labels as values</a> functionality.</p>
+
+<h2 id="thank-you">Thank You</h2>
+
+<p>That’s it for now, if you made it this far I hope you found it useful.</p>
+
+<p>Thanks to Paul A. Clayton, Adrian, Peter E. Fry, anon, nkurz, maztheman, hyperpape, Arseny Kapoulkine, Thomas Applencourt, haberman, caf, Nick Craver, pczarn, Bruce Dawson, Fabian Giesen, glaebhoerl and Matthew Fernandez for pointing out errors and other feedback.</p>
+
+<p>Thanks to Daniel Lemire for providing access to hardware on which I was able to test and verify some of these limits.</p>
+
+<h2 id="comments">Comments</h2>
+
+<p>You can leave any comments or questions using the form below.</p>
+
+<p>This post was <a href="https://news.ycombinator.com/item?id=20157196">discussed</a> on Hacker News.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:speedlemire" role="doc-endnote">
+      <p>I think this speed limit term came from <a href="https://lemire.me">Daniel Lemire</a>. I guess I liked it because I have used it a lot since then. <a href="#fnref:speedlemire" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:thatsaid" role="doc-endnote">
+      <p>That said, I am quite sure you can reach or at least approach closely these limits as I’ve tested most of them myself. Sure, a lot of these are micro-benchmarks, but you can get there in real code too. If you find some code that you think should reach a limit, but can’t - I’m interested to hear about it. <a href="#fnref:thatsaid" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:fused-domain" role="doc-endnote">
+      <p>The distinction between fused domain and unfused domain uops applies to instructions with a memory source or destination. For example, an instruction like <code class="language-plaintext highlighter-rouge">add eax, [rsp]</code> means “add the value pointed to by <code class="language-plaintext highlighter-rouge">rsp</code> to register <code class="language-plaintext highlighter-rouge">eax</code>. During execution, two separate micro-operations are created: one for the load and for the <code class="language-plaintext highlighter-rouge">add</code> instruction, this is the so-called <em>unfused domain</em>. However, prior to execution, the uops are kept together and only count as one against the pipeline width limit, this is the so called <em>fused domain</em>. Good list of instruction characteristics like <a href="https://www.agner.org/optimize/#manual_instr_tab">Agner Fog’s instruction tables</a> list both values. AMD macro-operations are largely similar to Intel fused-domain ops. <a href="#fnref:fused-domain" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:sum-halves" role="doc-endnote">
+      <p>You can this benchmark from <a href="https://github.com/travisdowns/uarch-bench"><abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>-bench</a>:  <code class="language-plaintext highlighter-rouge">./uarch-bench.sh --test-name=cpp/sum-halves</code> <a href="#fnref:sum-halves" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:extra-3" role="doc-endnote">
+      <p>Well it’s not exactly 14, it’s 14.03 - the extra 0.03 mostly comes from the fact that we call the benchmark repeatedly using an outer loop. Every time the sum loop terminates (it iterates over an array of 1024 elements), we suffer a branch misprediction and the CPU has gone ahead and executed an extra (falsely speculated) iteration or so of the loop, which is wasted work. You can see this by comparing with <code class="language-plaintext highlighter-rouge">uops_retired.retire_slots</code> which is also issued uops, but only counting ones which actually retired and not those which were on wrongly speculated path: this reads 14.01, so 2 out of 3 extra uops came from the misprediction. The other <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> is just the outer loop overhead. <a href="#fnref:extra-3" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:gcc-notgreat" role="doc-endnote">
+      <p>It puts in a ton of <a href="https://gist.github.com/travisdowns/9216bffba33876ee578aa0bb74b3c8f2">unnecessary shuffles</a> probably to try reproduce the exact structure of the unrolled-by-two loop (removing the unroll is likely to help). In gcc’s defense, clang 5 does even worse, running almost twice as slow as gcc. <a href="#fnref:gcc-notgreat" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:delamopt" role="doc-endnote">
+      <p>Not <em>fully described</em> is basically a ephemism for (partly) <em>wrong</em>. The manual describes a test you can use to determine if <abbr title="An situation where an instruction using an indexed addressing mode, that is otherwise eligible for micro-fusion, stays fused in the uop-cache, but then delaminates into two separate uops prior to issue, and so counts as two against the pipeline (rename) limit of four uops.">delamination</abbr> will occur, but it gives the wrong result for many instructions. <a href="#fnref:delamopt" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:issued" role="doc-endnote">
+      <p>Here I’m using <em>issued</em> as Intel uses it, indicating the moment an operation is renamed and send to the reservation station (RS) awaiting execution (which can happen after all its operands are ready). At the moment the operation leaves the reservation station to execute it is said to be dispatched. This terminology is exactly reversed from that used by some other CPU documentation and most academic literature: the terms <em>issue</em> and <em>dispatch</em> are also used but with meanings flipped. <a href="#fnref:issued" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:ports" role="doc-endnote">
+      <p>We are going to mostly gloss over the difference between ports and execution units here. In practice, operations are not dispatched directly to an execution unit, but rather pass though a numbered port, and we treat the port as the constrained resource. The relationship between ports and execution units is normally 1:N (i.e., each port gates access a private group of EUs), but other arrangements are possible. <a href="#fnref:ports" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:memaccess" role="doc-endnote">
+      <p>Now <em>memory access</em> doesn’t necessarily mean that the main memory (RAM) of the system is accessed: just that the machine code contains instructions which involve memory access. For most programs the overwhelming majority of these accesses hit in cache and never get to main memory. <a href="#fnref:memaccess" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:armstp" role="doc-endnote">
+      <p>Both of the Arm CPUs on this list support <code class="language-plaintext highlighter-rouge">LDP</code> and <code class="language-plaintext highlighter-rouge">STP</code> instructions which store a <em>pair</em> of registers, and both can merge this into a single wider store so it only counts as one access and such paired accesses also count as one access in this table. <a href="#fnref:armstp" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:iclstore" role="doc-endnote">
+      <p>Two stores can be sustained only with significant restrictions on the store pattern, as detailed below. <a href="#fnref:iclstore" class="reversefootnote" role="doc-backlink">&#8617;</a> <a href="#fnref:iclstore:1" class="reversefootnote" role="doc-backlink">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:recentintel" role="doc-endnote">
+      <p>Every mainstream core since Sandy Bridge (inclusive) has two read ports. <a href="#fnref:recentintel" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:zen3ll" role="doc-endnote">
+      <p>Zen 3 can do three general-purpose loads per cycle, but only two vector (128b or larger) loads per cycle. <a href="#fnref:zen3ll" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:bankconf" role="doc-endnote">
+      <p>Bank conflicts occur in a banked cache design when two loads try to access the same bank. <a href="https://twitter.com/rygorous/status/1138934828198326272">Per Fabian</a> Ivy Bridge and earlier had banked cache designs, as does Zen1. The Intel chips have 16 banks per line (bank selected by bits <code class="language-plaintext highlighter-rouge">[5:2]</code> of the address), while Zen1 has 8 banks per line (bits <code class="language-plaintext highlighter-rouge">[5:3]</code> used). A load uses any bank it overlaps. I also find bank-conflict like effects on Graviton 2 (only tested for stores) as many patterns of stores, especially unaligned, achieve less than the theoretical maximum of 2/cycle – even when the stores are all to the same cache line. <a href="#fnref:bankconf" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:written-weirdly" role="doc-endnote">
+      <p>Yes, it’s written kind of weirdly because this generates better assembly than say a forwards for loop. In particular, we want the final check to be for <code class="language-plaintext highlighter-rouge">i != 0</code>, since that comes for free on x86 (the result of the <code class="language-plaintext highlighter-rouge">i -= 2</code> will set the zero flag), which ends up dictating the rest of the loop. Another possibility is to adjust the <code class="language-plaintext highlighter-rouge">data</code> pointer which lets you use <code class="language-plaintext highlighter-rouge">i</code> and <code class="language-plaintext highlighter-rouge">i + 1</code> as the indices into the array. <a href="#fnref:written-weirdly" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:delam2" role="doc-endnote">
+      <p>Well, on Haswell and later there are 5 fused-domain uops, but on earlier architectures there are 7, because <code class="language-plaintext highlighter-rouge">ecx, DWORD PTR [rdi+r8*4]</code> cannot fully fuse due to its use of an indexed addressing mode (i.e., so-called <abbr title="An situation where an instruction using an indexed addressing mode, that is otherwise eligible for micro-fusion, stays fused in the uop-cache, but then delaminates into two separate uops prior to issue, and so counts as two against the pipeline (rename) limit of four uops.">delamination</abbr> occurs). <a href="#fnref:delam2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:add-indirect" role="doc-endnote">
+      <p>You can run the tests for this item yourself in <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>-bench with <code class="language-plaintext highlighter-rouge">./uarch-bench.sh --timer=perf --test-name=cpp/add-indirect*</code>. <a href="#fnref:add-indirect" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:gatherdd" role="doc-endnote">
+      <p>Meaning that the maximum theoretical throughput is 1 per 4 cycles on Intel based on the load limit, while the actual measured throughput is slightly worse at 1 per 5. Most of the gather instructions follow this pattern: a throuhgput 1 or 2 cycles worse than that suggested by the load limit. <a href="#fnref:gatherdd" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:simdloadex" role="doc-endnote">
+      <p>As mentioned, Zen 1 can only do one 256-bit load per cycle, but two loads of other types, and Zen 3 can do two vector loads but three loads of other types. Still, vector loads, when they can be used, are usually very advantageous on these CPUs. <a href="#fnref:simdloadex" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:vector-scalar" role="doc-endnote">
+      <p>In fact, in a twist of irony, the most efficient way to get stuff from vector registers into scalar registers, in a throughput sense, is to store it to memory and then reload each item one-by-one into scalar registers. So vector loads cannot help you break the load speed limit if you need all loaded values in scalar registers. <a href="#fnref:vector-scalar" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:portable" role="doc-endnote">
+      <p>The dance with <code class="language-plaintext highlighter-rouge">std::memcpy</code> makes this <em>legal</em> C++, but it’s still not portable in principle: it could produce different results on machines with really weird endianess (neither little nor big endian). The values of <code class="language-plaintext highlighter-rouge">sum1</code> and <code class="language-plaintext highlighter-rouge">sum2</code> will be reversed on little vs big-endian machines, although the final result <code class="language-plaintext highlighter-rouge">sum1 + sum2</code> will be the same. <a href="#fnref:portable" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:zen3store" role="doc-endnote">
+      <p>On Zen 3, only 64-bit or smaller stores from general purpose stores can achieve two per cycle. Vector stores are limited to one per cycle. <a href="#fnref:zen3store" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:radix" role="doc-endnote">
+      <p>One to move the element to a bucket and one to update the bucket pointer. <a href="#fnref:radix" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:amdunalignedstore" role="doc-endnote">
+      <p>I’m weaseling around here because it is possible that this penalty isn’t cumulative with other stores but just represents worst case where many such stores occur back-to-back but the performance when mixed with non-crossing stores is better than this worst case. For example 5 non-crossing store + 1 crossing one might not count as 10 but rather 6 or 7. More testing needed on that one. Suffice it to say you should avoid boundary-crossing stores if you can. Additional details <a href="https://www.realworldtech.com/forum/?threadid=176780&amp;curpostid=176849">at RWT</a>. <a href="#fnref:amdunalignedstore" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:combinedwhy" role="doc-endnote">
+      <p>One reason these limits arise is that both loads and stores require an address generation unit to perform addressing calculations. These units are shared between load and store units, and there may be fewer of these units than there are load and store units. Other reasons include a limited number of busses to/from the L1 cache and or sharing of resources between the read and write ports of the L1 cache. <a href="#fnref:combinedwhy" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:srcdest" role="doc-endnote">
+      <p>Note that in <code class="language-plaintext highlighter-rouge">imul eax,DWORD PTR [rdi]</code> register <code class="language-plaintext highlighter-rouge">eax</code> is use both as one of the arguments for the multiply, and as the result register, in the same way as <code class="language-plaintext highlighter-rouge">y *= x</code> means <code class="language-plaintext highlighter-rouge">y = y * x</code>. Such “two operand” instructions where the destination is the same as one of the operands forms are common in x86, especially in scalar code where they are usually the only option - although new <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions using the AVX and subsequent instruction sets use three argument forms, like <code class="language-plaintext highlighter-rouge">vpaddb xmm0, xmm1, xmm2</code> where the destination is distinct from the sources. Most other extant ISAs, usually RISC or RISC-influenced, have always used the three operand form. <a href="#fnref:srcdest" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:assoc" role="doc-endnote">
+      <p>I mention <em>integer</em> multiplication for a reason: this property does not apply to floating point multiplication as performed by CPUs, and the same is true for most of the usual mathematic properties of operators when applied to floating point. For this reason, compilers often cannot perform transformations that they could for integer math, because it might change the result, even if only slightly. The result won’t necessarily be <em>worse</em> - just different than if the operations had occurred in source order. You can loosen these chains that hold the compiler back with <code class="language-plaintext highlighter-rouge">-ffast-math</code>. <a href="#fnref:assoc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:sklfe" role="doc-endnote">
+      <p>Complete up until Broadwell more or less. The guide does not reflect some newer changes such as the <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> cache granularity being 64 bytes rather than 32 bytes on Skylake. <a href="#fnref:sklfe" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:lsdno" role="doc-endnote">
+      <p>Note that <abbr title="Lysergic acid diethylamide or Loop stream detector, but in the context of this blog probably the latter: The so-called loop buffer that can cache small loops of up to ~64 uops on recent Intel architectures. Not actually a separate structure: the hardware justs locks the loop down in the IDQ.">LSD</abbr> doesn’t appear here, because there the measurement doesn’t make sense - these numbers represent the rate at which each decoding-type component can deliver uops to the <abbr title="Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).">IDQ</abbr>, but the <abbr title="Lysergic acid diethylamide or Loop stream detector, but in the context of this blog probably the latter: The so-called loop buffer that can cache small loops of up to ~64 uops on recent Intel architectures. Not actually a separate structure: the hardware justs locks the loop down in the IDQ.">LSD</abbr> is <em>inside</em> the <abbr title="Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).">IDQ</abbr>: when active the renamer repeatedly accesses the uops in the <abbr title="Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).">IDQ</abbr> without consuming them. So there is no delivery rate to the <abbr title="Queue that collects incoming instructions from the decoder, uop cache or microcode engine and delivers them to the renamer (RAT).">IDQ</abbr> because no uops are delivered. <a href="#fnref:lsdno" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:snote" role="doc-endnote">
+      <p>In this table, note that the Intel and Zen scheduler (RS) sizes are not directly comparable, since Intel uses a unified scheduler for <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> ops, with “all” (actually most) scheduler entries available to most uops, while AMD has one scheduler (RS) per port. The numbers shown for AMD are the sum of all the ALU and <abbr title="Address Generation Unit">AGU</abbr> scheduler sizes. <a href="#fnref:snote" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:sunnybuffers" role="doc-endnote">
+      <p>Ice Lake/<abbr title="The new 7nm microarchitecture used in Ice Lake CPUs.">Sunny Cove</abbr> data from <a href="https://github.com/travisdowns/robsize">robsize tool</a>, <a href="https://en.wikichip.org/wiki/File:sunny_cove_buffer_capacities.png">Ice Lake client</a> and <a href="https://www.servethehome.com/wp-content/uploads/2020/08/Hot-Chips-32-Intel-Ice-Lake-SP-Sunny-Cove-Microarchitecture.jpg">Ice Lake server</a> slides. The value of 384 for “<abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> window (i.e., the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size), in the last link is a <a href="https://twitter.com/MarkDSimmons/status/1295837457158725633">typo</a> – it should be 352. <a href="#fnref:sunnybuffers" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:zensched" role="doc-endnote">
+      <p>The Zen scheduler has 4x14 <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> ALU schedulers, a 96 entry FP scheduler and 2x14 <abbr title="Address Generation Unit">AGU</abbr>/mem schedulers. <a href="#fnref:zensched" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:zenlsq" role="doc-endnote">
+      <p>AnandTech <a href="https://www.anandtech.com/show/16214/amd-zen-3-ryzen-deep-dive-review-5950x-5900x-5800x-and-5700x-tested/4">reports</a> an LSQ of 44 entries plus an address generation queue of 28 entries for a total of 72, but I don’t know the details of this structure. The LSQ on Zen doesn’t act in the same way as that on Intel: entries seem to be freed before retirement (perhaps after the load completes or after no earlier loads are outstanding) and so <a href="https://twitter.com/DROP_ALL_TABLES/status/1188860067543703552">can’t easily be measured by robsize</a>. <a href="#fnref:zenlsq" class="reversefootnote" role="doc-backlink">&#8617;</a> <a href="#fnref:zenlsq:1" class="reversefootnote" role="doc-backlink">&#8617;<sup>2</sup></a> <a href="#fnref:zenlsq:2" class="reversefootnote" role="doc-backlink">&#8617;<sup>3</sup></a></p>
+    </li>
+    <li id="fn:zen2sched" role="doc-endnote">
+      <p>The Zen 2 scheduler has 4x16 <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> ALU schedulers, a 96 entry (?) FP scheduler and a 1x28 <abbr title="Address Generation Unit">AGU</abbr>/mem scheduler for a total of 188 entries. <a href="#fnref:zen2sched" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:zen3buffers" role="doc-endnote">
+      <p>Most of the Zen 3 buffer size data from AMD slides via <a href="https://www.anandtech.com/show/16214/amd-zen-3-ryzen-deep-dive-review-5950x-5900x-5800x-and-5700x-tested/3">AnandTech</a>. <a href="#fnref:zen3buffers" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:zen3sched" role="doc-endnote">
+      <p>The Zen 3 scheduler has 4x24 <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> ALU/mem schedulers, and an unknown number (but larger than 96) of FP/<abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> scheduler entries. <a href="#fnref:zen3sched" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:m1buffers" role="doc-endnote">
+      <p>Most of the <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> <abbr title="The big, high IPC cores in the Apple M1 CPU.">Firestorm</abbr> data comes from <a href="https://twitter.com/dougallj/status/1373973478731255812">Dougall J’s extensive analysis and reverse engineering</a> (see also <a href="https://dougallj.github.io/applecpu/firestorm.html">here</a>) of the <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> chip. Earlier revisions had numbers mostly from AnandTech’s <a href="https://www.anandtech.com/show/16226/apple-silicon-m1-a14-deep-dive/2">deep dive</a> on <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr>, by <a href="https://twitter.com/andreif7">Andrei</a>, using Veedrac’s <a href="https://github.com/Veedrac/microarchitecturometer">microarchitecturometer</a> which is itself based on the <a href="https://github.com/travisdowns/robsize">robsize tool</a>. <a href="#fnref:m1buffers" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:m1rob" role="doc-endnote">
+      <p>The <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> <abbr title="The big, high IPC cores in the Apple M1 CPU.">Firestorm</abbr> and <abbr title="The low power efficiency cores in the Apple M1 CPU.">Icestorm</abbr> cores don’t appear to have a traditional one-<abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr>-one-entry <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>, but rather a ~330 (<abbr title="The big, high IPC cores in the Apple M1 CPU.">Firestorm</abbr>) or 60 entry (<abbr title="The low power efficiency cores in the Apple M1 CPU.">Icestorm</abbr>) structure which has something like <em>macro entries</em> which can hold up to 7 uops which can retire as a group. Discovered by <a href="https://twitter.com/dougallj">Dougall J</a> who describes them in more detail under <em>Other limits</em> on his <a href="https://dougallj.github.io/applecpu/firestorm.html"><abbr title="The big, high IPC cores in the Apple M1 CPU.">Firestorm</abbr> summary</a>. Instead of listing this value, which would greatly underestimate the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size compared to the other microarchitectures in most scenarios, I use the <em>in-flight renames</em> value which is mostly 1:1 to uops and is more directly comparable with the values for non-Apple chips. In practice, you’ll hit this rename limit or one of the physical register file limits long before you get to the 330 * 7 = ~2,310 outstanding ops (<abbr title="The big, high IPC cores in the Apple M1 CPU.">Firestorm</abbr>) implied by totally filling the macro-entry structure. <a href="#fnref:m1rob" class="reversefootnote" role="doc-backlink">&#8617;</a> <a href="#fnref:m1rob:1" class="reversefootnote" role="doc-backlink">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:m1sched" role="doc-endnote">
+      <p>The <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> <abbr title="The big, high IPC cores in the Apple M1 CPU.">Firestorm</abbr> apparently has 326 scheduler entries across 14 execution ports. From <a href="https://twitter.com/dougallj/status/1373973478731255812">Dougall’s breakdown</a> we have six schedulers for the 6 integer ALU units of 24, 26, 16, 12, 28 and 28 entries, a 48-entry scheduler shared between the load, store and AMX units, and 4 x 36 entry schedulers for the 4 NEON <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> units. <a href="#fnref:m1sched" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:m1buffersice" role="doc-endnote">
+      <p>The <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> <abbr title="The low power efficiency cores in the Apple M1 CPU.">Icestorm</abbr> data comes from <a href="https://twitter.com/dougallj/status/1373973478731255812">Dougall J’s extensive analysis and reverse engineering</a> (see also <a href="https://dougallj.github.io/applecpu/icestorm.html">here</a>) of the <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> chip. <a href="#fnref:m1buffersice" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:m1schedice" role="doc-endnote">
+      <p>The <abbr title="The first generally available Apple CPU (&quot;Apple Silicon&quot;) for laptops with 4 Firestorm and 4 Icestorm cores.">M1</abbr> <abbr title="The low power efficiency cores in the Apple M1 CPU.">Icestorm</abbr> apparently has 71 scheduler entries across 7 execution ports. From <a href="https://twitter.com/dougallj/status/1373973478731255812">Dougall’s breakdown</a> we have 3 x 9-entry, 18 entry and 2 x 13 entry schedulers for the general purpose, load/store/AMX and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> units, respectively. <a href="#fnref:m1schedice" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:g2buffers" role="doc-endnote">
+      <p>These numbers I measured myself using a modified version of Veerdac’s <a href="https://github.com/Veedrac/microarchitecturometer">microarchitecturometer</a> which is itself based on <a href="https://github.com/travisdowns/robsize">robsize</a> (but unlike robsize supports Arm 64-bit platforms). My results for <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size are <a href="/assets/speed-limits/g2results/generic-aarch64.svg">here</a> and <a href="/assets/speed-limits/g2results/nop.svg">here</a> (the latter test indicating that <em>nop compression</em> does not appear to be present on Graviton 2). Scheduler size results, using instructions which are dependent on the fencing loads are <a href="/assets/speed-limits/g2results/depadd-aarch64.svg">here</a>. There are also <a href="/assets/speed-limits/g2results/load-aarch64.svg">load</a> and <a href="/assets/speed-limits/g2results/store-aarch64.svg">store</a> buffer results, as well as <a href="/assets/speed-limits/g2results/add-aarch64.svg">integer <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr></a> and <a href="/assets/speed-limits/g2results/fmla-aarch64.svg"><abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr></a> results. <a href="/assets/speed-limits/g2results/movz-fmla-aarch64.svg">This test</a> indicates that the integer and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> PRFs are not shared. It isn’t shown in the table, but <a href="/assets/speed-limits/g2results/cmp.svg">this result testing <code class="language-plaintext highlighter-rouge">cmp</code></a> indicates that there is a separate set of renamed flag registers with ~36 entries. <a href="/assets/speed-limits/g2results/branch-aarch64.svg">These results</a> indicate that up to 46 calls can be in flight at once. There are <a href="https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results">even more</a> results not mentioned here. <a href="#fnref:g2buffers" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:robgen" role="doc-endnote">
+      <p>Well this is at least true on Intel. Recent chips from AMD, Apple and others seem to use <em>nop compression</em> to pack several nops into one <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> slot: so in this case we can imagine that each nop takes only a <em>fraction</em> of a slot. It is not impossible to imagine an microarchitecture that entire avoids putting nops in the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>. <a href="#fnref:robgen" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:rmwnote" role="doc-endnote">
+      <p>Possibly also including <abbr title="Read-modify-write: an instruction that reads from a memory location, operates on the value, and writes the result back to the same location.">RMW</abbr> and compare-with-memory instructions, but it depends on the flags implementation. Current Intel chips seem to include flag register bits attached to each integer <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> entry, so an instruction that produces flags consumes a <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> entry even if it does not also produce an integer result. <a href="#fnref:rmwnote" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-8cd9df80-9787-11eb-8d48-332c9d8a879e" class="js-comment comment" uid="8cd9df80-9787-11eb-8d48-332c9d8a879e">
+
+  <div class="comment__author">
+    Andrey Semashev
+    <span class="comment__date">•
+        <a href="#comment-8cd9df80-9787-11eb-8d48-332c9d8a879e" title="Permalink to this comment">April  7th, 2021 09:56</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>In Complex Addressing Limit Remedies, first two asm code samples, you probably want to use a step of 8 instead of 4, as you’re storing a 64-bit rdx.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8cd9df80-9787-11eb-8d48-332c9d8a879e', 'respond', 'speed-limits', '8cd9df80-9787-11eb-8d48-332c9d8a879e')">↪&#xFE0E; Reply to Andrey Semashev</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-54918510-7b5d-11eb-9c06-973f46681990" class="js-comment comment" uid="54918510-7b5d-11eb-9c06-973f46681990">
+
+  <div class="comment__author">
+    jpaasen
+    <span class="comment__date">•
+        <a href="#comment-54918510-7b5d-11eb-9c06-973f46681990" title="Permalink to this comment">March  2th, 2021 13:43</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi,</p>
+
+<p>I have tested the store-on-port-7 “hack” (with simple addressing on write).
+https://godbolt.org/z/PPutUu</p>
+
+<p>However, gcc seems to have problems with this code if you try to add loop unrolling <code class="language-plaintext highlighter-rouge">-funroll-loops</code>, which is also crucial when you try to achieve maximum performance when using AVX/FMA intrinsic.</p>
+
+<p>With clang I’m able to generate unrolled and vectorized code with simple addressing, but it looks like gcc is incapable of this.</p>
+
+<p>This thread: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88760
+is discussing some shortcomings in gcc compared with clang.</p>
+
+<p>You don’t happen to know if it is possible to generate unrolled and vectorized code with simple addressing?</p>
+
+<p>Thanks</p>
+<ul>
+  <li>Jp</li>
+</ul>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-54918510-7b5d-11eb-9c06-973f46681990', 'respond', 'speed-limits', '54918510-7b5d-11eb-9c06-973f46681990')">↪&#xFE0E; Reply to jpaasen</a>
+    </div>
+</article>
+  
+
+<article id="comment-477dc470-9a83-11eb-a7e1-433b870d86b2" class="js-comment comment admin child" uid="477dc470-9a83-11eb-a7e1-433b870d86b2">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-477dc470-9a83-11eb-a7e1-433b870d86b2" title="Permalink to this comment">April 11th, 2021 05:03</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Well in your linked godbolt, your <code class="language-plaintext highlighter-rouge">sum2</code> version seems to successfully use simple addressing for the store, even with <code class="language-plaintext highlighter-rouge">-funroll-loops</code>?</p>
+
+<p>That said, if it wasn’t working you could almost certainly force simple addressing by laundering the address to store though an empty asm that “potentially modifies” the address (the <code class="language-plaintext highlighter-rouge">+r</code> output constraint), <a href="https://godbolt.org/z/qMo41P7Pd">like this</a>. At some point though, when you know exactly the asm you want and are trying to trick every supported version of the compiler into producing it, why not just check the assembly into your project and assemble that?</p>
+
+<p>Well, there are a lot of reasons, but sometimes it’s an appealing idea…</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-40dba220-555c-11eb-bfb5-01430c7bddbd" class="js-comment comment" uid="40dba220-555c-11eb-bfb5-01430c7bddbd">
+
+  <div class="comment__author">
+    Noah Goldstein
+    <span class="comment__date">•
+        <a href="#comment-40dba220-555c-11eb-bfb5-01430c7bddbd" title="Permalink to this comment">January 13th, 2021 05:00</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi,</p>
+
+<p>You seem to say that L1d cache cannot both retrieve from L2 and write to the core in the same cycle</p>
+<blockquote>
+  <p>You can achieve these limits, but you may not be able to consume all the bytes from each cache line, because demand accesses to the L1 cache cannot occur on the same cycle that the L1 cache receives data from the outer cache levels. So, for example, the L2 can provide 64 bytes of data to the L1 cache per cycle, but you cannot also access 64 bytes every cycle since the L1 cannot satisfy those reads from the core and the incoming data from the L2 every cycle.</p>
+</blockquote>
+
+<p>But in another article you seem to say the opposite (about skylake). 
+https://community.intel.com/t5/Software-Tuning-Performance/Haswell-L2-cache-bandwidth-to-L1-64-bytes-cycle/m-p/1014887/highlight/true#M3863</p>
+
+<p>Can you explain what I am missing between these two explinations? Thank you!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-40dba220-555c-11eb-bfb5-01430c7bddbd', 'respond', 'speed-limits', '40dba220-555c-11eb-bfb5-01430c7bddbd')">↪&#xFE0E; Reply to Noah Goldstein</a>
+    </div>
+</article>
+  
+
+<article id="comment-c8dc0340-570f-11eb-a528-c3ba3c204256" class="js-comment comment admin child" uid="c8dc0340-570f-11eb-a528-c3ba3c204256">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-c8dc0340-570f-11eb-a528-c3ba3c204256" title="Permalink to this comment">January 15th, 2021 08:58</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Noah,</p>
+
+<p>Good catch!</p>
+
+<p>There is a subtle difference between the two claims that explains the apparent inconsistency.</p>
+
+<p>Based on my tests, the <em>L1 cache</em> itself cannot service both a request from the core and accept an incoming line from L2 in the same cycle (that’s the claim in this post). However, the incoming line from L2 <em>can</em> be used to satisfy an outstanding read of that line, <em>bypassing</em> the L1 cache. So a line can be accepted from L2, and a read can be satisfied, in the same cycle: but only one read and only if it is to the same line as is incoming from L2.</p>
+
+<p>By the way, exploiting this is the basis for a trick that lets you increase your read bandwidth from the L2: normal linear reads can’t take advantage of the “bypass” described above, but a different pattern can and you can get ~42 bytes/cycle (3 lines every 2 cycles) instead of 32. I’ve written it up and hope to post it here soon.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-e6910110-4d05-11eb-8e32-8da66f6a8063" class="js-comment comment" uid="e6910110-4d05-11eb-8e32-8da66f6a8063">
+
+  <div class="comment__author">
+    Lk
+    <span class="comment__date">•
+        <a href="#comment-e6910110-4d05-11eb-8e32-8da66f6a8063" title="Permalink to this comment">January  2th, 2021 14:22</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Very helpful post</p>
+
+<p>I wonder if you be so kind and could give me some hints how to compile code from 
+<strong>Pipeline Width</strong> to have same assembly as yours. I want to be aligned you your examples and do some checks. Thanks.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e6910110-4d05-11eb-8e32-8da66f6a8063', 'respond', 'speed-limits', 'e6910110-4d05-11eb-8e32-8da66f6a8063')">↪&#xFE0E; Reply to Lk</a>
+    </div>
+</article>
+  
+
+<article id="comment-90183a70-61f9-11eb-8073-2b87c96cc065" class="js-comment comment admin child" uid="90183a70-61f9-11eb-8073-2b87c96cc065">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-90183a70-61f9-11eb-8073-2b87c96cc065" title="Permalink to this comment">January 29th, 2021 06:16</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Lk, sorry in the delay in my reply.</p>
+
+<p>You can find the associated benchmark <a href="https://github.com/travisdowns/uarch-bench/blob/1326be98a0d66583e01beb002d0c69e3cd1e4665/cpp-benches.cpp#L281">here in uarch-bench</a>. I tried compiling it just now on my current system (gcc 9.3.0) and it produced very similar but not identical code to what I have in the post (still 15 instructions, but there is some reordering and some different register choices) as this is a new compiler than what I was using when I wrote this. Still, it wouldn’t affect the conclusion.</p>
+
+<p>I think I was using gcc 5.4 on Ubuntu 16.04 when I wrote this, and indeed <a href="https://godbolt.org/z/Kj5Y5K">godbolt seems to give identical assembly to that shown in the post for that version</a>.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/06/11/speed-limits.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/06/11/speed-limits.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="speed-limits">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/06/11/speed-limits.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2019/06/11/speed-limits.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

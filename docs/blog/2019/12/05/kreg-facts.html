@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>A Note on Mask Registers | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="A Note on Mask Registers" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Some mostly too-low-level-to-care-about hardware details of the mask registers introduced in AVX-512." />
+<meta property="og:description" content="Some mostly too-low-level-to-care-about hardware details of the mask registers introduced in AVX-512." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/kreg/specialk.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-12-05T16:30:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/kreg/specialk.jpg" />
+<meta property="twitter:title" content="A Note on Mask Registers" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2019-12-05T16:30:00+00:00","datePublished":"2019-12-05T16:30:00+00:00","description":"Some mostly too-low-level-to-care-about hardware details of the mask registers introduced in AVX-512.","headline":"A Note on Mask Registers","image":"https://travisdowns.github.io/assets/kreg/specialk.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">A Note on Mask Registers</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2019-12-05T16:30:00+00:00" itemprop="datePublished">
+        Dec 5, 2019
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/performance.html">performance</a></span><span class="tag-link"><a href="/tags/c++.html">c++</a></span><span class="tag-link"><a href="/tags/Intel.html">Intel</a></span><span class="tag-link"><a href="/tags/uarch.html">uarch</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p class="warning">If you are in a rush, you can <a href="#summary">skip to the summary</a>, but you’ll miss out on the journey.</p>
+
+<p>AVX-512 introduced eight so-called <em>mask registers</em><sup id="fnref:naming" role="doc-noteref"><a href="#fn:naming" class="footnote" rel="footnote">1</a></sup>, <code class="language-plaintext highlighter-rouge">k0</code><sup id="fnref:k0note" role="doc-noteref"><a href="#fn:k0note" class="footnote" rel="footnote">2</a></sup> through <code class="language-plaintext highlighter-rouge">k7</code>, which apply to most ALU operations and allow you to apply a zero-masking or merging<sup id="fnref:maskmerge" role="doc-noteref"><a href="#fn:maskmerge" class="footnote" rel="footnote">3</a></sup> operation on a per-element basis, speeding up code that would otherwise require extra blending operations in AVX2 and earlier.</p>
+
+<p>If that single sentence doesn’t immediately indoctrinate you into the mask register religion, here’s a copy and paste from <a href="https://en.wikipedia.org/wiki/AVX-512#Opmask_registers">Wikipedia</a> that should fill in the gaps and close the deal:</p>
+
+<blockquote>
+  <p>Most AVX-512 instructions may indicate one of 8 opmask registers (k0–k7). For instructions which use a mask register as an opmask, register <code class="language-plaintext highlighter-rouge">k0</code> is special: a hardcoded constant used to indicate unmasked operations. For other operations, such as those that write to an opmask register or perform arithmetic or logical operations, <code class="language-plaintext highlighter-rouge">k0</code> is a functioning, valid register. In most instructions, the opmask is used to control which values are written to the destination. A flag controls the opmask behavior, which can either be “zero”, which zeros everything not selected by the mask, or “merge”, which leaves everything not selected untouched. The merge behavior is identical to the blend instructions.</p>
+</blockquote>
+
+<p>So mask registers<sup id="fnref:kreg" role="doc-noteref"><a href="#fn:kreg" class="footnote" rel="footnote">4</a></sup> are important, but are not household names unlike say general purpose registers (<code class="language-plaintext highlighter-rouge">eax</code>, <code class="language-plaintext highlighter-rouge">rsi</code> and friends) or <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers (<code class="language-plaintext highlighter-rouge">xmm0</code>, <code class="language-plaintext highlighter-rouge">ymm5</code>, etc). They certainly aren’t going to show up on Intel slides disclosing the size of <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr> resources, like these:</p>
+
+<p><img src="/assets/kreg/min/intel-skx-slide.png" alt="Intel Slide" /></p>
+
+<p><br /></p>
+
+<p>In particular, I don’t think the size of the mask register physical register file (<abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr>) has ever been reported. Let’s fix that today.</p>
+
+<p>We use an updated version of the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size <a href="https://github.com/travisdowns/robsize">probing tool</a> originally authored and <a href="http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/">described by Henry Wong</a><sup id="fnref:hcite" role="doc-noteref"><a href="#fn:hcite" class="footnote" rel="footnote">5</a></sup> (hereafter simply <em>Henry</em>), who used it to probe the size of various documented and undocumented <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">out-of-order</abbr> structures on earlier architecture. If you haven’t already read that post, stop now and do it. This post will be here when you get back.</p>
+
+<p>You’ve already read Henry’s blog for a full description (right?), but for the naughty among you here’s the fast food version:</p>
+
+<h4 id="fast-food-method-of-operation">Fast Food Method of Operation</h4>
+
+<p>We separate two cache miss load instructions<sup id="fnref:misstime" role="doc-noteref"><a href="#fn:misstime" class="footnote" rel="footnote">6</a></sup> by a variable number of <em>filler instructions</em> which vary based on the CPU resource we are probing. When the number of filler instructions is small enough, the two cache misses execute in parallel and their latencies are overlapped so the total execution time is roughly<sup id="fnref:roughly" role="doc-noteref"><a href="#fn:roughly" class="footnote" rel="footnote">7</a></sup> as long as a single miss.</p>
+
+<p>However, once the number of filler instructions reaches a critical threshold, all of the targeted resource are consumed and instruction allocation stalls before the second miss is issued and so the cache misses can no longer run in parallel. This causes the runtime to spike to about twice the baseline cache miss latency.</p>
+
+<p>Finally, we ensure that each filler instruction consumes exactly one of the resource we are interested in, so that the location of the spike indicates the size of the underlying resource. For example, regular <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> instructions usually consume one physical register from the <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> so are a good choice to measure the size of that resource.</p>
+
+<h4 id="mask-register-prf-size">Mask Register <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> Size</h4>
+
+<p>Here, we use instructions that write a mask register, so can measure the size of the mask register <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr>.</p>
+
+<p>To start, we use a series of <code class="language-plaintext highlighter-rouge">kaddd k1, k2, k3</code> instructions, as such (shown for 16 filler instructions):</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">mov</span>    <span class="nb">rcx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rcx</span><span class="p">]</span>  <span class="c1">; first cache miss load</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">mov</span>    <span class="nb">rdx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="p">]</span>  <span class="c1">; second cache miss load</span>
+<span class="nf">lfence</span>                      <span class="c1">; stop issue until the above block completes</span>
+<span class="c1">; this block is repeated 16 more times</span>
+</code></pre></div></div>
+
+<p>Each <code class="language-plaintext highlighter-rouge">kaddd</code> instruction consumes one physical mask register. If number of filler instructions is equal to or less than the number of mask registers, we expect the misses to happen in parallel, otherwise the misses will be resolved serially. So we expect at that point to see a large spike in the running time.</p>
+
+<p>That’s exactly what we see:</p>
+
+<p><img src="/assets/kreg/min/skx-27.svg" alt="Test 27 kaddd instructions" /></p>
+
+<p>Let’s zoom in on the critical region, where the spike occurs:</p>
+
+<p><img src="/assets/kreg/min/skx-27-zoomed.svg" alt="Test 27 zoomed" /></p>
+
+<p>Here we clearly see that the transition isn’t <em>sharp</em> – when the filler instruction count is between 130 and 134, we the runtime is intermediate: falling between the low and high levels. Henry calls this <em>non ideal</em> behavior and I have seen it repeatedly across many but not all of these resource size tests. The idea is that the hardware implementation doesn’t always allow all of the resources to be used as you approach the limit<sup id="fnref:nonideal" role="doc-noteref"><a href="#fn:nonideal" class="footnote" rel="footnote">8</a></sup> - sometimes you get to use every last resource, but in other cases you may hit the limit a few filler instructions before the theoretical limit.</p>
+
+<p>Under this assumption, we want to look at the last (rightmost) point which is still faster than the slow performance level, since it indicates that <em>sometimes</em> that many resources are available, implying that at least that many are physically present. Here, we see that final point occurs at 134 filler instructions.</p>
+
+<p>So we conclude that <em><abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> has 134 physical registers available to hold speculative mask register values</em>. As Henry indicates on the original post, it is likely that there are 8 physical registers dedicated to holding the non-speculative architectural state of the 8 mask registers, so our best guess at the total size of the mask register <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> is 142. That’s somewhat smaller than the <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> (180 entires) or the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> (168 entries), but still quite large (see <a href="/blog/2019/06/11/speed-limits.html#ooo-table">this table of out of order resource sizes</a> for sizes on other platforms).</p>
+
+<p>In particular, it is definitely large enough that you aren’t likely to run into this limit in practical code: it’s hard to imagine non-contrived code where almost 60%<sup id="fnref:twothirds" role="doc-noteref"><a href="#fn:twothirds" class="footnote" rel="footnote">9</a></sup> of the instructions <em>write</em><sup id="fnref:write" role="doc-noteref"><a href="#fn:write" class="footnote" rel="footnote">10</a></sup> to mask registers, because that’s what you’d need to hit this limit.</p>
+
+<h4 id="are-they-distinct-prfs">Are They Distinct PRFs?</h4>
+
+<p>You may have noticed that so far I’m simply <em>assuming</em> that the mask register <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> is distinct from the others. I think this is highly likely, given the way mask registers are used and since they are part of a disjoint renaming domain<sup id="fnref:rename" role="doc-noteref"><a href="#fn:rename" class="footnote" rel="footnote">11</a></sup>. It is also supported by the fact that that apparent mask register PFR size doesn’t match either the <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> or <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> sizes, but we can go further and actually test it!</p>
+
+<p>To do that, we use a similar test to the above, but with the filler instructions alternating between the same <code class="language-plaintext highlighter-rouge">kaddd</code> instruction as the original test and an instruction that uses either a <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> or <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> register. If the register file is shared, we expect to hit a limit at size of the <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr>. If the PRFs are not shared, we expect that neither <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> limit will be hit, and we will instead hit a different limit such as the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size.</p>
+
+<p><a href="https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-29.asm">Test 29</a> alternates <code class="language-plaintext highlighter-rouge">kaddd</code> and scalar <code class="language-plaintext highlighter-rouge">add</code> instructions, like this:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">mov</span>    <span class="nb">rcx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rcx</span><span class="p">]</span>
+<span class="nf">add</span>    <span class="nb">ebx</span><span class="p">,</span><span class="nb">ebx</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">add</span>    <span class="nb">esi</span><span class="p">,</span><span class="nb">esi</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">add</span>    <span class="nb">ebx</span><span class="p">,</span><span class="nb">ebx</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">add</span>    <span class="nb">esi</span><span class="p">,</span><span class="nb">esi</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">add</span>    <span class="nb">ebx</span><span class="p">,</span><span class="nb">ebx</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">add</span>    <span class="nb">esi</span><span class="p">,</span><span class="nb">esi</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">add</span>    <span class="nb">ebx</span><span class="p">,</span><span class="nb">ebx</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">mov</span>    <span class="nb">rdx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="p">]</span>
+<span class="nf">lfence</span>
+</code></pre></div></div>
+
+<p>Here’s the chart:</p>
+
+<p><img src="/assets/kreg/min/skx-29.svg" alt="Test 29: alternating kaddd and scalar add" /></p>
+
+<p>We see that the spike is at a filler count larger than the <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> and <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> sizes. So we can conclude that the mask and <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> PRFs are not shared.</p>
+
+<p>Maybe the mask register is shared with the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr>? After all, mask registers are more closely associated with <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions than general purpose ones, so maybe there is some synergy there.</p>
+
+<p>To check, here’s <a href="https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-35.asm">Test 35</a>, which is similar to 29 except that it alternates between <code class="language-plaintext highlighter-rouge">kaddd</code> and <code class="language-plaintext highlighter-rouge">vxorps</code>, like so:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">mov</span>    <span class="nb">rcx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rcx</span><span class="p">]</span>
+<span class="nf">vxorps</span> <span class="nv">ymm0</span><span class="p">,</span><span class="nv">ymm0</span><span class="p">,</span><span class="nv">ymm1</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">vxorps</span> <span class="nv">ymm2</span><span class="p">,</span><span class="nv">ymm2</span><span class="p">,</span><span class="nv">ymm3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">vxorps</span> <span class="nv">ymm4</span><span class="p">,</span><span class="nv">ymm4</span><span class="p">,</span><span class="nv">ymm5</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">vxorps</span> <span class="nv">ymm6</span><span class="p">,</span><span class="nv">ymm6</span><span class="p">,</span><span class="nv">ymm7</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">vxorps</span> <span class="nv">ymm0</span><span class="p">,</span><span class="nv">ymm0</span><span class="p">,</span><span class="nv">ymm1</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">vxorps</span> <span class="nv">ymm2</span><span class="p">,</span><span class="nv">ymm2</span><span class="p">,</span><span class="nv">ymm3</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">vxorps</span> <span class="nv">ymm4</span><span class="p">,</span><span class="nv">ymm4</span><span class="p">,</span><span class="nv">ymm5</span>
+<span class="nf">kaddd</span>  <span class="nv">k1</span><span class="p">,</span><span class="nv">k2</span><span class="p">,</span><span class="nv">k3</span>
+<span class="nf">mov</span>    <span class="nb">rdx</span><span class="p">,</span><span class="kt">QWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rdx</span><span class="p">]</span>
+<span class="nf">lfence</span>
+</code></pre></div></div>
+
+<p>Here’s the corresponding chart:</p>
+
+<p><img src="/assets/kreg/min/skx-35.svg" alt="Test 35: alternating kaddd and SIMD xor" /></p>
+
+<p>The behavior is basically identical to the prior test, so we conclude that there is no direct sharing between the mask register and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> PRFs either.</p>
+
+<p class="warning">This turned out not to be the end of the story. The mask registers <em>are</em> shared, just not with the general purpose or SSE/AVX register file. For all the details, see this <a href="/blog/2020/05/26/kreg2.html">follow up post</a>.</p>
+
+<h4 id="an-unresolved-puzzle">An Unresolved Puzzle</h4>
+
+<p>Something we notice in both of the above tests, however, is that the spike seems to finish around 212 filler instructions. However, the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size for this microarchtiecture is 224. Is this just <em>non ideal behavior</em> as we saw earlier? Well we can test this by comparing against Test 4, which just uses <code class="language-plaintext highlighter-rouge">nop</code> instructions as the filler: these shouldn’t consume almost any resources beyond <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> entries. Here’s Test 4 (<code class="language-plaintext highlighter-rouge">nop</code> filer) versus Test 29 (alternating <code class="language-plaintext highlighter-rouge">kaddd</code> and scalar <code class="language-plaintext highlighter-rouge">add</code>):</p>
+
+<p><img src="/assets/kreg/min/skx-4-29.svg" alt="Test 4 vs 29" /></p>
+
+<p>The <code class="language-plaintext highlighter-rouge">nop</code>-using <a href="https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-4.asm">Test 4</a> <em>nails</em> the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size at exactly 224 (these charts are SVG so feel free to “View Image” and zoom in confirm). So it seems that we hit some other limit around 212 when we mix mask and <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> registers, or when we mix mask and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers. In fact the same limit applies even between <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers, if we compare Test 4 and <a href="https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-21.asm">Test 21</a> (which mixes <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> adds with <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> <code class="language-plaintext highlighter-rouge">vxorps</code>):</p>
+
+<p><img src="/assets/kreg/min/skx-4-21.svg" alt="Test 4 vs 21" /></p>
+
+<p>Henry mentions a more extreme version of the same thing in the original <a href="http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/">blog entry</a>, in the section also headed <strong>Unresolved Puzzle</strong>:</p>
+
+<blockquote>
+  <p>Sandy Bridge AVX or SSE interleaved with integer instructions seems to be limited to looking ahead ~147 instructions by something other than the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>. Having tried other combinations (e.g., varying the ordering and proportion of AVX vs. integer instructions, inserting some NOPs into the mix), it seems as though both SSE/AVX and integer instructions consume registers from some form of shared pool, as the instruction window is always limited to around 147 regardless of how many of each type of instruction are used, as long as neither type exhausts its own <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> supply on its own.</p>
+</blockquote>
+
+<p>Read the full section for all the details. The effect is similar here but smaller: we at least get 95% of the way to the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size, but still stop before it.  It is possible the shared resource is related to register reclamation, e.g., the PRRT<sup id="fnref:prrt" role="doc-noteref"><a href="#fn:prrt" class="footnote" rel="footnote">12</a></sup> - a table which keeps track of which registers can be reclaimed when a given instruction retires.</p>
+
+<p>Finally, we finish this party off with a few miscellaneous notes on mask registers, checking for parity with some features available to <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers.</p>
+
+<h3 id="move-elimination">Move Elimination</h3>
+
+<p>Both <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> registers are eligible for so-called <em>move elimination</em>. This means that a register to register move like <code class="language-plaintext highlighter-rouge">mov eax, edx</code> or <code class="language-plaintext highlighter-rouge">vmovdqu ymm1, ymm2</code> can be eliminated at rename by “simply”<sup id="fnref:simply" role="doc-noteref"><a href="#fn:simply" class="footnote" rel="footnote">13</a></sup> pointing the destination register entry in the <abbr title="Register alias table: a table which maps an architectural register identifier to a physical register.">RAT</abbr> to the same physical register as the source, without involving the ALU.</p>
+
+<p>Let’s check if something like <code class="language-plaintext highlighter-rouge">kmov k1, k2</code> also qualifies for move elimination. First, we check the chart for <a href="https://github.com/travisdowns/robsize/blob/fb039f212f1364e2e65b8cb2a0c3f8023c85777f/asm-gold/asm-28.asm">Test 28</a>, where the filler instruction is <code class="language-plaintext highlighter-rouge">kmovd k1, k2</code>:</p>
+
+<p><img src="/assets/kreg/min/skx-28.svg" alt="Test 28" /></p>
+
+<p>It looks exactly like Test 27 we saw earlier with <code class="language-plaintext highlighter-rouge">kaddd</code>. So we would suspect that physical registers are being consumed, unless we have happened to hit a different move-elimination related limit with exactly the same size and limiting behavior<sup id="fnref:moves" role="doc-noteref"><a href="#fn:moves" class="footnote" rel="footnote">14</a></sup>.</p>
+
+<p>Additional confirmation comes from uops.info which <a href="https://uops.info/table.html?search=kmov%20(K%2C%20K)&amp;cb_lat=on&amp;cb_tp=on&amp;cb_uops=on&amp;cb_ports=on&amp;cb_SKX=on&amp;cb_measurements=on&amp;cb_avx512=on">shows that</a> all variants of mask to mask register <code class="language-plaintext highlighter-rouge">kmov</code> take one <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> dispatched to <abbr title="port 0 (GP and SIMD ALU, not-taken branches)">p0</abbr>. If the move is eliminated, we wouldn’t see any dispatched uops.</p>
+
+<p>Therefore I conclude that register to register<sup id="fnref:regreg" role="doc-noteref"><a href="#fn:regreg" class="footnote" rel="footnote">15</a></sup> moves involving mask registers are not eliminated.</p>
+
+<h3 id="dependency-breaking-idioms">Dependency Breaking Idioms</h3>
+
+<p>The <a href="https://stackoverflow.com/a/33668295/149138">best way</a> to set a <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> register to zero in x86 is via the xor zeroing idiom: <code class="language-plaintext highlighter-rouge">xor reg, reg</code>. This works because any value xored with itself is zero. This is smaller (fewer instruction bytes) than the more obvious <code class="language-plaintext highlighter-rouge">mov eax, 0</code>, and also faster since the processor recognizes it as a <em>zeroing idiom</em> and performs the necessary work at rename<sup id="fnref:zero" role="doc-noteref"><a href="#fn:zero" class="footnote" rel="footnote">16</a></sup>, so no ALU is involved and no <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> is dispatched.</p>
+
+<p>Furthermore, the idiom is <em>dependency breaking:</em> although <code class="language-plaintext highlighter-rouge">xor reg1, reg2</code> in general depends on the value of both <code class="language-plaintext highlighter-rouge">reg1</code> and <code class="language-plaintext highlighter-rouge">reg2</code>, in the special case that <code class="language-plaintext highlighter-rouge">reg1</code> and <code class="language-plaintext highlighter-rouge">reg2</code> are the same, there is no dependency as the result is zero regardless of the inputs. All modern x86 CPUs recognize this<sup id="fnref:otherzero" role="doc-noteref"><a href="#fn:otherzero" class="footnote" rel="footnote">17</a></sup> special case for <code class="language-plaintext highlighter-rouge">xor</code>. The same applies to <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> versions of xor such as integer <a href="https://www.felixcloutier.com/x86/pxor"><code class="language-plaintext highlighter-rouge">vpxor</code></a> and floating point <a href="https://www.felixcloutier.com/x86/xorps"><code class="language-plaintext highlighter-rouge">vxorps</code></a> and <a href="https://www.felixcloutier.com/x86/xorpd"><code class="language-plaintext highlighter-rouge">vxorpd</code></a>.</p>
+
+<p>That background out of the way, a curious person might wonder if the <code class="language-plaintext highlighter-rouge">kxor</code> <a href="https://www.felixcloutier.com/x86/kxorw:kxorb:kxorq:kxord">variants</a> are treated the same way. Is <code class="language-plaintext highlighter-rouge">kxorb k1, k1, k1</code><sup id="fnref:notall" role="doc-noteref"><a href="#fn:notall" class="footnote" rel="footnote">18</a></sup> treated as a zeroing idiom?</p>
+
+<p>This is actually two separate questions, since there are two aspects to zeroing idioms:</p>
+
+<ul>
+  <li>Zero latency execution with no execution unit (elimination)</li>
+  <li>Dependency breaking</li>
+</ul>
+
+<p>Let’s look at each in turn.</p>
+
+<h4 id="execution-elimination">Execution Elimination</h4>
+
+<p>So are zeroing xors like <code class="language-plaintext highlighter-rouge">kxorb k1, k1, k1</code> executed at rename without latency and without needing an execution unit?</p>
+
+<p>No.</p>
+
+<p>Here, I don’t even have to do any work: uops.info has our back because they’ve performed <a href="https://uops.info/html-tp/SKX/KXORD_K_K_K-Measurements.html#sameReg">this exact test</a> and report a latency of 1 cycle and one <abbr title="port 0 (GP and SIMD ALU, not-taken branches)">p0</abbr> <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> used. So we can conclude that zeroing xors of mask registers are not eliminated.</p>
+
+<h4 id="dependency-breaking">Dependency Breaking</h4>
+
+<p>Well maybe zeroing kxors are dependency breaking, even though they require an execution unit?</p>
+
+<p>In this case, we can’t simply check uops.info. <code class="language-plaintext highlighter-rouge">kxor</code> is a one cycle latency instruction that runs only on a single execution port (<abbr title="port 0 (GP and SIMD ALU, not-taken branches)">p0</abbr>), so we hit the interesting (?) case where a chain of <code class="language-plaintext highlighter-rouge">kxor</code> runs at the same speed regardless of whether the are dependent or independent: the throughput bottleneck of 1/cycle is the same as the latency bottleneck of 1/cycle!</p>
+
+<p>Don’t worry, we’ve got other tricks up our sleeve. We can test this by constructing a tests which involve a <code class="language-plaintext highlighter-rouge">kxor</code> in a carried dependency chain with enough total latency so that the chain latency is the bottleneck. If the <code class="language-plaintext highlighter-rouge">kxor</code> carries a dependency, the runtime will be equal to the sum of the latencies in the chain. If the instruction is dependency breaking, the chain is broken and the different disconnected chains can overlap and performance will likely be limited by some throughput restriction (e.g., <a href="/blog/2019/06/11/speed-limits.html#portexecution-unit-limits">port contention</a>). This could use a good diagram, but I’m not good at diagrams.</p>
+
+<p>All the tests are in <a href="https://github.com/travisdowns/uarch-bench/blob/ccbebbec39ab02d6460a1837857d052e120c0946/x86_avx512.asm#L20"><abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr> bench</a>, but I’ll show the key parts here.</p>
+
+<p>First we get a baseline measurement for the latency of moving from a mask register to a <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> register and back:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">kmovb</span> <span class="nv">k0</span><span class="p">,</span> <span class="nb">eax</span>
+<span class="nf">kmovb</span> <span class="nb">eax</span><span class="p">,</span> <span class="nv">k0</span>
+<span class="c1">; repeated 127 more times</span>
+</code></pre></div></div>
+
+<p>This pair clocks in<sup id="fnref:runit" role="doc-noteref"><a href="#fn:runit" class="footnote" rel="footnote">19</a></sup> at 4 cycles. It’s hard to know how to partition the latency between the two instructions: are they both 2 cycles or is there a 3-1 split one way or the other<sup id="fnref:fyiuops" role="doc-noteref"><a href="#fn:fyiuops" class="footnote" rel="footnote">20</a></sup>, but for our purposes it doesn’t matter because we just care about the latency of the round-trip. Importantly, the post-based throughput limit of this sequence is 1/cycle, 4x faster than the latency limit, because each instruction goes to a different port (<abbr title="port 5 (GP and SIMD ALU, vector shuffles)">p5</abbr> and <abbr title="port 0 (GP and SIMD ALU, not-taken branches)">p0</abbr>, respectively). This means we will be able to tease out latency effects independent of throughput.</p>
+
+<p>Next, we throw a <code class="language-plaintext highlighter-rouge">kxor</code> into the chain that we know is <em>not</em> zeroing:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">kmovb</span> <span class="nv">k0</span><span class="p">,</span> <span class="nb">eax</span>
+<span class="nf">kxorb</span> <span class="nv">k0</span><span class="p">,</span> <span class="nv">k0</span><span class="p">,</span> <span class="nv">k1</span>
+<span class="nf">kmovb</span> <span class="nb">eax</span><span class="p">,</span> <span class="nv">k0</span>
+<span class="c1">; repeated 127 more times</span>
+</code></pre></div></div>
+
+<p>Since <a href="https://uops.info/table.html?search=kxorb&amp;cb_lat=on&amp;cb_tp=on&amp;cb_uops=on&amp;cb_ports=on&amp;cb_SKX=on&amp;cb_measurements=on&amp;cb_avx512=on">we know</a> <code class="language-plaintext highlighter-rouge">kxorb</code> has 1 cycle of latency, we expect to increase the latency to 5 cycles and that’s exactly what we measure (the first two tests shown):</p>
+
+<pre>
+** Running group avx512 : AVX512 stuff **
+                               Benchmark    Cycles     Nanos
+                kreg-GP rountrip latency      4.00      1.25
+    kreg-GP roundtrip + nonzeroing kxorb      5.00      1.57
+</pre>
+
+<p>Finally, the key test:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">kmovb</span> <span class="nv">k0</span><span class="p">,</span> <span class="nb">eax</span>
+<span class="nf">kxorb</span> <span class="nv">k0</span><span class="p">,</span> <span class="nv">k0</span><span class="p">,</span> <span class="nv">k0</span>
+<span class="nf">kmovb</span> <span class="nb">eax</span><span class="p">,</span> <span class="nv">k0</span>
+<span class="c1">; repeated 127 more times</span>
+</code></pre></div></div>
+
+<p>This has a zeroing <code class="language-plaintext highlighter-rouge">kxorb k0, k0, k0</code>. If it breaks the dependency on k0, it would mean that the <code class="language-plaintext highlighter-rouge">kmovb eax, k0</code> no longer depends on the earlier <code class="language-plaintext highlighter-rouge">kmovb k0, eax</code>, and the carried chain is broken and we’d see a lower cycle time.</p>
+
+<p>Drumroll…</p>
+
+<p>We measure this at the exact same 5.0 cycles as the prior example:</p>
+
+<pre>
+** Running group avx512 : AVX512 stuff **
+                               Benchmark    Cycles     Nanos
+                kreg-GP rountrip latency      4.00      1.25
+    kreg-GP roundtrip + nonzeroing kxorb      5.00      1.57
+<span style="background: green;">       kreg-GP roundtrip + zeroing kxorb      5.00      1.57</span>
+</pre>
+
+<p>So we tentatively conclude that zeroing idioms aren’t recognized at all when they involve mask registers.</p>
+
+<p>Finally, as a check on our logic, we use the following test which replaces the <code class="language-plaintext highlighter-rouge">kxor</code> with a <code class="language-plaintext highlighter-rouge">kmov</code> which we know is <em>always</em> dependency breaking:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">kmovb</span> <span class="nv">k0</span><span class="p">,</span> <span class="nb">eax</span>
+<span class="nf">kmovb</span> <span class="nv">k0</span><span class="p">,</span> <span class="nb">ecx</span>
+<span class="nf">kmovb</span> <span class="nb">eax</span><span class="p">,</span> <span class="nv">k0</span>
+<span class="c1">; repeated 127 more times</span>
+</code></pre></div></div>
+
+<p>This is the final result shown in the output above, and it runs much more quickly at 2 cycles, bottlenecked on <abbr title="port 5 (GP and SIMD ALU, vector shuffles)">p5</abbr> (the two <code class="language-plaintext highlighter-rouge">kmov k, r32</code> instructions both go only to <abbr title="port 5 (GP and SIMD ALU, vector shuffles)">p5</abbr>):</p>
+
+<pre>
+** Running group avx512 : AVX512 stuff **
+                               Benchmark    Cycles     Nanos
+                kreg-GP rountrip latency      4.00      1.25
+    kreg-GP roundtrip + nonzeroing kxorb      5.00      1.57
+       kreg-GP roundtrip + zeroing kxorb      5.00      1.57
+<span style="background: green;">         kreg-GP roundtrip + mov from GP      2.00      0.63</span>
+</pre>
+
+<p>So our experiment seems to check out.</p>
+
+<h3 id="reproduction">Reproduction</h3>
+
+<p>You can reproduce these results yourself with the <a href="https://github.com/travisdowns/robsize">robsize</a> binary on Linux or Windows (using WSL). The specific results for this article are <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results">also available</a> as are the <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/">scripts</a> used to collect them and generate the plots.</p>
+
+<h3 id="summary">Summary</h3>
+
+<ul>
+  <li><abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> has a separate <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> for mask registers with a speculative size of 134 and an estimated total size of 142</li>
+  <li>This is large enough compared to the other <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> size and the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> to make it unlikely to be a bottleneck</li>
+  <li>Mask registers are not eligible for move elimination</li>
+  <li>Zeroing idioms<sup id="fnref:tech" role="doc-noteref"><a href="#fn:tech" class="footnote" rel="footnote">21</a></sup> in mask registers are not recognized for execution elimination or dependency breaking</li>
+</ul>
+
+<h3 id="part-ii">Part II</h3>
+
+<p>I didn’t expect it to happen, but it did: there is a <a href="/blog/2020/05/26/kreg2.html">follow up post</a> about mask registers, where we (roughly) confirm the register file size by looking at an image of a <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> CPU captured via microcope, and make an interesting discovery regarding sharing.</p>
+
+<h3 id="comments">Comments</h3>
+
+<p>Discussion on <a href="https://news.ycombinator.com/item?id=21714390">Hacker News</a>, Reddit (<a href="https://www.reddit.com/r/asm/comments/e6kokb/x86_avx512_a_note_on_mask_registers/">r/asm</a> and <a href="https://www.reddit.com/r/programming/comments/e6ko7i/a_note_on_mask_registers_avx512/">r/programming</a>) or <a href="https://twitter.com/trav_downs/status/1202637229606264833">Twitter</a>.</p>
+
+<p>Direct feedback also welcomed by <a href="mailto:travis.downs@gmail.com">email</a> or as <a href="https://github.com/travisdowns/travisdowns.github.io/issues">a GitHub issue</a>.</p>
+
+<h3 id="thanks">Thanks</h3>
+
+<p><a href="https://lemire.me">Daniel Lemire</a> who provided access to the AVX-512 system I used for testing.</p>
+
+<p><a href="http://www.stuffedcow.net/">Henry Wong</a> who wrote the <a href="http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/">original article</a> which introduced me to this technique and graciously shared the code for his tool, which I now <a href="https://github.com/travisdowns/robsize">host on github</a>.</p>
+
+<p><a href="https://twitter.com/Jeffinatorator/status/1202642436406669314">Jeff Baker</a>, <a href="http://0x80.pl">Wojciech Muła</a> for reporting typos.</p>
+
+<p>Image credit: <a href="https://www.flickr.com/photos/like_the_grand_canyon/31064064387">Kellogg’s Special K</a> by <a href="https://www.flickr.com/photos/like_the_grand_canyon/">Like_the_Grand_Canyon</a> is licensed under <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>.</p>
+
+<p class="info">If you liked this post, check out the <a href="/">homepage</a> for others you might enjoy.</p>
+
+<hr />
+<hr />
+<p><br /></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:naming" role="doc-endnote">
+      <p>These <em>mask registers</em> are often called <em>k</em> registers or simply <em>kregs</em> based on their naming scheme. <a href="https://twitter.com/tom_forsyth/status/1202666300591337472">Rumor has it</a> that this letter was chosen randomly only after a long and bloody naming battle between  MFs. <a href="#fnref:naming" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:k0note" role="doc-endnote">
+      <p>There is sometimes a misconception (until recently even on the AVX-512 wikipedia article) that <code class="language-plaintext highlighter-rouge">k0</code> is not a normal mask register, but just a hardcoded indicator that no masking should be used. That’s not true: <code class="language-plaintext highlighter-rouge">k0</code> is a valid mask register and you can read and write to it with the <code class="language-plaintext highlighter-rouge">k</code>-prefixed instructions and <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions that write mask registers (e.g., any AVX-512 <a href="https://www.felixcloutier.com/x86/pcmpeqb:pcmpeqw:pcmpeqd">comparison</a>. However, the encoding that would normally be used for <code class="language-plaintext highlighter-rouge">k0</code> as a writemask register in a <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> operation indicates instead “no masking”, so the contents of <code class="language-plaintext highlighter-rouge">k0</code> cannot be used for that purpose. <a href="#fnref:k0note" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:maskmerge" role="doc-endnote">
+      <p>The distinction being that a zero-masking operation results in zeroed destination elements at positions not selected by the mask, while merging leaves the existing elements in the destination register unchanged at those positions. As as side-effect this means that with merging, the destination register becomes a type of destructive source-destination register and there is an input dependency on this register. <a href="#fnref:maskmerge" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:kreg" role="doc-endnote">
+      <p>I’ll try to use the full term <em>mask register</em> here, but I may also use <em>kreg</em> a common nickname based on the labels <code class="language-plaintext highlighter-rouge">k0</code>, <code class="language-plaintext highlighter-rouge">k1</code>, etc. So just mentally swap <em>kreg</em> for <em>mask register</em> if and when you see it (or vice-versa). <a href="#fnref:kreg" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:hcite" role="doc-endnote">
+      <p>H. Wong, <em>Measuring Reorder Buffer Capacity</em>, May, 2013. [Online]. Available: http://blog.stuffedcow.net/2013/05/measuring-rob-capacity/ <a href="#fnref:hcite" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:misstime" role="doc-endnote">
+      <p>Generally taking 100 to 300 cycles each (latency-wise). The wide range is because the cache miss wall clock time varies by a factor of about 2x, generally between 50 and 100 naneseconds, depending on platform and <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr> details, and the CPU frequency varies by a factor of about 2.5x (say from 2 GHz to 5 GHz). However, on a given host, with equivalent TLB miss/hit behavior, we expect the time to be roughly constant. <a href="#fnref:misstime" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:roughly" role="doc-endnote">
+      <p>The reason I have to add <em>roughly</em> as a weasel word here is itself interesting. A glance at the charts shows that they are certainly not totally flat in either the fast or slow regions surrounding the spike. Rather there are various noticeable regions with distinct behavior and other artifacts: e.g., in Test 29 a very flat region up to about 104 filler instructions, followed by a bump and then a linearly ramping region up to the spike somewhat after 200 instructions. Some of those features are explicable by mentally (or <a href="https://godbolt.org/z/eAGxhH">actually</a>) simulating the pipeline, which reveals that at some point the filler instructions will contribute (although only a cycle or so) to the runtime, but some features are still unexplained (for now). <a href="#fnref:roughly" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:nonideal" role="doc-endnote">
+      <p>For example, a given rename slot may only be able to write a subset of all the <abbr title="Register alias table: a table which maps an architectural register identifier to a physical register.">RAT</abbr> entries, and uses the first available. When the <abbr title="Register alias table: a table which maps an architectural register identifier to a physical register.">RAT</abbr> is almost full, it is possible that none of the allowed entries are empty, so it is as if the structure is full even though some free entries remain, but accessible only to other uops. Since the allowed entries may be essentially random across iterations, this ends up with a more-or-less linear ramp between the low and high performance levels in the non-ideal region. <a href="#fnref:nonideal" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:twothirds" role="doc-endnote">
+      <p>The “60 percent” comes from 134 / 224, i.e., the speculative mask register <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> size, divided by the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size. The idea is that if you’ll hit the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size limit no matter what once you have 224 instructions in flight, so you’d need to have 60% of those instructions be mask register writes<sup id="fnref:write:1" role="doc-noteref"><a href="#fn:write" class="footnote" rel="footnote">10</a></sup> in order to hit the 134 limit first. Of course, you might also hit some <em>other</em> limit first, so even 60% might not be enough, but the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> size puts a lower bound on this figure since it <em>always</em> applies. <a href="#fnref:twothirds" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:write" role="doc-endnote">
+      <p>Importantly, only instructions which write a mask register consume a physical register. Instructions that simply read a mask register (e.g,. <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions using a writemask) do not consume a new physical mask register. <a href="#fnref:write" class="reversefootnote" role="doc-backlink">&#8617;</a> <a href="#fnref:write:1" class="reversefootnote" role="doc-backlink">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:rename" role="doc-endnote">
+      <p>More renaming domains makes things easier on the renamer for a given number of input registers. That is, it is easier to rename 2 <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> and 2 <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> input registers (separate domains) than 4 <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> registers. <a href="#fnref:rename" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:prrt" role="doc-endnote">
+      <p>This is either the <em>Physical Register Reclaim Table</em> or <em>Post Retirement Reclaim Table</em> depending on who you ask. <a href="#fnref:prrt" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:simply" role="doc-endnote">
+      <p>Of course, it is not actually so simple. For one, you now need to track these “move elimination sets” (sets of registers all pointing to the same physical register) in order to know when the physical register can be released (once the set is empty), and these sets are themselves a limited resource which must be tracked. Flags introduce another complication since flags are apparently stored along with the destination register, so the presence and liveness of the flags must be tracked as well. <a href="#fnref:simply" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:moves" role="doc-endnote">
+      <p>In particular, in the corresponding test for <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> registers (Test 7), the chart looks very different as move elimination reduce the <abbr title="Physical register file: The hardware registers used for renaming architectural (source visible) registers, usually much larger in number than the architectural register count.">PRF</abbr> demand down to almost zero and we get to the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> limit. <a href="#fnref:moves" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:regreg" role="doc-endnote">
+      <p>Note that I am not restricting my statement to moves between two mask registers only, but any registers. That is, moves between a <abbr title="General purpose: as opposed to SIMD or FP. On x86 often refers to instructions such as integer addition, or registers such as eax.">GP</abbr> registers and a mask registers are also not eliminated (the latter fact is obvious if consider than they use distinct register files, so move elimination seems impossible). <a href="#fnref:regreg" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:zero" role="doc-endnote">
+      <p>Probably by pointing the entry in the <abbr title="Register alias table: a table which maps an architectural register identifier to a physical register.">RAT</abbr> to a fixed, shared zero register, or setting a flag in the <abbr title="Register alias table: a table which maps an architectural register identifier to a physical register.">RAT</abbr> that indicates it is zero. <a href="#fnref:zero" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:otherzero" role="doc-endnote">
+      <p>Although <code class="language-plaintext highlighter-rouge">xor</code> is the most reliable, other idioms may be recognized as zeroing or dependency breaking idioms by some CPUs as well, e.g., <code class="language-plaintext highlighter-rouge">sub reg,reg</code> and even <code class="language-plaintext highlighter-rouge">sbb reg, reg</code> which is not a zeroing idiom, but rather sets the value of <code class="language-plaintext highlighter-rouge">reg</code> to zero or -1 (all bits set) depending on the value of the carry flag. This doesn’t depend on the value of <code class="language-plaintext highlighter-rouge">reg</code> but only the carry flag, and some CPUs recognize that and break the dependency. Agner’s <a href="https://www.agner.org/optimize/#manual_microarch">microarchitecture guide</a> covers the <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>-dependent support for these idioms very well. <a href="#fnref:otherzero" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:notall" role="doc-endnote">
+      <p>Note that only the two source registers really need to be the same: if <code class="language-plaintext highlighter-rouge">kxorb k1, k1, k1</code> is treated as zeroing, I would expect the same for <code class="language-plaintext highlighter-rouge">kxorb k1, k2, k2</code>. <a href="#fnref:notall" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:runit" role="doc-endnote">
+      <p>Run all the tests in this section using <code class="language-plaintext highlighter-rouge">./uarch-bench.sh --test-name=avx512/*</code>. <a href="#fnref:runit" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:fyiuops" role="doc-endnote">
+      <p>This is why uops.info reports the latency for both <code class="language-plaintext highlighter-rouge">kmov r32, k</code> and <code class="language-plaintext highlighter-rouge">kmov k, 32</code> as <code class="language-plaintext highlighter-rouge">&lt;= 3</code>. They know the pair takes 4 cycles in total and under the assumption that each instruction must take <em>at least</em> one cycle the only thing you can really say is that each instruction takes at most 3 cycles. <a href="#fnref:fyiuops" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:tech" role="doc-endnote">
+      <p>Technically, I only tested the xor zeroing idiom, but since that’s the groud-zero, most basic idiom we can pretty sure nothing else will be recognized as zeroing. I’m open to being proven wrong: the code is public and easy to modify to test whatever idiom you want. <a href="#fnref:tech" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="kreg-facts">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2019/12/05/kreg-facts.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

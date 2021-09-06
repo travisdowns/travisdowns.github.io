@@ -1,0 +1,4022 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>Adding Staticman Comments | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Adding Staticman Comments" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Adding static comments to a static blog using staticman. Static." />
+<meta property="og:description" content="Adding static comments to a static blog using staticman. Static." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/now-with-comments/twitter-card.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-02-05T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/now-with-comments/twitter-card.png" />
+<meta property="twitter:title" content="Adding Staticman Comments" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2020-02-05T00:00:00+00:00","datePublished":"2020-02-05T00:00:00+00:00","description":"Adding static comments to a static blog using staticman. Static.","headline":"Adding Staticman Comments","image":"https://travisdowns.github.io/assets/now-with-comments/twitter-card.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Adding Staticman Comments</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2020-02-05T00:00:00+00:00" itemprop="datePublished">
+        Feb 5, 2020
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/meta.html">meta</a></span><span class="tag-link"><a href="/tags/staticman.html">staticman</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    
+<p>I’ve added comments to my blog. You can find the existing comments, if any, and the new comment form <a href="#comment-section">at the bottom</a> of any post.</p>
+
+<p>I thought this would take a couple hours, but it actually took <strong>[REDACTED]</strong>. Estimates are hard.</p>
+
+<p>Here’s what I did.</p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#table-of-contents" id="markdown-toc-table-of-contents">Table of Contents</a></li>
+  <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
+  <li><a href="#set-up-github-bot-account" id="markdown-toc-set-up-github-bot-account">Set Up GitHub Bot Account</a>    <ul>
+      <li><a href="#generate-personal-access-token" id="markdown-toc-generate-personal-access-token">Generate Personal Access Token</a></li>
+    </ul>
+  </li>
+  <li><a href="#set-up-the-blog-repository-configuration" id="markdown-toc-set-up-the-blog-repository-configuration">Set Up the Blog Repository Configuration</a>    <ul>
+      <li><a href="#configuring-staticmanyml" id="markdown-toc-configuring-staticmanyml">Configuring staticman.yml</a></li>
+      <li><a href="#configuring-_configyml" id="markdown-toc-configuring-_configyml">Configuring _config.yml</a></li>
+    </ul>
+  </li>
+  <li><a href="#set-up-the-api-bridge" id="markdown-toc-set-up-the-api-bridge">Set Up the API Bridge</a>    <ul>
+      <li><a href="#generate-an-rsa-keypair" id="markdown-toc-generate-an-rsa-keypair">Generate an RSA Keypair</a></li>
+      <li><a href="#sign-up-for-heroku" id="markdown-toc-sign-up-for-heroku">Sign Up for Heroku</a></li>
+      <li><a href="#deploy-staticman-bridge-to-heroku" id="markdown-toc-deploy-staticman-bridge-to-heroku">Deploy Staticman Bridge to Heroku</a></li>
+      <li><a href="#configure-bridge-secrets" id="markdown-toc-configure-bridge-secrets">Configure Bridge Secrets</a></li>
+    </ul>
+  </li>
+  <li><a href="#invite-and-accept-bot-to-blog-repo" id="markdown-toc-invite-and-accept-bot-to-blog-repo">Invite and Accept Bot to Blog Repo</a></li>
+  <li><a href="#enable-recaptcha" id="markdown-toc-enable-recaptcha">Enable reCAPTCHA</a>    <ul>
+      <li><a href="#sign-up-for-recaptcha" id="markdown-toc-sign-up-for-recaptcha">Sign Up for reCAPTCHA</a></li>
+      <li><a href="#configure-recaptcha" id="markdown-toc-configure-recaptcha">Configure reCAPTCHA</a></li>
+    </ul>
+  </li>
+  <li><a href="#integrate-comments-into-site" id="markdown-toc-integrate-comments-into-site">Integrate Comments Into Site</a>    <ul>
+      <li><a href="#markdown-part" id="markdown-toc-markdown-part">Markdown Part</a></li>
+    </ul>
+  </li>
+  <li><a href="#testing-on-this-post" id="markdown-toc-testing-on-this-post">Testing on This Post</a></li>
+  <li><a href="#thanks" id="markdown-toc-thanks">Thanks</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I am using <a href="https://staticman.net/">staticman</a>, created by <a href="https://github.com/eduardoboucas">Eduardo Bouças</a>, as my comments system for this static site.</p>
+
+<p>The basic flow for comment submission is as follows:</p>
+
+<ol>
+  <li>A reader submits the comment form on a blog post.</li>
+  <li>Javascript<sup id="fnref:backup" role="doc-noteref"><a href="#fn:backup" class="footnote" rel="footnote">1</a></sup> attached to the form submits it to my <em>staticman API bridge<sup id="fnref:bridge" role="doc-noteref"><a href="#fn:bridge" class="footnote" rel="footnote">2</a></sup></em> running on Heroku.</li>
+  <li>The API bridge does some validation of the request and submits a <a href="https://github.com/travisdowns/travisdowns.github.io/issues">pull request</a> to the github repo hosting my blog, consisting of a .yml file with the post content and meta data.</li>
+  <li>When I accept the pull request, it triggers a regeneration and republishing of the content (this is a GitHub pages feature), so the reply appears almost immediately<sup id="fnref:cache" role="doc-noteref"><a href="#fn:cache" class="footnote" rel="footnote">3</a></sup>.</li>
+</ol>
+
+<p>Here are the detailed steps to get this working. There are several other tutorials out there, with varying states of exhaustiveness, some of which
+I found only after writing most of this, but I’m going to add the pile anyways. There have been several changes to deploying staticman which mean that existing resources (and this one, of course) are marked by which “era” they were written in.</p>
+
+<p>The major changes are:</p>
+
+<ul>
+  <li>At one point the idea was that everyone would use the public staticman API bridge, but this proved unsustainable. A large amount of the work in setting up staticman is associated with running your own instance of the bridge.</li>
+  <li>There are three version of the staticman API: v1, v2 and v3. This guide uses v2 (although v3 is almost identical<sup id="fnref:v3" role="doc-noteref"><a href="#fn:v3" class="footnote" rel="footnote">4</a></sup>), but the v1 version is considerably different.</li>
+</ul>
+
+<h2 id="set-up-github-bot-account">Set Up GitHub Bot Account</h2>
+
+<p>You’ll want to create a GitHub <em>bot account</em> which will be the account that the API bridge uses to actually submit the pull requests to your blog repository. In principle, you can skip this step entirely and simply use your existing GitHub account, but I wouldn’t recommend it:</p>
+
+<ul>
+  <li>You’ll be generating a <em>personal access token</em> for this account, and uploading it to the cloud (Heroku) and if this somehow gets compromised, it’s better that it’s a throwaway bot account than your real account.</li>
+  <li>Having a dedicated account makes it easy to segregate work done by the bot, versus what you’ve done yourself. That is, you probably don’t want all the commits and pushes the bot does to show up on your personal account.</li>
+</ul>
+
+<p>The <em>bot account</em> is nothing special: it is just a regular personal account that you’ll only be using from the API bridge. So, open a private browser window, go to <a href="https://github.com">GitHub</a> and choose “Sign Up”. Call your bot something specific, which I’ll refer to as <em>GITHUB-BOT-NAME</em> from here forwards.</p>
+
+<h3 id="generate-personal-access-token">Generate Personal Access Token</h3>
+
+<p>Next, you’ll need to generate a GitHub <em>personal access token</em>, for your bot account. The <a href="https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line">GitHub doc</a> does a better job of explaining this than I can. If you just want everything to work for sure now and in the future, select every single scope when it prompts you, but if you care about security you should only need the <em>repo</em> and <em>user</em> scopes (today):</p>
+
+<p><strong>Repo scope:</strong></p>
+
+<p><img src="/assets/now-with-comments/scopes-repo.png" alt="Repo scope" /></p>
+
+<p><strong>User scope:</strong></p>
+
+<p><img src="/assets/now-with-comments/scopes-user.png" alt="User scope" /></p>
+
+<p>Copy and paste the displayed token somewhere safe: you’ll need this token in a later step where I’ll refer to it as  <em>${github_token}</em>. Once you close this page there is no way to recover the access token.</p>
+
+<h2 id="set-up-the-blog-repository-configuration">Set Up the Blog Repository Configuration</h2>
+
+<p>You’ll need to include configuration for staticman in two separate places in your blog repository: <code class="language-plaintext highlighter-rouge">_config.yml</code> (the primary Jekyll config file) and <code class="language-plaintext highlighter-rouge">staticman.yml</code>, both at the top level of the repository.</p>
+
+<p>In general, the stuff that goes in <code class="language-plaintext highlighter-rouge">_config.yml</code> is for use within the static generation phase of your site, e.g., controlling the generation of the comment form and the associated javascipt. The stuff in <code class="language-plaintext highlighter-rouge">staticman.yml</code> isn’t used during generation, but is used dynamically by the API bridge (read directly from GitHub on each request) to configure the activities of the bridge. A few thigns are duplicated in both places.</p>
+
+<h3 id="configuring-staticmanyml">Configuring staticman.yml</h3>
+
+<p>Most of the configuration for the ABI bridge is set in <code class="language-plaintext highlighter-rouge">staticman.yml</code> which lives in the top level of your <em>blog repository</em>. This means that one API bridge can support many different blog repositories, each with their own configuration (indeed, this feature was critical for the original design of a shared ABI bridge).</p>
+
+<p><a href="https://github.com/eduardoboucas/staticman/blob/master/staticman.sample.yml">Here’s a sample file</a> from the staticman GitHub repository, but you might want to use <a href="https://github.com/travisdowns/travisdowns.github.io/blob/master/staticman.yml">this one</a> from my repository as it is a bit more fleshed out.</p>
+
+<p>The main things you want to change are shown below.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># all of these fields are nested under the comments key, which corresponds to the final element</span>
+<span class="c1"># of the API bridge enpoint, i.e., you can different configurations even within the same staticman.yml</span>
+<span class="c1"># file all under different keys</span>
+<span class="na">comments</span><span class="pi">:</span>
+
+  <span class="c1"># There are many more required config values here, not shown:</span>
+  <span class="c1"># use the file linked above as a template</span>
+
+  <span class="c1"># I guess used only for email notifications?</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Performance</span><span class="nv"> </span><span class="s">Matters</span><span class="nv"> </span><span class="s">Blog"</span>
+
+  <span class="c1"># You may want a different set of "required fields". Staticman will</span>
+  <span class="c1"># reject posts without all of these fields</span>
+  <span class="na">requiredFields</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">name"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">email"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">message"</span><span class="pi">]</span>
+
+  <span class="c1"># you are going to want reCaptcha set up, but for now leave it disabled because we need the API</span>
+  <span class="c1"># bridge up and running in order to encrypt the secrets that go in this section</span>
+  <span class="na">reCaptcha</span><span class="pi">:</span>
+    <span class="na">enabled</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="c1">#  siteKey: 6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1</span>
+  <span class="c1">#  secret: a big encrypted secret (see Note above)</span>
+
+
+</code></pre></div></div>
+
+<h3 id="configuring-_configyml">Configuring _config.yml</h3>
+
+<p>The remainder of the configuration goes in <code class="language-plaintext highlighter-rouge">_config.yml</code>. Here’s the configuration I added to start with (we’ll add a bit more later):</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># The URL for the staticman API bridge endpoint</span>
+<span class="c1"># You will want to modify some of the values:</span>
+<span class="c1">#  ${github-username}: the username of the account with which you publish your blog</span>
+<span class="c1">#  ${blog-repo}: the name of your blog repository in github</span>
+<span class="c1">#  master: this the branch out of which your blog is published, often master or gh-pages</span>
+<span class="c1">#  ${bridge_app_name}: the name you chose in Heroku for your bridge API</span>
+<span class="c1">#  comments: the so-called property, this defines the key in staticman.yml where the configuration is found</span>
+<span class="c1">#</span>
+<span class="c1"># for me, this line reads:</span>
+<span class="c1"># https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments</span>
+<span class="na">staticman_url</span><span class="pi">:</span> <span class="s">https://${bridge_app_name}.herokuapp.com/v2/entry/${github-username}/${blog-repo}/master/comments</span>
+</code></pre></div></div>
+
+<h2 id="set-up-the-api-bridge">Set Up the API Bridge</h2>
+
+<p>This section covers deploying a private instances of the API bridge to Heroku.</p>
+
+<h3 id="generate-an-rsa-keypair">Generate an RSA Keypair</h3>
+
+<p>This keypair will be used to encrypt secrets that will be stored in public places, such as your reCAPTCHA site secret. The sececrets will be encrypted with the public half of the keypair, and decriped in the Bridge API server with the private part.</p>
+
+<p>Use the following on your local to generate to generate the pair:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh-keygen -m PEM -t rsa -b 4096 -C "staticman key" -f ~/.ssh/staticman_key
+</code></pre></div></div>
+
+<p>Don’t use any passphrase<sup id="fnref:pass" role="doc-noteref"><a href="#fn:pass" class="footnote" rel="footnote">5</a></sup>. You can change the <code class="language-plaintext highlighter-rouge">-f</code> argument if you want to save the key somewhere else, in which case you’ll have to use the new location when setting up the Heroku config below.</p>
+
+<p>You can verify the key was genreated by running:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>head -2 ~/.ssh/staticman_key
+</code></pre></div></div>
+
+<p>Which should output something like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-----BEGIN RSA PRIVATE KEY-----
+MIIJKAIBAAKCAgEAud7+fPWXzuxCoyyGbQTYCGi9C1N984roI/Tr7yJi074F+Cfp
+</code></pre></div></div>
+
+<p>Your second line will vary of course, but the first line must be <code class="language-plaintext highlighter-rouge">-----BEGIN RSA PRIVATE KEY-----</code>. If you see something else, perhaps mentioning <code class="language-plaintext highlighter-rouge">OPENSSH PRIVATE KEY</code>, it won’t work.</p>
+
+<h3 id="sign-up-for-heroku">Sign Up for Heroku</h3>
+
+<p>The original idea of staticman was to have a public API bridge that everyone uses for free. However, in practice this hasn’t proved sustainable as whatever free tier the thing was running on tends to hit its limits and then the fun stops. So the current recommendation is to set up a free instance of the API bridge on Heroku. So let’s do that.</p>
+
+<p><a href="https://signup.heroku.com/">Sign up</a> for a free account on Heroku. No credit card is required and a free account should give you enough juice for at least 1,000 comments a month<sup id="fnref:juice" role="doc-noteref"><a href="#fn:juice" class="footnote" rel="footnote">6</a></sup>.</p>
+
+<h3 id="deploy-staticman-bridge-to-heroku">Deploy Staticman Bridge to Heroku</h3>
+
+<p>The easiest way to do this is simply to click the <em>Deploy to Heroku</em> button in the <a href="https://github.com/eduardoboucas/staticman">README on the staticman repo</a>:</p>
+
+<p><img src="/assets/now-with-comments/deploy.png" alt="Deploy" width="50%" /></p>
+
+<p>You’ll see probably some logging indicating that the project is downloading, building and then successfully deployed.</p>
+
+<h3 id="configure-bridge-secrets">Configure Bridge Secrets</h3>
+
+<p>The bridge needs a couple of secrets to do its job:</p>
+
+<ul>
+  <li>The <em>GitHub personal access token</em> of your bot account. This lets it do work on behalf of your bot account (in particular, submit pull requests to your blog repository).</li>
+  <li>The private key of the keypair you generated earlier.</li>
+</ul>
+
+<p>If you want, you can add both of these through the Heroku web dashboard: go to Settings -&gt; Reveal Config Vars, and enter them <a href="/assets/now-with-comments/config-vars.png">like this</a>).</p>
+
+<p>However, you might as well get familiar with the Heroku command line, because it’s pretty cool and allows you to complete this flow without having your GitHub token flow through your clipboard and makes it easy to remove the newline characters in the private key.</p>
+
+<p>Follow <a href="https://devcenter.heroku.com/articles/heroku-cli">the instructions</a> to install and login to the Heroku CLI, then issue the following commands from any directory (note that <code class="language-plaintext highlighter-rouge">${github_token}</code> is the <em>personal access token</em> you generated earlier: copy and paste it into the command):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>heroku config:add <span class="nt">--app</span> <span class="k">${</span><span class="nv">bridge_app_name</span><span class="k">}</span> <span class="s2">"RSA_PRIVATE_KEY=</span><span class="si">$(</span><span class="nb">cat</span> ~/.ssh/staticman_key | <span class="nb">tr</span> <span class="nt">-d</span> <span class="s1">'\n'</span><span class="si">)</span><span class="s2">"</span>
+heroku config:add <span class="nt">--app</span> <span class="k">${</span><span class="nv">bridge_app_name</span><span class="k">}</span> <span class="s2">"GITHUB_TOKEN=</span><span class="k">${</span><span class="nv">github_token</span><span class="k">}</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>Here, the <code class="language-plaintext highlighter-rouge">tr -d '\n'</code> part of the pipeline is removing the newlines from the private key, since Heroku config variables can’t handle them and/or the API bridge can’t handle them.</p>
+
+<p>You can check that the config was correctly set by outputting it as follows:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>heroku config <span class="nt">--app</span> <span class="k">${</span><span class="nv">bridge_app_name</span><span class="k">}</span>
+</code></pre></div></div>
+
+<h2 id="invite-and-accept-bot-to-blog-repo">Invite and Accept Bot to Blog Repo</h2>
+
+<p>Finally, you need to invite your GitHub <em>bot account</em> that you created earlier to your blog repository<sup id="fnref:whycollab" role="doc-noteref"><a href="#fn:whycollab" class="footnote" rel="footnote">7</a></sup> and accept the invite.</p>
+
+<p>Open your blog repository, go to <em>Settings -&gt; Collaborators</em> and search for and add the GitHub bot account that you created earlier as a collaborator:</p>
+
+<p><img src="/assets/now-with-comments/add-collab.png" alt="Adding Collaborators" /></p>
+
+<p>Next, accept<sup id="fnref:invite" role="doc-noteref"><a href="#fn:invite" class="footnote" rel="footnote">8</a></sup> the invitation using the bridge API, by going to the following URL:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://${bridge_app_name}.herokuapp.com/v2/connect/${github-username}/${blog-repo}
+</code></pre></div></div>
+
+<p>You should see <code class="language-plaintext highlighter-rouge">OK!</code> as the output if it worked: this only appears <em>once</em> when the invitation got accepted, at all other times it will show <code class="language-plaintext highlighter-rouge">Invitation not found</code>.</p>
+
+<h2 id="enable-recaptcha">Enable reCAPTCHA</h2>
+
+<p>You are going to want to gate comment submission using reCAPTCHA or a similar system so you don’t get destroyed by spam (even if you have moderation enabled, dealing with all the pull requests will probably be tiring).</p>
+
+<p>Here we’ll cover setting up reCAPTCHA, which has built-in support in staticman. Although it involves modifying the same <code class="language-plaintext highlighter-rouge">_config.yml</code> and <code class="language-plaintext highlighter-rouge">staticman.yml</code> files that we’ve modified before, this part of the configuration needs to occur after the bridge is running because we use the <code class="language-plaintext highlighter-rouge">/encrypt</code> endpoint on the bridge as part of the setup.</p>
+
+<h3 id="sign-up-for-recaptcha">Sign Up for reCAPTCHA</h3>
+
+<p>Go to <a href="https://developers.google.com/recaptcha">reCAPTCHA</a> and sign up if you haven’t already, and create a new site. We are going to use the “v2, Checkbox” variant (<a href="https://developers.google.com/recaptcha/docs/display">docs here</a>), although I’m interested to hear how it works out with other variants.</p>
+
+<p>You will need the reCAPTCHA <em>site key</em> and <em>secret key</em> for configuration in the next section.</p>
+
+<h3 id="configure-recaptcha">Configure reCAPTCHA</h3>
+
+<p>Next, we need to add the <em>site key</em> and <em>secret key</em> to the <code class="language-plaintext highlighter-rouge">_config.yml</code> and <code class="language-plaintext highlighter-rouge">staticman.yml</code> config files.</p>
+
+<p>The <em>site key</em> will be used as-is, but the <em>secret key</em> property will be <a href="https://staticman.net/docs/encryption"><em>encrypted</em></a> so that it is not exposed in plaintext in your configuration files. To encrypt the secret key copy the secret from the reCAPTCHA admin console, and load the following URL from your API bridge, replacing <code class="language-plaintext highlighter-rouge">YOUR_SITE_KEY</code> at with the copied secret key.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://${bridge_app_name}.herokuapp.com/v2/encrypt/YOUR_SITE_KEY
+</code></pre></div></div>
+
+<p>You should get a blob of characters back as a result (considerably longer than the original secret) – it is <em>this</em> value that you need to include as <code class="language-plaintext highlighter-rouge">reCaptcha.secret</code> in both <code class="language-plaintext highlighter-rouge">staticman.yml</code> and in <code class="language-plaintext highlighter-rouge">_config.yml</code>.</p>
+
+<p>The reCAPTCHA configuration for both files is almost the same. It looks like this for <code class="language-plaintext highlighter-rouge">staticman.yml</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">comments</span><span class="pi">:</span>
+
+  <span class="c1"># more stuff</span>
+
+  <span class="c1"># note that reCaptcha is nested under comments</span>
+  <span class="na">reCaptcha</span><span class="pi">:</span>
+    <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="c1"># the siteKey is used as-is (no encryption)</span>
+    <span class="na">siteKey</span><span class="pi">:</span> <span class="s">6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1</span>
+    <span class="c1"># the secret is the encrypted blob you got back from the encrypt call</span>
+    <span class="na">secret</span><span class="pi">:</span> <span class="s">a big encrypted secret (see description above)</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">_config.yml</code> version is similar except that they key appears at the top level and there is no enabled property:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># reCaptcha configuration info: the exact same site key and *encrypted* secret that you used in staticman.yml</span>
+<span class="c1"># I personally don't think the secret needs to be included in the generated site, but the staticman API bridge uses</span>
+<span class="c1"># it to ensure the site configuration and bridge configuration match (but why not just compare the site key?)</span>
+<span class="na">reCaptcha</span><span class="pi">:</span>
+  <span class="na">siteKey</span><span class="pi">:</span> <span class="s">6LcWstQUAAAAALoGBcmKsgCFbMQqkiGiEt361nK1</span>
+  <span class="na">secret</span><span class="pi">:</span> <span class="s">exactly the same secret as the staticman.yml file</span>
+</code></pre></div></div>
+
+<h2 id="integrate-comments-into-site">Integrate Comments Into Site</h2>
+
+<p>Finally, you need to integrate code to display the existing comments and submit new comments.</p>
+
+<p>I used a mash up of commenting code from the <a href="https://spinningnumbers.org">spinningnumbers.org</a> blog as well as the staticman integration in the <a href="https://mmistakes.github.io/minimal-mistakes/docs/configuration/#static-based-comments-via-staticman">minimal mistakes theme</a>. The advantage the former has over the latter is that the comments allow one level of nesting (replies to top-level comments are nested beneath it).</p>
+
+<p>I planed to extract the associated markdown, liquid and JavaScript code to a separate repository as a single point where people could collaborate on this part of the integration, but man I’ve already spent way to long on this. I may still do it, but for now here’s how I did the integration.</p>
+
+<h3 id="markdown-part">Markdown Part</h3>
+
+<p>The key thing you need to do is include a blob of HTML and associated JavaScript in any page where you want to display and accept comments. I do this as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% if page.comments == true %}
+  {% include comments.html %}
+{% endif %}
+</code></pre></div></div>
+
+<p>You can paste it into any post, or better add it to the <code class="language-plaintext highlighter-rouge">footer.html</code> include or something like that (details depend on your theme). The invariant is that wherever this appears, the existing comments appear, followed by a form to submit new comments. You can see the <a href="https://github.com/travisdowns/travisdowns.github.io/blob/master/_includes/comments.html"><code class="language-plaintext highlighter-rouge">comments.html</code> include here</a> – in turn, it includes <code class="language-plaintext highlighter-rouge">comment.html</code> (once per comment, generates the comment html) and <code class="language-plaintext highlighter-rouge">comment_form.html</code> which generates the new comment form.</p>
+
+<p>This ultimately includes <a href="https://github.com/travisdowns/travisdowns.github.io/blob/4a57e4f6d8cb4ef0ac8801a31740d1ca32dfa8ae/_includes/comments.html#L28">external JavaScript</a> for JQuery and reCAPTCHA, as well as <a href="https://github.com/travisdowns/travisdowns.github.io/blob/master/assets/main.js">main.js</a> which includes the JavaScript to implement the replies (moving the form when the “reply to” button is clicked, and submitting the form via AJAX to the API bridge).</p>
+
+<p>You can try to use this same integration in your Jekyll blog. You’d need to:</p>
+
+<ul>
+  <li>Copy the <code class="language-plaintext highlighter-rouge">_includes/comment.html</code>, <code class="language-plaintext highlighter-rouge">_includes/comments.html</code>, <code class="language-plaintext highlighter-rouge">_includes/comment_form.html</code>, <code class="language-plaintext highlighter-rouge">assets/main.js</code>, and <code class="language-plaintext highlighter-rouge">_sass/comment-styles.css</code> from my <a href="https://github.com/travisdowns/travisdowns.github.io">blog files</a> to your blog repository.</li>
+  <li>In <code class="language-plaintext highlighter-rouge">assets/main.js</code>, replace the link to <code class="language-plaintext highlighter-rouge">https://github.com/travisdowns/travisdowns.github.io/pulls</code> with a link to your own repository (or otherwise customize the “success” message as you see fit).</li>
+  <li>Include <code class="language-plaintext highlighter-rouge">@import "comment-styles";</code> in your <code class="language-plaintext highlighter-rouge">assets/main.scss</code> file. If you don’t have one, you’ll need to create it following the rules for your theme. Usually this just means a <code class="language-plaintext highlighter-rouge">main.scss</code> with empty front-matter and an <code class="language-plaintext highlighter-rouge">@import "your-theme";</code> line to import the theme SCSS. Alternately, you could avoid putting anything in <code class="language-plaintext highlighter-rouge">main.scss</code> and just include the comment styles as a separate file, but this adds another request to each post.</li>
+  <li>Do the <code class="language-plaintext highlighter-rouge">include comments.html</code> thing shown above in an appropriate place in your template/theme.</li>
+  <li>Set <code class="language-plaintext highlighter-rouge">comments: true</code> in the front matter of posts you want to have comments (or set it as a default in <code class="language-plaintext highlighter-rouge">_config.yml</code>).</li>
+</ul>
+
+<h2 id="testing-on-this-post">Testing on This Post</h2>
+
+<p>If you want to leave a non-trivial comment on the content of this post, you can do so below. However, if you’d instead like to make a “just testing” post, to see how the http request works, or check the  created pull request, etc, please do it <a href="/misc/comments-test.html">over here</a>. Testing only comments made on this post will be closed without accepting them.</p>
+
+<h2 id="thanks">Thanks</h2>
+
+<p>Thanks to Eduardo Boucas for creating staticman.</p>
+
+<p>Thanks to <a href="https://spinningnumbers.org/">Willy McAllister</a> for nested comment display work I unabashedly cribbed, and helping me sort out an RSA key genreation problem, and pointing out some inconsistencies in the doc.</p>
+
+<h2 id="references">References</h2>
+
+<p>Things that were handy references while getting this working.</p>
+
+<p>This comment on <a href="https://github.com/eduardoboucas/staticman/issues/318#issuecomment-552755165">GitHub issue #318</a> was the list that I more or less follwed (I didn’t use the dev branch though).</p>
+
+<p>Willy McAllister describes setting up staticman <a href="https://spinningnumbers.org/a/staticman.html">in this post</a> – his implemented of nested comments forms the basis the one I used.</p>
+
+<p>Another <a href="https://gist.github.com/jannispaul/3787603317fc9bbb96e99c51fe169731">list of steps</a> to get staticman working and some troubleshooting.</p>
+
+<p>Michael Rose, the author of minimal mistakes Jekyll theme <a href="https://mademistakes.com/articles/improving-jekyll-static-comments/">describes setting up nested staticman comments</a> – I cribbed some stuff from here such as the submitting spinner.</p>
+
+<p>Willy McAllister subsequently wrote a <a href="https://spinningnumbers.org/a/staticman-heroku.html">great guide</a> to setting up Staticman, similar in nature to this one but with some additional sections such as <em>troubleshooting</em> and setting up reply notifications via MailGun. If that one was around when I started out, I wouldn’t have felt the need to write this one.</p>
+
+<hr />
+<p><br /></p>
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:backup" role="doc-endnote">
+      <p>If javascript is disabled, a regular POST action takes over. <a href="#fnref:backup" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:bridge" role="doc-endnote">
+      <p>I don’t think you’ll find this <em>bridge</em> term in the official documentation, but I’m going to use it here. <a href="#fnref:bridge" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:cache" role="doc-endnote">
+      <p>Well, subject to whatever edge caching GitHub pages is using – btw you can bust the cache by appending any random query parameter to the page: <code class="language-plaintext highlighter-rouge">...post.html?foo=1234</code>. <a href="#fnref:cache" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:v3" role="doc-endnote">
+      <p>v3 mostly just extends to the URL format for the <code class="language-plaintext highlighter-rouge">/event</code> endpoint to include the hosting provider (either GitHub or GitLab), allowing the use of GitHub in addition to GitLab. Almost everything in this guide would remain unchanged. <a href="#fnref:v3" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:pass" role="doc-endnote">
+      <p>You could use a passphrase, but then you’ll have to change the <code class="language-plaintext highlighter-rouge">cat</code> used below to echo the key into the Heroku config. If you want to be super safe, best is to generate the key to a transient location like ramfs and then simply delete the private portion after you’ve uploaded it to the Heroku config. <a href="#fnref:pass" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:juice" role="doc-endnote">
+      <p>In particular, the <em>unverified</em> (no credit card) free tier gives you 550 hours of uptime a month, and since the <em>dyno</em> (heroku speak for their on-demand host) sleeps after 30 minutes, I figure you can handle 550/0.5 = 1100 sparsely submitted comments. Of course, if comments come in bursts, you could handle much more than that, since you’ve already “paid” for the 30 minute uptime. <a href="#fnref:juice" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:whycollab" role="doc-endnote">
+      <p>The bot needs to be a collaborator to, at a minimum, commit comments to the repository, and to delete branches (using the delete branches webhook which cleans up comment related branches). However, it is possible to not use either of these features if you have moderation enabled (in which case comments arrive as a PR, which doesn’t require any particular permissions), and aren’t using the webhook. So maybe you could do without the collaborator status in that case? I haven’t tested it. <a href="#fnref:whycollab" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:invite" role="doc-endnote">
+      <p>I guess you can also just accept the invitation by opening the email sent to you by github and following the link there. This workflow involving the <code class="language-plaintext highlighter-rouge">v2/connect</code> endpoint probably made more sense when the API was meant to be shared among many uses using a common github bot account. <a href="#fnref:invite" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-c195ec60-09c8-11ec-ae93-e35ce0952288" class="js-comment comment" uid="c195ec60-09c8-11ec-ae93-e35ce0952288">
+
+  <div class="comment__author">
+    Yury
+    <span class="comment__date">•
+        <a href="#comment-c195ec60-09c8-11ec-ae93-e35ce0952288" title="Permalink to this comment">August 30th, 2021 19:30</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for really awesome guide!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c195ec60-09c8-11ec-ae93-e35ce0952288', 'respond', 'now-with-comments', 'c195ec60-09c8-11ec-ae93-e35ce0952288')">↪&#xFE0E; Reply to Yury</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-dc9720d0-ff3a-11eb-8d09-53c36ddeeb6f" class="js-comment comment" uid="dc9720d0-ff3a-11eb-8d09-53c36ddeeb6f">
+
+  <div class="comment__author">
+    Daniel
+    <span class="comment__date">•
+        <a href="#comment-dc9720d0-ff3a-11eb-8d09-53c36ddeeb6f" title="Permalink to this comment">August 17th, 2021 09:09</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Is this working from and in China?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-dc9720d0-ff3a-11eb-8d09-53c36ddeeb6f', 'respond', 'now-with-comments', 'dc9720d0-ff3a-11eb-8d09-53c36ddeeb6f')">↪&#xFE0E; Reply to Daniel</a>
+    </div>
+</article>
+  
+
+<article id="comment-ca9418b0-ff72-11eb-86e5-c944749b2149" class="js-comment comment admin child" uid="ca9418b0-ff72-11eb-86e5-c944749b2149">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-ca9418b0-ff72-11eb-86e5-c944749b2149" title="Permalink to this comment">August 17th, 2021 15:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I don’t see why not.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-46b17260-efb7-11eb-9a2f-035cd1030cee" class="js-comment comment" uid="46b17260-efb7-11eb-9a2f-035cd1030cee">
+
+  <div class="comment__author">
+    stella
+    <span class="comment__date">•
+        <a href="#comment-46b17260-efb7-11eb-9a2f-035cd1030cee" title="Permalink to this comment">July 28th, 2021 15:20</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>great post really helpful</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-46b17260-efb7-11eb-9a2f-035cd1030cee', 'respond', 'now-with-comments', '46b17260-efb7-11eb-9a2f-035cd1030cee')">↪&#xFE0E; Reply to stella</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-35ce2ba0-ec8d-11eb-844a-35b2f3ebe9e1" class="js-comment comment" uid="35ce2ba0-ec8d-11eb-844a-35b2f3ebe9e1">
+
+  <div class="comment__author">
+    Sachin
+    <span class="comment__date">•
+        <a href="#comment-35ce2ba0-ec8d-11eb-844a-35b2f3ebe9e1" title="Permalink to this comment">July 24th, 2021 14:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for the artice!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-35ce2ba0-ec8d-11eb-844a-35b2f3ebe9e1', 'respond', 'now-with-comments', '35ce2ba0-ec8d-11eb-844a-35b2f3ebe9e1')">↪&#xFE0E; Reply to Sachin</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-1492ae80-e2b4-11eb-93af-192f4dec9349" class="js-comment comment" uid="1492ae80-e2b4-11eb-93af-192f4dec9349">
+
+  <div class="comment__author">
+    LaTex Test
+    <span class="comment__date">•
+        <a href="#comment-1492ae80-e2b4-11eb-93af-192f4dec9349" title="Permalink to this comment">July 12th, 2021 01:54</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Testing if maths works:
+\(f(x)\)
+( f(x) )
+$ f(x) $
+[ f(x) ]</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1492ae80-e2b4-11eb-93af-192f4dec9349', 'respond', 'now-with-comments', '1492ae80-e2b4-11eb-93af-192f4dec9349')">↪&#xFE0E; Reply to LaTex Test</a>
+    </div>
+</article>
+  
+
+<article id="comment-23cc9560-e349-11eb-aee5-e589cffb2216" class="js-comment comment admin child" uid="23cc9560-e349-11eb-aee5-e589cffb2216">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-23cc9560-e349-11eb-aee5-e589cffb2216" title="Permalink to this comment">July 12th, 2021 19:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>In principle, kramdown has support for LaTeX, using the <code class="language-plaintext highlighter-rouge">$$ your formula here $$</code> syntax and MathJax by default, but I haven’t included any of the required JS for it to actually render client side. I do miss math layout support though, and I’m thinking of adding it, but likely via Katex, pre-rendered to HTML rather than Mathjax + HTML.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-e38ced50-de17-11eb-86ad-f1abbd705f11" class="js-comment comment" uid="e38ced50-de17-11eb-86ad-f1abbd705f11">
+
+  <div class="comment__author">
+    foxpass
+    <span class="comment__date">•
+        <a href="#comment-e38ced50-de17-11eb-86ad-f1abbd705f11" title="Permalink to this comment">July  6th, 2021 05:06</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Amazing post. thanks for sharing.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e38ced50-de17-11eb-86ad-f1abbd705f11', 'respond', 'now-with-comments', 'e38ced50-de17-11eb-86ad-f1abbd705f11')">↪&#xFE0E; Reply to foxpass</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-91d4dca0-d8ec-11eb-8fb0-2ba242f57a44" class="js-comment comment" uid="91d4dca0-d8ec-11eb-8fb0-2ba242f57a44">
+
+  <div class="comment__author">
+    Michael Scepaniak
+    <span class="comment__date">•
+        <a href="#comment-91d4dca0-d8ec-11eb-8fb0-2ba242f57a44" title="Permalink to this comment">June 29th, 2021 15:13</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thank you for writing this! I appreciate it.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-91d4dca0-d8ec-11eb-8fb0-2ba242f57a44', 'respond', 'now-with-comments', '91d4dca0-d8ec-11eb-8fb0-2ba242f57a44')">↪&#xFE0E; Reply to Michael Scepaniak</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-82601cf0-d665-11eb-9b9e-27b864b36c1c" class="js-comment comment" uid="82601cf0-d665-11eb-9b9e-27b864b36c1c">
+
+  <div class="comment__author">
+    Vlad
+    <span class="comment__date">•
+        <a href="#comment-82601cf0-d665-11eb-9b9e-27b864b36c1c" title="Permalink to this comment">June 26th, 2021 10:01</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Is it actual in 2021-2022</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-82601cf0-d665-11eb-9b9e-27b864b36c1c', 'respond', 'now-with-comments', '82601cf0-d665-11eb-9b9e-27b864b36c1c')">↪&#xFE0E; Reply to Vlad</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-4b7e54f0-d335-11eb-a28b-2b17081581e0" class="js-comment comment" uid="4b7e54f0-d335-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    Jennifer
+    <span class="comment__date">•
+        <a href="#comment-4b7e54f0-d335-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 08:39</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I am here to <em>experience</em> the Staticman comment system. Yea, <strong>this</strong> feels really good.</p>
+
+<p>Trying out some bullets:</p>
+<ul>
+  <li>One</li>
+  <li>Two</li>
+  <li>Three</li>
+  <li>Four</li>
+  <li>Five</li>
+</ul>
+
+<p>Here’s an <code class="language-plaintext highlighter-rouge">inline code</code> and here’s a code block:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+   <span class="n">printf</span><span class="p">(</span><span class="s">"%d is a prime number"</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<hr />
+<p>Great!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4b7e54f0-d335-11eb-a28b-2b17081581e0', 'respond', 'now-with-comments', '4b7e54f0-d335-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Jennifer</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-3dbc3740-d26f-11eb-a480-611bcc300c00" class="js-comment comment" uid="3dbc3740-d26f-11eb-a480-611bcc300c00">
+
+  <div class="comment__author">
+    Amit
+    <span class="comment__date">•
+        <a href="#comment-3dbc3740-d26f-11eb-a480-611bcc300c00" title="Permalink to this comment">June 21th, 2021 09:01</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Helpful Article. Thanks for writing and sharing!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3dbc3740-d26f-11eb-a480-611bcc300c00', 'respond', 'now-with-comments', '3dbc3740-d26f-11eb-a480-611bcc300c00')">↪&#xFE0E; Reply to Amit</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-3c5350c0-d164-11eb-8586-3f92de53fc06" class="js-comment comment" uid="3c5350c0-d164-11eb-8586-3f92de53fc06">
+
+  <div class="comment__author">
+    Yet another thankful reader
+    <span class="comment__date">•
+        <a href="#comment-3c5350c0-d164-11eb-8586-3f92de53fc06" title="Permalink to this comment">June 20th, 2021 01:10</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for sharing!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3c5350c0-d164-11eb-8586-3f92de53fc06', 'respond', 'now-with-comments', '3c5350c0-d164-11eb-8586-3f92de53fc06')">↪&#xFE0E; Reply to Yet another thankful reader</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-ebdccdc0-c938-11eb-9ca1-7bfaffb09392" class="js-comment comment" uid="ebdccdc0-c938-11eb-9ca1-7bfaffb09392">
+
+  <div class="comment__author">
+    augussst
+    <span class="comment__date">•
+        <a href="#comment-ebdccdc0-c938-11eb-9ca1-7bfaffb09392" title="Permalink to this comment">June  9th, 2021 15:39</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>How do you exactly “Integrate Comments Into Site” ? I’m very new to this thing and just trying out new stuff. I’m trying to make a simple website where people can share their thoughts anonymously, can anyone help me?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ebdccdc0-c938-11eb-9ca1-7bfaffb09392', 'respond', 'now-with-comments', 'ebdccdc0-c938-11eb-9ca1-7bfaffb09392')">↪&#xFE0E; Reply to augussst</a>
+    </div>
+</article>
+  
+
+<article id="comment-1515b220-c942-11eb-8e66-69de26557bc1" class="js-comment comment child" uid="1515b220-c942-11eb-8e66-69de26557bc1">
+
+  <div class="comment__author">
+    augussst
+    <span class="comment__date">•
+        <a href="#comment-1515b220-c942-11eb-8e66-69de26557bc1" title="Permalink to this comment">June  9th, 2021 16:45</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>okay I already create a form but when I submit the message I get an 405 error and it doesn’t push anything to my git repo. This is my repo https://github.com/Augussst/your-thoughts</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-f0278ea0-c96b-11eb-9dc1-d5a886ca0ca1" class="js-comment comment admin child" uid="f0278ea0-c96b-11eb-9dc1-d5a886ca0ca1">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-f0278ea0-c96b-11eb-9dc1-d5a886ca0ca1" title="Permalink to this comment">June  9th, 2021 21:44</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi, augussst.</p>
+
+<p>I’m not really able to diagnose staticman or HTML issues here. If you think your problem is with the staticman server, I’d recommend taking a look on their github repo.</p>
+
+<p>If you think instead the problem is more likely to be with the HTML or javascript necessary to integrate the form, try StackOverflow.</p>
+
+<p>Good luck!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-63e13de0-c7a1-11eb-a650-1d769e4bdb9c" class="js-comment comment" uid="63e13de0-c7a1-11eb-a650-1d769e4bdb9c">
+
+  <div class="comment__author">
+    Ches
+    <span class="comment__date">•
+        <a href="#comment-63e13de0-c7a1-11eb-a650-1d769e4bdb9c" title="Permalink to this comment">June  7th, 2021 15:02</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice article</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-63e13de0-c7a1-11eb-a650-1d769e4bdb9c', 'respond', 'now-with-comments', '63e13de0-c7a1-11eb-a650-1d769e4bdb9c')">↪&#xFE0E; Reply to Ches</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-72d6f280-c225-11eb-a9de-854a9d808d3a" class="js-comment comment" uid="72d6f280-c225-11eb-a9de-854a9d808d3a">
+
+  <div class="comment__author">
+    Bob
+    <span class="comment__date">•
+        <a href="#comment-72d6f280-c225-11eb-a9de-854a9d808d3a" title="Permalink to this comment">May 31th, 2021 15:32</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Awesome post</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-72d6f280-c225-11eb-a9de-854a9d808d3a', 'respond', 'now-with-comments', '72d6f280-c225-11eb-a9de-854a9d808d3a')">↪&#xFE0E; Reply to Bob</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-f63fa1c0-bb82-11eb-a196-eb9b6d635e6e" class="js-comment comment" uid="f63fa1c0-bb82-11eb-a196-eb9b6d635e6e">
+
+  <div class="comment__author">
+    Curious Reader
+    <span class="comment__date">•
+        <a href="#comment-f63fa1c0-bb82-11eb-a196-eb9b6d635e6e" title="Permalink to this comment">May 23th, 2021 04:54</a></span>
+  </div>
+
+  <div class="comment__body">
+    <h1 id="heading">Heading</h1>
+<p>Body text! <strong>More!</strong></p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f63fa1c0-bb82-11eb-a196-eb9b6d635e6e', 'respond', 'now-with-comments', 'f63fa1c0-bb82-11eb-a196-eb9b6d635e6e')">↪&#xFE0E; Reply to Curious Reader</a>
+    </div>
+</article>
+  
+
+<article id="comment-1c19b140-c7a1-11eb-a650-1d769e4bdb9c" class="js-comment comment child" uid="1c19b140-c7a1-11eb-a650-1d769e4bdb9c">
+
+  <div class="comment__author">
+    anonymous
+    <span class="comment__date">•
+        <a href="#comment-1c19b140-c7a1-11eb-a650-1d769e4bdb9c" title="Permalink to this comment">June  7th, 2021 15:00</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Great</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-8f363170-ce6e-11eb-b52e-0783d3234109" class="js-comment comment child" uid="8f363170-ce6e-11eb-b52e-0783d3234109">
+
+  <div class="comment__author">
+    abc
+    <span class="comment__date">•
+        <a href="#comment-8f363170-ce6e-11eb-b52e-0783d3234109" title="Permalink to this comment">June 16th, 2021 06:46</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>test <strong>bold</strong></p>
+
+<ol>
+  <li>list</li>
+  <li>list-2</li>
+</ol>
+
+<blockquote>
+  <p>blockquote abc</p>
+</blockquote>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-b3a45660-b986-11eb-96d6-1110e4aaf73e" class="js-comment comment" uid="b3a45660-b986-11eb-96d6-1110e4aaf73e">
+
+  <div class="comment__author">
+    Bob
+    <span class="comment__date">•
+        <a href="#comment-b3a45660-b986-11eb-96d6-1110e4aaf73e" title="Permalink to this comment">May 20th, 2021 16:16</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Great article, thanks</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b3a45660-b986-11eb-96d6-1110e4aaf73e', 'respond', 'now-with-comments', 'b3a45660-b986-11eb-96d6-1110e4aaf73e')">↪&#xFE0E; Reply to Bob</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-159a7d50-b51c-11eb-a627-5d7d5cd32089" class="js-comment comment" uid="159a7d50-b51c-11eb-a627-5d7d5cd32089">
+
+  <div class="comment__author">
+    Ed
+    <span class="comment__date">•
+        <a href="#comment-159a7d50-b51c-11eb-a627-5d7d5cd32089" title="Permalink to this comment">May 15th, 2021 01:22</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thank you</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-159a7d50-b51c-11eb-a627-5d7d5cd32089', 'respond', 'now-with-comments', '159a7d50-b51c-11eb-a627-5d7d5cd32089')">↪&#xFE0E; Reply to Ed</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-a487fa90-a6d2-11eb-bb3c-c559e9317af9" class="js-comment comment" uid="a487fa90-a6d2-11eb-bb3c-c559e9317af9">
+
+  <div class="comment__author">
+    Ryan
+    <span class="comment__date">•
+        <a href="#comment-a487fa90-a6d2-11eb-bb3c-c559e9317af9" title="Permalink to this comment">April 26th, 2021 21:02</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Super helpful, thanks! I’ve used this to add comments on a couple sites of mine.</p>
+
+<p>But I’m having an issue with one thing! I’m trying to add a new field to the form (It’s a question field, and if they get the question wrong then the form errors). I’m able to do this if I add it as name=”question” and then validate it via js. But if I add it as name=”fields[question]” and add “question” to the allowedFields, I get an error “INVALID_FIELDS”. Is there a step I’m missing for adding in new fields?</p>
+
+<p>Confused and confused,
+Ryan</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a487fa90-a6d2-11eb-bb3c-c559e9317af9', 'respond', 'now-with-comments', 'a487fa90-a6d2-11eb-bb3c-c559e9317af9')">↪&#xFE0E; Reply to Ryan</a>
+    </div>
+</article>
+  
+
+<article id="comment-1f6734a0-a6de-11eb-9205-97dc9bde7a12" class="js-comment comment admin child" uid="1f6734a0-a6de-11eb-9205-97dc9bde7a12">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-1f6734a0-a6de-11eb-9205-97dc9bde7a12" title="Permalink to this comment">April 26th, 2021 22:24</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Ryan,</p>
+
+<p>Have you checked into GitHub your changes to add the field? Staticman reads the config from the committed state of the branch and repo you specify so when making changes like this you have to check in changes before staticman can see them.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-141c2a80-9219-11eb-bd4d-47758afa851c" class="js-comment comment" uid="141c2a80-9219-11eb-bd4d-47758afa851c">
+
+  <div class="comment__author">
+    Amitabh bachan
+    <span class="comment__date">•
+        <a href="#comment-141c2a80-9219-11eb-bd4d-47758afa851c" title="Permalink to this comment">March 31th, 2021 12:03</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>This looks cool</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-141c2a80-9219-11eb-bd4d-47758afa851c', 'respond', 'now-with-comments', '141c2a80-9219-11eb-bd4d-47758afa851c')">↪&#xFE0E; Reply to Amitabh bachan</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-22c8f8b0-81fc-11eb-ae24-af8f5674fe21" class="js-comment comment" uid="22c8f8b0-81fc-11eb-ae24-af8f5674fe21">
+
+  <div class="comment__author">
+    Chris
+    <span class="comment__date">•
+        <a href="#comment-22c8f8b0-81fc-11eb-ae24-af8f5674fe21" title="Permalink to this comment">March 10th, 2021 23:55</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Almost there but I’m hitting a nasty bug. Comments are saving just fine by following this tutorial, but will not load.</p>
+
+<p>I’m saving them in site.data.comments.recipes.recipe-name and have tried a few different iterations of comments.html to load them, all unsuccessful.</p>
+
+<p>I’m close, because it’s loading the raw comment on the page but not parsing it correctly.</p>
+
+<p>Here’s the key file: https://github.com/datapolitical/contrast/blob/master/_includes/comments.html</p>
+
+<p>And the relevant code:</p>
+
+<p>{% if site.data.comments.recipes[urlfilename] %}</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        {% if site.data.comments.recipes\[urlfilename\].size &gt; 1 %}
+          {{ site.data.comments.recipes\[urlfilename\] | size }}
+        {% endif %}
+        Comments test 1
+      
+       {{ site.data.comments.recipes\[urlfilename\] }} 
+{% assign comments = site.data.comments.recipes\[urlfilename\] | sort | where_exp: 'entry', 'comment[1].replying_to_uid == blank' %}
+{% for comment in comments %}
+  comment test 2
+  {% assign index       = forloop.index %}
+  
+  {% assign email       = comment[1].email %}
+  {% assign name        = comment[1].name %}
+  {% assign url         = comment[1].url %}
+  {% assign date        = comment[1].date %}
+  {% assign message     = comment[1].message %}
+  {%- assign uid             = comment[1]._id %}
+  {% include comment.html index=index replying_to=replying_to avatar=avatar email=email name=name url=url date=date message=message %}
+{% endfor %}
+</code></pre></div></div>
+
+<p>{% endif %}</p>
+
+<p>I know there’s something amiss in how i’m iterating through the available comments, but I’m not familiar enough with Jekyll or ruby to know what’s missing.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-22c8f8b0-81fc-11eb-ae24-af8f5674fe21', 'respond', 'now-with-comments', '22c8f8b0-81fc-11eb-ae24-af8f5674fe21')">↪&#xFE0E; Reply to Chris</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-18ca1550-7163-11eb-8b6b-8392ddc63337" class="js-comment comment" uid="18ca1550-7163-11eb-8b6b-8392ddc63337">
+
+  <div class="comment__author">
+    Nitish
+    <span class="comment__date">•
+        <a href="#comment-18ca1550-7163-11eb-8b6b-8392ddc63337" title="Permalink to this comment">February 17th, 2021 20:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Excellent article. Helped me integrate staticman on my <a href="https://codeahoy.com">blog</a></p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-18ca1550-7163-11eb-8b6b-8392ddc63337', 'respond', 'now-with-comments', '18ca1550-7163-11eb-8b6b-8392ddc63337')">↪&#xFE0E; Reply to Nitish</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-b9cfb4d0-5eb9-11eb-802a-d773fbbe9b0a" class="js-comment comment" uid="b9cfb4d0-5eb9-11eb-802a-d773fbbe9b0a">
+
+  <div class="comment__author">
+    Hansi
+    <span class="comment__date">•
+        <a href="#comment-b9cfb4d0-5eb9-11eb-802a-d773fbbe9b0a" title="Permalink to this comment">January 25th, 2021 03:02</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice work!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b9cfb4d0-5eb9-11eb-802a-d773fbbe9b0a', 'respond', 'now-with-comments', 'b9cfb4d0-5eb9-11eb-802a-d773fbbe9b0a')">↪&#xFE0E; Reply to Hansi</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-d067ad00-547e-11eb-b6f8-699b8a574550" class="js-comment comment" uid="d067ad00-547e-11eb-b6f8-699b8a574550">
+
+  <div class="comment__author">
+    test
+    <span class="comment__date">•
+        <a href="#comment-d067ad00-547e-11eb-b6f8-699b8a574550" title="Permalink to this comment">January 12th, 2021 02:35</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d067ad00-547e-11eb-b6f8-699b8a574550', 'respond', 'now-with-comments', 'd067ad00-547e-11eb-b6f8-699b8a574550')">↪&#xFE0E; Reply to test</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-a0f84900-52b0-11eb-81b1-95b3310c8fa9" class="js-comment comment" uid="a0f84900-52b0-11eb-81b1-95b3310c8fa9">
+
+  <div class="comment__author">
+    Nick
+    <span class="comment__date">•
+        <a href="#comment-a0f84900-52b0-11eb-81b1-95b3310c8fa9" title="Permalink to this comment">January  9th, 2021 19:26</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for the post.</p>
+
+<p>I hope that you guy’s might be interested to hear my following thoughts (I’m super lazy and this commenting architecture appears too complex for my liking :peace:)</p>
+
+<p>Do we need to use liquid for the comments ? We could just integrate them in every post (would appear simpler and little bit faster) - instead of having a separate comments folder.</p>
+
+<p>Do we actually need an online deployed service (staticman) and a complex api to receive them ?</p>
+
+<p>We could just receive them via email through any free form processing tool from sth like formspree to even a wordpress/google sites/wix/etc form. (Aggregate a couple and) Imap receive via JS (lazy) when and as often we feel like, add them to the blog - by authoring a commit (automated or not).</p>
+
+<p>The staticman’s md5 nowadays seems like a joke. We could publicly store an encrypted version of the email address via gpg (encrypt by public key). This could be done before saving and committing a new comment to the repository. Now we can contact the author of each comment if we feel like it. With the hashes we lose the contact functionality</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a0f84900-52b0-11eb-81b1-95b3310c8fa9', 'respond', 'now-with-comments', 'a0f84900-52b0-11eb-81b1-95b3310c8fa9')">↪&#xFE0E; Reply to Nick</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-43bcdd10-4d2d-11eb-9ba4-edbcfa27132f" class="js-comment comment" uid="43bcdd10-4d2d-11eb-9ba4-edbcfa27132f">
+
+  <div class="comment__author">
+    Charles
+    <span class="comment__date">•
+        <a href="#comment-43bcdd10-4d2d-11eb-9ba4-edbcfa27132f" title="Permalink to this comment">January  2th, 2021 19:03</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi, congrats on the success of this beautiful integration.
+I am relatively ‘new’ to static websites and jekyll, including integrating with APIs.</p>
+
+<p>I currently have Staticman running as a local server via localhost or 0.0.0.0
+I have setup a simple HTML form to post to http://localhost.</p>
+
+<p>The question I have is: how will I know the localhost POST and GET are working? I want to have the localhost development working before submission to public domain.</p>
+
+<p>I have kept eye out on the terminal for any changes after submitting the form. Maybe, I need to understand the flowchart more on how each piece speaks to one another for both local and remote hosting.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-43bcdd10-4d2d-11eb-9ba4-edbcfa27132f', 'respond', 'now-with-comments', '43bcdd10-4d2d-11eb-9ba4-edbcfa27132f')">↪&#xFE0E; Reply to Charles</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-0a59e5a0-3e0e-11eb-a51a-338d5e9fe6d5" class="js-comment comment" uid="0a59e5a0-3e0e-11eb-a51a-338d5e9fe6d5">
+
+  <div class="comment__author">
+    ALU
+    <span class="comment__date">•
+        <a href="#comment-0a59e5a0-3e0e-11eb-a51a-338d5e9fe6d5" title="Permalink to this comment">December 14th, 2020 13:12</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thank you for such a thorough tutorial. It works!
+The only problem is I do not get the message of a successful comment submission. It shows a message “Sending…” and disappears. However, it works fine on a test website. Probably, there is some js conflict. I am still figuring it out…
+I also wonder if someone tried to use <code class="language-plaintext highlighter-rouge">staticman-netlify-function</code> on Netlify, instead of Heroku?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-0a59e5a0-3e0e-11eb-a51a-338d5e9fe6d5', 'respond', 'now-with-comments', '0a59e5a0-3e0e-11eb-a51a-338d5e9fe6d5')">↪&#xFE0E; Reply to ALU</a>
+    </div>
+</article>
+  
+
+<article id="comment-33453b40-3e90-11eb-8924-4740ce81cfc8" class="js-comment comment admin child" uid="33453b40-3e90-11eb-8924-4740ce81cfc8">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-33453b40-3e90-11eb-8924-4740ce81cfc8" title="Permalink to this comment">December 15th, 2020 04:44</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>That’s strange: I tried it just now and it works for me. Are you saying it doesn’t work for here on my blog, or on your own blog?</p>
+
+<p>If the latter, check the comments below for a message form <em>Qi</em> where is a note about a conflict with bootstrap which caused a similar problem and how they fixed it.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-c3c410d0-1832-11eb-9d03-b55c3e3c0440" class="js-comment comment" uid="c3c410d0-1832-11eb-9d03-b55c3e3c0440">
+
+  <div class="comment__author">
+    Andrzej Kubaszek
+    <span class="comment__date">•
+        <a href="#comment-c3c410d0-1832-11eb-9d03-b55c3e3c0440" title="Permalink to this comment">October 27th, 2020 08:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>“Copy the … <code class="language-plaintext highlighter-rouge">assets/main.js</code> … “ - rather: copy <code class="language-plaintext highlighter-rouge">assets/main.js</code> and replace link in <code class="language-plaintext highlighter-rouge">showModal('Comment submitted', 'Thanks! Your comment is pending...</code></p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c3c410d0-1832-11eb-9d03-b55c3e3c0440', 'respond', 'now-with-comments', 'c3c410d0-1832-11eb-9d03-b55c3e3c0440')">↪&#xFE0E; Reply to Andrzej Kubaszek</a>
+    </div>
+</article>
+  
+
+<article id="comment-e0608740-3e8f-11eb-8924-4740ce81cfc8" class="js-comment comment admin child" uid="e0608740-3e8f-11eb-8924-4740ce81cfc8">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-e0608740-3e8f-11eb-8924-4740ce81cfc8" title="Permalink to this comment">December 15th, 2020 04:42</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks Andrzej, I had miss that one and added a step to replace the link below the copy step.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-21e85a30-0e20-11eb-b685-b325fbe1a424" class="js-comment comment" uid="21e85a30-0e20-11eb-b685-b325fbe1a424">
+
+  <div class="comment__author">
+    ak
+    <span class="comment__date">•
+        <a href="#comment-21e85a30-0e20-11eb-b685-b325fbe1a424" title="Permalink to this comment">October 14th, 2020 13:21</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-21e85a30-0e20-11eb-b685-b325fbe1a424', 'respond', 'now-with-comments', '21e85a30-0e20-11eb-b685-b325fbe1a424')">↪&#xFE0E; Reply to ak</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-f2d19c70-eaf2-11ea-a0a5-0155e2492e3a" class="js-comment comment" uid="f2d19c70-eaf2-11ea-a0a5-0155e2492e3a">
+
+  <div class="comment__author">
+    ditsing
+    <span class="comment__date">•
+        <a href="#comment-f2d19c70-eaf2-11ea-a0a5-0155e2492e3a" title="Permalink to this comment">August 30th, 2020 18:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks Travis, this post is very informative! I spent about 10 hours on making everything work and this post helped most. I did not find a single place, other than your post, that explained I need an RSA key to self host staticman, not even in the official document. :-(</p>
+
+<p>Except that</p>
+<ol>
+  <li>staticman has moved to Github Apps on v3. The process is a little bit different.</li>
+  <li>Now the private keys can (and must) contain newlines. It seems octokit/app updated their code.</li>
+</ol>
+
+<p>And reCaptca is annoying since I run uMatrix.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f2d19c70-eaf2-11ea-a0a5-0155e2492e3a', 'respond', 'now-with-comments', 'f2d19c70-eaf2-11ea-a0a5-0155e2492e3a')">↪&#xFE0E; Reply to ditsing</a>
+    </div>
+</article>
+  
+
+<article id="comment-bd756ed0-ff83-11ea-8ad4-13a6ca14e392" class="js-comment comment child" uid="bd756ed0-ff83-11ea-8ad4-13a6ca14e392">
+
+  <div class="comment__author">
+    Justin
+    <span class="comment__date">•
+        <a href="#comment-bd756ed0-ff83-11ea-8ad4-13a6ca14e392" title="Permalink to this comment">September 25th, 2020 23:06</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>is this working</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-dea62c50-e617-11ea-ad3a-3ba5ee7fa193" class="js-comment comment" uid="dea62c50-e617-11ea-ad3a-3ba5ee7fa193">
+
+  <div class="comment__author">
+    Adrien
+    <span class="comment__date">•
+        <a href="#comment-dea62c50-e617-11ea-ad3a-3ba5ee7fa193" title="Permalink to this comment">August 24th, 2020 14:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>just to see how it looks :)</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-dea62c50-e617-11ea-ad3a-3ba5ee7fa193', 'respond', 'now-with-comments', 'dea62c50-e617-11ea-ad3a-3ba5ee7fa193')">↪&#xFE0E; Reply to Adrien</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-00e3b040-dfc3-11ea-a0cb-a1d2d62499bf" class="js-comment comment" uid="00e3b040-dfc3-11ea-a0cb-a1d2d62499bf">
+
+  <div class="comment__author">
+    techboyg5
+    <span class="comment__date">•
+        <a href="#comment-00e3b040-dfc3-11ea-a0cb-a1d2d62499bf" title="Permalink to this comment">August 16th, 2020 13:18</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Is this system XSS-protected?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-00e3b040-dfc3-11ea-a0cb-a1d2d62499bf', 'respond', 'now-with-comments', '00e3b040-dfc3-11ea-a0cb-a1d2d62499bf')">↪&#xFE0E; Reply to techboyg5</a>
+    </div>
+</article>
+  
+
+<article id="comment-fc80dbc0-1930-11eb-9d6e-41adb5137ce0" class="js-comment comment child" uid="fc80dbc0-1930-11eb-9d6e-41adb5137ce0">
+
+  <div class="comment__author">
+    ar363
+    <span class="comment__date">•
+        <a href="#comment-fc80dbc0-1930-11eb-9d6e-41adb5137ce0" title="Permalink to this comment">October 28th, 2020 15:19</a></span>
+  </div>
+
+  <div class="comment__body">
+    
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-76050690-d739-11ea-a695-fda9a887b364" class="js-comment comment" uid="76050690-d739-11ea-a695-fda9a887b364">
+
+  <div class="comment__author">
+    Vipin Saini
+    <span class="comment__date">•
+        <a href="#comment-76050690-d739-11ea-a695-fda9a887b364" title="Permalink to this comment">August  5th, 2020 16:33</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>nice blog</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-76050690-d739-11ea-a695-fda9a887b364', 'respond', 'now-with-comments', '76050690-d739-11ea-a695-fda9a887b364')">↪&#xFE0E; Reply to Vipin Saini</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-63cb5030-d412-11ea-805f-61fd967a4fdb" class="js-comment comment" uid="63cb5030-d412-11ea-805f-61fd967a4fdb">
+
+  <div class="comment__author">
+    Ozymandias
+    <span class="comment__date">•
+        <a href="#comment-63cb5030-d412-11ea-805f-61fd967a4fdb" title="Permalink to this comment">August  1th, 2020 16:16</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Just testing.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-63cb5030-d412-11ea-805f-61fd967a4fdb', 'respond', 'now-with-comments', '63cb5030-d412-11ea-805f-61fd967a4fdb')">↪&#xFE0E; Reply to Ozymandias</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-0fa59080-d3ed-11ea-b44d-d99889a8abdc" class="js-comment comment" uid="0fa59080-d3ed-11ea-b44d-d99889a8abdc">
+
+  <div class="comment__author">
+    Abhimanyu
+    <span class="comment__date">•
+        <a href="#comment-0fa59080-d3ed-11ea-b44d-d99889a8abdc" title="Permalink to this comment">August  1th, 2020 11:49</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>This is a test comment . System looks nice!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-0fa59080-d3ed-11ea-b44d-d99889a8abdc', 'respond', 'now-with-comments', '0fa59080-d3ed-11ea-b44d-d99889a8abdc')">↪&#xFE0E; Reply to Abhimanyu</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-db711290-d34b-11ea-bc72-9f3711045b46" class="js-comment comment" uid="db711290-d34b-11ea-bc72-9f3711045b46">
+
+  <div class="comment__author">
+    Sam Westrick
+    <span class="comment__date">•
+        <a href="#comment-db711290-d34b-11ea-bc72-9f3711045b46" title="Permalink to this comment">July 31th, 2020 16:35</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks Travis! Beautifully straightforward and thorough tutorial. I’ve been throwing together a blog as a side project (https://shwestrick.github.io/), and your instructions here were perfect; everything seemed to just work.</p>
+
+<p>Also, your other posts look really interesting! I’ll enjoy reading through them this weekend.</p>
+
+<p>Now I have some styling work to do—it seems like the .scss files might not be getting loaded correctly because my “Add Comment” form looks like shite. Perhaps the version of minima theme I’m using is different. Oh well, that will be a little puzzle for another day.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-db711290-d34b-11ea-bc72-9f3711045b46', 'respond', 'now-with-comments', 'db711290-d34b-11ea-bc72-9f3711045b46')">↪&#xFE0E; Reply to Sam Westrick</a>
+    </div>
+</article>
+  
+
+<article id="comment-f63af420-d412-11ea-805f-61fd967a4fdb" class="js-comment comment admin child" uid="f63af420-d412-11ea-805f-61fd967a4fdb">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-f63af420-d412-11ea-805f-61fd967a4fdb" title="Permalink to this comment">August  1th, 2020 16:20</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Sam,</p>
+
+<p>Thanks for the kind comment! Your blog looks up my alley (admittedly based on the sample size of 1 entry), and I’m definitely adding it to my list of blogs to check for new articles.</p>
+
+<p>About the shite appearance, I’m not sure. It looks OK now, maybe you fixed it? You need to ensure the styles are actually included, e.g., by including main.js  (or whatever the name of the file with your comment styles is: you can organize it in a few different ways) somehow in your html.</p>
+
+<p>Now as design, html and CSS are not my strong suit, I’d personally argue even my comments look like more or less shite even when the styles are added correctly. It would be nice if each comment was visually distinguished a bit, maybe with a subtle background color, but I’ve never really modified it since I set it up (minus fixing a few bugs).</p>
+
+<p>Actually I think I’m going to make a change right now so that the “comments” field has the full width, by default as it’s annoying to expand it every time I want to write a longer comment.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-217a44f0-d41e-11ea-805f-61fd967a4fdb" class="js-comment comment child" uid="217a44f0-d41e-11ea-805f-61fd967a4fdb">
+
+  <div class="comment__author">
+    Sam Westrick
+    <span class="comment__date">•
+        <a href="#comment-217a44f0-d41e-11ea-805f-61fd967a4fdb" title="Permalink to this comment">August  1th, 2020 17:40</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes I figured it out! It was a really silly issue: my <code class="language-plaintext highlighter-rouge">assets/main.scss</code> was missing the Jekyll “top matter” thing:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+# this is mandatory :(
+---
+</code></pre></div></div>
+
+<p>So, I think it was getting ignored by Jekyll entirely. I’m not 100% sure yet how Jekyll works, but I’m slowly getting the hang of it.</p>
+
+<p>I was also thinking it might be nice to modify the comments style a little. I’ll enjoy seeing what you come up with. And I’ll let you know if I make any changes myself!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-2654e660-d428-11ea-bcfd-5926e8a7f29c" class="js-comment comment admin child" uid="2654e660-d428-11ea-bcfd-5926e8a7f29c">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-2654e660-d428-11ea-bcfd-5926e8a7f29c" title="Permalink to this comment">August  1th, 2020 18:52</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Ah right.</p>
+
+<p>So when your site gets generated, I think Jekyll has three high level behaviors for files appearing in the source repository:</p>
+
+<ul>
+  <li>Files that are copied “as is” to the output (the “output” is your static site, ready to server, by default the <code class="language-plaintext highlighter-rouge">_site</code> sub-directory), like stuff in <code class="language-plaintext highlighter-rouge">assets</code> say png files.</li>
+  <li>Files that are not copied at all: this is anything with an underscore prefix, like <code class="language-plaintext highlighter-rouge">_sass</code></li>
+  <li>Files that are “processed” by Jekyll: this end up as part of your site, but after processing my Jekyll. E.g., you wrote your post as a <code class="language-plaintext highlighter-rouge">foo.md</code> file and Jekyll processes it and creates a <code class="language-plaintext highlighter-rouge">foo.html</code> with the markdown transformed to html, the post template applied, etc. Processing is triggered when the file has front matter (the <code class="language-plaintext highlighter-rouge">--------</code> stuff).</li>
+</ul>
+
+<p>Processing includes transforming scss to css and copying it to <code class="language-plaintext highlighter-rouge">_site/assets</code> So stuff in the <code class="language-plaintext highlighter-rouge">_sass</code> directory like <code class="language-plaintext highlighter-rouge">main.scss</code> won’t  get into your site at all without front-matter.</p>
+
+<p>That’s how I understand it, at least!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-043f8660-cf65-11ea-8d70-d7ef5efd9bf5" class="js-comment comment" uid="043f8660-cf65-11ea-8d70-d7ef5efd9bf5">
+
+  <div class="comment__author">
+    Abhishek
+    <span class="comment__date">•
+        <a href="#comment-043f8660-cf65-11ea-8d70-d7ef5efd9bf5" title="Permalink to this comment">July 26th, 2020 17:25</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for the tutorial. I will try to embed it on my own website!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-043f8660-cf65-11ea-8d70-d7ef5efd9bf5', 'respond', 'now-with-comments', '043f8660-cf65-11ea-8d70-d7ef5efd9bf5')">↪&#xFE0E; Reply to Abhishek</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-731184d0-cf51-11ea-adfe-e944f0d58139" class="js-comment comment" uid="731184d0-cf51-11ea-adfe-e944f0d58139">
+
+  <div class="comment__author">
+    jeansn
+    <span class="comment__date">•
+        <a href="#comment-731184d0-cf51-11ea-adfe-e944f0d58139" title="Permalink to this comment">July 26th, 2020 15:05</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi, following your guide I set up the heroku instance successfully. But now I am clueless about inegrating this to the actual site. Should I use the _includes folder from your test-blog and copy everything over?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-731184d0-cf51-11ea-adfe-e944f0d58139', 'respond', 'now-with-comments', '731184d0-cf51-11ea-adfe-e944f0d58139')">↪&#xFE0E; Reply to jeansn</a>
+    </div>
+</article>
+  
+
+<article id="comment-280f0b50-cfbb-11ea-89f3-dfba9d852500" class="js-comment comment admin child" uid="280f0b50-cfbb-11ea-89f3-dfba9d852500">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-280f0b50-cfbb-11ea-89f3-dfba9d852500" title="Permalink to this comment">July 27th, 2020 03:42</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Right, so this is kind of the least standard part of the integration, because unlike the API bridge, the data format, the integration with GitHub and so on, how you want to do this depends a lot on how you generate your blog, and how you want the comments section to look, etc.</p>
+
+<p>Still, I tried to cover the case of integrating it with a typical Jekyll blog <a href="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html#integrate-comments-into-site">here</a>. This is the integration I used: you have to copy the supporting files to your repository, and the modify some part of your post template or foot or whatever to include the comments.</p>
+
+<p>Is there any particular part you are stuck on? Note that I’m neither an HTML, CSS or JavaScript expert (which probably shows in the relatively vanilla appearance of the integration).</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-8c94c890-cf47-11ea-9618-9ff78c8ee372" class="js-comment comment" uid="8c94c890-cf47-11ea-9618-9ff78c8ee372">
+
+  <div class="comment__author">
+    techboyg5
+    <span class="comment__date">•
+        <a href="#comment-8c94c890-cf47-11ea-9618-9ff78c8ee372" title="Permalink to this comment">July 26th, 2020 13:54</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8c94c890-cf47-11ea-9618-9ff78c8ee372', 'respond', 'now-with-comments', '8c94c890-cf47-11ea-9618-9ff78c8ee372')">↪&#xFE0E; Reply to techboyg5</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-8151d610-cf0d-11ea-9230-3f004ad64d0c" class="js-comment comment" uid="8151d610-cf0d-11ea-9230-3f004ad64d0c">
+
+  <div class="comment__author">
+    vidhun
+    <span class="comment__date">•
+        <a href="#comment-8151d610-cf0d-11ea-9230-3f004ad64d0c" title="Permalink to this comment">July 26th, 2020 06:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>hi, i tried every step of this tutorial but the heroku instance returns me a application error with the logs showing error code H10.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8151d610-cf0d-11ea-9230-3f004ad64d0c', 'respond', 'now-with-comments', '8151d610-cf0d-11ea-9230-3f004ad64d0c')">↪&#xFE0E; Reply to vidhun</a>
+    </div>
+</article>
+  
+
+<article id="comment-46893d00-cfb9-11ea-89f3-dfba9d852500" class="js-comment comment admin child" uid="46893d00-cfb9-11ea-89f3-dfba9d852500">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-46893d00-cfb9-11ea-89f3-dfba9d852500" title="Permalink to this comment">July 27th, 2020 03:28</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>No idea about the Heroku error H10, sorry. Google turned up a few leads though…</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-76238460-0bd9-11eb-8ab5-b9cbe233d68d" class="js-comment comment child" uid="76238460-0bd9-11eb-8ab5-b9cbe233d68d">
+
+  <div class="comment__author">
+    Synvani
+    <span class="comment__date">•
+        <a href="#comment-76238460-0bd9-11eb-8ab5-b9cbe233d68d" title="Permalink to this comment">October 11th, 2020 15:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I also suffered from this - what worked for me was copying the RSA private key manually(!) from the file on my computer to the config vars in the Heroku settings dashboard (make sure you copy everything inline, so there are no spaces/enters).</p>
+
+<p>For example: —–BEGIN RSA PRIVATE KEY—–ABCDEFGHIJK………XYZ—–END RSA PRIVATE KEY—–</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-c8cf2960-cf04-11ea-8662-4b80d8ae3ef5" class="js-comment comment" uid="c8cf2960-cf04-11ea-8662-4b80d8ae3ef5">
+
+  <div class="comment__author">
+    Rakshit Soral
+    <span class="comment__date">•
+        <a href="#comment-c8cf2960-cf04-11ea-8662-4b80d8ae3ef5" title="Permalink to this comment">July 26th, 2020 05:56</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Great Article!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c8cf2960-cf04-11ea-8662-4b80d8ae3ef5', 'respond', 'now-with-comments', 'c8cf2960-cf04-11ea-8662-4b80d8ae3ef5')">↪&#xFE0E; Reply to Rakshit Soral</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-a88d8160-ce46-11ea-9e44-77ee3abe9081" class="js-comment comment" uid="a88d8160-ce46-11ea-9e44-77ee3abe9081">
+
+  <div class="comment__author">
+    vidhun
+    <span class="comment__date">•
+        <a href="#comment-a88d8160-ce46-11ea-9e44-77ee3abe9081" title="Permalink to this comment">July 25th, 2020 07:15</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Is staticman stil working?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a88d8160-ce46-11ea-9e44-77ee3abe9081', 'respond', 'now-with-comments', 'a88d8160-ce46-11ea-9e44-77ee3abe9081')">↪&#xFE0E; Reply to vidhun</a>
+    </div>
+</article>
+  
+
+<article id="comment-9c8013b0-cea0-11ea-83f0-cb81f4d3e54b" class="js-comment comment admin child" uid="9c8013b0-cea0-11ea-83f0-cb81f4d3e54b">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-9c8013b0-cea0-11ea-83f0-cb81f4d3e54b" title="Permalink to this comment">July 25th, 2020 17:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes, it is. In principle, this approach does not depend on “staticman” to keep working, because you are hosting your own service. There is no 3rd party shared service involved. So you would really ask “is my staticman instance hosted at XYZ” still running, or something like that.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-10387ce0-c814-11ea-b209-1d176e40e470" class="js-comment comment" uid="10387ce0-c814-11ea-b209-1d176e40e470">
+
+  <div class="comment__author">
+    Test
+    <span class="comment__date">•
+        <a href="#comment-10387ce0-c814-11ea-b209-1d176e40e470" title="Permalink to this comment">July 17th, 2020 09:58</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Testing this.</p>
+
+<h1 id="does-it-work">Does it work?</h1>
+<ul>
+  <li>We will see</li>
+</ul>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-10387ce0-c814-11ea-b209-1d176e40e470', 'respond', 'now-with-comments', '10387ce0-c814-11ea-b209-1d176e40e470')">↪&#xFE0E; Reply to Test</a>
+    </div>
+</article>
+  
+
+<article id="comment-5adaa830-cea0-11ea-83f0-cb81f4d3e54b" class="js-comment comment admin child" uid="5adaa830-cea0-11ea-83f0-cb81f4d3e54b">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-5adaa830-cea0-11ea-83f0-cb81f4d3e54b" title="Permalink to this comment">July 25th, 2020 17:57</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes, it works!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-64d16e80-bf2a-11ea-809b-61584248414a" class="js-comment comment" uid="64d16e80-bf2a-11ea-809b-61584248414a">
+
+  <div class="comment__author">
+    ee
+    <span class="comment__date">•
+        <a href="#comment-64d16e80-bf2a-11ea-809b-61584248414a" title="Permalink to this comment">July  6th, 2020 01:45</a></span>
+  </div>
+
+  <div class="comment__body">
+    <h1 id="testing-comments">testing comments</h1>
+<h3 id="eweiowe">eweiowe</h3>
+<ul>
+  <li>ewi</li>
+  <li>ewioe
+    <blockquote>
+      <p>block quote
+eiwoe</p>
+    </blockquote>
+  </li>
+</ul>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-64d16e80-bf2a-11ea-809b-61584248414a', 'respond', 'now-with-comments', '64d16e80-bf2a-11ea-809b-61584248414a')">↪&#xFE0E; Reply to ee</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-b9aea280-b537-11ea-9b83-775ac5b8ed7d" class="js-comment comment" uid="b9aea280-b537-11ea-9b83-775ac5b8ed7d">
+
+  <div class="comment__author">
+    Joe
+    <span class="comment__date">•
+        <a href="#comment-b9aea280-b537-11ea-9b83-775ac5b8ed7d" title="Permalink to this comment">June 23th, 2020 09:55</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Testing comments 123</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b9aea280-b537-11ea-9b83-775ac5b8ed7d', 'respond', 'now-with-comments', 'b9aea280-b537-11ea-9b83-775ac5b8ed7d')">↪&#xFE0E; Reply to Joe</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-c109af60-b3a3-11ea-a7fd-c9d805058555" class="js-comment comment" uid="c109af60-b3a3-11ea-a7fd-c9d805058555">
+
+  <div class="comment__author">
+    Saur
+    <span class="comment__date">•
+        <a href="#comment-c109af60-b3a3-11ea-a7fd-c9d805058555" title="Permalink to this comment">June 21th, 2020 09:44</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>this is awesome. I am gonna give it a try!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c109af60-b3a3-11ea-a7fd-c9d805058555', 'respond', 'now-with-comments', 'c109af60-b3a3-11ea-a7fd-c9d805058555')">↪&#xFE0E; Reply to Saur</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-9f1919b0-b2f7-11ea-b240-211b2c5f92e2" class="js-comment comment" uid="9f1919b0-b2f7-11ea-b240-211b2c5f92e2">
+
+  <div class="comment__author">
+    sss
+    <span class="comment__date">•
+        <a href="#comment-9f1919b0-b2f7-11ea-b240-211b2c5f92e2" title="Permalink to this comment">June 20th, 2020 13:11</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>greatttt</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-9f1919b0-b2f7-11ea-b240-211b2c5f92e2', 'respond', 'now-with-comments', '9f1919b0-b2f7-11ea-b240-211b2c5f92e2')">↪&#xFE0E; Reply to sss</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-df230ba0-afec-11ea-8854-13cbba306a75" class="js-comment comment" uid="df230ba0-afec-11ea-8854-13cbba306a75">
+
+  <div class="comment__author">
+    Abhi
+    <span class="comment__date">•
+        <a href="#comment-df230ba0-afec-11ea-8854-13cbba306a75" title="Permalink to this comment">June 16th, 2020 16:17</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-df230ba0-afec-11ea-8854-13cbba306a75', 'respond', 'now-with-comments', 'df230ba0-afec-11ea-8854-13cbba306a75')">↪&#xFE0E; Reply to Abhi</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-a552c870-afec-11ea-8854-13cbba306a75" class="js-comment comment" uid="a552c870-afec-11ea-8854-13cbba306a75">
+
+  <div class="comment__author">
+    anonymous
+    <span class="comment__date">•
+        <a href="#comment-a552c870-afec-11ea-8854-13cbba306a75" title="Permalink to this comment">June 16th, 2020 16:15</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>testing</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a552c870-afec-11ea-8854-13cbba306a75', 'respond', 'now-with-comments', 'a552c870-afec-11ea-8854-13cbba306a75')">↪&#xFE0E; Reply to anonymous</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-40db4be0-ac56-11ea-83eb-2383e42b60ab" class="js-comment comment" uid="40db4be0-ac56-11ea-83eb-2383e42b60ab">
+
+  <div class="comment__author">
+    RyanArrive
+    <span class="comment__date">•
+        <a href="#comment-40db4be0-ac56-11ea-83eb-2383e42b60ab" title="Permalink to this comment">June 12th, 2020 02:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hey does this still work? (test comment) Btw, nice job, this is really cool and helpful. Cheers!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-40db4be0-ac56-11ea-83eb-2383e42b60ab', 'respond', 'now-with-comments', '40db4be0-ac56-11ea-83eb-2383e42b60ab')">↪&#xFE0E; Reply to RyanArrive</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-4a89ad30-abf7-11ea-8721-4de4aba73748" class="js-comment comment" uid="4a89ad30-abf7-11ea-8721-4de4aba73748">
+
+  <div class="comment__author">
+    Junghyun Kim
+    <span class="comment__date">•
+        <a href="#comment-4a89ad30-abf7-11ea-8721-4de4aba73748" title="Permalink to this comment">June 11th, 2020 15:21</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thank you for your post!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4a89ad30-abf7-11ea-8721-4de4aba73748', 'respond', 'now-with-comments', '4a89ad30-abf7-11ea-8721-4de4aba73748')">↪&#xFE0E; Reply to Junghyun Kim</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-3f818340-aa1c-11ea-8cf2-75929df5e558" class="js-comment comment" uid="3f818340-aa1c-11ea-8cf2-75929df5e558">
+
+  <div class="comment__author">
+    Jacky
+    <span class="comment__date">•
+        <a href="#comment-3f818340-aa1c-11ea-8cf2-75929df5e558" title="Permalink to this comment">June  9th, 2020 06:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>just checking comments</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3f818340-aa1c-11ea-8cf2-75929df5e558', 'respond', 'now-with-comments', '3f818340-aa1c-11ea-8cf2-75929df5e558')">↪&#xFE0E; Reply to Jacky</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-d7177820-a406-11ea-ae75-35522e92a643" class="js-comment comment" uid="d7177820-a406-11ea-ae75-35522e92a643">
+
+  <div class="comment__author">
+    Cian
+    <span class="comment__date">•
+        <a href="#comment-d7177820-a406-11ea-ae75-35522e92a643" title="Permalink to this comment">June  1th, 2020 12:53</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Very useful article. Thanks for the writeup</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d7177820-a406-11ea-ae75-35522e92a643', 'respond', 'now-with-comments', 'd7177820-a406-11ea-ae75-35522e92a643')">↪&#xFE0E; Reply to Cian</a>
+    </div>
+</article>
+  
+
+<article id="comment-50ea88c0-a517-11ea-a66f-3f709943d759" class="js-comment comment child" uid="50ea88c0-a517-11ea-a66f-3f709943d759">
+
+  <div class="comment__author">
+    Andrew
+    <span class="comment__date">•
+        <a href="#comment-50ea88c0-a517-11ea-a66f-3f709943d759" title="Permalink to this comment">June  2th, 2020 21:23</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>This is a test comment. Thanks for the article :)</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-605e5590-a1e1-11ea-8dff-b7efb3b7c695" class="js-comment comment" uid="605e5590-a1e1-11ea-8dff-b7efb3b7c695">
+
+  <div class="comment__author">
+    Trevor Clack
+    <span class="comment__date">•
+        <a href="#comment-605e5590-a1e1-11ea-8dff-b7efb3b7c695" title="Permalink to this comment">May 29th, 2020 19:19</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hey dude, thanks a bunch for this tutorial. I’ve been wanting to do this for a while and very much wanted to avoid the problems of unsustainability should something happen to the “main staticman” implementation</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-605e5590-a1e1-11ea-8dff-b7efb3b7c695', 'respond', 'now-with-comments', '605e5590-a1e1-11ea-8dff-b7efb3b7c695')">↪&#xFE0E; Reply to Trevor Clack</a>
+    </div>
+</article>
+  
+
+<article id="comment-00351140-e8f9-11ea-870c-b3544f9df060" class="js-comment comment child" uid="00351140-e8f9-11ea-870c-b3544f9df060">
+
+  <div class="comment__author">
+    Trevor Clack
+    <span class="comment__date">•
+        <a href="#comment-00351140-e8f9-11ea-870c-b3544f9df060" title="Permalink to this comment">August 28th, 2020 06:37</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>test for email responsiveness</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-816d0dc0-9e0e-11ea-944e-b706636399d8" class="js-comment comment" uid="816d0dc0-9e0e-11ea-944e-b706636399d8">
+
+  <div class="comment__author">
+    David
+    <span class="comment__date">•
+        <a href="#comment-816d0dc0-9e0e-11ea-944e-b706636399d8" title="Permalink to this comment">May 24th, 2020 22:32</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Great post and tutorial on getting Staticman up and running via Heroku. Took some time, but I was able to get comments up and running on one of my Jekyll sites hosted on Netlify.</p>
+
+<p>The only place I had a problem was getting Heroku to accept my RSA Private Key via the command line. I’m a Heroku noob and, because the suntax in your post was different for the variable on the RSA key than for the <code class="language-plaintext highlighter-rouge">${braidge_app_name}</code> and <code class="language-plaintext highlighter-rouge">${github_token}</code>, it took me quite awhile to figure out I needed to run <code class="language-plaintext highlighter-rouge">cat ~/.ssh/staticman_key | tr -d '\n'</code> in my command line and use the output in the Heroku command.</p>
+
+<p>Everything else was pretty much a breeze. Thanks again for a super post!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-816d0dc0-9e0e-11ea-944e-b706636399d8', 'respond', 'now-with-comments', '816d0dc0-9e0e-11ea-944e-b706636399d8')">↪&#xFE0E; Reply to David</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-9592d530-9dde-11ea-8647-53f5ff109437" class="js-comment comment" uid="9592d530-9dde-11ea-8647-53f5ff109437">
+
+  <div class="comment__author">
+    Hassler
+    <span class="comment__date">•
+        <a href="#comment-9592d530-9dde-11ea-8647-53f5ff109437" title="Permalink to this comment">May 24th, 2020 16:49</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Testttt</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-9592d530-9dde-11ea-8647-53f5ff109437', 'respond', 'now-with-comments', '9592d530-9dde-11ea-8647-53f5ff109437')">↪&#xFE0E; Reply to Hassler</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-74431eb0-9dc7-11ea-a0e1-37dd930dad93" class="js-comment comment" uid="74431eb0-9dc7-11ea-a0e1-37dd930dad93">
+
+  <div class="comment__author">
+    Dima
+    <span class="comment__date">•
+        <a href="#comment-74431eb0-9dc7-11ea-a0e1-37dd930dad93" title="Permalink to this comment">May 24th, 2020 14:04</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-74431eb0-9dc7-11ea-a0e1-37dd930dad93', 'respond', 'now-with-comments', '74431eb0-9dc7-11ea-a0e1-37dd930dad93')">↪&#xFE0E; Reply to Dima</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-66e7e0c0-9c5f-11ea-a11c-4b5c201f4fbb" class="js-comment comment" uid="66e7e0c0-9c5f-11ea-a11c-4b5c201f4fbb">
+
+  <div class="comment__author">
+    test
+    <span class="comment__date">•
+        <a href="#comment-66e7e0c0-9c5f-11ea-a11c-4b5c201f4fbb" title="Permalink to this comment">May 22th, 2020 19:06</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-66e7e0c0-9c5f-11ea-a11c-4b5c201f4fbb', 'respond', 'now-with-comments', '66e7e0c0-9c5f-11ea-a11c-4b5c201f4fbb')">↪&#xFE0E; Reply to test</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-673bab10-9c28-11ea-91cb-2bc366514c9a" class="js-comment comment" uid="673bab10-9c28-11ea-91cb-2bc366514c9a">
+
+  <div class="comment__author">
+    Qi
+    <span class="comment__date">•
+        <a href="#comment-673bab10-9c28-11ea-91cb-2bc366514c9a" title="Permalink to this comment">May 22th, 2020 12:33</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks Travis, I really <strong>LOVE</strong> your tutorial. I am able to set up comment section on my own site following your instructions.</p>
+
+<p>But I also face the same issue that when clicking “submit” the message, about “pending” shows up as it should, but the webpage goes “greyed out” and the message about the comment being pending is not clickable. I just want to check what is the behavior on your site.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-673bab10-9c28-11ea-91cb-2bc366514c9a', 'respond', 'now-with-comments', '673bab10-9c28-11ea-91cb-2bc366514c9a')">↪&#xFE0E; Reply to Qi</a>
+    </div>
+</article>
+  
+
+<article id="comment-9f32bba0-9c8f-11ea-bcc4-0d6f4fedc904" class="js-comment comment admin child" uid="9f32bba0-9c8f-11ea-bcc4-0d6f4fedc904">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-9f32bba0-9c8f-11ea-bcc4-0d6f4fedc904" title="Permalink to this comment">May 23th, 2020 00:52</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Must be related to the css classes that the javascript applies. Make sure you have all the classes referred to in <a href="https://github.com/travisdowns/travisdowns.github.io/blob/master/assets/main.js#L42">this section of code</a>.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-f618d9b0-9dfa-11ea-a7b4-f3f2f05e3cab" class="js-comment comment child" uid="f618d9b0-9dfa-11ea-a7b4-f3f2f05e3cab">
+
+  <div class="comment__author">
+    Qi
+    <span class="comment__date">•
+        <a href="#comment-f618d9b0-9dfa-11ea-a7b4-f3f2f05e3cab" title="Permalink to this comment">May 24th, 2020 20:12</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Travis, I really appreciate your help. The problem is related the Bootstrap modal. When the modal container has a fixed or relative position or is within an element with a fixed or relative position, the modal window appears underneath the grey fade and is noneditable. I fixed this problem by replacing the showModal function call with Sweetalert2. Thanks again for your awesome post!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-ca319090-99f3-11ea-9972-5f2aa4dbc829" class="js-comment comment" uid="ca319090-99f3-11ea-9972-5f2aa4dbc829">
+
+  <div class="comment__author">
+    Harish
+    <span class="comment__date">•
+        <a href="#comment-ca319090-99f3-11ea-9972-5f2aa4dbc829" title="Permalink to this comment">May 19th, 2020 17:11</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I tried to added Staticman on my blog and its not working “https://twnbot.herokuapp.com/v3/entry/github/thewhatnote/thewhatnote.github.io”</p>
+
+<p>If possible please check my repository and advise.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ca319090-99f3-11ea-9972-5f2aa4dbc829', 'respond', 'now-with-comments', 'ca319090-99f3-11ea-9972-5f2aa4dbc829')">↪&#xFE0E; Reply to Harish</a>
+    </div>
+</article>
+  
+
+<article id="comment-3b025380-9a54-11ea-a63e-e572a13dec6f" class="js-comment comment child" uid="3b025380-9a54-11ea-a63e-e572a13dec6f">
+
+  <div class="comment__author">
+    Harish
+    <span class="comment__date">•
+        <a href="#comment-3b025380-9a54-11ea-a63e-e572a13dec6f" title="Permalink to this comment">May 20th, 2020 04:41</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I have changed it to v2, and it worked. but comments are not displaying under posts.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-8b2e53e0-9ac7-11ea-ad6f-bbbf8e601ec3" class="js-comment comment admin child" uid="8b2e53e0-9ac7-11ea-ad6f-bbbf8e601ec3">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-8b2e53e0-9ac7-11ea-ad6f-bbbf8e601ec3" title="Permalink to this comment">May 20th, 2020 18:27</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Sorry, I can’t help you debug it.</p>
+
+<p>In general, staticman is a “batteries not included” solution that will probably, at some point require some basic debugging on your part. Familiarity with html and javascript (including node.js) is a plus. If you run into a specific, reproducible issue you could consider <a href="https://github.com/eduardoboucas/staticman/issues/">filing an issue</a> on the staticman repo, although as a free project you can expect that the current maintainers may not always have the time or energy to look into specific issues.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-c7b51680-9790-11ea-9742-55790a08d395" class="js-comment comment" uid="c7b51680-9790-11ea-9742-55790a08d395">
+
+  <div class="comment__author">
+    test
+    <span class="comment__date">•
+        <a href="#comment-c7b51680-9790-11ea-9742-55790a08d395" title="Permalink to this comment">May 16th, 2020 16:17</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c7b51680-9790-11ea-9742-55790a08d395', 'respond', 'now-with-comments', 'c7b51680-9790-11ea-9742-55790a08d395')">↪&#xFE0E; Reply to test</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-71a23160-92cc-11ea-a621-c7ebe04983ba" class="js-comment comment" uid="71a23160-92cc-11ea-a621-c7ebe04983ba">
+
+  <div class="comment__author">
+    frroool
+    <span class="comment__date">•
+        <a href="#comment-71a23160-92cc-11ea-a621-c7ebe04983ba" title="Permalink to this comment">May 10th, 2020 14:42</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi! 
+Big thanks for the guide!</p>
+
+<p>I have implemented it to a website and it seems to work. I have a couple of questions though.</p>
+
+<p>When clicking “submit” the message about “pending” shows up as it should, but the webpage goes “greyed out” and the message about the comment being pending is not clickable.</p>
+
+<p>I removed your `` in that message from <code class="language-plaintext highlighter-rouge">main.js</code>, thought that could be the problem but that did not help.</p>
+
+<p>Any ideas?</p>
+
+<p>Also, I have almost none experience with HTML/CSS and my page uses some kind of dynamic font size. Could that be applied to ‘_sass/comment-styles.css` somehow?</p>
+
+<p>My main.scss:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+html { /* apply a natural box layout model to all elements */ box-sizing: border-box; background-color: #f3f3f3; font-size: 16px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+@media (min-width: 48em) { html { font-size: 16px; } }
+@media (min-width: 64em) { html { font-size: 18px; } }
+@media (min-width: 80em) { html { font-size: 20px; } }
+
+.page__content p, .page__content li, .page__content dl {
+  font-size: smaller;
+}
+...
+</code></pre></div></div>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-71a23160-92cc-11ea-a621-c7ebe04983ba', 'respond', 'now-with-comments', '71a23160-92cc-11ea-a621-c7ebe04983ba')">↪&#xFE0E; Reply to frroool</a>
+    </div>
+</article>
+  
+
+<article id="comment-23772910-9ac8-11ea-ad6f-bbbf8e601ec3" class="js-comment comment admin child" uid="23772910-9ac8-11ea-ad6f-bbbf8e601ec3">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-23772910-9ac8-11ea-ad6f-bbbf8e601ec3" title="Permalink to this comment">May 20th, 2020 18:31</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Sorry, I can’t really help you debug this issue much.</p>
+
+<p>It may be a problem with your styles. You can see that it works in my case. You could try to triangulate what’s different between my setup and yours, or reduce the example to the bare minimum and add stuff back in until it stops working.</p>
+
+<p>I wrote this post about staticman because it was harder than I thought and it might help others, but I can’t really help you debug your individual issues.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-76be41f0-91c0-11ea-a87d-1b9ef4949362" class="js-comment comment" uid="76be41f0-91c0-11ea-a87d-1b9ef4949362">
+
+  <div class="comment__author">
+    Faisal
+    <span class="comment__date">•
+        <a href="#comment-76be41f0-91c0-11ea-a87d-1b9ef4949362" title="Permalink to this comment">May  9th, 2020 06:44</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Testing</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-76be41f0-91c0-11ea-a87d-1b9ef4949362', 'respond', 'now-with-comments', '76be41f0-91c0-11ea-a87d-1b9ef4949362')">↪&#xFE0E; Reply to Faisal</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-432a21b0-912a-11ea-bae9-b7bcaf3a6fe7" class="js-comment comment" uid="432a21b0-912a-11ea-bae9-b7bcaf3a6fe7">
+
+  <div class="comment__author">
+    Vel
+    <span class="comment__date">•
+        <a href="#comment-432a21b0-912a-11ea-bae9-b7bcaf3a6fe7" title="Permalink to this comment">May  8th, 2020 12:48</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Awesome job. I faced some issues with comments not showing but fixed it when i removed symbols from post names. All working now!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-432a21b0-912a-11ea-bae9-b7bcaf3a6fe7', 'respond', 'now-with-comments', '432a21b0-912a-11ea-bae9-b7bcaf3a6fe7')">↪&#xFE0E; Reply to Vel</a>
+    </div>
+</article>
+  
+
+<article id="comment-1890cb80-3e8f-11eb-8924-4740ce81cfc8" class="js-comment comment admin child" uid="1890cb80-3e8f-11eb-8924-4740ce81cfc8">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-1890cb80-3e8f-11eb-8924-4740ce81cfc8" title="Permalink to this comment">December 15th, 2020 04:36</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for the note!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-61293eb0-9122-11ea-951c-d9129305c6e7" class="js-comment comment" uid="61293eb0-9122-11ea-951c-d9129305c6e7">
+
+  <div class="comment__author">
+    Vel-San
+    <span class="comment__date">•
+        <a href="#comment-61293eb0-9122-11ea-951c-d9129305c6e7" title="Permalink to this comment">May  8th, 2020 11:52</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks a lot for this well made detailed guide. I do have a couple of questions tho!</p>
+
+<ul>
+  <li>
+    <p>Everything is working properly except that, my comments aren’t showing at all. I tried moderation on and off, i can see the PRs, i merged the PRs, but nothing is showing on my blog. Do you have any idea ?</p>
+  </li>
+  <li>
+    <p>When i submit a comment, the ‘Pending’ message is always shown with or without moderation enabled. Also, when i click on the link it takes me to your own site. Where can i change that?</p>
+  </li>
+</ul>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-61293eb0-9122-11ea-951c-d9129305c6e7', 'respond', 'now-with-comments', '61293eb0-9122-11ea-951c-d9129305c6e7')">↪&#xFE0E; Reply to Vel-San</a>
+    </div>
+</article>
+  
+
+<article id="comment-0c7cbf00-914e-11ea-a6bb-5b36c84be69d" class="js-comment comment child" uid="0c7cbf00-914e-11ea-a6bb-5b36c84be69d">
+
+  <div class="comment__author">
+    Vel-San
+    <span class="comment__date">•
+        <a href="#comment-0c7cbf00-914e-11ea-a6bb-5b36c84be69d" title="Permalink to this comment">May  8th, 2020 17:04</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Fixed! However, i’m facing another issue:</p>
+
+<p>On my site i can now see comments, but when i reply to a comment using the button and filling everything, it gives me a INVALID_FILEDS error. Any idea why would this happen?</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-13290fb0-9046-11ea-bfc0-630eaf4f61ab" class="js-comment comment" uid="13290fb0-9046-11ea-bfc0-630eaf4f61ab">
+
+  <div class="comment__author">
+    devesh anand
+    <span class="comment__date">•
+        <a href="#comment-13290fb0-9046-11ea-bfc0-630eaf4f61ab" title="Permalink to this comment">May  7th, 2020 09:35</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I added the bot account (in the heroku app i created) as collaborator, yet it is still showing Invitation not found</p>
+
+<p>have been stuck at that step since yesterday, tried a lot of things but i just can’t find the issue. Please help.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-13290fb0-9046-11ea-bfc0-630eaf4f61ab', 'respond', 'now-with-comments', '13290fb0-9046-11ea-bfc0-630eaf4f61ab')">↪&#xFE0E; Reply to devesh anand</a>
+    </div>
+</article>
+  
+
+<article id="comment-9b3426e0-9093-11ea-9170-4181cea7519a" class="js-comment comment admin child" uid="9b3426e0-9093-11ea-9170-4181cea7519a">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-9b3426e0-9093-11ea-9170-4181cea7519a" title="Permalink to this comment">May  7th, 2020 18:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Did you accept the bot invite by email? If you did that (it’s probably easiest way), you don’t need to do the invite link in the API: it’s one or the other. As soon as the invite has been accepted by any method, the API will return the “Invitation not found” message.</p>
+
+<p>If you have further issues, try to make it reproducible so you can file an issue on the staticman repo, where you’ll probably get better help.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-8b015ed0-8e42-11ea-83a0-e518383f0a38" class="js-comment comment" uid="8b015ed0-8e42-11ea-83a0-e518383f0a38">
+
+  <div class="comment__author">
+    Jonathan
+    <span class="comment__date">•
+        <a href="#comment-8b015ed0-8e42-11ea-83a0-e518383f0a38" title="Permalink to this comment">May  4th, 2020 20:05</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Want to see what happens after i press submit</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8b015ed0-8e42-11ea-83a0-e518383f0a38', 'respond', 'now-with-comments', '8b015ed0-8e42-11ea-83a0-e518383f0a38')">↪&#xFE0E; Reply to Jonathan</a>
+    </div>
+</article>
+  
+
+<article id="comment-5f053330-9093-11ea-9170-4181cea7519a" class="js-comment comment admin child" uid="5f053330-9093-11ea-9170-4181cea7519a">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-5f053330-9093-11ea-9170-4181cea7519a" title="Permalink to this comment">May  7th, 2020 18:48</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Your comment gets moderated (the link to the PR is in the submission notice) and when I accept it, it shows up like this!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-bec58400-8288-11ea-9c16-35d3f6bde252" class="js-comment comment" uid="bec58400-8288-11ea-9c16-35d3f6bde252">
+
+  <div class="comment__author">
+    Willy McAllister
+    <span class="comment__date">•
+        <a href="#comment-bec58400-8288-11ea-9c16-35d3f6bde252" title="Permalink to this comment">April 19th, 2020 21:57</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I’m unclear on the proper webhook address when I deploy Staticman at Heroku.</p>
+
+<p>For the public instance the webhook was https://api.staticman.net/v1/webhook</p>
+
+<p>For my instance I’m guessing https://spinningnumbers-staticmandev2.herokuapp.com/v1/webhook/, but I’m getting a 404 not found error.</p>
+
+<p>While moving to Heroku I deleted the public staticman collaborator and only have my robot as a collaborator.</p>
+
+<p>2020-04-18T22:56:56.155851+00:00 heroku[router]: at=info method=POST path=”/v1/webhook/” host=spinningnumbers-staticmandev2.herokuapp.com request_id=a8552a56-4182-415d-ba95-5cae432a7f07 fwd=”140.82.115.241” dyno=web.1 connect=0ms service=6ms <strong>status=404</strong> bytes=505 protocol=https</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-bec58400-8288-11ea-9c16-35d3f6bde252', 'respond', 'now-with-comments', 'bec58400-8288-11ea-9c16-35d3f6bde252')">↪&#xFE0E; Reply to Willy McAllister</a>
+    </div>
+</article>
+  
+
+<article id="comment-23abb2b0-82c3-11ea-ba2e-4dbfce738e5c" class="js-comment comment admin child" uid="23abb2b0-82c3-11ea-ba2e-4dbfce738e5c">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-23abb2b0-82c3-11ea-ba2e-4dbfce738e5c" title="Permalink to this comment">April 20th, 2020 04:55</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I never set up a webhook due to laziness and I just click “delete branch” every time I accept a reply (not actually sure which is lazier, obviously the webhook will pay off if I get a lot of replies, but so far that’s not the case).</p>
+
+<p>So I don’t know anything about the webhook. However, maybe your problem is the trailing slash: try with <code class="language-plaintext highlighter-rouge">v1/webhook</code> not <code class="language-plaintext highlighter-rouge">v1/webhook/</code></p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-113bfab0-832a-11ea-be07-dd969cefdbae" class="js-comment comment child" uid="113bfab0-832a-11ea-be07-dd969cefdbae">
+
+  <div class="comment__author">
+    Willy McAllister
+    <span class="comment__date">•
+        <a href="#comment-113bfab0-832a-11ea-be07-dd969cefdbae" title="Permalink to this comment">April 20th, 2020 17:12</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Travis - You guessed right. I changed <code class="language-plaintext highlighter-rouge">v1/webhook/</code> to <code class="language-plaintext highlighter-rouge">v1/webhook</code> and the not-found problem cleared up. I started getting notification emails from MailGun. This mailhook provides two services: It deletes unneeded branches <em>and</em> it launches a notification email to people who have subscribed. This second feature isn’t mentioned in the Staticman documentation for webhooks.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-11a7cf50-833f-11ea-ae71-1fd506a4da38" class="js-comment comment admin child" uid="11a7cf50-833f-11ea-ae71-1fd506a4da38">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-11a7cf50-833f-11ea-ae71-1fd506a4da38" title="Permalink to this comment">April 20th, 2020 19:42</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Glad to hear it worked out!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-52d25c30-913a-11ea-84ba-1963dcb74d6d" class="js-comment comment child" uid="52d25c30-913a-11ea-84ba-1963dcb74d6d">
+
+  <div class="comment__author">
+    Vel-San
+    <span class="comment__date">•
+        <a href="#comment-52d25c30-913a-11ea-84ba-1963dcb74d6d" title="Permalink to this comment">May  8th, 2020 14:43</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hey! Do you know of any alternative for mailgun issue ? It’s not free anymore and the sandbox domain doesn’t work.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-1eea4e50-8037-11ea-b67c-01d4ef1ce708" class="js-comment comment" uid="1eea4e50-8037-11ea-b67c-01d4ef1ce708">
+
+  <div class="comment__author">
+    apisashla
+    <span class="comment__date">•
+        <a href="#comment-1eea4e50-8037-11ea-b67c-01d4ef1ce708" title="Permalink to this comment">April 16th, 2020 23:08</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi! Just wanted to say thanks so much for writing this guide, I would never have been able to get staticman configured and working without it. Have a fantastic day.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1eea4e50-8037-11ea-b67c-01d4ef1ce708', 'respond', 'now-with-comments', '1eea4e50-8037-11ea-b67c-01d4ef1ce708')">↪&#xFE0E; Reply to apisashla</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-6e90b390-785d-11ea-b5c5-d342406766ae" class="js-comment comment" uid="6e90b390-785d-11ea-b5c5-d342406766ae">
+
+  <div class="comment__author">
+    Kaunta
+    <span class="comment__date">•
+        <a href="#comment-6e90b390-785d-11ea-b5c5-d342406766ae" title="Permalink to this comment">April  6th, 2020 23:22</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hey Travis! First off, I’d like to give a big thanks for making this blog and helping everyone setup staticman. I got everything working, but for some reason, the CSS for the comment submission isn’t appearing. I was wondering if there’s something wrong with the guide, or if I just set something up wrong. Thanks! :D</p>
+
+<p>My website repo: https://github.com/KauntaOfficial/kauntaofficial.github.io</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-6e90b390-785d-11ea-b5c5-d342406766ae', 'respond', 'now-with-comments', '6e90b390-785d-11ea-b5c5-d342406766ae')">↪&#xFE0E; Reply to Kaunta</a>
+    </div>
+</article>
+  
+
+<article id="comment-43e03ed0-785e-11ea-b5c5-d342406766ae" class="js-comment comment admin child" uid="43e03ed0-785e-11ea-b5c5-d342406766ae">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-43e03ed0-785e-11ea-b5c5-d342406766ae" title="Permalink to this comment">April  6th, 2020 23:28</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>When you say “the CSS for the comment submission isn’t appearing”, do you mean stuff is not being styled as expected?</p>
+
+<p>The things to do would be to view source/dev tools on your page, and check that the classes are applied to the elements as you expect, the stylesheets are included as you expect and contain your styles, etc. The Firefox style browser or whatever the thing in chrome is called make this relatively easy.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-cc53f8f0-7855-11ea-8bea-95a736f37258" class="js-comment comment" uid="cc53f8f0-7855-11ea-8bea-95a736f37258">
+
+  <div class="comment__author">
+    Ivy Zhang
+    <span class="comment__date">•
+        <a href="#comment-cc53f8f0-7855-11ea-8bea-95a736f37258" title="Permalink to this comment">April  6th, 2020 22:27</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I’m just testing</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-cc53f8f0-7855-11ea-8bea-95a736f37258', 'respond', 'now-with-comments', 'cc53f8f0-7855-11ea-8bea-95a736f37258')">↪&#xFE0E; Reply to Ivy Zhang</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-b7cdc740-753e-11ea-a6c5-592cca6048e5" class="js-comment comment" uid="b7cdc740-753e-11ea-a6c5-592cca6048e5">
+
+  <div class="comment__author">
+    Dug
+    <span class="comment__date">•
+        <a href="#comment-b7cdc740-753e-11ea-a6c5-592cca6048e5" title="Permalink to this comment">April  3th, 2020 00:04</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Travis thanks for the detailed explanation. Have done the work-at-night-until-late-with-a-glass-of-wine thing so not surprised my installation (here: http://donkeyontheedge.com) isn’t working yet;-) Will get stuck in tomorrow afternoon after work should hopefully crack it.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b7cdc740-753e-11ea-a6c5-592cca6048e5', 'respond', 'now-with-comments', 'b7cdc740-753e-11ea-a6c5-592cca6048e5')">↪&#xFE0E; Reply to Dug</a>
+    </div>
+</article>
+  
+
+<article id="comment-2ae00b20-7662-11ea-b926-b135953eecfd" class="js-comment comment child" uid="2ae00b20-7662-11ea-b926-b135953eecfd">
+
+  <div class="comment__author">
+    Dug
+    <span class="comment__date">•
+        <a href="#comment-2ae00b20-7662-11ea-b926-b135953eecfd" title="Permalink to this comment">April  4th, 2020 10:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Travis, Dug replying to Dug here. Just to say I’m going to go through the installation again line by line double-checking against your instructions.
+One thing that would be useful is a debbuging method. Current status is I’m getting the “missing block” config file error, which I think you listed as a Staticman issue? I’ll get stuck in a bit later but all pointers welcome:-)</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-8b49e5d0-7662-11ea-b926-b135953eecfd" class="js-comment comment child" uid="8b49e5d0-7662-11ea-b926-b135953eecfd">
+
+  <div class="comment__author">
+    Dug
+    <span class="comment__date">•
+        <a href="#comment-8b49e5d0-7662-11ea-b926-b135953eecfd" title="Permalink to this comment">April  4th, 2020 10:53</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>…also just noticed that carriage return in a comment message field upsets the key/vale pair layout in the generated pull request (I think)</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-8a2e26b0-7690-11ea-898a-852a73570658" class="js-comment comment admin child" uid="8a2e26b0-7690-11ea-898a-852a73570658">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-8a2e26b0-7690-11ea-898a-852a73570658" title="Permalink to this comment">April  4th, 2020 16:22</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Dug,</p>
+
+<p>So that “missing block” error shows up for a lot of different problems due to bugs in the staticman error handling. You can get more detailed info using a fixed branch rather than staticman/master, but I’ll respond more on <a href="https://github.com/eduardoboucas/staticman/issues/345">issue 345</a> which I think you opened on this.</p>
+
+<p>Yes, any newlines in the comment reply breaks the formatting in the pull request. I’m pretty sure the staticman project would happily accept a PR to fix that! I think it’s just a matter of escaping (markdown style) the newlines when generating the text for the PR.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-abf832f0-745a-11ea-bead-ade51f5dc984" class="js-comment comment" uid="abf832f0-745a-11ea-bead-ade51f5dc984">
+
+  <div class="comment__author">
+    dtu
+    <span class="comment__date">•
+        <a href="#comment-abf832f0-745a-11ea-bead-ade51f5dc984" title="Permalink to this comment">April  1th, 2020 20:52</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for this blog, I find it very informative. Micro-optimizing (alone or within friendly competition - to the extent possible) is really interesting to me, but I’m still lacking a lot of knowledge (and ideas for things to optimize). I was wondering if there’s anywhere to chat about this kind of stuff (e.g. Discord)? Thanks!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-abf832f0-745a-11ea-bead-ade51f5dc984', 'respond', 'now-with-comments', 'abf832f0-745a-11ea-bead-ade51f5dc984')">↪&#xFE0E; Reply to dtu</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-c05fc5d0-702e-11ea-9327-49e12d1c73f0" class="js-comment comment" uid="c05fc5d0-702e-11ea-9327-49e12d1c73f0">
+
+  <div class="comment__author">
+    Xavier
+    <span class="comment__date">•
+        <a href="#comment-c05fc5d0-702e-11ea-9327-49e12d1c73f0" title="Permalink to this comment">March 27th, 2020 13:27</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hello,</p>
+
+<p>Thanks for this guide, as the main site of staticman is out of date, sadly even by following your instructions, I can’t make it work for my blog. My bridge application on herokuapp.com always returns me errors, so I can’t generate the encrypted secret key for recaptcha,…</p>
+
+<p>I hope that you can tell me why this is not working for me.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c05fc5d0-702e-11ea-9327-49e12d1c73f0', 'respond', 'now-with-comments', 'c05fc5d0-702e-11ea-9327-49e12d1c73f0')">↪&#xFE0E; Reply to Xavier</a>
+    </div>
+</article>
+  
+
+<article id="comment-68093e00-7067-11ea-a089-152069685020" class="js-comment comment admin child" uid="68093e00-7067-11ea-a089-152069685020">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-68093e00-7067-11ea-a089-152069685020" title="Permalink to this comment">March 27th, 2020 20:13</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>No, I can’t tell you why it’s not working without any details.</p>
+
+<p>Your best approach is to file a bug <a href="https://github.com/eduardoboucas/staticman/issues/">against staticman</a> after checking that your error isn’t also mentioned/solved in an existing issue.</p>
+
+<p>Include full details of your error message, how you generated your keys, whether it works if you disable reCAPTCHA, etc.</p>
+
+<p>Finally note that a while ago I changed the <code class="language-plaintext highlighter-rouge">ssh-keygen</code> command to include <code class="language-plaintext highlighter-rouge">-m PEM</code> which is necessary to get the right key format in newer versions of openssl. If you used the command without that, you can try regenerating your keys.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-520fe880-706a-11ea-a089-152069685020" class="js-comment comment child" uid="520fe880-706a-11ea-a089-152069685020">
+
+  <div class="comment__author">
+    Xavier
+    <span class="comment__date">•
+        <a href="#comment-520fe880-706a-11ea-a089-152069685020" title="Permalink to this comment">March 27th, 2020 20:34</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thank you a lot Travis, my issue was the wrong generation of the ssh key. With the new command line it works directly.</p>
+
+<p>Now I just need to integrate it in a post as my configuration should be good.</p>
+
+<p>I really appreciate the help you gave me.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-db15e530-70dd-11ea-9d39-f3a030b7010f" class="js-comment comment child" uid="db15e530-70dd-11ea-9d39-f3a030b7010f">
+
+  <div class="comment__author">
+    Xavier
+    <span class="comment__date">•
+        <a href="#comment-db15e530-70dd-11ea-9d39-f3a030b7010f" title="Permalink to this comment">March 28th, 2020 10:21</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I have an issue with the display of comments, I tried to post a comment and I have it on in the _data/comments/{$my_post_file_name}/ folder but it doesn’t appear.
+It seems that the test site.data.comments[page.slug] in comments.html failed. May I miss something in the configuration file or maybe because I have the ‘+’ character in the filename of the blog post?</p>
+
+<p>Thank you.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-a3ad3b10-70fc-11ea-b5e1-2f5a8cc54610" class="js-comment comment child" uid="a3ad3b10-70fc-11ea-b5e1-2f5a8cc54610">
+
+  <div class="comment__author">
+    Xavier
+    <span class="comment__date">•
+        <a href="#comment-a3ad3b10-70fc-11ea-b5e1-2f5a8cc54610" title="Permalink to this comment">March 28th, 2020 14:01</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I finally understood why ‘+’ character in the file names cause an issue with jekyll, the page.slug have to be put between double quotes, which breaks which can lead in some errors in code.</p>
+
+<p>Thank you again, I am super happy to leave Wordpress</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-a766f470-710c-11ea-9876-954d9ba3d8d4" class="js-comment comment admin child" uid="a766f470-710c-11ea-9876-954d9ba3d8d4">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-a766f470-710c-11ea-9876-954d9ba3d8d4" title="Permalink to this comment">March 28th, 2020 15:56</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks for your comment.</p>
+
+<p>Can you clarify if/how you resolved the problem? Did you add double quotes? Was the problem with the + character?</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-34ba8380-7137-11ea-b42e-9fc3ec8d2c60" class="js-comment comment child" uid="34ba8380-7137-11ea-b42e-9fc3ec8d2c60">
+
+  <div class="comment__author">
+    Xavier
+    <span class="comment__date">•
+        <a href="#comment-34ba8380-7137-11ea-b42e-9fc3ec8d2c60" title="Permalink to this comment">March 28th, 2020 21:00</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes the issue was the + characters in the post filename, I replaced C++ by Cpp to make it works. It was hard to understand the issue as I have almost 0 knowledge in web technologies and particularly in jekyll. It seems that jekyll add “ in some circumstances around string when interpreting it and sometimes it doesn’t. So my page.slug variable did not contained the “ instead of the corresponding key of the site.data.comments table.
+You can find my new blog at https://flamaros.github.io/.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-c049c0a0-952c-11ea-8394-c3d83ae44fcd" class="js-comment comment child" uid="c049c0a0-952c-11ea-8394-c3d83ae44fcd">
+
+  <div class="comment__author">
+    Phu
+    <span class="comment__date">•
+        <a href="#comment-c049c0a0-952c-11ea-8394-c3d83ae44fcd" title="Permalink to this comment">May 13th, 2020 15:16</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>In the comment form and comment list, instead of just using page.slug, you should slugify it, for me slugify: “ascii” is safe enough. The reason is that comments are stored in a directory named after the “slug” you pass to Staticman in the comment form, I suppose it is page.slug, if that slug contains special characters then these characters will be altered and/or discarded by Jekyll when it reads that directory name. Then when you use page.slug again in the comment list, Jekyll doesn’t find any comment for that slug, thus no comment is displayed</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-4e0619c0-6f9e-11ea-a731-8f0153c6e592" class="js-comment comment" uid="4e0619c0-6f9e-11ea-a731-8f0153c6e592">
+
+  <div class="comment__author">
+    HyperTesto
+    <span class="comment__date">•
+        <a href="#comment-4e0619c0-6f9e-11ea-a731-8f0153c6e592" title="Permalink to this comment">March 26th, 2020 20:13</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks man! Got it working finally after months, i wasted so much time trying with the v3 GitHub app, so at the end went for the old v2 method described here.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4e0619c0-6f9e-11ea-a731-8f0153c6e592', 'respond', 'now-with-comments', '4e0619c0-6f9e-11ea-a731-8f0153c6e592')">↪&#xFE0E; Reply to HyperTesto</a>
+    </div>
+</article>
+  
+
+<article id="comment-520120e0-6fb9-11ea-abf3-0f81154aad50" class="js-comment comment admin child" uid="520120e0-6fb9-11ea-abf3-0f81154aad50">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-520120e0-6fb9-11ea-abf3-0f81154aad50" title="Permalink to this comment">March 26th, 2020 23:27</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks!</p>
+
+<p>Note that almost everything about v2 and v3 are the same. v3 basically just extends the URL format to not assume github: it now supports gitlab as well, so either github or gitlab needs to be in the URL. You can follow this guide and use the v3 scheme just fine, others have done it.</p>
+
+<p>So just to clarify that the problems you had were probably not related to v3 vs v2, but some other aspect of using the shared github bot, and that “v2” isn’t really old: it has the same functionality as v3, minus gitlab support.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-7e5d58f0-74de-11ea-af7e-ef9e18d20be0" class="js-comment comment child" uid="7e5d58f0-74de-11ea-af7e-ef9e18d20be0">
+
+  <div class="comment__author">
+    HyperTesto
+    <span class="comment__date">•
+        <a href="#comment-7e5d58f0-74de-11ea-af7e-ef9e18d20be0" title="Permalink to this comment">April  2th, 2020 12:35</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Thanks again for the clarification. I am aware that v3 just extends the URL formats and have tried those scenarios. The problem was just i got errors and timeouts, and i totally forget to open the issue with a stacktrace XD. I think it was just some sort of incompatibility with that version of Node.</p>
+
+<p>Anyway i’m very happy with the setup, i was just stubborn for that v3/bot install… you know… rocket science :-)</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-7b707640-6c9b-11ea-9683-37803f7596d9" class="js-comment comment" uid="7b707640-6c9b-11ea-9683-37803f7596d9">
+
+  <div class="comment__author">
+    nazaal
+    <span class="comment__date">•
+        <a href="#comment-7b707640-6c9b-11ea-9683-37803f7596d9" title="Permalink to this comment">March 23th, 2020 00:16</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>First of all, thanks for the very details post!
+I want to mention my experience which went against footnote 8: I initially accepted the invitation from the bot account via the Github linked but kept invitation not found when trying to connect it. Then i came across <a href="https://www.flyinggrizzly.io/2017/12/setting-up-staticman-server/">this</a> which says I should not accept it so after I tried removed the bot as a collaborator and tried to connect again it worked</p>
+
+<p>Once again thanks</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-7b707640-6c9b-11ea-9683-37803f7596d9', 'respond', 'now-with-comments', '7b707640-6c9b-11ea-9683-37803f7596d9')">↪&#xFE0E; Reply to nazaal</a>
+    </div>
+</article>
+  
+
+<article id="comment-8d950b10-6d5e-11ea-8b7c-87e8595887cb" class="js-comment comment admin child" uid="8d950b10-6d5e-11ea-8b7c-87e8595887cb">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-8d950b10-6d5e-11ea-8b7c-87e8595887cb" title="Permalink to this comment">March 23th, 2020 23:32</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Actually, I think that’s consistent with footnote 8, but perhaps there is some confusion. Assuming that by “via the Github linked” you mean that you accepted the invitation sent to your email, then I think your experience is as expected.</p>
+
+<p>That is, you only need to accept the email invite <em>or</em> do the <code class="language-plaintext highlighter-rouge">v2/connect</code> thing because they serve the same purpose: to accept the invitation for the bot to become a collaborator to the repository. If you accepted the invite via email, you don’t need to go to the <code class="language-plaintext highlighter-rouge">connect</code> URL: and if you do, you’ll get the “not found” error since there is no waiting connection.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-8fd0cab0-6802-11ea-b569-8df7ca2348f0" class="js-comment comment" uid="8fd0cab0-6802-11ea-b569-8df7ca2348f0">
+
+  <div class="comment__author">
+    david
+    <span class="comment__date">•
+        <a href="#comment-8fd0cab0-6802-11ea-b569-8df7ca2348f0" title="Permalink to this comment">March 17th, 2020 03:51</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>i wanna test a msg ^_^</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8fd0cab0-6802-11ea-b569-8df7ca2348f0', 'respond', 'now-with-comments', '8fd0cab0-6802-11ea-b569-8df7ca2348f0')">↪&#xFE0E; Reply to david</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-1527c3f0-6617-11ea-8df9-332f20be4af5" class="js-comment comment" uid="1527c3f0-6617-11ea-8df9-332f20be4af5">
+
+  <div class="comment__author">
+    Daniel D
+    <span class="comment__date">•
+        <a href="#comment-1527c3f0-6617-11ea-8df9-332f20be4af5" title="Permalink to this comment">March 14th, 2020 17:13</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Stumbled upon staticman and was superexcited! 
+Then learned staticmanapp can’t be added… 
+Started to read through staticman issues… 
+Got stuck not understanding outdated tutorials… 
+Went through staticman issues by going backwards and stumbled upon your page.
+Before I start the steps in this tutorial I first wanna check if it works :P</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1527c3f0-6617-11ea-8df9-332f20be4af5', 'respond', 'now-with-comments', '1527c3f0-6617-11ea-8df9-332f20be4af5')">↪&#xFE0E; Reply to Daniel D</a>
+    </div>
+</article>
+  
+
+<article id="comment-a72dabb0-695b-11ea-be74-5d7178b5214a" class="js-comment comment child" uid="a72dabb0-695b-11ea-be74-5d7178b5214a">
+
+  <div class="comment__author">
+    Daniel D
+    <span class="comment__date">•
+        <a href="#comment-a72dabb0-695b-11ea-be74-5d7178b5214a" title="Permalink to this comment">March 18th, 2020 21:01</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I followed most of your steps - haven’t set up recaptcha yet - and staticman is now running on Heroku and successfully forwarding comments as pull requests.
+Thank you Travis Downs.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-095caf90-6536-11ea-910f-0d27dd8a559e" class="js-comment comment" uid="095caf90-6536-11ea-910f-0d27dd8a559e">
+
+  <div class="comment__author">
+    Raul
+    <span class="comment__date">•
+        <a href="#comment-095caf90-6536-11ea-910f-0d27dd8a559e" title="Permalink to this comment">March 13th, 2020 14:22</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I just wanna test this</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-095caf90-6536-11ea-910f-0d27dd8a559e', 'respond', 'now-with-comments', '095caf90-6536-11ea-910f-0d27dd8a559e')">↪&#xFE0E; Reply to Raul</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-0666b590-4ab2-11ea-8211-4b02c05d3f92" class="js-comment comment admin" uid="0666b590-4ab2-11ea-8211-4b02c05d3f92">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-0666b590-4ab2-11ea-8211-4b02c05d3f92" title="Permalink to this comment">February  8th, 2020 20:31</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Testing a kramdown comment with a <a href="http://www.example.com">link</a>, a footnote<sup id="fnref:fn" role="doc-noteref"><a href="#fn:fn" class="footnote" rel="footnote">1</a></sup>, <code class="language-plaintext highlighter-rouge">some code</code>.</p>
+
+<h3 id="a-heading">A heading</h3>
+
+<p>Some javacscript:</p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:fn" role="doc-endnote">
+      <p>footnote text <a href="#fnref:fn" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-0666b590-4ab2-11ea-8211-4b02c05d3f92', 'respond', 'now-with-comments', '0666b590-4ab2-11ea-8211-4b02c05d3f92')">↪&#xFE0E; Reply to Travis Downs</a>
+    </div>
+</article>
+  
+
+<article id="comment-4e565890-708e-11ea-b83a-9bfed3636525" class="js-comment comment admin child" uid="4e565890-708e-11ea-b83a-9bfed3636525">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-4e565890-708e-11ea-b83a-9bfed3636525" title="Permalink to this comment">March 28th, 2020 00:51</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Test reply 42</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-2ee5b6b0-4a35-11ea-9c28-754afcaf3249" class="js-comment comment" uid="2ee5b6b0-4a35-11ea-9c28-754afcaf3249">
+
+  <div class="comment__author">
+    Toaler
+    <span class="comment__date">•
+        <a href="#comment-2ee5b6b0-4a35-11ea-9c28-754afcaf3249" title="Permalink to this comment">February  8th, 2020 05:38</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Right on tdowns will give this a go myself. Appreciate you documenting this for others.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-2ee5b6b0-4a35-11ea-9c28-754afcaf3249', 'respond', 'now-with-comments', '2ee5b6b0-4a35-11ea-9c28-754afcaf3249')">↪&#xFE0E; Reply to Toaler</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-3d877410-488c-11ea-8ef7-4f7557522197" class="js-comment comment" uid="3d877410-488c-11ea-8ef7-4f7557522197">
+
+  <div class="comment__author">
+    Zach Wegner
+    <span class="comment__date">•
+        <a href="#comment-3d877410-488c-11ea-8ef7-4f7557522197" title="Permalink to this comment">February  6th, 2020 02:56</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I appreciate the detail here, much more information than I expected from the title. Good to know there’s a system for comments on a static site.</p>
+
+<p>reCAPTCHA often translates to a back-button-press for me. I’ve heard (but not tried) an easy anti-spam solution is to add hidden form fields and fail if they get filled out, which should stop most of the untargeted stuff.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3d877410-488c-11ea-8ef7-4f7557522197', 'respond', 'now-with-comments', '3d877410-488c-11ea-8ef7-4f7557522197')">↪&#xFE0E; Reply to Zach Wegner</a>
+    </div>
+</article>
+  
+
+<article id="comment-9ca19bd0-4911-11ea-a68f-990916a38351" class="js-comment comment admin child" uid="9ca19bd0-4911-11ea-a68f-990916a38351">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-9ca19bd0-4911-11ea-a68f-990916a38351" title="Permalink to this comment">February  6th, 2020 18:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes, I have a so-called hidden “honeypot” field as a second line of defense. Some people say you should even have the field visible for it to work best, and the theme I copied this from did that – but I just couldn’t stomach making it visible and telling people not to fill it out.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-48f01140-4869-11ea-830d-298f52001f30" class="js-comment comment" uid="48f01140-4869-11ea-830d-298f52001f30">
+
+  <div class="comment__author">
+    Thankful Reader
+    <span class="comment__date">•
+        <a href="#comment-48f01140-4869-11ea-830d-298f52001f30" title="Permalink to this comment">February  5th, 2020 22:46</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice detour post explaining how to make this work!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-48f01140-4869-11ea-830d-298f52001f30', 'respond', 'now-with-comments', '48f01140-4869-11ea-830d-298f52001f30')">↪&#xFE0E; Reply to Thankful Reader</a>
+    </div>
+</article>
+  
+
+<article id="comment-e76dcc40-4869-11ea-830d-298f52001f30" class="js-comment comment admin child" uid="e76dcc40-4869-11ea-830d-298f52001f30">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-e76dcc40-4869-11ea-830d-298f52001f30" title="Permalink to this comment">February  5th, 2020 22:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes, for some definition of “work” :).</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="now-with-comments">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2020/02/05/now-with-comments.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

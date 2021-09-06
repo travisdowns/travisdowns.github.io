@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>Hardware Store Elimination | Performance Matters</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Hardware Store Elimination" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Probing a previously undocumented zero-related optimization on Intel CPUs." />
+<meta property="og:description" content="Probing a previously undocumented zero-related optimization on Intel CPUs." />
+<link rel="canonical" href="https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html" />
+<meta property="og:url" content="https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta property="og:image" content="https://travisdowns.github.io/assets/intel-zero-opt/twitter-card.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-13T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://travisdowns.github.io/assets/intel-zero-opt/twitter-card.png" />
+<meta property="twitter:title" content="Hardware Store Elimination" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2020-05-13T00:00:00+00:00","datePublished":"2020-05-13T00:00:00+00:00","description":"Probing a previously undocumented zero-related optimization on Intel CPUs.","headline":"Hardware Store Elimination","image":"https://travisdowns.github.io/assets/intel-zero-opt/twitter-card.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Hardware Store Elimination</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2020-05-13T00:00:00+00:00" itemprop="datePublished">
+        May 13, 2020
+      </time><span>
+          •
+          <span class="tag-link"><a href="/tags/Intel.html">Intel</a></span><span class="tag-link"><a href="/tags/x86.html">x86</a></span><span class="tag-link"><a href="/tags/uarch.html">uarch</a></span>
+        </span></p>
+    <!-- end override -->
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    
+<!-- boilerplate 
+page.assets: /assets/intel-zero-opt
+assetpath: /assets/intel-zero-opt
+tablepath: /misc/tables/intel-zero-opt
+-->
+
+<p>I had no plans to write <a href="/blog/2020/01/20/zero.html">another post</a> about zeros, but when life throws you a zero make zeroaid, or something like that. Here we go!</p>
+
+<p>If you want to jump over the winding reveal and just read the summary and advice, <a href="#summary-perma">now is your chance</a>.</p>
+
+<p>When writing simple memory benchmarks I have always taken the position the <em>value</em> written to memory didn’t matter. Recently, while running a straightforward benchmark<sup id="fnref:ubstore" role="doc-noteref"><a href="#fn:ubstore" class="footnote" rel="footnote">1</a></sup> probing the interaction between AVX-512 stores and <a href="https://en.wikipedia.org/wiki/MESI_protocol#Read_For_Ownership">read for ownership</a> I ran into a weird performance deviation. This is that story<sup id="fnref:story" role="doc-noteref"><a href="#fn:story" class="footnote" rel="footnote">2</a></sup>.</p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#table-of-contents" id="markdown-toc-table-of-contents">Table of Contents</a></li>
+  <li><a href="#prelude" id="markdown-toc-prelude">Prelude</a>    <ul>
+      <li><a href="#data-dependent-performance" id="markdown-toc-data-dependent-performance">Data Dependent Performance</a></li>
+      <li><a href="#source" id="markdown-toc-source">Source</a></li>
+    </ul>
+  </li>
+  <li><a href="#benchmarks" id="markdown-toc-benchmarks">Benchmarks</a>    <ul>
+      <li><a href="#a-very-simple-loop" id="markdown-toc-a-very-simple-loop">A Very Simple Loop</a></li>
+      <li><a href="#our-first-benchmark" id="markdown-toc-our-first-benchmark">Our First Benchmark</a>        <ul>
+          <li><a href="#l1-and-l2" id="markdown-toc-l1-and-l2">L1 and L2</a></li>
+          <li><a href="#getting-weird-in-the-l3" id="markdown-toc-getting-weird-in-the-l3">Getting Weird in the L3</a></li>
+          <li><a href="#ram-still-weird" id="markdown-toc-ram-still-weird">RAM: Still Weird</a></li>
+        </ul>
+      </li>
+      <li><a href="#wild-irresponsible-speculation-and-miscellanous-musings" id="markdown-toc-wild-irresponsible-speculation-and-miscellanous-musings">Wild, Irresponsible Speculation and Miscellanous Musings</a>        <ul>
+          <li><a href="#predicting-a-new-predictor" id="markdown-toc-predicting-a-new-predictor">Predicting a New Predictor</a></li>
+          <li><a href="#predictor-test" id="markdown-toc-predictor-test">Predictor Test</a></li>
+        </ul>
+      </li>
+      <li><a href="#hardware-survey" id="markdown-toc-hardware-survey">Hardware Survey</a></li>
+      <li><a href="#further-notes" id="markdown-toc-further-notes">Further Notes</a></li>
+    </ul>
+  </li>
+  <li><a href="#wrapping-up" id="markdown-toc-wrapping-up">Wrapping Up</a>    <ul>
+      <li><a href="#findings" id="markdown-toc-findings">Findings</a></li>
+      <li><a href="#tuning-advice" id="markdown-toc-tuning-advice">Tuning “Advice”</a></li>
+      <li><a href="#thanks" id="markdown-toc-thanks">Thanks</a></li>
+      <li><a href="#discussion-and-feedback" id="markdown-toc-discussion-and-feedback">Discussion and Feedback</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="prelude">Prelude</h2>
+
+<h3 id="data-dependent-performance">Data Dependent Performance</h3>
+
+<p>On current mainstream CPUs, the timing of most instructions isn’t data-dependent. That is, their performance is the same regardless of the <em>value</em> of the input(s) to the instruction. Unlike you<sup id="fnref:assume" role="doc-noteref"><a href="#fn:assume" class="footnote" rel="footnote">3</a></sup> or me your CPU takes the same time to add <code class="language-plaintext highlighter-rouge">1 + 2</code> as it does to add <code class="language-plaintext highlighter-rouge">68040486 + 80866502</code>.</p>
+
+<p>Now, there are some notable exceptions:</p>
+
+<ul>
+  <li>Integer division is data-dependent on most x86 CPUs: larger inputs generally take longer although the details vary widely among microarchitectures<sup id="fnref:icldiv" role="doc-noteref"><a href="#fn:icldiv" class="footnote" rel="footnote">4</a></sup>.</li>
+  <li>BMI2 instructions <code class="language-plaintext highlighter-rouge">pdep</code> and <code class="language-plaintext highlighter-rouge">pext</code> have <a href="https://twitter.com/uops_info/status/1202950247900684290">famously terrible</a> and data-dependent performance on AMD Zen and Zen2 chips.</li>
+  <li>Floating point instructions often have slower performance when <a href="https://en.wikipedia.org/wiki/Denormal_number#Performance_issues">denormal numbers</a> are encountered, although some rounding modes such as <em>flush to zero</em> may avoid this.</li>
+</ul>
+
+<p>That list is not exhaustive: there are other cases of data-dependent performance, especially when you start digging into complex microcoded instructions such as <a href="https://www.felixcloutier.com/x86/cpuid"><code class="language-plaintext highlighter-rouge">cpuid</code></a>. Still, it isn’t unreasonable to assume that most simple instructions not listed above execute in constant time.</p>
+
+<p>How about memory operations, such as loads and stores?</p>
+
+<p>Certainly, the <em>address</em> matters. After all the address determines the caching behavior, and caching can easily account for two orders of magnitude difference in performance<sup id="fnref:memperf" role="doc-noteref"><a href="#fn:memperf" class="footnote" rel="footnote">5</a></sup>. On the other hand, I wouldn’t expect the <em>data values</em> loaded or stored to matter. There is not much reason to expect the memory or caching subsystem to care about the value of the bits loaded or stored, outside of scenarios such as hardware-compressed caches not widely deployed<sup id="fnref:atall" role="doc-noteref"><a href="#fn:atall" class="footnote" rel="footnote">6</a></sup> on x86.</p>
+
+<h3 id="source">Source</h3>
+
+<p>The full benchmark associated with this post (including some additional benchmarks not mention here) is <a href="https://github.com/travisdowns/zero-fill-bench">available on GitHub</a>.</p>
+
+<h2 id="benchmarks">Benchmarks</h2>
+
+<p>That’s enough prelude <img src="/assets/intel-zero-opt/prelude.jpg" alt="a small red car" style="display:inline; height: 1.2em;" /> for now. Let’s write some benchmarks.</p>
+
+<h3 id="a-very-simple-loop">A Very Simple Loop</h3>
+
+<p>Let’s start with a very simple task. Write a function that takes an <code class="language-plaintext highlighter-rouge">int</code> value <code class="language-plaintext highlighter-rouge">val</code> and fills a buffer of a given size with copies of that value. Just like <a href="https://en.cppreference.com/w/c/string/byte/memset"><code class="language-plaintext highlighter-rouge">memset</code></a>, but with an <code class="language-plaintext highlighter-rouge">int</code> value rather than a <code class="language-plaintext highlighter-rouge">char</code> one.</p>
+
+<p>The canonical C implementation is probably some type of for loop, like this:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">fill_int</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span> <span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>… or maybe this<sup id="fnref:otherc" role="doc-noteref"><a href="#fn:otherc" class="footnote" rel="footnote">7</a></sup>:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">fill_int</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span> <span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span> <span class="n">end</span> <span class="o">=</span> <span class="n">buf</span> <span class="o">+</span> <span class="n">size</span><span class="p">;</span> <span class="n">buf</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">buf</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">*</span><span class="n">buf</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In C++, we don’t even need that much: we can simply delegate directly to <code class="language-plaintext highlighter-rouge">std::fill</code> which does the same thing as a one-liner<sup id="fnref:bpurp" role="doc-noteref"><a href="#fn:bpurp" class="footnote" rel="footnote">8</a></sup>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">std</span><span class="o">::</span><span class="n">fill</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">buf</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>There is nothing magic about <code class="language-plaintext highlighter-rouge">std::fill</code>, it also <a href="https://github.com/gcc-mirror/gcc/blob/866cd688d1b72b0700a7e001428bdf2fe73fbf64/libstdc%2B%2B-v3/include/bits/stl_algobase.h#L698">uses a loop</a> just like the C version above. Not surprisingly, gcc and clang compile them to the <a href="https://godbolt.org/z/R5bJiE">same machine code</a><sup id="fnref:clangv" role="doc-noteref"><a href="#fn:clangv" class="footnote" rel="footnote">9</a></sup>.</p>
+
+<p>With the right compiler arguments (<code class="language-plaintext highlighter-rouge">-march=native -O3 -funroll-loops</code> in our case), we expect this <code class="language-plaintext highlighter-rouge">std::fill</code> version (and all the others) to be implemented with with AVX vector instructions, and <a href="https://godbolt.org/z/SfGVEC">it is so</a>. The part which does the heavy lifting work for large fills looks like this:</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.L4:</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span>   <span class="mi">0</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span>  <span class="mi">32</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span>  <span class="mi">64</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span>  <span class="mi">96</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">128</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">160</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">192</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">vmovdqu</span> <span class="nv">YMMWORD</span> <span class="nv">PTR</span> <span class="p">[</span><span class="nb">rax</span> <span class="o">+</span> <span class="mi">224</span><span class="p">],</span> <span class="nv">ymm1</span>
+  <span class="nf">add</span>     <span class="nb">rax</span><span class="p">,</span> <span class="mi">256</span>
+  <span class="nf">cmp</span>     <span class="nb">rax</span><span class="p">,</span> <span class="nv">r9</span>
+  <span class="nf">jne</span>     <span class="nv">.L4</span>
+</code></pre></div></div>
+
+<p>It copies 256 bytes of data every iteration using eight 32-byte AVX2 store instructions. The full function is much larger, with a scalar portion for buffers smaller than 32 bytes (and which also handles the odd elements after the vectorized part is done), and a vectorized jump table to handle up to seven 32-byte chunks before the main loop. No effort is made to align the destination, but we’ll align everything to 64 bytes in our benchmark so this won’t matter.</p>
+
+<h3 id="our-first-benchmark">Our First Benchmark</h3>
+
+<p>Enough foreplay: let’s take the C++ version out for a spin, with two different fill values (<code class="language-plaintext highlighter-rouge">val</code>) selected completely at random: zero (<code class="language-plaintext highlighter-rouge">fill0</code>) and one (<code class="language-plaintext highlighter-rouge">fill1</code>). We’ll use gcc 9.2.1 and the <code class="language-plaintext highlighter-rouge">-march=native -O3 -funroll-loops</code> flags mentioned above.</p>
+
+<p>We organize it so that for both tests we call the <em>same</em> non-inlined function: the exact same instructions are executed and only the value differs. That is, the compile isn’t making any data-dependent optimizations.</p>
+
+<p>Here’s the fill throughput in GB/s for these two values, for region sizes ranging from 100 up to 100,000,000 bytes.</p>
+
+<center><strong>Figure 1</strong></center>
+
+<div class="svg-fig">
+    <a href="#fig1" id="fig1">[link to this chart]</a> 
+    <a href="/misc/tables/intel-zero-opt/fig1.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/overall.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig1.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig1.svg" alt="Figure 1" />
+    </a>
+</div>
+
+<p class="info"><strong>About this chart:</strong><br />
+At each region size (that is, at each position along the x-axis) 17 semi-transparent samples<sup id="fnref:warm" role="doc-noteref"><a href="#fn:warm" class="footnote" rel="footnote">10</a></sup> are plotted and although they usually overlap almost completely (resulting in a single circle), you can see cases where there are outliers that don’t line up with the rest of this sample. This plot tries to give you an idea of the spread of back-to-back samples without hiding them behind error bars<sup id="fnref:errorbars" role="doc-noteref"><a href="#fn:errorbars" class="footnote" rel="footnote">11</a></sup>. Finally, the sizes of the various data caches (32, 256 and 6144 KiB for the L1D, L2 and L3, respectively) are marked for convenience.</p>
+
+<h4 id="l1-and-l2">L1 and L2</h4>
+
+<p>Not surprisingly, the performance depends heavily on what level of cache the filled region fits into.</p>
+
+<p>Everything is fairly sane when the buffer fits in the L1 or L2 cache (up to ~256 KiB<sup id="fnref:l2" role="doc-noteref"><a href="#fn:l2" class="footnote" rel="footnote">12</a></sup>). The relatively poor performance for very small region sizes is explained by the prologue and epilogue of the vectorized implementation: for small sizes a relatively large amount of time is spent in these int-at-a-time loops: rather than copying up to 32 bytes per cycle, we copy only 4.</p>
+
+<p>This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That’s because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former<sup id="fnref:badvec" role="doc-noteref"><a href="#fn:badvec" class="footnote" rel="footnote">13</a></sup>. Essentially, we are sampling semi-randomly a sawtooth function and if you plot this region with finer granularity (go for it or just <a href="/assets/intel-zero-opt/sawtooth.svg">click here</a><sup id="fnref:melty" role="doc-noteref"><a href="#fn:melty" class="footnote" rel="footnote">14</a></sup>) you can see it quite clearly.</p>
+
+<h4 id="getting-weird-in-the-l3">Getting Weird in the L3</h4>
+
+<p>So while there are some interesting effects in the first half of the results, covering L1 and L2, they are fairly easy to explain and, more to the point, performance for the zero and one cases are identical: the samples are all concentric. As soon as we dip our toes into the L3, however, things start to get <em>weird</em>.</p>
+
+<p>Weird in that we we see a clear divergence between stores of zero versus ones. Remember that this is the exact same function, the same <em>machine</em> code executing the same stream of instructions, only varying in the value of the <code class="language-plaintext highlighter-rouge">ymm1</code> register passed to the store instruction. Storing zero is consistently about 17% to 18% faster than storing one, both in the region covered by the L3 (up to 6 MiB on my system), and beyond that where we expect misses to RAM (it looks like the difference narrows in the RAM region, but it’s mostly a trick of the eye: the relative performance difference is about the same).</p>
+
+<p>What’s going on here? Why does the CPU care <em>what values</em> are being stored, and why is zero special?</p>
+
+<p>We can get some additional insight by measuring the <code class="language-plaintext highlighter-rouge">l2_lines_out.silent</code> and <code class="language-plaintext highlighter-rouge">l2_lines_out.non_silent</code> events while we focus on the regions that fit in L2 or L3. These events measure the number of lines evicted from L2 either <em>silently</em> or <em>non-silently</em>.</p>
+
+<p>Here are Intel’s descriptions of these events:</p>
+
+<p><strong>l2_lines_out.silent</strong></p>
+<blockquote>
+  <p>Counts the number of lines that are silently dropped by L2 cache when triggered by an L2 cache fill. These lines are typically in Shared or Exclusive state.</p>
+</blockquote>
+
+<p><strong>l2_lines_out.non_silent</strong></p>
+<blockquote>
+  <p>Counts the number of lines that are evicted by L2 cache when triggered by an L2 cache fill. Those lines are in Modified state. Modified lines are written back to L3.</p>
+</blockquote>
+
+<p>The states being referred to here are <a href="https://en.wikipedia.org/wiki/MESI_protocol">MESI</a> cache states, commonly abbreviated M (modified), E (exclusive, but not modified) and S (possibly shared, not modified).</p>
+
+<p>The second definition is not completely accurate. In particular, it implies that only modified lines trigger the <em>non-silent</em> event. However, <a href="https://stackoverflow.com/q/52565303/149138">I find</a> that unmodified lines in E state can also trigger this event. Roughly, the behavior for unmodified lines seems to be that lines that miss in L2 <em>and</em> L3 usually get filled into the L2 in a state where they will be evicted <em>non-silently</em>, but unmodified lines that miss in L2 and <em>hit</em> in L3 will generally be evicted silently<sup id="fnref:silent" role="doc-noteref"><a href="#fn:silent" class="footnote" rel="footnote">15</a></sup>. Of course, lines that are modified <em>must</em> be evicted non-silently in order to update the outer levels with the new data.</p>
+
+<p>In summary: silent evictions are associated with unmodified lines in E or S state, while non-silent evictions are associated with M, E or (possibly) S state lines, with the silent vs non-silent choice for E and S being made in some unknown matter.</p>
+
+<p>Let’s look at silent vs non-silent evictions for the <code class="language-plaintext highlighter-rouge">fill0</code> and <code class="language-plaintext highlighter-rouge">fill1</code> cases:</p>
+
+<center><strong>Figure 2</strong></center>
+
+<div class="svg-fig">
+    <a href="#fig2" id="fig2">[link to this chart]</a> 
+    <a href="/misc/tables/intel-zero-opt/fig2.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig2.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig2.svg" alt="Figure 2" />
+    </a>
+</div>
+
+<p class="info"><strong>About this chart:</strong><br />
+For clarity, I show only the median single sample for each size<sup id="fnref:trust" role="doc-noteref"><a href="#fn:trust" class="footnote" rel="footnote">16</a></sup>. As before, the left axis is fill speed and on the right axis the two types eviction events are plotted, normalized to the number of cache lines accessed in the benchmark. That is, a value of 1.0 means that for every cache line accessed, the event occurred one time.</p>
+
+<p>The <em>total</em> number of evictions (sum of silent and non-silent) is the same for both cases: near zero<sup id="fnref:wb" role="doc-noteref"><a href="#fn:wb" class="footnote" rel="footnote">17</a></sup> when the region fits in L2, and then quickly increases to ~1 eviction per stored cache line. In the L3, <code class="language-plaintext highlighter-rouge">fill1</code> also behaves as we’d expect: essentially all of the evictions are non-silent. This makes sense since modified lines <em>must</em> be evicted non-silently to write their modified data to the next layer of the cache subsystem.</p>
+
+<p>For <code class="language-plaintext highlighter-rouge">fill0</code>, the story is different. Once the buffer size no longer fits in L2, we see the same <em>total</em> number of evictions from L2, but 63% of these are silent, the rest non-silent. Remember, only unmodified lines even have the hope of a silent eviction. This means that at least 63% of the time, the L2<sup id="fnref:orl3" role="doc-noteref"><a href="#fn:orl3" class="footnote" rel="footnote">18</a></sup> is able to detect that the write is <em>redundant</em>: it doesn’t change the value of the line, and so the line is evicted silently. That is, it is never written back to the L3. This is presumably what causes the performance boost: the pressure on the L3 is reduced: although all the implied reads<sup id="fnref:rfo" role="doc-noteref"><a href="#fn:rfo" class="footnote" rel="footnote">19</a></sup> still need to go through the L3, only about 1 out of 3 of those lines ends up getting written back.</p>
+
+<p>Once the test starts to exceed the L3 threshold, all of the evictions become non-silent even in the <code class="language-plaintext highlighter-rouge">fill0</code> case. This doesn’t necessarily mean that the zero optimization stops occurring. As mentioned earlier<sup id="fnref:silent:1" role="doc-noteref"><a href="#fn:silent" class="footnote" rel="footnote">15</a></sup>, it is a typical pattern even for read-only workloads: once lines arrive in L2 as a result of an L3 miss rather than a hit, their subsequent eviction becomes non-silent, even if never written. So we can assume that the lines are probably still detected as not modified, although we lose our visibility into the effect at least as far as the <code class="language-plaintext highlighter-rouge">l2_lines_out</code> events go. That is, although all evictions are non-silent, some fraction of the evictions are still indicating that the outgoing data is unmodified.</p>
+
+<h4 id="ram-still-weird">RAM: Still Weird</h4>
+
+<p>In fact, we can confirm that this apparent optimization still happens as move into RAM using a different set of events. There are several to choose from – and all of those that I tried tell the same story. We’ll focus on <code class="language-plaintext highlighter-rouge">unc_arb_trk_requests.writes</code>, <a href="https://www.intel.com/content/dam/www/public/us/en/documents/manuals/6th-gen-core-family-uncore-performance-monitoring-manual.pdf">documented</a> as follows:</p>
+
+<blockquote>
+  <p>Number of writes allocated including any write transaction including full, partials and evictions.</p>
+</blockquote>
+
+<p>Important to note that the “uncore tracker” these events monitor is used by data flowing between L3 and memory, not between L2 and L3. So <em>writes</em> here generally refers to writes that will reach memory.</p>
+
+<p>Here’s how this event scales for the same test we’ve been running this whole time (the size range has been shifted for focus on the area of interest)<sup id="fnref:sneaky" role="doc-noteref"><a href="#fn:sneaky" class="footnote" rel="footnote">20</a></sup>:</p>
+
+<center><strong>Figure 3</strong></center>
+
+<div class="svg-fig">
+    <a href="#fig3" id="fig3">[link to this chart]</a> 
+    <a href="/misc/tables/intel-zero-opt/fig3.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig3.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig3.svg" alt="Figure 3" />
+    </a>
+</div>
+
+<p>The number of writes for well-behaved <code class="language-plaintext highlighter-rouge">fill1</code> approaches one write per cache line as the buffer exceeds the size of L3 – again, this is as expected. For the more rebellious <code class="language-plaintext highlighter-rouge">fill0</code>, it is almost exactly half that amount. For every two lines written by the benchmark, we only write one back to memory! This same 2:1 ratio is reflected also if we measure memory writes at the integrated memory controller<sup id="fnref:imcevent" role="doc-noteref"><a href="#fn:imcevent" class="footnote" rel="footnote">21</a></sup>: writing zeros results in only half the number of writes at the memory controller.</p>
+
+<h3 id="wild-irresponsible-speculation-and-miscellanous-musings">Wild, Irresponsible Speculation and Miscellanous Musings</h3>
+
+<p>This is all fairly strange. It’s not weird that there would be a “redundant writes” optimization to avoid writing back identical values: this seems like it could benefit some common write patterns.</p>
+
+<p>It is perhaps a bit unusual that it only apparently applies to all-zero values. Maybe this is because zeros overwriting zeros is one of the most common redundant write cases, and detecting zero values can done more cheaply than a full compare. Also, the “is zero?” state can be communicated and stored as a single bit, which might be useful. For example, if the L2 is involved in the duplicate detection (and the <code class="language-plaintext highlighter-rouge">l2_lines_out</code> results suggest it is), perhaps the detection happens when the line is evicted, at which point you want to compare to the line in L3, but you certainly can’t store the entire old value in or near the L2 (that would require storage as large as the L2 itself). You could store an indicator that the line was zero, however, in a single bit and compare the existing line as part of the eviction process.</p>
+
+<h4 id="predicting-a-new-predictor">Predicting a New Predictor</h4>
+
+<p>What is the weirdest of all, however, is that the optimization doesn’t kick in 100% of the time but only for 40% to 60% of the lines, depending on various parameters<sup id="fnref:params" role="doc-noteref"><a href="#fn:params" class="footnote" rel="footnote">22</a></sup>. What would lead to that effect? One could imagine that there could be some type of predictor which determines whether to apply this optimization or not, depending on e.g., whether the optimization has recently been effective – that is, whether redundant stores have been common recently. Perhaps this predictor also considers factors such as the occupancy of outbound queues<sup id="fnref:obbus" role="doc-noteref"><a href="#fn:obbus" class="footnote" rel="footnote">23</a></sup>: when the bus is near capacity, searching for eliminating redundant writes might be more worth the power or latency penalty compared to the case when there is little apparent pressure on the bus.</p>
+
+<p>In this benchmark, any predictor would find that the optimization is 100% effective: <em>every</em> write is redundant! So we might guess that the second condition (queue occupancy) results in a behavior where only some stores are eliminated: as more stores are eliminated, the load on the bus becomes lower and so at some point the predictor no long thinks it is worth it to eliminate stores and you reach a kind of stable state where only a fraction of stores are eliminated based on the predictor threshold.</p>
+
+<h4 id="predictor-test">Predictor Test</h4>
+
+<p>We can kind of test that theory: in this model, any store is <em>capable</em> of being eliminated, but the ratio of eliminated stores is bounded above by the predictor behavior. So if we find that a benchmark of <em>pure</em> redundant zero stores is eliminated at a 60% rate, we might expect that any benchmark with at least 60% redundant stores can reach the 60% rate, and with lower rates, you’d see full elimination of all redundant stores (since now the bus always stays active enough to trigger the predictor).</p>
+
+<p class="info">Apparently analogies are helpful, so an analogy here would be a person controlling the length of a line by redirecting some incoming people. For example, in an airport security line the handler tries to keep the line at a certain maximum length by redirecting (redirecting -&gt; store elimination) people to the priority line if they are eligible and the main line is at or above its limit. Eligible people are those without carry-on luggage (eligible people -&gt; zero-over-zero stores).<br />
+<br />
+If everyone is eligible (-&gt; 100% zero stores), this control will always be successful and the fraction of people redirected will depend on the relative rate of ingress and egress through security. If security only has a throughput of 40% of the ingress rate, 60% of people will redirected in the steady state. Now, consider what happens if not everyone is eligible: if the eligible fraction is at least 60%, nothing changes. You still redirect 60% of people. Only if the eligible rate drops below 60% is there a problem: now you’ll be redirecting 100% of eligible people, but the primary line will grow beyond your limit.<br />
+<br />
+Whew! Not sure if that was helpful after all?</p>
+
+<p>Let’s try a benchmark which adds a new implementation, <code class="language-plaintext highlighter-rouge">alt01</code> which alternates between writing a cache line of zeros and a cache line of ones. All the writes are redundant, but only 50% are zeros, so under the theory that a predictor is involved we expect that maybe 50% of the stores will be eliminated (i.e., 100% of the redundant stores are eliminated and they make up 50% of the total).</p>
+
+<p>Here we focus on the L3, similar to Fig. 2 above, showing silent evictions (the non-silent ones make up the rest, adding up to 1 total as before):</p>
+
+<center><strong>Figure 4</strong></center>
+
+<div class="svg-fig">
+    <a href="#fig4" id="fig4">[link to this chart]</a> 
+    <a href="/misc/tables/intel-zero-opt/fig4.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig4.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig4.svg" alt="Figure 4" />
+    </a>
+</div>
+
+<p>We don’t see 50% elimination. Rather we see less than half the elimination of the all-zeros case: 27% versus 63%. Performance is better in the L3 region than the all ones case, but only slightly so! So this doesn’t support the theory of a predictor capable of eliminating on any store and operating primarily on outbound queue occupancy.</p>
+
+<p>Similarly, we can examine the region where the buffer fits only in RAM, similar to Fig. 3 above:</p>
+
+<center><strong>Figure 5</strong></center>
+
+<div class="svg-fig">
+    <a href="#fig5" id="fig5">[link to this chart]</a> 
+    <a href="/misc/tables/intel-zero-opt/fig5.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig5.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig5.svg" alt="Figure 5" />
+    </a>
+</div>
+
+<p>Recall that the lines show the number of writes reaching the memory subsystem. Here we see that <code class="language-plaintext highlighter-rouge">alt01</code> again splits the difference between the zero and ones case: about 75% of the writes reach memory, versus 48% in the all-zeros case, so the elimination is again roughly half as effective. In this case, the performance also splits the difference between all zeros and all ones: it falls almost exactly half-way between the two other cases.</p>
+
+<p>So I don’t know what’s going on exactly. It seems like maybe only some fraction are of lines are eligible for elimination due to some unknown internal mechanism in the <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>.</p>
+
+<h3 id="hardware-survey">Hardware Survey</h3>
+
+<p>Finally, here are the performance results (same as <strong>Figure 1</strong>) on a variety of other Intel and AMD x86 architectures, as well as IBM’s POWER9 and Amazon’s Graviton 2 ARM processor, one per tab.</p>
+
+<!-- uresults: snb/remote.csv,hsw/remote.csv,skl/remote.csv,skx/remote.csv,cnl/remote.csv,zen2/remote.csv,power9/remote.csv,gra2/remote.csv -->
+
+<div class="tabs">
+    <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-1" name="tab-group-1" checked="" />
+      <label class="tab-label" for="tab-1">Sandy Bridge</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-snb.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/snb/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-snb.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-snb.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-2" name="tab-group-1" />
+      <label class="tab-label" for="tab-2">Haswell</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-hsw.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/hsw/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-hsw.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-hsw.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-3" name="tab-group-1" />
+      <label class="tab-label" for="tab-3">Skylake-S</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-skl.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/skl/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-skl.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-skl.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-4" name="tab-group-1" />
+      <label class="tab-label" for="tab-4">Skylake-X</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-skx.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/skx/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-skx.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-skx.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-5" name="tab-group-1" />
+      <label class="tab-label" for="tab-5">Cannon Lake</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-cnl.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/cnl/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-cnl.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-cnl.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-6" name="tab-group-1" />
+      <label class="tab-label" for="tab-6">Zen2</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-zen2.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/zen2/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-zen2.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-zen2.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-7" name="tab-group-1" />
+      <label class="tab-label" for="tab-7">POWER9</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-power9.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/power9/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-power9.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-power9.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+    <div class="tab">
+      <input class="tab-radio" type="radio" id="tab-8" name="tab-group-1" />
+      <label class="tab-label" for="tab-8">Graviton 2</label>
+      <div class="tab-panel">
+        <div class="tab-content">
+          
+          
+          
+
+<div class="svg-fig">
+    
+    <a href="/misc/tables/intel-zero-opt/fig6-gra2.html">[data table]</a> 
+    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/gra2/remote.csv">[raw data]</a> 
+    <br />
+    <a href="/misc/tables/intel-zero-opt/fig6-gra2.html">
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-gra2.svg" alt="Figure 4" />
+    </a>
+</div>
+        </div>
+      </div> 
+    </div>
+    
+</div>
+
+<p>Some observations on these results:</p>
+
+<ul>
+  <li>The redundant write optimization isn’t evident in the performance profile for <em>any</em> of the other non-<abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr> hardware tested. Not even closely related Intel hardware like Haswell or Skylake-X. I also did a few spot tests with performance counters, and didn’t see any evidence of a reduction in writes. So for now this might a Skylake client only thing (of course, Skylake client is perhaps the most widely deployed Intel <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr> even due to the many identical-<abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>-except-in-name variants: Kaby Lake, Coffee Lake, etc, etc). Note that the Skylake-S result here is for a different (desktop i7-6700) chip than the rest of this post, so we can at least confirm this occurs on two different chips.</li>
+  <li>Except in the RAM region, Sandy Bridge throughput is half of its successors: a consequence of having only a 16-byte load/store path in the core, despite supporting 32-byte AVX instructions.</li>
+  <li>AMD Zen2 has <em>excellent</em> write performance in the L2 and L3 regions. All of the Intel chips drop to about half throughput for writes in the L2: slightly above 16 bytes per cycle (around 50 GB/s for most of these chips). Zen2 maintains its L1 throughput and in fact has its highest results in L2: over 100 GB/s. Zen2 also manages more than 70 GB/s in the L3, much better than the Intel chips, in this test.</li>
+  <li>Both Cannon Lake and Skylake-X exhibit a fair amount of inter-sample variance in the L2 resident region. My theory here would be prefetcher interference which behaves differently than earlier chips, but I am not sure.</li>
+  <li>Skylake-X, with a different L3 design than the other chips, has quite poor L3 fill throughput, about half of contemporary Intel chips, and less than a third of Zen2.</li>
+  <li>The POWER9 performance is neither terrible nor great. The most interesting part is probably the high L3 fill throughput: L3 throughput is as high or higher than L1 or L2 throughput, but still not in Zen2 territory.</li>
+  <li>Amazon’s new Graviton processor is very interesting. It seems to be limited to one 16-byte store per cycle<sup id="fnref:armcompile" role="doc-noteref"><a href="#fn:armcompile" class="footnote" rel="footnote">24</a></sup>, giving it a peak possible store throughput of 40 GB/s, so it doesn’t do well in the L1 region versus competitors that can hit 100 GB/s or more (they have both higher frequency and 32 byte stores), but it sustains the 40 GB/s all the way to RAM sizes, with a RAM result flat enough to serve drinks on, and this on a shared 64-CPU host where I paid for only a single core<sup id="fnref:g2ga" role="doc-noteref"><a href="#fn:g2ga" class="footnote" rel="footnote">25</a></sup>! The RAM performance is the highest out of all hardware tested.</li>
+</ul>
+
+<p>You might notice that Ice Lake, Intel’s newest microarchitecture, is missing from this list: that’s because there is a <a href="/blog/2020/05/18/icelake-zero-opt.html">whole separate post</a> on it.</p>
+
+<p><a id="summary-perma"></a></p>
+
+<h3 id="further-notes">Further Notes</h3>
+
+<p>Here’s a grab back of notes and observations that don’t get their a full section, don’t have any associated plots, etc. That doesn’t mean they are less important! Don’t say that! These ones matter too, they really do.</p>
+
+<ul>
+  <li>Despite any impressions I may have given above: you don’t need to <em>fully</em> overwrite a cache line with zeros for this to kick in, and you can even write <em>non-zero</em> values if you overwrite them “soon enough” with zeros. Rather, the line must initially fully zero, and then all the <em>escaping<sup id="fnref:escaping" role="doc-noteref"><a href="#fn:escaping" class="footnote" rel="footnote">26</a></sup></em> writes must be zero. Another way of thinking about this is that the thing that matters is the value of the cache line written back, as well as the old value of the line that the writeback is replacing: these must both be fully zero, but that doesn’t mean that you need to overwrite the line with zeros: any locations not written are still zero “from before”. I directly test this in the <code class="language-plaintext highlighter-rouge">one_per0</code> and <code class="language-plaintext highlighter-rouge">one_per1</code> tests in the benchmark. These write only a single <code class="language-plaintext highlighter-rouge">int</code> value in each cache line, leaving the other values unchanged. In that benchmark the optimization kicks triggers in exactly the same way when writing a single zero.</li>
+  <li>Although we didn’t find evidence of this happening on other x86 hardware, nor on POWER or ARM, that doesn’t mean it isn’t or can’t happen. It is possible the conditions for it to happen aren’t triggered, or that it is happening but doesn’t make a difference in performance. Similarly for the POWER9 and ARM chips: we didn’t check any performance counters, so maybe the thing is happening but it just doesn’t make any difference in performance. That’s especially feasible in the ARM case where the performance is totally limited by the core-level 16-bytes-per-cycle write throughput: even if all writes are eliminated later on in the path to memory, we expect the performance to be the same.</li>
+  <li>We could learn more about this effect by setting up a test which writes ones first to a region of some fixed size, then overwrites it with zeros, and repeats this in a rolling fashion over a larger buffer. This test basically lets the 1s escape to a certain level of the cache hierarchy, and seeing where the optimization kicks in will tell us something interesting.</li>
+</ul>
+
+<h2 id="wrapping-up">Wrapping Up</h2>
+
+<h3 id="findings">Findings</h3>
+
+<p>Here’s a brief summary of what we found. This will be a bit redundant if you’ve just read the whole thing, but we need to accommodate everyone who just skipped down to this part, right?</p>
+
+<ul>
+  <li>Intel chips can apparently eliminate some redundant stores when zeros are written to a cache line that is already all zero (the line doesn’t need to be fully overwritten).</li>
+  <li>This optimization applies at least as early as L2 writeback to L3, so would apply to the extend that working sets don’t fit in L2.</li>
+  <li>The effect eliminates both write accesses to L3, and writes to memory depending on the working set size.</li>
+  <li>For the pure store benchmark discussed here effect of this optimization is a reduction in the number of writes of ~63% (to L3) and ~50% (to memory), with a runtime reduction of between 15% and 20%.</li>
+  <li>It is unclear why not all redundant zero-over-zero stores are eliminated.</li>
+</ul>
+
+<h3 id="tuning-advice">Tuning “Advice”</h3>
+
+<p>So is any of actually useful? Can we use this finding to quadruple the speed of the things that really matter in computation: tasks like bitcoin mining, high-frequency trading and targeting ads in real time?</p>
+
+<p>Nothing like that, no – but it might provide a small boost for some cases.</p>
+
+<p>Many of those cases are probably getting the benefit without any special effort. After all, zero is already a special value: it’s how memory arrives comes from the operating system, and at the language allocation level for some languages. So a lot of cases that could get this benefit, probably already are.</p>
+
+<p>Redundant zero-over-zero probably isn’t as rare as you might think either: consider that in low level languages, memory is often cleared after receiving it from the allocator, but in many cases this memory came directly from the OS so it is already zero<sup id="fnref:calloc" role="doc-noteref"><a href="#fn:calloc" class="footnote" rel="footnote">27</a></sup>. Consider also cases like fairly-sparse matrix multiplication: where your matrix isn’t sparse enough to actually use dedicated sparse routines, but still has a lot of zeros. In that case, you are going to be writing 0 all the time in your final result and scratch buffers. This optimization will reduce the writeback traffic in that case.</p>
+
+<p>If you are making a ton of redundant writes, the first thing you might want to do is look for a way to stop doing that. Beyond that, we can list some ways you <em>might</em> be able to take advantage of this new behavior:</p>
+
+<ul>
+  <li>In the case you are likely to have redundant writes, prefer zero as the special value that is likely to be redundantly overwritten. For example if you are doing some blind writes, something like <a href="https://richardstartin.github.io/posts/garbage-collector-code-artifacts-card-marking">card marking</a> where you don’t know if your write is redundant, you might consider writing zeros, rather than writing non-zeros, since in the case that some region of card marks gets repeatedly written, it will be all-zero and the optimization can apply. Of course, this cuts the wrong way when you go to clear the marked region: now you have to write non-zero so you don’t get the optimization during clearing (but maybe this happens out of line with the user code that matters). What ends up better depends on the actual write pattern.</li>
+  <li>In case you might have redundant zero-over-zero writes, pay a bit more attention to 64-byte alignment than you normally would because this optimization only kicks in when a full cache line is zero. So if you have some 64-byte structures that might often be all zero (but with non-zero neighbors), a forced 64-byte alignment will be useful since it would activate the optimization more frequently.</li>
+  <li>Probably the most practical advice of all: just keep this effect in mind because it can mess up your benchmarks and make you distrust performance counters. I found this when I noticed that the scalar version of a benchmark was writing 2x as much memory as the AVX version, despite them doing the same thing other than the choice of registers. As it happens, the dummy value in vector register I was storing was zero, while in the scalar case it wasn’t: so there was a large difference that had nothing to do with scalar vs vector, but non-zero vs zero instead. Prefer non-zero values in store microbenchmarks, unless you really expect them to be zero in real life!</li>
+  <li>Keep an eye for a more general version of this optimization: maybe one day we’ll see this effect apply to redundant writes that aren’t zero-over-zero.</li>
+  <li>Floating point has two zero values: +0 and -0. The representation of +0 is all-bits-zero, so using +0 gives you the chance of getting this optimization. Of course, everyone is already using +0 whenever they explicitly want zero.</li>
+</ul>
+
+<p>Of course, the fact that this seems to currently only apply on Skylake and <a href="/blog/2020/05/18/icelake-zero-opt.html">Ice Lake</a> client hardware makes specifically targeting this quite dubious indeed.</p>
+
+<h3 id="thanks">Thanks</h3>
+
+<p>Thanks to Daniel Lemire who provided access to the hardware used in the <a href="#hardware-survey">Hardware Survey</a> part of this post.</p>
+
+<p>Thanks Alex Blewitt and Zach Wegner who pointed out the CSS tab technique (I used the one linked in the <a href="https://twitter.com/zwegner/status/1223701307078402048">comments of this post</a>) and others who replied to <a href="https://twitter.com/trav_downs/status/1223690150175236102">this tweet</a> about image carousels.</p>
+
+<p>Thanks to Tarlinian, 不良大脑的所有者, Bruce Dawson, Zach Wegner and Andrey Penechko who pointed out typos or omissions in the text.</p>
+
+<h3 id="discussion-and-feedback">Discussion and Feedback</h3>
+
+<p>Leave a comment below, or discuss on <a href="https://twitter.com/trav_downs/status/1260620313483771905">Twitter</a>, <a href="https://news.ycombinator.com/item?id=23169605">Hacker News</a>, <a href="https://www.reddit.com/r/asm/comments/gj3xq7/hardware_store_elimination/">reddit</a> or <a href="https://www.realworldtech.com/forum/?threadid=191798&amp;curpostid=191798">RWT</a>.</p>
+
+<p>Feedback is also warmly welcomed by <a href="mailto:travis.downs@gmail.com">email</a> or as <a href="https://github.com/travisdowns/travisdowns.github.io/issues">a GitHub issue</a>.</p>
+
+<hr />
+<p><br /></p>
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:ubstore" role="doc-endnote">
+      <p>Specifically, I was running <code class="language-plaintext highlighter-rouge">uarch-bench.sh --test-name=memory/bandwidth/store/*</code> from <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>-bench. <a href="#fnref:ubstore" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:story" role="doc-endnote">
+      <p>Like many posts on this blog, what follows is essentially a <em>reconstruction</em>. I encountered the effect originally in a benchmark, as described, and then worked backwards from there to understand the underlying effect. Then, I wrote this post the other way around: building up a new benchmark to display the effect … but at that point I already knew what we’d find. So please don’t think I just started writing the benchmark you find on GitHub and then ran into this issue coincidentally: the arrow of causality points the other way. <a href="#fnref:story" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:assume" role="doc-endnote">
+      <p>Probably? I don’t like to assume too much about the reader, but this seems like a fair bet. <a href="#fnref:assume" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:icldiv" role="doc-endnote">
+      <p>Starting with Ice Lake, it seems like Intel has implemented a constant-time integer divide unit. <a href="#fnref:icldiv" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:memperf" role="doc-endnote">
+      <p>Latency-wise, something like 4-5 cycles for an L1 hit, versus 200-500 cycles for a typical miss to DRAM. Throughput wise there is also a very large gap (256 GB/s L1 throughput <em>per core</em> on a 512-bit wide machine versus usually less than &lt; 100 GB/s <em>per socket</em> on recent Intel). <a href="#fnref:memperf" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:atall" role="doc-endnote">
+      <p>Is it deployed anywhere at all on x86? Ping me if you know. <a href="#fnref:atall" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:otherc" role="doc-endnote">
+      <p>It’s hard to say which is faster if they are compiled as written: x86 has indexed addressing modes that make the indexing more or less free, at least for arrays of element size 1, 2, 4 or 8, so the usual arguments againt indexed access mostly don’t apply. Probably, it doesn’t matter: this detail might have made a big difference 20 years ago, but it is unlikely to make a difference on a decent compiler today, which can transform one into the other, depending on the target hardware. <a href="#fnref:otherc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:bpurp" role="doc-endnote">
+      <p>For benchmarking purposes, we wrap this in <a href="https://github.com/travisdowns/zero-fill-bench/blob/post1/algos.cpp#L28">another function</a> so we can slap a <code class="language-plaintext highlighter-rouge">noinline</code> attribute on this function to ensure that we have a single non-inlined version to call for different values. If we just called <code class="language-plaintext highlighter-rouge">std::fill</code> with a literal <code class="language-plaintext highlighter-rouge">int</code> value, it highly likely to get inlined at the call site and we’d have code with different alignment (and possibly other differences) for each value. <a href="#fnref:bpurp" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:clangv" role="doc-endnote">
+      <p>Admittedly I didn’t go line-by-line though the long vectorized version produced by clang but the line count is identical and if you squint so the assembly is just a big green and yellow blur they look the same… <a href="#fnref:clangv" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:warm" role="doc-endnote">
+      <p>There are 27 samples total at each size: the first 10 are discarded as warmup and the remaining 17 are plotted. <a href="#fnref:warm" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:errorbars" role="doc-endnote">
+      <p>The main problem with error bars are that most performance profiling results, and especially microbenchmarks, are mightly non-normal in their distribution, so displaying an error bar based a statistic like the variance is often highly misleading. <a href="#fnref:errorbars" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:l2" role="doc-endnote">
+      <p>The ~ is there in ~256 KiB because unless you use huge pages, you might start to see L2 misses even before 256 KiB since only a 256 KiB <em>virtually contiguous</em> buffer is not necessarily well behaved in terms of evictions: it depends how those 4k pages are mapped to physical pages. As soon as you get too many 4k pages mapping to the same group of sets, you’ll see evictions even before 256 KiB. <a href="#fnref:l2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:badvec" role="doc-endnote">
+      <p>It is worth noting<sup id="fnref:nested" role="doc-noteref"><a href="#fn:nested" class="footnote" rel="footnote">28</a></sup> that this performance variation with buffer size isn’t exactly inescapable. Rather, it is just a consequence of poor remainder handling in the compiler’s auto-vectorizer. An approach that would be much faster and generate much less code to handle the remaining elements would be to do a final full-width vector store but aligned to the end of the buffer. So instead of doing up to 7 additional scalar stores, you do one additional vector store (and suffer up to one fewer branch mispredictions for random lengths, since the scalar outro involves conditional jumps). <a href="#fnref:badvec" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:melty" role="doc-endnote">
+      <p>Those melty bits where the pattern gets all weird, in the middle and near the right side are not random artifacts: they are consistently reproducible. I suspect a collision in the branch predictor history. <a href="#fnref:melty" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:silent" role="doc-endnote">
+      <p>This behavior is interesting and a bit puzzling. There are several reasons why you might want to do a non-silent eviction. (1a) would be to keep the L3 snoop filter up to date: if the L3 knows a core no longer has a copy of the line, later requests for that line can avoid snooping the core and are some 30 cycles faster. (1b) Similarly, if the L3 wants to evict this line, this is faster if it knows it can do it without writing back, versus snooping the owning core for a possibly modified line. (2) Keeping the L3 <abbr title="Least recently used - an eviction strategy suitable for data with temporal locality">LRU</abbr> more up to date: the L3 <abbr title="Least recently used - an eviction strategy suitable for data with temporal locality">LRU</abbr> wants to know which lines are hot, but most of the accesses are filtered through the L1 and L2, so the L3 doesn’t get much information – a non-silent eviction can provide some of the missing info (3) If the L3 serves as a victim cache, the L2 needs to write back the line for it to be stored in L3 at all. <abbr title="Intel's Skylake (server) architecture including Skylake-SP, Skylake-X and Skylake-W">SKX</abbr> L3 actually works this way, but despite being a very similar <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>, <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr> apparently doesn’t. However, one can imagine that on a miss to DRAM it may be advantageous to send the line directly to the L2, updating the L3 tags (snoop filter) only, without writing the data into L3. The data only gets written when the line is subsequently evicted from the owning L2. When lines are frequently modified, this cuts the number of writes to L3 in half. This behavior warrants further investigation. <a href="#fnref:silent" class="reversefootnote" role="doc-backlink">&#8617;</a> <a href="#fnref:silent:1" class="reversefootnote" role="doc-backlink">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:trust" role="doc-endnote">
+      <p>You’ve already seen in Fig. 1 that there is little inter-sample variation, and this keeps the noise down. You can always check the raw data if you want the detailed view. <a href="#fnref:trust" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:wb" role="doc-endnote">
+      <p>This shows that the L2 is a write-back cache, not write-through: modified lines can remain in L2 until they are evicted, rather than immediately being written to the outer levels of the memory hierarchy. This type of design is key for high store throughput, since otherwise the long-term store throughput is limited to the bandwidth of the slowest write-through cache level. <a href="#fnref:wb" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:orl3" role="doc-endnote">
+      <p>I say the L2 because the behavior is already reflected in the L2 performance counters, but it could be teamwork between the L2 and other components, e.g., the L3 could say “OK, I’ve got that line you <abbr title="Request for ownership: when a request for a cache line originates from a store, or a type of prefetch that predicts the location is likely to be the target of a store, an RFO is performed which gets the line in an exclusive MESI state.">RFO</abbr>’d and BTW it is all zeros”. <a href="#fnref:orl3" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:rfo" role="doc-endnote">
+      <p>Although only stores appear in the source, at the hardware level this benchmark does at least as many reads as stores: every store must do a <em>read for ownership</em> (<abbr title="Request for ownership: when a request for a cache line originates from a store, or a type of prefetch that predicts the location is likely to be the target of a store, an RFO is performed which gets the line in an exclusive MESI state.">RFO</abbr>) to get the current value of the line before storing to it. <a href="#fnref:rfo" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:sneaky" role="doc-endnote">
+      <p>Eagle-eyed readers, all two of them, might notice that the performance in the L3 region is different than the previous figure: here the performance slopes up gradually across most of the L3 range, while in the previous test it was very flat. Absolute performance is also somewhat lower. This is a testing artifact: reading the uncore performance counters necessarily involves a kernel call, taking over 1,000 cycles versus the &lt; 100 cycles required for <code class="language-plaintext highlighter-rouge">rdpmc</code> to measure the CPU performance counters needed for the prior figure. Due to “flaws” (laziness) in the benchmark, this overhead is captured in the shown performance, and larger regions take longer, meaning that this fixed measurement overhead has a smaller relative impact, so you get this <code class="language-plaintext highlighter-rouge">measured = actual - overhead/size</code> type effect. It can be fixed, but I have to reboot my host into single-user mode to capture clean numbers, and I am feeling too lazy to do that right now, although as I look back at the size of the footnote I needed to explain it I am questioning my judgement. <a href="#fnref:sneaky" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:imcevent" role="doc-endnote">
+      <p>On <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr> client CPUs we can do this with the <code class="language-plaintext highlighter-rouge">uncore_imc/data_writes/</code> events, which polls internal counters in the memory controller itself. This is a socket-wide event, so it is important to do this measurement on as quiet a machine as possible. <a href="#fnref:imcevent" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:params" role="doc-endnote">
+      <p>I tried a bunch of other stuff that I didn’t write up in detail. Many of them affect the behavior: we still see the optimization but with different levels of effectiveness. For example, with L2 prefetching off, only about 40% of the L2 evictions are eliminated (versus &gt; 60% with prefetch on), and the performance difference between is close to zero despite the large number of eliminations. I tried other sizes of writes, and with narrow writes the effect is reduced until it is eliminated at 4-byte writes. I don’t think the write size <em>directly</em> affects the optimization, but rather narrower writes slow down the maximum possible performance which interacts in some way with the hardware mechanisms that support this to reduce how often it occurs (a similar observation could apply to prefetching). <a href="#fnref:params" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:obbus" role="doc-endnote">
+      <p>By <em>outbound queues</em> I mean the path between an inner and outer cache level. So for the L2, the outbound bus is the so-called <em>superqueue</em> that connects the L2 to the uncore and L3 cache. <a href="#fnref:obbus" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:armcompile" role="doc-endnote">
+      <p>The Graviton 2 uses the Cortex A76 <abbr title="Microarchitecture: a specific implementation of an ISA, e.g., &quot;Haswell microarchitecture&quot;.">uarch</abbr>, which can <em>execute</em> 2 stores per cycle, but the L1 cache write ports limits sustained execution to only one 128-bit store per cycle. <a href="#fnref:armcompile" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:g2ga" role="doc-endnote">
+      <p>It was the first full day of general availability for Graviton, so perhaps these hosts are very lightly used at the moment because it certainly felt like I had the whole thing to myself. <a href="#fnref:g2ga" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:escaping" role="doc-endnote">
+      <p>By <em>escaping</em> I mean that a store that visibly gets to the cache level where this optimization happens. For example, if I write a 1 immediately followed by a 0, the 1 will never make it out of the L1 cache, so from the point of view of the L2 and beyond only a zero was written. I expect the optimization to still trigger in this case. <a href="#fnref:escaping" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:calloc" role="doc-endnote">
+      <p>This phenomenon is why <code class="language-plaintext highlighter-rouge">calloc</code> is sometimes considerably faster than <code class="language-plaintext highlighter-rouge">malloc + memset</code>. With <code class="language-plaintext highlighter-rouge">calloc</code> the zeroing happens within the allocator, and the allocator can track whether the memory it is about to return is <em>known zero</em> (usually because it the block is fresh from the OS, which always zeros memory before handing it out to userspace), and in the case of <code class="language-plaintext highlighter-rouge">calloc</code> it can avoid the zeroing entirely (so <code class="language-plaintext highlighter-rouge">calloc</code> runs as fast as <code class="language-plaintext highlighter-rouge">malloc</code> in that case). The client code calling <code class="language-plaintext highlighter-rouge">malloc</code> doesn’t receive this information and can’t make the same optimization. If you stretch the analogy almost to the breaking point, one can see what Intel is doing here as “similar, but in hardware”. <a href="#fnref:calloc" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:nested" role="doc-endnote">
+      <p>Ha! To me, everything is “worth noting” if it means another footnote. <a href="#fnref:nested" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div><!-- travis override -->
+  
+    <section class="comments" id="comment-section">
+  <hr>
+  
+  <!-- Existing comments -->
+  <div class="comments__existing">
+    <h2>Comments</h2>
+    
+    
+    <!-- List main comments in reverse date order, newest first. List replies in date order, oldest first. -->
+    
+    
+
+<article id="comment-ea575830-d45a-11eb-a781-93a616abab19" class="js-comment comment" uid="ea575830-d45a-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+    Ext3h
+    <span class="comment__date">•
+        <a href="#comment-ea575830-d45a-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 19:40</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>On point 27., the memory you get from the OS is initially mapped to the shared zero page, but on the first access violation (non-zero write!), you get an interrupt which spends about half the time in updating the page tables, and the other half in performing a memset to 0. (Which by the way happens with a <code class="language-plaintext highlighter-rouge">rep stos</code>, not an AVX loop.)</p>
+
+<p>The freshly mapped pages <em>may</em> have been already zeroed out, but not always are, and unless the OS would be zeroing eagerly, it wouldn’t know either.</p>
+
+<p>For that interrupt, this is (or was…) an essential optimization. Partly because newer Intel CPUs have a failed design, where non-“thread”-safe interrupts (such as a page fault) must use a spin lock as the only possible safeguard against a corrupted page table, but too many cores in the spinlock burn up all the cache bandwidth and thereby slow down the work in the critical section. In summary, you may have 1TB of RAM, and a couple dozen cores, but if you ain’t careful, all cores get trapped in the interrupt while you can’t page fault at a rate of more than 10-15GB/s.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ea575830-d45a-11eb-a781-93a616abab19', 'respond', 'intel-zero-opt', 'ea575830-d45a-11eb-a781-93a616abab19')">↪&#xFE0E; Reply to Ext3h</a>
+    </div>
+</article>
+  
+
+<article id="comment-762deb60-d45d-11eb-a781-93a616abab19" class="js-comment comment admin child" uid="762deb60-d45d-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-762deb60-d45d-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 19:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I agree with your description of how the zero page allocation happens[1], but it’s not inconsistent with anything in the footnote, is it?</p>
+
+<p>The footnote talks about the <em>userspace</em> side of things: the <em>userspace</em> allocator (e.g., in libc) gets “effectively” zeroed memory from the OS, regardless of how that happens. Now if <code class="language-plaintext highlighter-rouge">malloc</code> was used by the application code, the caller can’t assume the returned region is zero, because malloc doesn’t in general return zero memory: the (userspace) allocator may have either recycled an existing free region (not zero) or returned fresh obtained from the OS (zero). So the caller must zero the memory, which may be redundant if the pages were known to be zero to the allocator.</p>
+
+<p>In <code class="language-plaintext highlighter-rouge">calloc</code>, the zeroing happens inside the (userspace) allocator, which <em>knows</em> where it got the pages from, and hence whether they are guaranteed zero. So in the case of fresh memory from the OS, it can skip the zeroing.</p>
+
+<hr />
+<p>[1] Although it’s configurable so not <em>everyone</em> is using the zero page, especially outside of x86, and some have argued that this whole zero-page page thing is worse than the simple alternative: the benefit is that “sparse” mappings in which most pages are never written to, but are read, are efficient: they need only one physical page for every <em>written</em> page, but the downside is you need an extra fault for every page. Since <em>most</em> pages are written after allocation, is it even a win?</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-540b2b20-d34e-11eb-a28b-2b17081581e0" class="js-comment comment" uid="540b2b20-d34e-11eb-a28b-2b17081581e0">
+
+  <div class="comment__author">
+    pmuldq
+    <span class="comment__date">•
+        <a href="#comment-540b2b20-d34e-11eb-a28b-2b17081581e0" title="Permalink to this comment">June 22th, 2021 11:38</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Quick question regarding Graviton performance. ARMv8 has an explicit instruction to zero out a cache line (DCZVA). Do you know if std::fill or memset have a short circuit for the case where the value to fill is zero which defaults to using DCZVA. I assume it would improve zero-fill significantly, although obviously, it is not a dynamic feature.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-540b2b20-d34e-11eb-a28b-2b17081581e0', 'respond', 'intel-zero-opt', '540b2b20-d34e-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to pmuldq</a>
+    </div>
+</article>
+  
+
+<article id="comment-c1337a10-d45f-11eb-a781-93a616abab19" class="js-comment comment admin child" uid="c1337a10-d45f-11eb-a781-93a616abab19">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-c1337a10-d45f-11eb-a781-93a616abab19" title="Permalink to this comment">June 23th, 2021 20:15</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I doubt <code class="language-plaintext highlighter-rouge">std::fill</code> has a special case itself, because the standard library implementations rarely seem to use platform specific code to improve performance, relying instead on compiler transformations. Now, the compiler <a href="https://godbolt.org/z/GMqfhrs1h">can transform</a> <code class="language-plaintext highlighter-rouge">std::fill</code> to <code class="language-plaintext highlighter-rouge">memset</code>, and <code class="language-plaintext highlighter-rouge">memset</code> <em>does</em> have a DCVZA <a href="https://github.com/bminor/glibc/blob/17a73a6d8b4c46f3e87fc53c7c25fa7cec01d707/sysdeps/aarch64/memset.S#L103">path in glibc</a> at least!</p>
+
+<p>So it would be interesting to see how much difference this makes.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-3e568a70-5a29-11eb-9e5b-15b668946273" class="js-comment comment" uid="3e568a70-5a29-11eb-9e5b-15b668946273">
+
+  <div class="comment__author">
+    Noah Goldstein
+    <span class="comment__date">•
+        <a href="#comment-3e568a70-5a29-11eb-9e5b-15b668946273" title="Permalink to this comment">January 19th, 2021 07:37</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Regarding:</p>
+<blockquote>
+  <p>What is the weirdest of all, however, is that the optimization doesn’t kick in 100% of the time but only for 40% to 60%</p>
+</blockquote>
+
+<p>and</p>
+
+<blockquote>
+  <p>Let’s try a benchmark which adds a new implementation, alt01 which alternates between writing a cache line of zeros and a cache line of ones.</p>
+</blockquote>
+
+<p>If you didn’t have the L2 prefetchers off the 40 - 60% success rate seems to corresponding somewhat reasonably with the fact that the <a href="https://stackoverflow.com/questions/20544917/prefetching-data-at-l1-and-l2">L2 spatial and streamer prefetchers will attempt to prefetch 128 byte cache line pair</a> and if this was indeed what was causing that number (say something like only the 128 byte aligned line could be “store-eliminated”) then that might explain wait the <code class="language-plaintext highlighter-rouge">alt01</code> version didn’t have any affect.</p>
+
+<p>I think your next blog post’s data on icelake about how <code class="language-plaintext highlighter-rouge">ymm</code> fill beats <code class="language-plaintext highlighter-rouge">zmm</code> fill might also support your theory that the “store-elimination” is done opportunistically when there is heavy store pressure i.e you get 2x the writes with <code class="language-plaintext highlighter-rouge">ymm</code> so if you theory is correct twice the pressure would induce more efforts for “store-elimination”.</p>
+
+<p>Mostly bullshitting but it kind of lines up :)</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3e568a70-5a29-11eb-9e5b-15b668946273', 'respond', 'intel-zero-opt', '3e568a70-5a29-11eb-9e5b-15b668946273')">↪&#xFE0E; Reply to Noah Goldstein</a>
+    </div>
+</article>
+  
+
+<article id="comment-6c288700-5b87-11eb-ac86-931d7b94d6d2" class="js-comment comment child" uid="6c288700-5b87-11eb-ac86-931d7b94d6d2">
+
+  <div class="comment__author">
+    Noah Goldstein
+    <span class="comment__date">•
+        <a href="#comment-6c288700-5b87-11eb-ac86-931d7b94d6d2" title="Permalink to this comment">January 21th, 2021 01:24</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Tested this. No luck.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-79d35640-61aa-11eb-ae6f-195020150b40" class="js-comment comment admin child" uid="79d35640-61aa-11eb-ae6f-195020150b40">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-79d35640-61aa-11eb-ae6f-195020150b40" title="Permalink to this comment">January 28th, 2021 20:50</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Noah,</p>
+
+<p>Thanks for your comment!</p>
+
+<p>The results shown have prefetching on, but I did also try with prefetching off and some other variations as discussed briefly <a href="https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html#fn:params">in a footnote</a>. In fact, I found <em>less</em> elimination with prefetching off.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-a7b680b0-c000-11ea-b24f-4945d5db13e7" class="js-comment comment" uid="a7b680b0-c000-11ea-b24f-4945d5db13e7">
+
+  <div class="comment__author">
+    Vladimir
+    <span class="comment__date">•
+        <a href="#comment-a7b680b0-c000-11ea-b24f-4945d5db13e7" title="Permalink to this comment">July  7th, 2020 03:19</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice writeup</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a7b680b0-c000-11ea-b24f-4945d5db13e7', 'respond', 'intel-zero-opt', 'a7b680b0-c000-11ea-b24f-4945d5db13e7')">↪&#xFE0E; Reply to Vladimir</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-48755d00-993c-11ea-8849-3f1b5cac7d3c" class="js-comment comment" uid="48755d00-993c-11ea-8849-3f1b5cac7d3c">
+
+  <div class="comment__author">
+    Kuba Beránek
+    <span class="comment__date">•
+        <a href="#comment-48755d00-993c-11ea-8849-3f1b5cac7d3c" title="Permalink to this comment">May 18th, 2020 19:17</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>This is a super interesting effect, very nice find! I took the liberty of adding it to my HW effects repository (https://github.com/kobzol/hardware-effects/tree/master/hardware-store-elimination).</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-48755d00-993c-11ea-8849-3f1b5cac7d3c', 'respond', 'intel-zero-opt', '48755d00-993c-11ea-8849-3f1b5cac7d3c')">↪&#xFE0E; Reply to Kuba Beránek</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-59652190-96ad-11ea-aacc-b1346604130d" class="js-comment comment" uid="59652190-96ad-11ea-aacc-b1346604130d">
+
+  <div class="comment__author">
+    Doug Miller
+    <span class="comment__date">•
+        <a href="#comment-59652190-96ad-11ea-aacc-b1346604130d" title="Permalink to this comment">May 15th, 2020 13:09</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Having a 512-wide arithmetic op–even just a wide OR–lying around in the cache hierarchy outside of a processor seems rather peculiar to me. There also aren’t any arithmetic instruction ports used on a vector store (per Agner Fog’s tables), which raises the question of where the “is zero” bit is being calculated. To speculate and conjecture wildly for a moment… I think the most natural place for an “is zero” bit to come from is use of the (renamed) zero register in either the integer or vector register file. In other words, there’s a little heuristic piece of hardware in the store port that detects if you’ve just covered a cacheline with writes from the zero register, and sets an “is zero” bit on the last write if so. My prediction, then, is that if you “trick” a register into being zero, rather than performing operations that may have it renamed to the zero register, you’ll see the effect go away. One way I can think of to do this would be to add three static vectors that you know in advance sum to all zeros.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-59652190-96ad-11ea-aacc-b1346604130d', 'respond', 'intel-zero-opt', '59652190-96ad-11ea-aacc-b1346604130d')">↪&#xFE0E; Reply to Doug Miller</a>
+    </div>
+</article>
+  
+
+<article id="comment-693d2630-96df-11ea-8bfa-f9544424bd98" class="js-comment comment admin child" uid="693d2630-96df-11ea-8bfa-f9544424bd98">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-693d2630-96df-11ea-8bfa-f9544424bd98" title="Permalink to this comment">May 15th, 2020 19:08</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I am not sure we are on the same page wrt the costs of a 512-bit wide compare-to-zero. I am not an ASIC designer (I feel like I’m pointing this out almost every day, now!), but I believe the cost of such a comparator is quite small in the overall scheme of things. Things like 128-bit (result size) integer multipliers are probably a couple of orders of magnitude larger, and they still seem to take up vanishingly small portions of the chip if you look at die shots. So I don’t think having a 512-bit wide comparator somewhere in the cache hierarchy is a problem.</p>
+
+<p>Keep in mind, this is still very much <em>inside</em> the processor! The whole cache hierarchy we are talking about is inside the processor, and the L2 is right inside the core. So the cache is implemented in very much the same logic process as the core itself, so there is particular problem putting a comparator in there.</p>
+
+<blockquote>
+  <p>My prediction, then, is that if you “trick” a register into being zero, rather than performing operations that may have it renamed to the zero register, you’ll see the effect go away.</p>
+</blockquote>
+
+<p>The test already does this: if you look at the assembly, no zeroing idiom is being used, and the function is compiled separately and so is generic for all values. The function takes an integer register, and broadcasts it to a vector one, so the zeroness of the register is lost (unless you think there is a special case for broadcast from a zero integer register, which I think is very unlikely). Still, I did double check and changed the code to read from a <code class="language-plaintext highlighter-rouge">volatile int zero = 0</code> variable, and checked the assembly to confirm that the zero now comes from a memory read, not a zeroing idiom in an integer register and I get the results.</p>
+
+<p>Apart from the actual results, I see at least a couple of problems with the suggested mechanism:</p>
+
+<p>1) I think it would massively reduce the applicability of the optimization, because a lot of zeroing is done with not-zero-idiom initialized registers. I think also the zeroed-by-idiom state is lost after e.g., a context switch.</p>
+
+<p>2) The thing you need to track is the zeroness of the entire 64-byte line. Constantly checking and updating this state on stores of smaller values seems both expensive and difficult. For example when you write a zero to a line, you need know if the rest of the line was zero to update the all zero state. Also, you might write the line millions of times before it is ever evicted from the L1, so you update the status millions of times when only the final state is useful.</p>
+
+<p>Calculating this property at the moment (or nearby) to when the line is actually being evicted, as Intel seems to do, strikes me as a better strategy.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-b56ba5c0-9637-11ea-9007-51f9f966835a" class="js-comment comment" uid="b56ba5c0-9637-11ea-9007-51f9f966835a">
+
+  <div class="comment__author">
+    Jeff Hammond
+    <span class="comment__date">•
+        <a href="#comment-b56ba5c0-9637-11ea-9007-51f9f966835a" title="Permalink to this comment">May 14th, 2020 23:07</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>You really should run those tests in parallel, because server CPUs are designed to run workloads that use more than one core. It’s neat that Graviton can drive 40 GB/s from a single core, but that’s irrelevant unless you actually care about workloads where only one core of many is moving data.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b56ba5c0-9637-11ea-9007-51f9f966835a', 'respond', 'intel-zero-opt', 'b56ba5c0-9637-11ea-9007-51f9f966835a')">↪&#xFE0E; Reply to Jeff Hammond</a>
+    </div>
+</article>
+  
+
+<article id="comment-10d8f9f0-9640-11ea-8bb7-012d5eb40616" class="js-comment comment admin child" uid="10d8f9f0-9640-11ea-8bb7-012d5eb40616">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-10d8f9f0-9640-11ea-8bb7-012d5eb40616" title="Permalink to this comment">May 15th, 2020 00:07</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Are you under the mistaken impression that I’m trying to do a server workload comparison or something like that?</p>
+
+<p>I’m not. I’m running these tests only to probe this specific uarch effect and single-thread is ideal for that. As a side effect, I made some notes on single threaded performance, but I’m not doing multi-threaded numbers here because none of that is the point.</p>
+
+<p>That said, single thread memory bandwidth is pretty important for server loads too: because it usually predicts well for 2, 3, 4 threads, etc. Not all server loads are pushing memory to the limit on every thread (in fact, I’d argue most don’t)!</p>
+
+<p>In any case, using all the cores produces quite boring results on any decent server, whether it’s AMD, Intel or ARM: you reach some significant fraction of the implied maximum memory bandwidth, unless you screw up NUMA placement or something. Graviton is no different: IIRC it gets within 85% or 90% of the peak, based on tests run by others. You probably don’t want me to run those <em>again</em> – this is about a cool thing Intel is doing in their memory subsystem, not a server shootout.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-d887d100-9560-11ea-8885-c1a370f2dc6c" class="js-comment comment" uid="d887d100-9560-11ea-8885-c1a370f2dc6c">
+
+  <div class="comment__author">
+    Peter Cordes
+    <span class="comment__date">•
+        <a href="#comment-d887d100-9560-11ea-8885-c1a370f2dc6c" title="Permalink to this comment">May 13th, 2020 21:29</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Re: footnote 8: indeed, <code class="language-plaintext highlighter-rouge">std::fill(0)</code> vs. <code class="language-plaintext highlighter-rouge">std::fill(1)</code> with compile-time constant values can make very different code: https://stackoverflow.com/q/42558907/224132</p>
+
+<p>std::fill(0) gets inlined a REP MOVSB on some GCC versions, but GCC doesn’t do memset pattern recognition for patterns wider than 1 byte and can only auto-vectorize fill(1) the normal way.  (Like for a runtime-variable value).</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d887d100-9560-11ea-8885-c1a370f2dc6c', 'respond', 'intel-zero-opt', 'd887d100-9560-11ea-8885-c1a370f2dc6c')">↪&#xFE0E; Reply to Peter Cordes</a>
+    </div>
+</article>
+  
+
+<article id="comment-fc335990-95be-11ea-9278-c52ec055ca5f" class="js-comment comment child" uid="fc335990-95be-11ea-9278-c52ec055ca5f">
+
+  <div class="comment__author">
+    Alexander Monakov
+    <span class="comment__date">•
+        <a href="#comment-fc335990-95be-11ea-9278-c52ec055ca5f" title="Permalink to this comment">May 14th, 2020 08:43</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>gcc recognizes fill-with-same-bytes since gcc-4.9, see const_with_all_bytes_same in gcc/tree-loop-distribution.c and this CE example: https://godbolt.org/z/Neo9tN</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+<article id="comment-eafe8c50-61a9-11eb-ae6f-195020150b40" class="js-comment comment admin child" uid="eafe8c50-61a9-11eb-ae6f-195020150b40">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-eafe8c50-61a9-11eb-ae6f-195020150b40" title="Permalink to this comment">January 28th, 2021 20:46</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Peter, nice to see you here and thanks for your comment!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2" class="js-comment comment" uid="4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2">
+
+  <div class="comment__author">
+    Vadim Korchagin
+    <span class="comment__date">•
+        <a href="#comment-4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2" title="Permalink to this comment">May 13th, 2020 18:48</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Very interesting. Thanks for the article!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2', 'respond', 'intel-zero-opt', '4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2')">↪&#xFE0E; Reply to Vadim Korchagin</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-e2d21e30-9543-11ea-b265-99f655d4465e" class="js-comment comment" uid="e2d21e30-9543-11ea-b265-99f655d4465e">
+
+  <div class="comment__author">
+    gfoidl
+    <span class="comment__date">•
+        <a href="#comment-e2d21e30-9543-11ea-b265-99f655d4465e" title="Permalink to this comment">May 13th, 2020 18:02</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Fabalous write-up. Thanks! :+1:</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e2d21e30-9543-11ea-b265-99f655d4465e', 'respond', 'intel-zero-opt', 'e2d21e30-9543-11ea-b265-99f655d4465e')">↪&#xFE0E; Reply to gfoidl</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+  </div>
+  
+
+  <!-- New comment form -->
+  <div id="respond" class="comment__new">
+    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+  <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html">
+  <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html">
+  <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
+  <input type="hidden" name="options[slug]" value="intel-zero-opt">
+  
+  
+  <div class="textfield">
+    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+      <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
+    </label>
+  </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-name">Name
+        <input class="textfield__input" name="fields[name]" type="text" id="comment-form-name" placeholder="Your name (required)" required/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield">
+      <label for="comment-form-email">E-mail
+        <input class="textfield__input" name="fields[email]" type="email" id="comment-form-email" placeholder="Your email (optional)"/>
+      </label>
+    </div>
+
+    <div class="textfield narrowfield hp">
+      <label for="hp">
+        <input class="textfield__input" name="fields[hp]" id="hp" type="text" placeholder="Leave blank">
+      </label>
+    </div>
+
+    
+
+    <button class="button" id="comment-form-submit">
+      Submit
+    </button>
+
+</form>
+
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none" >
+  <symbol id="icon-loading" viewBox="149.8 37.8 499.818 525"><path d="M557.8 187.8c13.8 0 24.601-10.8 24.601-24.6S571.6 138.6 557.8 138.6s-24.6 10.8-24.6 24.6c0 13.2 10.8 24.6 24.6 24.6zm61.2 90.6c-16.8 0-30.6 13.8-30.6 30.6s13.8 30.6 30.6 30.6 30.6-13.8 30.6-30.6c.6-16.8-13.2-30.6-30.6-30.6zm-61.2 145.2c-20.399 0-36.6 16.2-36.6 36.601 0 20.399 16.2 36.6 36.6 36.6 20.4 0 36.601-16.2 36.601-36.6C595 439.8 578.2 423.6 557.8 423.6zM409 476.4c-24 0-43.2 19.199-43.2 43.199s19.2 43.2 43.2 43.2 43.2-19.2 43.2-43.2S433 476.4 409 476.4zM260.8 411c-27 0-49.2 22.2-49.2 49.2s22.2 49.2 49.2 49.2 49.2-22.2 49.2-49.2-22.2-49.2-49.2-49.2zm-10.2-102c0-27.6-22.8-50.4-50.4-50.4-27.6 0-50.4 22.8-50.4 50.4 0 27.6 22.8 50.4 50.4 50.4 27.6 0 50.4-22.2 50.4-50.4zm10.2-199.8c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24.6-54-54-54zM409 37.8c-35.4 0-63.6 28.8-63.6 63.6S374.2 165 409 165s63.6-28.8 63.6-63.6-28.2-63.6-63.6-63.6z"/>
+  </symbol>
+</svg>
+
+
+
+  </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/assets/main.js"></script>
+
+
+  
+  <!-- end override -->
+
+  <a class="u-url" href="/blog/2020/05/13/intel-zero-opt.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

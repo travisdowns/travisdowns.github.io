@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+<title>Performance Matters | A blog about low-level software and hardware performance.</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Performance Matters" />
+<meta name="author" content="Travis Downs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A blog about low-level software and hardware performance." />
+<meta property="og:description" content="A blog about low-level software and hardware performance." />
+<link rel="canonical" href="https://travisdowns.github.io/misc/tables/concurrency-costs/icl/fair-yield.html" />
+<meta property="og:url" content="https://travisdowns.github.io/misc/tables/concurrency-costs/icl/fair-yield.html" />
+<meta property="og:site_name" content="Performance Matters" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Performance Matters" />
+<meta name="twitter:site" content="@trav_downs" />
+<meta name="twitter:creator" content="@trav_downs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Performance Matters","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/misc/tables/concurrency-costs/icl/fair-yield.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<script>
+  window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-136594956-1');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Implementation</th>
+      <th>mutex add</th>
+      <th>atomic add</th>
+      <th>cas add</th>
+      <th>ticket yield</th>
+    </tr>
+    <tr>
+      <th>Trial</th>
+      <th>Cores</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="3" valign="top">0</th>
+      <th>2</th>
+      <td>222.8</td>
+      <td>32.7</td>
+      <td>103.2</td>
+      <td>275.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>135.5</td>
+      <td>49.4</td>
+      <td>171.2</td>
+      <td>445.7</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>446.5</td>
+      <td>69.5</td>
+      <td>267.0</td>
+      <td>593.9</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">1</th>
+      <th>2</th>
+      <td>219.0</td>
+      <td>32.8</td>
+      <td>102.0</td>
+      <td>278.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>135.9</td>
+      <td>49.2</td>
+      <td>171.0</td>
+      <td>447.4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>447.1</td>
+      <td>69.5</td>
+      <td>266.7</td>
+      <td>621.1</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">2</th>
+      <th>2</th>
+      <td>217.1</td>
+      <td>32.8</td>
+      <td>103.1</td>
+      <td>275.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>136.4</td>
+      <td>49.2</td>
+      <td>171.3</td>
+      <td>446.9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>442.0</td>
+      <td>69.5</td>
+      <td>266.6</td>
+      <td>588.8</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">3</th>
+      <th>2</th>
+      <td>221.1</td>
+      <td>32.7</td>
+      <td>102.2</td>
+      <td>275.9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>135.6</td>
+      <td>49.2</td>
+      <td>171.1</td>
+      <td>444.7</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>441.3</td>
+      <td>69.4</td>
+      <td>266.8</td>
+      <td>582.9</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">4</th>
+      <th>2</th>
+      <td>223.0</td>
+      <td>32.7</td>
+      <td>102.7</td>
+      <td>278.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>136.4</td>
+      <td>49.5</td>
+      <td>170.9</td>
+      <td>444.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>446.6</td>
+      <td>69.5</td>
+      <td>266.8</td>
+      <td>588.4</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">5</th>
+      <th>2</th>
+      <td>216.4</td>
+      <td>32.9</td>
+      <td>102.6</td>
+      <td>277.1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>135.5</td>
+      <td>49.1</td>
+      <td>171.0</td>
+      <td>446.8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>444.0</td>
+      <td>69.4</td>
+      <td>266.6</td>
+      <td>578.9</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">6</th>
+      <th>2</th>
+      <td>219.4</td>
+      <td>32.8</td>
+      <td>103.2</td>
+      <td>276.3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>136.6</td>
+      <td>49.3</td>
+      <td>170.9</td>
+      <td>446.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>447.0</td>
+      <td>69.5</td>
+      <td>266.5</td>
+      <td>597.7</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">7</th>
+      <th>2</th>
+      <td>222.9</td>
+      <td>33.0</td>
+      <td>103.3</td>
+      <td>276.7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>136.3</td>
+      <td>49.1</td>
+      <td>171.6</td>
+      <td>446.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>452.4</td>
+      <td>69.5</td>
+      <td>266.3</td>
+      <td>587.1</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">8</th>
+      <th>2</th>
+      <td>219.4</td>
+      <td>33.0</td>
+      <td>103.1</td>
+      <td>275.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>135.0</td>
+      <td>49.3</td>
+      <td>173.1</td>
+      <td>446.8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>446.2</td>
+      <td>69.5</td>
+      <td>266.0</td>
+      <td>596.3</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">9</th>
+      <th>2</th>
+      <td>217.9</td>
+      <td>32.8</td>
+      <td>102.8</td>
+      <td>275.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>134.4</td>
+      <td>49.3</td>
+      <td>171.2</td>
+      <td>446.9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>449.3</td>
+      <td>69.5</td>
+      <td>267.1</td>
+      <td>600.5</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">10</th>
+      <th>2</th>
+      <td>217.0</td>
+      <td>33.0</td>
+      <td>103.3</td>
+      <td>273.1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>135.1</td>
+      <td>49.4</td>
+      <td>172.1</td>
+      <td>446.4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>450.3</td>
+      <td>69.4</td>
+      <td>265.6</td>
+      <td>582.0</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">11</th>
+      <th>2</th>
+      <td>216.6</td>
+      <td>32.8</td>
+      <td>103.2</td>
+      <td>275.9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>134.8</td>
+      <td>49.3</td>
+      <td>172.4</td>
+      <td>447.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>447.1</td>
+      <td>69.3</td>
+      <td>266.5</td>
+      <td>585.7</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">12</th>
+      <th>2</th>
+      <td>216.8</td>
+      <td>32.8</td>
+      <td>103.4</td>
+      <td>275.8</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>134.7</td>
+      <td>49.3</td>
+      <td>171.2</td>
+      <td>445.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>444.3</td>
+      <td>69.3</td>
+      <td>265.2</td>
+      <td>592.8</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">13</th>
+      <th>2</th>
+      <td>220.4</td>
+      <td>33.0</td>
+      <td>103.3</td>
+      <td>276.3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>135.9</td>
+      <td>49.3</td>
+      <td>171.5</td>
+      <td>444.9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>446.4</td>
+      <td>69.3</td>
+      <td>266.7</td>
+      <td>601.5</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">14</th>
+      <th>2</th>
+      <td>227.2</td>
+      <td>32.9</td>
+      <td>103.1</td>
+      <td>276.3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>134.7</td>
+      <td>49.3</td>
+      <td>171.6</td>
+      <td>445.7</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>442.8</td>
+      <td>69.3</td>
+      <td>266.8</td>
+      <td>598.0</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Travis Downs</li>
+          <li><a class="u-email" href="mailto:travis.downs@gmail.com">travis.downs@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>A blog about low-level software and hardware performance.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/travisdowns" title="travisdowns"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/trav_downs" title="trav_downs"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
