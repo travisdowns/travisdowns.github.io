@@ -58,6 +58,7 @@ echo "Commit message : ${SNAPSHOT_COMMIT_MSG:=screenshots}"
 echo "Excludes       : ${SNAPSHOT_EXCLUDES-(unset)}"
 echo "Viewport width : ${SNAPSHOT_WIDTH:=1200}"
 echo "Viewport height: ${SNAPSHOT_HEIGHT:=600}"
+echo "Color pref    : ${SNAPSHOT_COLOR_PREF-light}"
 
 # When using GitHub actions, we won't by default have permissions to push to the
 # target repo unless we provide auth info, which can be the action-provided 
@@ -100,9 +101,10 @@ fi
 outdir="dest-repo/$SNAPSHOT_DEST_PATH"
 
 if [[ "${SKIP_SNAP:-0}" -eq 0 ]]; then
+    [[ $SNAPSHOT_COLOR_PREF == dark ]] && darkarg=--dark
     "$(npm bin)/snap-site" --site-dir="$SITE_ABS" --out-dir="$outdir" \
         --width="$SNAPSHOT_WIDTH" --height="$SNAPSHOT_HEIGHT" \
-        --host-port="localhost:$port" ${SNAPSHOT_EXCLUDES+"--exclude=$SNAPSHOT_EXCLUDES"}
+        --host-port="localhost:$port" ${darkarg-} ${SNAPSHOT_EXCLUDES+"--exclude=$SNAPSHOT_EXCLUDES"}
 fi
 
 $gitcmd add "./$SNAPSHOT_DEST_PATH"
@@ -121,6 +123,7 @@ echo "Files to commit: $total_count ($mod_count modified, $new_count new)"
 SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_MOD_TAG/$mod_count}
 SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_NEW_TAG/$new_count}
 SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_WIDTH_TAG/$SNAPSHOT_WIDTH}
+SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_COLOR_PREF_TAG/$SNAPSHOT_COLOR_PREF}
 
 
 if [[ $total_count -gt 0 ]]; then
