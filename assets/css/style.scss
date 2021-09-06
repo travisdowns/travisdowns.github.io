@@ -24,25 +24,25 @@
 
 .danger {
   @extend %callout-base;
-  background-color: #ffdddd;
+  background-color: $danger-bg-color;
   border-left: 6px solid #f44336;
 }
 
 .success {
   @extend %callout-base;
-  background-color: #ddffdd;
+  background-color: $success-bg-color;
   border-left: 6px solid #4CAF50;
 }
 
 .info {
   @extend %callout-base;
-  background-color: #e7f3fe;
+  background-color: $info-bg-color;
   border-left: 6px solid #2196F3;
 }
 
 .warning {
   @extend %callout-base;
-  background-color: #ffffcc;
+  background-color: $warning-bg-color;
   border-left: 6px solid #ffeb3b;
 }
 
