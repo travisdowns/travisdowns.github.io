@@ -115,8 +115,11 @@ $gitcmd diff --name-only --cached
 echo "==============================="
 echo "Files to commit: $total_count ($mod_count modified, $new_count new)"
 
+# we replace various tags in the commit message, if present, with their values
 SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_MOD_TAG/$mod_count}
 SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_NEW_TAG/$new_count}
+SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_WIDTH_TAG/$SNAPSHOT_WIDTH}
+
 
 if [[ $total_count -gt 0 ]]; then
     echo "Comitting updated screenshots"
