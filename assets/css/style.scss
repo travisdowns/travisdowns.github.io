@@ -4,6 +4,8 @@
 
 @import "minima/skins/{{ site.minima.skin | default: 'classic' }}";
 @import "minima/initialize";
+// the next file contains my own local skin-dependent vars
+@import "{{ site.minima.skin | default: 'classic' }}-vars";
 @import "comment-styles";
 @import "tab-styles";
 
@@ -95,8 +97,7 @@ sup[id^='fnref'] {
 }
 
 .tag-link {
-  background-color:rgb(221, 221, 221);
-  color:#fff;
+  background-color:$tag-bg-color;
   display:inline-block;
   padding-left:8px;
   padding-right:8px;
