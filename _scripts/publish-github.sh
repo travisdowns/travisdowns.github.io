@@ -20,7 +20,7 @@ ev repo
 site_dir=$(readlink -f "$GITHUB_WORKSPACE/_site")
 ev site_dir
 
-echo "Commit summary: $($PUB_COMMIT_MSG | head -1)"
+echo "Commit summary: $(echo "$PUB_COMMIT_MSG" | head -1)"
 
 cd "${GITHUB_WORKSPACE}/output"
 pwd
