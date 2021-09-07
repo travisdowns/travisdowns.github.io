@@ -4,10 +4,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {%- seo -%}
     <!-- override -->
-    <link rel="stylesheet" href="{{ "/assets/css/dark.css" | relative_url }}"
+    <link rel="stylesheet" href="{{ '/assets/css/light.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/dark.css' | relative_url }}"
         media="(prefers-color-scheme: dark)">
-    <link rel="stylesheet" href="{{ "/assets/css/light.css" | relative_url }}"
-        media="not all and (prefers-color-scheme: dark)">
     <!-- end -->
     {%- feed_meta -%}
     {%- if jekyll.environment == 'production' and site.google_analytics -%}
