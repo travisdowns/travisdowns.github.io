@@ -8,111 +8,111 @@ $comment-font-size: 17px !default;
 //
 // Staticman new comment form
 //
-input, select, textarea, label, button {
-//    @extend body;
-    font: $base-font-weight #{$base-font-size}/#{$base-line-height} $base-font-family;
-    color: $text-color;
-    background-color: $background-color;
-    -webkit-text-size-adjust: 100%;
-    -webkit-font-feature-settings: "kern" 1;
-        -moz-font-feature-settings: "kern" 1;
-        -o-font-feature-settings: "kern" 1;
-            font-feature-settings: "kern" 1;
-    font-kerning: normal;
-}
-
-fieldset {
-    border: none;
-    padding: 0;
-}
-
-// each staticman text field is wrapped in this div
-.textfield {
-    max-width: 100%;
-    padding: 0.5rem 0;
-}
-
-// fields except the comment field get this class too
-// to keep them a reasonable size
-.narrowfield {
-    width: 420px;
-}
-
-.hp {
-    display: none;
-}
-
-textarea {
-    vertical-align: top;
-}
-.textfield__input {
-    border: 1px solid rgba(0,0,0,.12);
-    padding: 4px 5px;
-    width: 100%;
-    font-size: $comment-font-size;
-}
-.notify-me, .g-recaptcha {
-    padding: 0.5rem 0;
-}
-.button {
-    background: rgba(158,158,158,.2);
-    box-shadow: 0 2px 2px 2px rgba(0,0,0,.14);
-    border: none;
-    border-radius: 2px;
-    padding: 4px 8px;
-    overflow: hidden;
-    cursor: pointer;
-    -webkit-transition-duration: 0.4s;
-    transition-duration: 0.4s;
-    margin: 4px 0px 0px 0px;
-}
-button:hover {
-    background-color: $brand-color;
-    color: white;
-}
-
-//
-// Staticman existing comments
-//
 .comments {
-}
-.comment__new {
-    padding: 0px 0px 14px 0px;
-}
-.comment__author {
-    color: $brand-color;
-}
-.comment__admin_tag {
-    background-color: rgb(187, 255, 187);
-    border-radius: 3px;
-    padding: 3px;
-}
-.comment__date {
-    font-size: $small-font-size;
-}
-.comment__body {
-    font-size: $comment-font-size;
-}
-.comment__meta {
-    text-align: left;
-    color: $brand-color;
-    font-size: $small-font-size;
-}
-.comments__existing {
-    padding: 8px 0px 0px 0px;
-}
-.comment {
-    border-top: 0px solid $brand-color-light;
-    padding: 0px 0px 0px 0px;
-    margin-bottom: 1em;
-}
-.comment.child {
-    margin-left: 3em;
-}
-.comment__reply-link {
-    color: $brand-color;
-    font-size: $small-font-size;
-    cursor: pointer;
+    input, select, textarea, label, button {
+        font: $base-font-weight #{$base-font-size}/#{$base-line-height} $base-font-family;
+        color: $text-color;
+        background-color: $background-color;
+        -webkit-text-size-adjust: 100%;
+        -webkit-font-feature-settings: "kern" 1;
+            -moz-font-feature-settings: "kern" 1;
+            -o-font-feature-settings: "kern" 1;
+                font-feature-settings: "kern" 1;
+        font-kerning: normal;
+    }
+    
+    fieldset {
+        border: none;
+        padding: 0;
+    }
+
+    // each staticman text field is wrapped in this div
+    .textfield {
+        max-width: 100%;
+        padding: 0.5rem 0;
+    }
+
+    // fields except the comment field get this class too
+    // to keep them a reasonable size
+    .narrowfield {
+        width: 420px;
+    }
+
+    .hp {
+        display: none;
+    }
+
+    textarea {
+        vertical-align: top;
+    }
+    .textfield__input {
+        border: 1px solid rgba(0,0,0,.12);
+        padding: 4px 5px;
+        width: 100%;
+        font-size: $comment-font-size;
+    }
+    .notify-me, .g-recaptcha {
+        padding: 0.5rem 0;
+    }
+    .button {
+        background: rgba(158,158,158,.2);
+        box-shadow: 0 2px 2px 2px rgba(0,0,0,.14);
+        border: none;
+        border-radius: 2px;
+        padding: 4px 8px;
+        overflow: hidden;
+        cursor: pointer;
+        -webkit-transition-duration: 0.4s;
+        transition-duration: 0.4s;
+        margin: 4px 0px 0px 0px;
+    }
+    button:hover {
+        background-color: $brand-color;
+        color: white;
+    }
+
+    //
+    // Staticman existing comments
+    //
+    .comment__new {
+        padding: 0px 0px 14px 0px;
+    }
+    .comment__author {
+        color: $brand-color;
+    }
+    .comment__admin_tag {
+        background-color: rgb(187, 255, 187);
+        border-radius: 3px;
+        padding: 3px;
+    }
+    .comment__date {
+        font-size: $small-font-size;
+    }
+    .comment__body {
+        font-size: $comment-font-size;
+    }
+    .comment__meta {
+        text-align: left;
+        color: $brand-color;
+        font-size: $small-font-size;
+    }
+    .comments__existing {
+        padding: 8px 0px 0px 0px;
+    }
+    .comment {
+        border-top: 0px solid $brand-color-light;
+        padding: 0px 0px 0px 0px;
+        margin-bottom: 1em;
+    }
+    .comment.child {
+        margin-left: 3em;
+    }
+    .comment__reply-link {
+        color: $brand-color;
+        font-size: $small-font-size;
+        cursor: pointer;
+    }
+
 }
 
 //
@@ -166,6 +166,7 @@ button:hover {
     padding: 16px;
     width: 90%;
 }
+
 .modal-title {
     margin-bottom: 0px;
 }
@@ -182,3 +183,4 @@ button:hover {
         opacity: 0.65;
     }
 }
+
