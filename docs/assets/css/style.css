@@ -333,7 +333,7 @@ table td { border: 1px solid #e8e8e8; }
 
 .comments textarea { vertical-align: top; }
 
-.comments .textfield__input { border: 1px solid rgba(0, 0, 0, 0.12); padding: 4px 5px; width: 100%; font-size: 17px; }
+.comments .textfield__input { border: 1px solid rgba(0, 0, 0, 0.12); padding: 4px 5px; width: 100%; font-size: 16px; }
 
 .comments .notify-me, .comments .g-recaptcha { padding: 0.5rem 0; }
 
@@ -349,7 +349,7 @@ table td { border: 1px solid #e8e8e8; }
 
 .comments .comment__date { font-size: 14px; }
 
-.comments .comment__body { font-size: 17px; }
+.comments .comment__body { font-size: 16px; }
 
 .comments .comment__meta { text-align: left; color: #828282; font-size: 14px; }
 
