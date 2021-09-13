@@ -367,13 +367,9 @@ table td { border: 1px solid #e8e8e8; }
 
 .show-modal .modal { display: block; }
 
-.mdl-card { min-height: 200px; overflow: hidden; z-index: 1; position: relative; background: #fff; box-sizing: border-box; }
+.modal { display: none; position: fixed; width: 330px; top: 50%; left: 50%; margin-left: -150px; margin-top: -150px; min-height: 0; z-index: 9999; box-shadow: 0 2px 2px 2px rgba(0, 0, 0, 0.14); padding: 16px; border-radius: 2px; background: white; overflow: hidden; box-sizing: border-box; }
 
-.modal { display: none; position: fixed; width: 330px; top: 50%; left: 50%; margin-left: -150px; margin-top: -150px; min-height: 0; z-index: 9999; box-shadow: 0 2px 2px 2px rgba(0, 0, 0, 0.14); padding: 16px; border-radius: 2px; background: white; }
-
-.mdl-shadow--16dp { box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2); }
-
-.mdl-card__supporting-text { overflow: hidden; padding: 16px; width: 90%; }
+.mdl-card__supporting-text { max-height: 400px; overflow: auto; padding: 16px; width: 90%; }
 
 .modal-title { margin-bottom: 0px; }
 
