@@ -63,7 +63,9 @@ jobs:
     name: Take Screenshots
     runs-on: ubuntu-20.04
     needs: build-publish
-    if: github.event_name == 'push'
+    if: |
+      github.event_name == 'push' &&
+      ! startsWith(github.ref, 'refs/heads/staticman_'
     strategy:
       fail-fast: false
       matrix:
