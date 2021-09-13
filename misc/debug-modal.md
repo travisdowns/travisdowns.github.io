@@ -3,7 +3,7 @@ layout: default
 ---
 
 <div class="comments">
-<article class="modal mdl-card mdl-shadow--2dp">
+<article class="modal mdl-shadow--2dp">
   <div>
     <h3 class="modal-title js-modal-title"></h3>
   </div>
