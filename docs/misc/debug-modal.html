@@ -10,15 +10,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="A blog about low-level software and hardware performance." />
 <meta property="og:description" content="A blog about low-level software and hardware performance." />
-<link rel="canonical" href="https://travisdowns.github.io/misc/debug.html" />
-<meta property="og:url" content="https://travisdowns.github.io/misc/debug.html" />
+<link rel="canonical" href="https://travisdowns.github.io/misc/debug-modal.html" />
+<meta property="og:url" content="https://travisdowns.github.io/misc/debug-modal.html" />
 <meta property="og:site_name" content="Performance Matters" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Performance Matters" />
 <meta name="twitter:site" content="@trav_downs" />
 <meta name="twitter:creator" content="@trav_downs" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Performance Matters","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/misc/debug.html"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Performance Matters","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/misc/debug-modal.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
 <script>
@@ -48,82 +48,69 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <p>Last rebuild (<code class="language-plaintext highlighter-rouge">site.time</code>): 2021-09-13 23:38:51 +0000</p>
+        <div class="comments">
+<article class="modal mdl-card mdl-shadow--2dp">
+  <div>
+    <h3 class="modal-title js-modal-title"></h3>
+  </div>
+  <div class="mdl-card__supporting-text js-modal-text"></div>
+  <div class="mdl-card__actions mdl-card--border">
+    <button class="button mdl-button--colored mdl-js-button mdl-js-ripple-effect js-close-modal">Close</button>
+  </div>
+</article>
 
-<table>
-  <thead>
-    <tr>
-      <th>Property</th>
-      <th>Value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>jekyll.environment</td>
-      <td>production</td>
-    </tr>
-    <tr>
-      <td>site.url</td>
-      <td>https://travisdowns.github.io</td>
-    </tr>
-    <tr>
-      <td>site.baseurl</td>
-      <td> </td>
-    </tr>
-    <tr>
-      <td>site.markdown</td>
-      <td>kramdown</td>
-    </tr>
-    <tr>
-      <td>site.kramdown</td>
-      <td><code class="language-plaintext highlighter-rouge">{"auto_ids"=&gt;true, "toc_levels"=&gt;[1, 2, 3, 4, 5, 6], "entity_output"=&gt;"as_char", "smart_quotes"=&gt;"lsquo,rsquo,ldquo,rdquo", "input"=&gt;"GFM", "hard_wrap"=&gt;false, "guess_lang"=&gt;true, "footnote_nr"=&gt;1, "show_warnings"=&gt;true, "syntax_highlighter"=&gt;"rouge", "syntax_highlighter_opts"=&gt;{:default_lang=&gt;"plaintext", :guess_lang=&gt;true}, "coderay"=&gt;{}}</code></td>
-    </tr>
-    <tr>
-      <td>site.rss</td>
-      <td> </td>
-    </tr>
-  </tbody>
-</table>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
-<p>relative foo: /foo</p>
-
-<p><a href="http://www.example.com">link</a></p>
-
-<p><a href="/notexist.html">bad link</a><br />
-<a href="/misc/debug.html">self link</a></p>
-
-<style>
-.color-check:after   { content: 'unset'; }
-
-@media (prefers-color-scheme: dark) {
-  .color-check:after   { content: 'dark mode'; }
-}
-
-@media (prefers-color-scheme: light) {
-  .color-check:after   { content: 'light mode'; }
-}
-</style>
-
-<p class="color-check">prefers-color-scheme: </p>
-
-<style>
-#props span, .mono {
-    font-family: monospace;
-    white-space: pre;
-}
-
-#props span {
-    background-color: lightgrey;
-}
-</style>
-
-<div class="mono">
 <script>
-        document.write('location.href    : ' + location.href + '<br>')
-        document.write('window.location  : ' + window.location + '<br>')
-        document.write('document.referrer: ' + document.referrer + '<br>')
-    </script>
+(function ($) {
+  
+  showModal('Comment submitted', 'Thanks! Your comment is <a href="https://github.com/travisdowns/travisdowns.github.io/pulls">pending</a>. It will appear when approved.');
+
+        
+
+  $('.js-close-modal').click(function () {
+    $('body').removeClass('show-modal');
+  });
+
+  function showModal(title, message) {
+    $('.js-modal-title').text(title);
+    $('.js-modal-text').html(message);
+    $('body').addClass('show-modal');
+  }
+})(jQuery);
+
+</script>
+
 </div>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
+<p>This is some background text.</p>
+
 
       </div>
     </main><footer class="site-footer h-card">
