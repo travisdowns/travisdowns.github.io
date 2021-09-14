@@ -49,14 +49,15 @@ done
 port=$(lsof -P -a -p$SERVERPID -itcp | grep -o 'TCP \*:[0-9]*' | grep -o '[0-9]*')
 echo "http-server seems to be up on port $port"
 
-echo "repo          : ${SNAPSHOT_REPO:=$(git config --get remote.origin.url)}"
-echo "dest path:    : ${SNAPSHOT_DEST_PATH:=}"
-echo "branch        : ${SNAPSHOT_BRANCH:=screenshots}"
-echo "Github user   : ${SNAPSHOT_USER-(unset)}"
-echo "Github email  : ${SNAPSHOT_EMAIL-(unset)}"
-echo "Commit message: ${SNAPSHOT_COMMIT_MSG:=screenshots}"
-echo "Excludes      : ${SNAPSHOT_EXCLUDES-(unset)}"
-echo "Viewport width: ${SNAPSHOT_WIDTH-1200}"
+echo "repo           : ${SNAPSHOT_REPO:=$(git config --get remote.origin.url)}"
+echo "dest path:     : ${SNAPSHOT_DEST_PATH:=}"
+echo "branch         : ${SNAPSHOT_BRANCH:=screenshots}"
+echo "Github user    : ${SNAPSHOT_USER-(unset)}"
+echo "Github email   : ${SNAPSHOT_EMAIL-(unset)}"
+echo "Commit message : ${SNAPSHOT_COMMIT_MSG:=screenshots}"
+echo "Excludes       : ${SNAPSHOT_EXCLUDES-(unset)}"
+echo "Viewport width : ${SNAPSHOT_WIDTH-1200}"
+echo "Viewport height: ${SNAPSHOT_HEIGHT-600}"
 
 # When using GitHub actions, we won't by default have permissions to push to the
 # target repo unless we provide auth info, which can be the action-provided 
@@ -99,7 +100,8 @@ fi
 outdir="dest-repo/$SNAPSHOT_DEST_PATH"
 
 if [[ "${SKIP_SNAP:-0}" -eq 0 ]]; then
-    "$(npm bin)/snap-site" --site-dir="$SITE_ABS" --out-dir="$outdir" --width="$SNAPSHOT_WIDTH" \
+    "$(npm bin)/snap-site" --site-dir="$SITE_ABS" --out-dir="$outdir" \
+        --width="$SNAPSHOT_WIDTH" --height="$SNAPSHOT_HEIGHT" \
         --host-port="localhost:$port" ${SNAPSHOT_EXCLUDES+"--exclude=$SNAPSHOT_EXCLUDES"}
 fi
 
