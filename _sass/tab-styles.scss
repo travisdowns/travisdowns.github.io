@@ -1,6 +1,8 @@
 
 // support styles for carousel.html include
 
+$selected-tab-color: lighten($background-color, 10%);
+
   .tabs {
     font-size: 0;
     margin: 25px 0;
@@ -17,7 +19,7 @@
   }
   
   .tabs .tab-label {
-    background: #eee; 
+    background: $background-color; 
     border: 1px solid #ccc; 
     display: inline-block;
     font-size: 16px;
@@ -52,9 +54,9 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: block;
-    background: white;
+    background: $selected-tab-color;
     // padding: 0 20px;
-    border: 1px solid #ccc;
+    border: 1px solid $brand-color;
     float: left;
     font-size: 16px;
     font-size: 1rem;
@@ -63,7 +65,7 @@
   }
   
   .tabs .tab [type="radio"]:checked + .tab-label {
-    background: white;
+    background: $selected-tab-color;
     border-bottom-width: 0;
     padding-bottom: 11px;
     z-index: 1;
@@ -74,16 +76,7 @@
   }
   
   
-  /*
-  
-  =======================================
-  UNIMPORTANT STYLES BEGIN HERE
-  =======================================
-  
-  */
-  
-  
-  /* and just for fun... */
+  /* for smaller screens, use a different tab scheme */
   @media only screen and (max-width: 43em) {
     .tabs .tab > label {
       background: #BBB;
@@ -95,8 +88,8 @@
       width: 100%;
     }
     .tabs .tab [type="radio"]:checked + .tab-label {
-      background: #222;
-      border-color: #444;
-      color: #DDD;
+      background: $selected-tab-color;
+      // border-color: #444;
+      // color: #DDD;
     }
   }
