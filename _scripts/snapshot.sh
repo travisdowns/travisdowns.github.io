@@ -56,8 +56,8 @@ echo "Github user    : ${SNAPSHOT_USER-(unset)}"
 echo "Github email   : ${SNAPSHOT_EMAIL-(unset)}"
 echo "Commit message : ${SNAPSHOT_COMMIT_MSG:=screenshots}"
 echo "Excludes       : ${SNAPSHOT_EXCLUDES-(unset)}"
-echo "Viewport width : ${SNAPSHOT_WIDTH-1200}"
-echo "Viewport height: ${SNAPSHOT_HEIGHT-600}"
+echo "Viewport width : ${SNAPSHOT_WIDTH:=1200}"
+echo "Viewport height: ${SNAPSHOT_HEIGHT:=600}"
 
 # When using GitHub actions, we won't by default have permissions to push to the
 # target repo unless we provide auth info, which can be the action-provided 
