@@ -381,21 +381,20 @@ table td { border: 1px solid #404040; }
 
 .tabs .tab { display: inline; }
 
-.tabs .tab-label { background: #eee; border: 1px solid #ccc; display: inline-block; font-size: 16px; font-size: 1rem; left: 1px; margin-left: -1px; padding: 10px; position: relative; vertical-align: bottom; cursor: pointer; }
+.tabs .tab-label { background: #181818; border: 1px solid #ccc; display: inline-block; font-size: 16px; font-size: 1rem; left: 1px; margin-left: -1px; padding: 10px; position: relative; vertical-align: bottom; cursor: pointer; }
 
 .tabs .tab > [type="radio"] { clip: rect(0 0 0 0); height: 1px; opacity: 0; position: fixed; width: 1px; z-index: -1; }
 
 .tabs .tab-panel { display: inline-block; overflow: hidden; position: relative; height: 0; width: 0; }
 
-.tabs .tab-content { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; display: block; background: white; border: 1px solid #ccc; float: left; font-size: 16px; font-size: 1rem; margin-top: -1px; width: 100%; }
+.tabs .tab-content { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; display: block; background: #323232; border: 1px solid #999999; float: left; font-size: 16px; font-size: 1rem; margin-top: -1px; width: 100%; }
 
-.tabs .tab [type="radio"]:checked + .tab-label { background: white; border-bottom-width: 0; padding-bottom: 11px; z-index: 1; }
+.tabs .tab [type="radio"]:checked + .tab-label { background: #323232; border-bottom-width: 0; padding-bottom: 11px; z-index: 1; }
 
 .tabs .tab [type="radio"]:checked ~ .tab-panel { display: inline; }
 
-/* ======================================= UNIMPORTANT STYLES BEGIN HERE ======================================= */
-/* and just for fun... */
-@media only screen and (max-width: 43em) { .tabs .tab > label { background: #BBB; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: #222; border-color: #444; color: #DDD; } }
+/* for smaller screens, use a different tab scheme */
+@media only screen and (max-width: 43em) { .tabs .tab > label { background: #BBB; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: #323232; } }
 
 .footnotes { font-size: 14px; margin: -10px 20px; }
 
