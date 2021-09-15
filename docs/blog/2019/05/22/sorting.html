@@ -70,7 +70,7 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <div class="invert">
+    <div class="invert-img">
   <p>Recently, Daniel Lemire <a href="https://lemire.me/blog/2019/05/07/almost-picking-n-distinct-numbers-at-random/">tackled the topic</a> of selecting N <em>distinct</em> numbers at random. In the case we want sorted output, an obvious solution presents itself: sorting randomly chosen values and de-duplicating the list, which is easy since identical values are now adjacent.<sup id="fnref:distinct" role="doc-noteref"><a href="#fn:distinct" class="footnote" rel="footnote">1</a></sup></p>
 
   <p>While Daniel suggests a clever method of avoiding a sort entirely<sup id="fnref:danmethod" role="doc-noteref"><a href="#fn:danmethod" class="footnote" rel="footnote">2</a></sup>, I’m also interested in they <em>why</em> for the underlying performace of the sort method: it takes more than 100 ns per element, which means 100s of CPU clock cycles and usually even more instructions than that (on a superscalar processor)! As a sanity check, a quick benchmark (<code class="language-plaintext highlighter-rouge">perf record ./bench &amp;&amp; perf report</code>) shows that more than 90% of the time spent in this approach is in the sorting routine, <a href="https://devdocs.io/c/algorithm/qsort">qsort</a> - so we are right to focus on this step, rather than say the de-duplication step or the initial random number generation. This naturally, this raises the question: how fast is qsort when it comes to sorting integers and can we do better?</p>
