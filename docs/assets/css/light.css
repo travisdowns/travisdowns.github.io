@@ -347,7 +347,7 @@ table td { border: 1px solid #e8e8e8; }
 
 .comments .comment__author { color: #828282; }
 
-.comments .comment__admin_tag { background-color: #bbffbb; border-radius: 3px; padding: 3px; }
+.comments .comment__admin_tag { border-color: #828282; border-style: solid; border-width: 1px; background-color: #bfb; border-radius: 2em; padding: 3px 4px 1px 4px; }
 
 .comments .comment__date { font-size: 14px; }
 
