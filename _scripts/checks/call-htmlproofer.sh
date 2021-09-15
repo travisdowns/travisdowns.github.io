@@ -13,7 +13,11 @@ echo "Additional arguments: $*"
 tries=0
 
 while true; do
-    htmlproofer --assume-extension --http-status-ignore=429 --url-ignore '/.*/notexist.html/' \
+    htmlproofer \
+        --assume-extension \
+        --http-status-ignore=429 \
+        --url-ignore '/.*/notexist.html/' \
+        --internal-domains travisdowns.github.io,0.0.0.0:4000 \
         --hydra-config='{ "max_concurrency": 5 }' "$@" "$SITE" && break
     tries=$((tries + 1))
     if [[ $tries -ge $MAX_TRIES ]]; then
