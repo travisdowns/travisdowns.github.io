@@ -10,3 +10,8 @@
 @import "minima/skins/dark";
 @import "minima/initialize";
 
+// useful for inverting images only in dark mode
+.invert-img img {
+    filter: invert(0.88);
+}
+
