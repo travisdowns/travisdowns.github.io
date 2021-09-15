@@ -52,7 +52,7 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <p>Last rebuild (<code class="language-plaintext highlighter-rouge">site.time</code>): 2021-09-15 06:02:28 +0000</p>
+        <p>Last rebuild (<code class="language-plaintext highlighter-rouge">site.time</code>): 2021-09-15 06:04:24 +0000</p>
 
 <table>
   <thead>
@@ -97,14 +97,19 @@
 <a href="/misc/debug.html">self link</a></p>
 
 <style>
-.color-check:after   { content: 'unset'; }
+.color-check:after   { content: 'unset or unsupported'; }
 
 @media (prefers-color-scheme: dark) {
-  .color-check:after   { content: 'dark mode'; }
+  .color-check:after   { content: 'dark'; }
 }
 
 @media (prefers-color-scheme: light) {
-  .color-check:after   { content: 'light mode'; }
+  .color-check:after   { content: 'light'; }
+}
+
+/* obsolete: https://github.com/w3c/csswg-drafts/issues/3857#issuecomment-634779976 */
+@media (prefers-color-scheme: no-preference ) {
+  .color-check:after   { content: 'no-preference'; }
 }
 </style>
 
