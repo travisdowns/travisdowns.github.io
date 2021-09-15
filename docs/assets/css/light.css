@@ -325,7 +325,7 @@ table td { border: 1px solid #e8e8e8; }
 
 .comments fieldset { border: none; padding: 0; }
 
-.comments textarea, .comments input { background-color: #2c2c2c; }
+.comments textarea, .comments input { background-color: #f4f4f4; }
 
 .comments .textfield { max-width: 100%; padding: 0.5rem 0; }
 
