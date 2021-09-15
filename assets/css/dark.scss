@@ -2,6 +2,9 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
+// rules can use ld-select to choose between light and dark options
+@function ld-select($light, $dark) { @return $dark; }
+
 // this import contains my own local skin-dependent vars
 @import "dark-vars";
 @import "minima/skins/dark";
