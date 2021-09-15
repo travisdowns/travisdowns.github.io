@@ -432,4 +432,6 @@ sup[id^='fnref'] { font-size: 0.8em; line-height: 0; }
 
 pre, code { font-size: 0.9375rem; }
 
+.invert-img img { filter: invert(0.88); }
+
 /*# sourceMappingURL=dark.css.map */
