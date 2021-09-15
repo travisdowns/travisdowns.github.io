@@ -1,0 +1,18 @@
+<style>
+.color-check:after   { content: 'unset or unsupported'; }
+
+@media (prefers-color-scheme: dark) {
+  .color-check:after   { content: 'dark'; }
+}
+
+@media (prefers-color-scheme: light) {
+  .color-check:after   { content: 'light'; }
+}
+
+/* obsolete: https://github.com/w3c/csswg-drafts/issues/3857#issuecomment-634779976 */
+@media (prefers-color-scheme: no-preference ) {
+  .color-check:after   { content: 'no-preference'; }
+}
+</style>
+
+<p class="color-check">prefers-color-scheme: </p>
