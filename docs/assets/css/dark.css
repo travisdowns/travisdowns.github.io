@@ -401,7 +401,7 @@ table td { border: 1px solid #404040; }
 .footnotes { font-size: 14px; margin: -10px 20px; }
 
 /* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_danger */
-.warning, .info, .success, .danger { padding: 4px 12px; margin-left: 30px; margin-right: 30px; }
+.warning, .info, .success, .danger { padding: 4px 12px; margin: 15px 30px; }
 
 .danger { background-color: #6b0000; border-left: 6px solid #f44336; }
 
