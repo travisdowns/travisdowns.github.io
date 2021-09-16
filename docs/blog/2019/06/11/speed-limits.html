@@ -54,7 +54,7 @@
         <div class="trigger"><a class="page-link" href="/about/">About</a></div>
       </nav></div>
 </header>
-<main class="page-content" aria-label="Content">
+<main class="page-content invert-img" aria-label="Content">
       <div class="wrapper">
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
@@ -314,11 +314,11 @@ Running benchmarks groups using timer perf
 
 <p>On modern chips all operations execute only through a limited number of ports<sup id="fnref:ports" role="doc-noteref"><a href="#fn:ports" class="footnote" rel="footnote">9</a></sup> and for multiplications that is always only <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr>. You can get this information from Agner’s <a href="https://www.agner.org/optimize/#manual_instr_tab">instruction tables</a>:</p>
 
-<p><img src="/assets/speed-limits/agner-imul.png" alt="Agner's port usage info" /></p>
+<p><img src="/assets/speed-limits/agner-imul.png" alt="Agner's port usage info" class="invert-rotate-img" /></p>
 
 <p>… or from <a href="http://uops.info/html-instr/IMUL_R32_R32.html">uops.info</a>:</p>
 
-<p><img src="/assets/speed-limits/uops-info-imul.png" alt="uops-info port usage info" /></p>
+<p><img src="/assets/speed-limits/uops-info-imul.png" alt="uops-info port usage info" class="invert-rotate-img" /></p>
 
 <p>On modern Intel some simple integer arithmetic (<code class="language-plaintext highlighter-rouge">add</code>, <code class="language-plaintext highlighter-rouge">sub</code>, <code class="language-plaintext highlighter-rouge">inc</code>, <code class="language-plaintext highlighter-rouge">dec</code>), bitwise operation (<code class="language-plaintext highlighter-rouge">or</code>, <code class="language-plaintext highlighter-rouge">and</code>, <code class="language-plaintext highlighter-rouge">xor</code>) and flag setting tests (<code class="language-plaintext highlighter-rouge">test</code>, <code class="language-plaintext highlighter-rouge">cmp</code>) run on four ports, so you aren’t very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations compete for only a few ports. For example, shift instructions and bit test/set operations like <code class="language-plaintext highlighter-rouge">bt</code>, <code class="language-plaintext highlighter-rouge">btr</code> and friends use only <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr> and <abbr title="port 6 (GP ALU, all branches)">p6</abbr>. More advanced bit operations like <code class="language-plaintext highlighter-rouge">popcnt</code> and <code class="language-plaintext highlighter-rouge">tzcnt</code> execute only <code class="language-plaintext highlighter-rouge">p1</code>, and so on. Note that in some cases instructions which can go to wide variety of ports, such as <code class="language-plaintext highlighter-rouge">add</code> may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is <a href="http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly">not fully understood</a>.</p>
 
