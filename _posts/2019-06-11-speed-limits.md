@@ -8,6 +8,7 @@ image:  /assets/speed-limits/speed-limit-50-ns.png
 twitter:
   card: summary
 excerpt: A laundry list of speed limits that your code can't exceed.
+content_classes: invert-img
 ---
 
 ## How fast can it go?
@@ -177,11 +178,11 @@ What gives? As it turns out, the limitation is the `imul` instructions. Although
 
 On modern chips all operations execute only through a limited number of ports[^ports] and for multiplications that is always only p1. You can get this information from Agner's [instruction tables](https://www.agner.org/optimize/#manual_instr_tab):
 
-![Agner's port usage info]({% link {{page.assets}}/agner-imul.png %})
+![Agner's port usage info]({% link {{page.assets}}/agner-imul.png %}){: .invert-rotate-img}
 
 ... or from [uops.info](http://uops.info/html-instr/IMUL_R32_R32.html):
 
-![uops-info port usage info]({% link {{page.assets}}/uops-info-imul.png %})
+![uops-info port usage info]({% link {{page.assets}}/uops-info-imul.png %}){: .invert-rotate-img}
 
 On modern Intel some simple integer arithmetic (`add`, `sub`, `inc`, `dec`), bitwise operation (`or`, `and`, `xor`) and flag setting tests (`test`, `cmp`) run on four ports, so you aren't very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations compete for only a few ports. For example, shift instructions and bit test/set operations like `bt`, `btr` and friends use only p1 and p6. More advanced bit operations like `popcnt` and `tzcnt` execute only `p1`, and so on. Note that in some cases instructions which can go to wide variety of ports, such as `add` may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is [not fully understood](http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly).
 

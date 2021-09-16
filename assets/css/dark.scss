@@ -15,3 +15,8 @@
     filter: invert(0.88);
 }
 
+// invert and rotate hue override
+.invert-rotate-img {
+    filter: invert(0.88) hue-rotate(180deg) !important;
+}
+
