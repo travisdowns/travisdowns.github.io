@@ -54,7 +54,7 @@
         <div class="trigger"><a class="page-link" href="/about/">About</a></div>
       </nav></div>
 </header>
-<main class="page-content" aria-label="Content">
+<main class="page-content invert-img" aria-label="Content">
       <div class="wrapper">
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
@@ -116,7 +116,7 @@
 
 <p>Let’s get three observations that aren’t really part of the story out of the way.</p>
 
-<p>First, the pattern for the branchy algorithm (green). It’s the only one that varies much at all with input size - the other two are basically flat. This turns out to be just a benchmarking artifact. I use random ASCII input<sup id="fnref:randnote" role="doc-noteref"><a href="#fn:randnote" class="footnote" rel="footnote">4</a></sup>, so primary determinant of performance our branchy algorithm is branch prediction. For small input sizes, the branch predictor <em>learns the entire input sequence</em> across iterations of the benchmark and so mispredictions are low and performance is high, <a href="https://lemire.me/blog/2019/10/16/benchmarking-is-hard-processors-learn-to-predict-branches/">just like this</a>. As sequence size grows the predictor memorizes less and less of the sequence until it flatlines when it mispredicts every time there is an uppercase character (0.27 mispredicts per character).</p>
+<p>First, the pattern for the branchy algorithm (<code class="language-plaintext highlighter-rouge">toupper_branch</code>). It’s the only one that varies much at all with input size - the other two are basically flat. This turns out to be just a benchmarking artifact. I use random ASCII input<sup id="fnref:randnote" role="doc-noteref"><a href="#fn:randnote" class="footnote" rel="footnote">4</a></sup>, so primary determinant of performance our branchy algorithm is branch prediction. For small input sizes, the branch predictor <em>learns the entire input sequence</em> across iterations of the benchmark and so mispredictions are low and performance is high, <a href="https://lemire.me/blog/2019/10/16/benchmarking-is-hard-processors-learn-to-predict-branches/">just like this</a>. As sequence size grows the predictor memorizes less and less of the sequence until it flatlines when it mispredicts every time there is an uppercase character (0.27 mispredicts per character).</p>
 
 <p>The second thing is this green blob of much slower samples from the <code class="language-plaintext highlighter-rouge">toupper_branch</code> in the upper left:</p>
 
