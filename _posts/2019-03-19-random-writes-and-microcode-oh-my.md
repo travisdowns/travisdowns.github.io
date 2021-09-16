@@ -6,6 +6,7 @@ category: blog
 tags: [Intel, memory, performance]
 assets: /assets/2019-03-19
 excerpt: CPU microcode updates can cause silent and dramatic performance changes.
+content_classes: invert-img
 ---
 
 ## Microcode Mystery
