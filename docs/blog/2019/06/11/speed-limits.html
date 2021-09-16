@@ -283,7 +283,7 @@ Running benchmarks groups using timer perf
 
 <p>The loop compiles to the following assembly. I’ve marked <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> counts as before.</p>
 
-<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">930:</span>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.top:</span>
     <span class="nf">mov</span>    <span class="nb">r10d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="o">+</span><span class="mh">0x4</span><span class="p">]</span> <span class="c1">;  1 y = data[i + 1]</span>
     <span class="nf">mov</span>    <span class="nb">r8d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;  2 setup up r8d to hold result of multiplies</span>
     <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">ecx</span>                    <span class="c1">;  3 i * y</span>
@@ -294,7 +294,7 @@ Running benchmarks groups using timer perf
     <span class="nf">mov</span>    <span class="nb">r9d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;  8 stash y for next iteration</span>
     <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="nb">r8d</span>                    <span class="c1">;  9 sum += ...</span>
     <span class="nf">cmp</span>    <span class="nb">rcx</span><span class="p">,</span><span class="nb">rsi</span>                    <span class="c1">;    i &lt; len (fuses with jne)</span>
-    <span class="nf">jne</span>    <span class="mi">930</span>                        <span class="c1">; 10</span>
+    <span class="nf">jne</span>    <span class="nv">.top</span>                       <span class="c1">; 10</span>
 </code></pre></div></div>
 
 <p>Despite the source containing two loads per iteration (<code class="language-plaintext highlighter-rouge">x = data[i]</code> and <code class="language-plaintext highlighter-rouge">y = data[i + 1]</code>), the compiler was clever enough to reduce that to one, since <code class="language-plaintext highlighter-rouge">y</code> in iteration <code class="language-plaintext highlighter-rouge">n</code> becomes <code class="language-plaintext highlighter-rouge">x</code> in iteration <code class="language-plaintext highlighter-rouge">n + 1</code>, so it saves the loaded value in a register across iterations.</p>

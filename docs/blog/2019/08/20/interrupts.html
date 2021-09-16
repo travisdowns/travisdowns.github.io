@@ -70,17 +70,7 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <style>
-.perf-annotate {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-family: monospace;
-  background-color: Gainsboro;
-  margin-bottom: 20px;
-}
-</style>
-
-<p>On Twitter, Paul Khuong <a href="https://twitter.com/pkhuong/status/1162832557030948864">asks</a>: <em>Has anyone done a study on the distribution of interrupt points in <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OOO</abbr> processors?</em></p>
+    <p>On Twitter, Paul Khuong <a href="https://twitter.com/pkhuong/status/1162832557030948864">asks</a>: <em>Has anyone done a study on the distribution of interrupt points in <abbr title="Out-of-order execution allows CPUs to execute instructions out of order with respect to the source.">OOO</abbr> processors?</em></p>
 
 <p>Personally, I’m not aware of any such study for modern x86, and I have also wondered the same thing. In particular, when a CPU receives an externally triggered<sup id="fnref:triggered" role="doc-noteref"><a href="#fn:triggered" class="footnote" rel="footnote">1</a></sup> interrupt, at what point in the instruction stream is the CPU interrupted?</p>
 
@@ -113,7 +103,7 @@
 
 <p>Next, we get to the meat of the investigation. We run the binary using <code class="language-plaintext highlighter-rouge">perf record -e task-clock ./indep-mov</code>, which will periodically interrupt the process and record the <abbr title="Instruction pointer">IP</abbr>. Next, we examine the interrupted locations with <code class="language-plaintext highlighter-rouge">perf report</code><sup id="fnref:acommand" role="doc-noteref"><a href="#fn:acommand" class="footnote" rel="footnote">6</a></sup>. Here’s the output (hereafter, I’m going to cut out the header and just show the samples):</p>
 
-<div class="perf-annotate">
+<pre>
  Samples |	Source code &amp; Disassembly of indep-mov for task-clock (1769 samples, percent: local period)
 -----------------------------------------------------------------------------------------------------------
          :
@@ -122,27 +112,27 @@
          :            00000000004000ae &lt;_start.loop&gt;:
          :            _start.loop():
          :            indep-mov.asm:15
-<span style="color:green;">      16</span> : <span style="color:purple;">  4000ae:</span><span style="color:blue;">       mov    eax,0x1</span>
-<span style="color:green;">      15</span> : <span style="color:purple;">  4000b3:</span><span style="color:blue;">       mov    ebx,0x2</span>
-<span style="color:green;">      22</span> : <span style="color:purple;">  4000b8:</span><span style="color:blue;">       mov    edi,0x3</span>
-<span style="color:green;">      25</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       mov    edx,0x4</span>
-<span style="color:green;">      14</span> : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       mov    r8d,0x5</span>
-<span style="color:green;">      19</span> : <span style="color:purple;">  4000c8:</span><span style="color:blue;">       mov    r9d,0x6</span>
-<span style="color:green;">      25</span> : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       mov    r10d,0x7</span>
-<span style="color:green;">      18</span> : <span style="color:purple;">  4000d4:</span><span style="color:blue;">       mov    r11d,0x8</span>
-<span style="color:green;">      22</span> : <span style="color:purple;">  4000da:</span><span style="color:blue;">       mov    eax,0x1</span>
-<span style="color:green;">      24</span> : <span style="color:purple;">  4000df:</span><span style="color:blue;">       mov    ebx,0x2</span>
-<span style="color:green;">      20</span> : <span style="color:purple;">  4000e4:</span><span style="color:blue;">       mov    edi,0x3</span>
-<span style="color:green;">      29</span> : <span style="color:purple;">  4000e9:</span><span style="color:blue;">       mov    edx,0x4</span>
-<span style="color:green;">      28</span> : <span style="color:purple;">  4000ee:</span><span style="color:blue;">       mov    r8d,0x5</span>
-<span style="color:green;">      18</span> : <span style="color:purple;">  4000f4:</span><span style="color:blue;">       mov    r9d,0x6</span>
-<span style="color:green;">      21</span> : <span style="color:purple;">  4000fa:</span><span style="color:blue;">       mov    r10d,0x7</span>
-<span style="color:green;">      19</span> : <span style="color:purple;">  400100:</span><span style="color:blue;">       mov    r11d,0x8</span>
-<span style="color:green;">      26</span> : <span style="color:purple;">  400106:</span><span style="color:blue;">       mov    eax,0x1</span>
-<span style="color:green;">      18</span> : <span style="color:purple;">  40010b:</span><span style="color:blue;">       mov    ebx,0x2</span>
-<span style="color:green;">      29</span> : <span style="color:purple;">  400110:</span><span style="color:blue;">       mov    edi,0x3</span>
-<span style="color:green;">      19</span> : <span style="color:purple;">  400115:</span><span style="color:blue;">       mov    edx,0x4</span>
-</div>
+<span style="color:green;">      16</span> : <span style="color:purple;">  4000ae:</span><span style="color:#77f;">       mov    eax,0x1</span>
+<span style="color:green;">      15</span> : <span style="color:purple;">  4000b3:</span><span style="color:#77f;">       mov    ebx,0x2</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000b8:</span><span style="color:#77f;">       mov    edi,0x3</span>
+<span style="color:green;">      25</span> : <span style="color:purple;">  4000bd:</span><span style="color:#77f;">       mov    edx,0x4</span>
+<span style="color:green;">      14</span> : <span style="color:purple;">  4000c2:</span><span style="color:#77f;">       mov    r8d,0x5</span>
+<span style="color:green;">      19</span> : <span style="color:purple;">  4000c8:</span><span style="color:#77f;">       mov    r9d,0x6</span>
+<span style="color:green;">      25</span> : <span style="color:purple;">  4000ce:</span><span style="color:#77f;">       mov    r10d,0x7</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  4000d4:</span><span style="color:#77f;">       mov    r11d,0x8</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000da:</span><span style="color:#77f;">       mov    eax,0x1</span>
+<span style="color:green;">      24</span> : <span style="color:purple;">  4000df:</span><span style="color:#77f;">       mov    ebx,0x2</span>
+<span style="color:green;">      20</span> : <span style="color:purple;">  4000e4:</span><span style="color:#77f;">       mov    edi,0x3</span>
+<span style="color:green;">      29</span> : <span style="color:purple;">  4000e9:</span><span style="color:#77f;">       mov    edx,0x4</span>
+<span style="color:green;">      28</span> : <span style="color:purple;">  4000ee:</span><span style="color:#77f;">       mov    r8d,0x5</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  4000f4:</span><span style="color:#77f;">       mov    r9d,0x6</span>
+<span style="color:green;">      21</span> : <span style="color:purple;">  4000fa:</span><span style="color:#77f;">       mov    r10d,0x7</span>
+<span style="color:green;">      19</span> : <span style="color:purple;">  400100:</span><span style="color:#77f;">       mov    r11d,0x8</span>
+<span style="color:green;">      26</span> : <span style="color:purple;">  400106:</span><span style="color:#77f;">       mov    eax,0x1</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  40010b:</span><span style="color:#77f;">       mov    ebx,0x2</span>
+<span style="color:green;">      29</span> : <span style="color:purple;">  400110:</span><span style="color:#77f;">       mov    edi,0x3</span>
+<span style="color:green;">      19</span> : <span style="color:purple;">  400115:</span><span style="color:#77f;">       mov    edx,0x4</span>
+</pre>
 
 <p>The first column shows the number of interrupts received for each instruction. Specially, the number of times an instruction would be the next instruction to execute following the interrupt.</p>
 
@@ -173,21 +163,21 @@
 <p>Here the chain through <code class="language-plaintext highlighter-rouge">rax</code> should limit the throughput of the above repeated block to 1 per 2 cycles, and indeed I measure an <abbr title="Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.">IPC</abbr> of 2 (4 instructions / 2 cycles = 2 <abbr title="Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.">IPC</abbr>).</p>
 
 <p>Here’s the interrupt distribution:</p>
-<div class="perf-annotate">
-       0 : <span style="color:purple;">  4000ae:</span><span style="color:blue;">       add    rax,0x1</span>
-<span style="color:green;">      82</span> : <span style="color:purple;">  4000b2:</span><span style="color:blue;">       add    rax,0x2</span>
-<span style="color:green;">     112</span> : <span style="color:purple;">  4000b6:</span><span style="color:blue;">       add    rsi,0x3</span>
-       0 : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       add    rdi,0x4</span>
-       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       add    rax,0x1</span>
-<span style="color:green;">      45</span> : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       add    rax,0x2</span>
-<span style="color:green;">     144</span> : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       add    rsi,0x3</span>
-       0 : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       add    rdi,0x4</span>
-       0 : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       add    rax,0x1</span>
-<span style="color:green;">      44</span> : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       add    rax,0x2</span>
-<span style="color:green;">     107</span> : <span style="color:purple;">  4000d6:</span><span style="color:blue;">       add    rsi,0x3</span>
+<pre>
+       0 : <span style="color:purple;">  4000ae:</span><span style="color:#77f;">       add    rax,0x1</span>
+<span style="color:green;">      82</span> : <span style="color:purple;">  4000b2:</span><span style="color:#77f;">       add    rax,0x2</span>
+<span style="color:green;">     112</span> : <span style="color:purple;">  4000b6:</span><span style="color:#77f;">       add    rsi,0x3</span>
+       0 : <span style="color:purple;">  4000ba:</span><span style="color:#77f;">       add    rdi,0x4</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:#77f;">       add    rax,0x1</span>
+<span style="color:green;">      45</span> : <span style="color:purple;">  4000c2:</span><span style="color:#77f;">       add    rax,0x2</span>
+<span style="color:green;">     144</span> : <span style="color:purple;">  4000c6:</span><span style="color:#77f;">       add    rsi,0x3</span>
+       0 : <span style="color:purple;">  4000ca:</span><span style="color:#77f;">       add    rdi,0x4</span>
+       0 : <span style="color:purple;">  4000ce:</span><span style="color:#77f;">       add    rax,0x1</span>
+<span style="color:green;">      44</span> : <span style="color:purple;">  4000d2:</span><span style="color:#77f;">       add    rax,0x2</span>
+<span style="color:green;">     107</span> : <span style="color:purple;">  4000d6:</span><span style="color:#77f;">       add    rsi,0x3</span>
 
 (pattern repeats...)
-</div>
+</pre>
 
 <p>This is certainly something new. We see that <em>all</em> the interrupts fall on the middle two instructions, one of which is part of the addition chain and one which is not. The second of the two locations also gets about 2-3 times as many interrupts as the first.</p>
 
@@ -216,52 +206,52 @@
 
 <p>The result:</p>
 
-<div class="perf-annotate">
-       0 : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:red;">      33</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000bf:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c0:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      11</span> : <span style="color:purple;">  4000c1:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c3:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c4:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      22</span> : <span style="color:purple;">  4000c5:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c7:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:green;">      15</span> : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000cb:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000cc:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      13</span> : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       nop</span>
-       1 : <span style="color:purple;">  4000cf:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d0:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d1:</span><span style="color:blue;">       nop</span>
-<span style="color:red;">      35</span> : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d3:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d4:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:green;">      16</span> : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d8:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d9:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000da:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      14</span> : <span style="color:purple;">  4000db:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000dc:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000dd:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000de:</span><span style="color:blue;">       nop</span>
-<span style="color:red;">      31</span> : <span style="color:purple;">  4000df:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000e0:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000e1:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:green;">      22</span> : <span style="color:purple;">  4000e4:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000e5:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000e6:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000e7:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      16</span> : <span style="color:purple;">  4000e8:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000e9:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000ea:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000eb:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      24</span> : <span style="color:purple;">  4000ec:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000ed:</span><span style="color:blue;">       nop</span>
-</div>
+<pre>
+       0 : <span style="color:purple;">  4000ba:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      33</span> : <span style="color:purple;">  4000bd:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000bf:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c0:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      11</span> : <span style="color:purple;">  4000c1:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c2:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c3:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c4:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000c5:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c6:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c7:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:green;">      15</span> : <span style="color:purple;">  4000ca:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000cb:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000cc:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000cd:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      13</span> : <span style="color:purple;">  4000ce:</span><span style="color:#77f;">       nop</span>
+       1 : <span style="color:purple;">  4000cf:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d0:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d1:</span><span style="color:#77f;">       nop</span>
+<span style="color:red;">      35</span> : <span style="color:purple;">  4000d2:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d3:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d4:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:green;">      16</span> : <span style="color:purple;">  4000d7:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d8:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d9:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000da:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      14</span> : <span style="color:purple;">  4000db:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000dc:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000dd:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000de:</span><span style="color:#77f;">       nop</span>
+<span style="color:red;">      31</span> : <span style="color:purple;">  4000df:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000e0:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000e1:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:green;">      22</span> : <span style="color:purple;">  4000e4:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000e5:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000e6:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000e7:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      16</span> : <span style="color:purple;">  4000e8:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000e9:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000ea:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000eb:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      24</span> : <span style="color:purple;">  4000ec:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000ed:</span><span style="color:#77f;">       nop</span>
+</pre>
 
 <p>The <em>selected</em> instructions are the long-latency <code class="language-plaintext highlighter-rouge">mov</code>-chain, but also two specific <code class="language-plaintext highlighter-rouge">nop</code> instructions out of the 10 that follow: those which fall 4 and 8 instructions after the <code class="language-plaintext highlighter-rouge">mov</code>. Here we can see the impact of retirement throughput. Although the <code class="language-plaintext highlighter-rouge">mov</code>-chain is the only thing that contributes to <em>execution</em> latency, this Skylake CPU can <a href="https://www.realworldtech.com/forum/?threadid=161978&amp;curpostid=162222">only retire</a> up to 4 instructions per cycle (per thread). So when the <code class="language-plaintext highlighter-rouge">mov</code> finally retires, there will be two cycles of retiring blocks of 4 <code class="language-plaintext highlighter-rouge">nop</code> instructions before we get to the next <code class="language-plaintext highlighter-rouge">mov</code>:</p>
 
@@ -301,29 +291,29 @@
 
 <p>The results:</p>
 
-<div class="perf-annotate">
-       0 : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:red;">      94</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000bf:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c0:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      17</span> : <span style="color:purple;">  4000c1:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c2:</span><span style="color:blue;">       add    rax,0x0</span>
-       0 : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:red;">      78</span> : <span style="color:purple;">  4000c9:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000cb:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000cc:</span><span style="color:blue;">       nop</span>
-<span style="color:green;">      18</span> : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000ce:</span><span style="color:blue;">       add    rax,0x0</span>
-</div>
+<pre>
+       0 : <span style="color:purple;">  4000ba:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      94</span> : <span style="color:purple;">  4000bd:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000bf:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c0:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      17</span> : <span style="color:purple;">  4000c1:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c2:</span><span style="color:#77f;">       add    rax,0x0</span>
+       0 : <span style="color:purple;">  4000c6:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      78</span> : <span style="color:purple;">  4000c9:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000ca:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000cb:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000cc:</span><span style="color:#77f;">       nop</span>
+<span style="color:green;">      18</span> : <span style="color:purple;">  4000cd:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000ce:</span><span style="color:#77f;">       add    rax,0x0</span>
+</pre>
 
 <p>The <code class="language-plaintext highlighter-rouge">add</code> instruction is on the critical path: it increases the execution time of the block from 4 cycles to 6 cycles<sup id="fnref:4to6" role="doc-noteref"><a href="#fn:4to6" class="footnote" rel="footnote">12</a></sup>, yet it is never selected. The retirement pattern looks like:
 <a name="lookhere"></a></p>
-<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                        <span class="err">/-</span> <span class="nf">scheduled</span>
-                       <span class="err">|</span>  <span class="err">/-</span> <span class="nf">ready</span>
-                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">complete</span>
-                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">retired</span>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                     <span class="c1">;  /- scheduled</span>
+                     <span class="c1">; |  /- ready</span>
+                     <span class="c1">; |  |  /- complete</span>
+                     <span class="c1">; |  |  |  /- retired</span>
     <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 0  0  5  5 &lt;-- selected</span>
     <span class="nf">nop</span>              <span class="c1">; 0  0  0  5 &lt;-- sample</span>
     <span class="nf">nop</span>              <span class="c1">; 0  0  0  5</span>
@@ -369,34 +359,34 @@
 
 <p>We’ve only slid the <code class="language-plaintext highlighter-rouge">add</code> up a few places. The number of instructions is the same and this block executes in 6 cycles, identical to the last example. However, the <code class="language-plaintext highlighter-rouge">add</code> instruction now always gets selected:</p>
 
-<div class="perf-annotate">
-<span style="color:green;">      21</span> : <span style="color:purple;">  4000ba:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:red;">      54</span> : <span style="color:purple;">  4000bd:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000be:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000bf:</span><span style="color:blue;">       add    rax,0x0</span>
-<span style="color:green;">      15</span> : <span style="color:purple;">  4000c3:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c4:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c5:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000c6:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:red;">      88</span> : <span style="color:purple;">  4000c9:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000ca:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000cb:</span><span style="color:blue;">       add    rax,0x0</span>
-<span style="color:green;">      14</span> : <span style="color:purple;">  4000cf:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d0:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d1:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       mov    rax,QWORD PTR [rax]</span>
-<span style="color:red;">      91</span> : <span style="color:purple;">  4000d5:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d6:</span><span style="color:blue;">       nop</span>
-       0 : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       add    rax,0x0</span>
-<span style="color:green;">      13</span> : <span style="color:purple;">  4000db:</span><span style="color:blue;">       nop</span>
-</div>
+<pre>
+<span style="color:green;">      21</span> : <span style="color:purple;">  4000ba:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      54</span> : <span style="color:purple;">  4000bd:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000be:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000bf:</span><span style="color:#77f;">       add    rax,0x0</span>
+<span style="color:green;">      15</span> : <span style="color:purple;">  4000c3:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c4:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c5:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000c6:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      88</span> : <span style="color:purple;">  4000c9:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000ca:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000cb:</span><span style="color:#77f;">       add    rax,0x0</span>
+<span style="color:green;">      14</span> : <span style="color:purple;">  4000cf:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d0:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d1:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d2:</span><span style="color:#77f;">       mov    rax,QWORD PTR [rax]</span>
+<span style="color:red;">      91</span> : <span style="color:purple;">  4000d5:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d6:</span><span style="color:#77f;">       nop</span>
+       0 : <span style="color:purple;">  4000d7:</span><span style="color:#77f;">       add    rax,0x0</span>
+<span style="color:green;">      13</span> : <span style="color:purple;">  4000db:</span><span style="color:#77f;">       nop</span>
+</pre>
 
 <p>Here’s the cycle analysis and retirement pattern for this version:</p>
 
-<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                        <span class="err">/-</span> <span class="nf">scheduled</span>
-                       <span class="err">|</span>  <span class="err">/-</span> <span class="nf">ready</span>
-                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">complete</span>
-                       <span class="err">|</span>  <span class="err">|</span>  <span class="err">|</span>  <span class="err">/-</span> <span class="nf">retired</span>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                     <span class="c1">;  /- scheduled</span>
+                     <span class="c1">; |  /- ready</span>
+                     <span class="c1">; |  |  /- complete</span>
+                     <span class="c1">; |  |  |  /- retired</span>
     <span class="nf">mov</span>  <span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nb">rax</span><span class="p">]</span>  <span class="c1">; 0  0  5  5 &lt;-- selected</span>
     <span class="nf">nop</span>              <span class="c1">; 0  0  0  5 &lt;-- sample</span>
     <span class="nf">nop</span>              <span class="c1">; 0  0  0  5</span>
@@ -444,41 +434,41 @@
 
 <p>This loop <em>still takes 20 cycles</em> to execute. That is, the atomic costs nothing in runtime: the performance is the same if you comment it out. The <code class="language-plaintext highlighter-rouge">vpmulld</code> dependency chain is long enough to hide the cost of the atomic. Let’s take a look at the interrupt distribution for this code:</p>
 
-<div class="perf-annotate">
-       0 : <span style="color:purple;">  4000c8:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-      12 : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-      10 : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     244</span> : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  4000dc:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      26</span> : <span style="color:purple;">  4000e1:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     299</span> : <span style="color:purple;">  4000e6:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  4000eb:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      35</span> : <span style="color:purple;">  4000f0:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     277</span> : <span style="color:purple;">  4000f5:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  4000fa:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      33</span> : <span style="color:purple;">  4000ff:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     302</span> : <span style="color:purple;">  400104:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400109:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      33</span> : <span style="color:purple;">  40010e:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     272</span> : <span style="color:purple;">  400113:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400118:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      31</span> : <span style="color:purple;">  40011d:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     280</span> : <span style="color:purple;">  400122:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400127:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      40</span> : <span style="color:purple;">  40012c:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     277</span> : <span style="color:purple;">  400131:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400136:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      21</span> : <span style="color:purple;">  40013b:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     282</span> : <span style="color:purple;">  400140:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400145:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      35</span> : <span style="color:purple;">  40014a:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     291</span> : <span style="color:purple;">  40014f:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400154:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      35</span> : <span style="color:purple;">  400159:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:red;">     270</span> : <span style="color:purple;">  40015e:</span><span style="color:blue;">       dec    rcx</span>
-       0 : <span style="color:purple;">  400161:</span><span style="color:blue;">       jne    4000c8 &lt;_start.loop&gt;</span>
+<pre>
+       0 : <span style="color:purple;">  4000c8:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+      12 : <span style="color:purple;">  4000cd:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+      10 : <span style="color:purple;">  4000d2:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     244</span> : <span style="color:purple;">  4000d7:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000dc:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      26</span> : <span style="color:purple;">  4000e1:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     299</span> : <span style="color:purple;">  4000e6:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000eb:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      35</span> : <span style="color:purple;">  4000f0:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     277</span> : <span style="color:purple;">  4000f5:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000fa:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      33</span> : <span style="color:purple;">  4000ff:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     302</span> : <span style="color:purple;">  400104:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400109:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      33</span> : <span style="color:purple;">  40010e:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     272</span> : <span style="color:purple;">  400113:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400118:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      31</span> : <span style="color:purple;">  40011d:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     280</span> : <span style="color:purple;">  400122:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400127:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      40</span> : <span style="color:purple;">  40012c:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     277</span> : <span style="color:purple;">  400131:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400136:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      21</span> : <span style="color:purple;">  40013b:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     282</span> : <span style="color:purple;">  400140:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400145:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      35</span> : <span style="color:purple;">  40014a:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     291</span> : <span style="color:purple;">  40014f:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400154:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      35</span> : <span style="color:purple;">  400159:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:red;">     270</span> : <span style="color:purple;">  40015e:</span><span style="color:#77f;">       dec    rcx</span>
+       0 : <span style="color:purple;">  400161:</span><span style="color:#77f;">       jne    4000c8 &lt;_start.loop&gt;</span>
 
-</div>
+</pre>
 
 <p>The <code class="language-plaintext highlighter-rouge">lock add</code> instructions are selected by the interrupt close to 90% of the time, despite not contributing to the execution time. Based on our mental model, these instructions should be able to run ahead of the <code class="language-plaintext highlighter-rouge">vpmulld</code> loop and hence be ready to retire as soon as they are the head of the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr>. The effect that we see here is because <code class="language-plaintext highlighter-rouge">lock</code>-prefixed instructions are <em>execute at retire</em>. This is a special type of instruction that waits until it at the head of the <abbr title="Re-order buffer: n ordered buffer which stores in-progress instructions on an out-of-order processor.">ROB</abbr> before it executes<sup id="fnref:execretire" role="doc-noteref"><a href="#fn:execretire" class="footnote" rel="footnote">15</a></sup>.</p>
 
@@ -493,35 +483,35 @@
 
 <p>This takes 40 cycles to execute, and the interrupt pattern looks like:</p>
 
-<div class="perf-annotate">
-       0 : <span style="color:purple;">  4000c8:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-      18 : <span style="color:purple;">  4000cd:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      49</span> : <span style="color:purple;">  4000d2:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     133</span> : <span style="color:purple;">  4000d7:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     152</span> : <span style="color:purple;">  4000dc:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:green;">     263</span> : <span style="color:purple;">  4000e1:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  4000e6:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      61</span> : <span style="color:purple;">  4000eb:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     160</span> : <span style="color:purple;">  4000f0:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     168</span> : <span style="color:purple;">  4000f5:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:green;">     251</span> : <span style="color:purple;">  4000fa:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  4000ff:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      59</span> : <span style="color:purple;">  400104:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     166</span> : <span style="color:purple;">  400109:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     162</span> : <span style="color:purple;">  40010e:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:green;">     267</span> : <span style="color:purple;">  400113:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400118:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      60</span> : <span style="color:purple;">  40011d:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     160</span> : <span style="color:purple;">  400122:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     155</span> : <span style="color:purple;">  400127:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
-<span style="color:green;">     218</span> : <span style="color:purple;">  40012c:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-       0 : <span style="color:purple;">  400131:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">      58</span> : <span style="color:purple;">  400136:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     144</span> : <span style="color:purple;">  40013b:</span><span style="color:blue;">       vpmulld xmm0,xmm0,xmm0</span>
-<span style="color:green;">     154</span> : <span style="color:purple;">  400140:</span><span style="color:blue;">       lock add QWORD PTR [rbx],0x1</span>
+<pre>
+       0 : <span style="color:purple;">  4000c8:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+      18 : <span style="color:purple;">  4000cd:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      49</span> : <span style="color:purple;">  4000d2:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     133</span> : <span style="color:purple;">  4000d7:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     152</span> : <span style="color:purple;">  4000dc:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     263</span> : <span style="color:purple;">  4000e1:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000e6:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      61</span> : <span style="color:purple;">  4000eb:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     160</span> : <span style="color:purple;">  4000f0:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     168</span> : <span style="color:purple;">  4000f5:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     251</span> : <span style="color:purple;">  4000fa:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  4000ff:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      59</span> : <span style="color:purple;">  400104:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     166</span> : <span style="color:purple;">  400109:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     162</span> : <span style="color:purple;">  40010e:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     267</span> : <span style="color:purple;">  400113:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400118:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      60</span> : <span style="color:purple;">  40011d:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     160</span> : <span style="color:purple;">  400122:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     155</span> : <span style="color:purple;">  400127:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
+<span style="color:green;">     218</span> : <span style="color:purple;">  40012c:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+       0 : <span style="color:purple;">  400131:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">      58</span> : <span style="color:purple;">  400136:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     144</span> : <span style="color:purple;">  40013b:</span><span style="color:#77f;">       vpmulld xmm0,xmm0,xmm0</span>
+<span style="color:green;">     154</span> : <span style="color:purple;">  400140:</span><span style="color:#77f;">       lock add QWORD PTR [rbx],0x1</span>
 
 pattern continues...
-</div>
+</pre>
 
 <p>The sample counts are similar for <code class="language-plaintext highlighter-rouge">lock add</code> but they’ve now increased to a comparable amount (in total) for the <code class="language-plaintext highlighter-rouge">vmulld</code> instructions<sup id="fnref:uneven" role="doc-noteref"><a href="#fn:uneven" class="footnote" rel="footnote">16</a></sup>. In fact, we can calculate how long the <code class="language-plaintext highlighter-rouge">lock add</code> instruction takes to retire, using the ratio of the times it was selected compared to the known block throughput of 40 cycles. I get about a 38%-40% rate over a couple of runs which corresponds to a retire time of 15-16 cycles, only slightly less than then back-to-back latency<sup id="fnref:atomiclat:1" role="doc-noteref"><a href="#fn:atomiclat" class="footnote" rel="footnote">14</a></sup> of this instruction.</p>
 
