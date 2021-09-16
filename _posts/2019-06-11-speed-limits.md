@@ -146,7 +146,7 @@ uint32_t mul_by(const uint32_t *data, size_t len, uint32_t m) {
 The loop compiles to the following assembly. I've marked uop counts as before.
 
 ~~~nasm
-930:
+.top:
     mov    r10d,DWORD [rdi+rcx*4+0x4] ;  1 y = data[i + 1]
     mov    r8d,r10d                   ;  2 setup up r8d to hold result of multiplies
     imul   r8d,ecx                    ;  3 i * y
@@ -157,7 +157,7 @@ The loop compiles to the following assembly. I've marked uop counts as before.
     mov    r9d,r10d                   ;  8 stash y for next iteration
     add    eax,r8d                    ;  9 sum += ...
     cmp    rcx,rsi                    ;    i < len (fuses with jne)
-    jne    930                        ; 10
+    jne    .top                       ; 10
 ~~~
 
 Despite the source containing two loads per iteration (`x = data[i]` and `y = data[i + 1]`), the compiler was clever enough to reduce that to one, since `y` in iteration `n` becomes `x` in iteration `n + 1`, so it saves the loaded value in a register across iterations.
