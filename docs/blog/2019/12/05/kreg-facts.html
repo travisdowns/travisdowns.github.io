@@ -70,9 +70,7 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p class="warning">If you are in a rush, you can <a href="#summary">skip to the summary</a>, but you’ll miss out on the journey.</p>
-
-<p>AVX-512 introduced eight so-called <em>mask registers</em><sup id="fnref:naming" role="doc-noteref"><a href="#fn:naming" class="footnote" rel="footnote">1</a></sup>, <code class="language-plaintext highlighter-rouge">k0</code><sup id="fnref:k0note" role="doc-noteref"><a href="#fn:k0note" class="footnote" rel="footnote">2</a></sup> through <code class="language-plaintext highlighter-rouge">k7</code>, which apply to most ALU operations and allow you to apply a zero-masking or merging<sup id="fnref:maskmerge" role="doc-noteref"><a href="#fn:maskmerge" class="footnote" rel="footnote">3</a></sup> operation on a per-element basis, speeding up code that would otherwise require extra blending operations in AVX2 and earlier.</p>
+    <p>AVX-512 introduced eight so-called <em>mask registers</em><sup id="fnref:naming" role="doc-noteref"><a href="#fn:naming" class="footnote" rel="footnote">1</a></sup>, <code class="language-plaintext highlighter-rouge">k0</code><sup id="fnref:k0note" role="doc-noteref"><a href="#fn:k0note" class="footnote" rel="footnote">2</a></sup> through <code class="language-plaintext highlighter-rouge">k7</code>, which apply to most ALU operations and allow you to apply a zero-masking or merging<sup id="fnref:maskmerge" role="doc-noteref"><a href="#fn:maskmerge" class="footnote" rel="footnote">3</a></sup> operation on a per-element basis, speeding up code that would otherwise require extra blending operations in AVX2 and earlier.</p>
 
 <p>If that single sentence doesn’t immediately indoctrinate you into the mask register religion, here’s a copy and paste from <a href="https://en.wikipedia.org/wiki/AVX-512#Opmask_registers">Wikipedia</a> that should fill in the gaps and close the deal:</p>
 
