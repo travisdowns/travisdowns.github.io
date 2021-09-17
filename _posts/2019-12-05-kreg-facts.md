@@ -12,9 +12,6 @@ twitter:
 excerpt: Some mostly too-low-level-to-care-about hardware details of the mask registers introduced in AVX-512.
 ---
 
-If you are in a rush, you can [skip to the summary](#summary), but you'll miss out on the journey.
-{: .warning}
-
 AVX-512 introduced eight so-called _mask registers_[^naming], `k0`[^k0note] through `k7`, which apply to most ALU operations and allow you to apply a zero-masking or merging[^maskmerge] operation on a per-element basis, speeding up code that would otherwise require extra blending operations in AVX2 and earlier.
 
 If that single sentence doesn't immediately indoctrinate you into the mask register religion, here's a copy and paste from [Wikipedia](https://en.wikipedia.org/wiki/AVX-512#Opmask_registers) that should fill in the gaps and close the deal:
