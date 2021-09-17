@@ -434,6 +434,6 @@ pre, code { font-size: 0.9375rem; }
 
 .invert-img img { filter: invert(0.88); }
 
-.invert-rotate-img img { filter: invert(0.88) hue-rotate(180deg); }
+.invert-rotate-img { filter: invert(0.88) hue-rotate(180deg) !important; }
 
 /*# sourceMappingURL=dark.css.map */
