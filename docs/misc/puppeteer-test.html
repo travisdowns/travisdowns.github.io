@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Puppeteer Test Page</title>
+<style>
+pre {
+  /* these three properties seen necessary for the issue to occur */
+  border: 1px solid grey;
+  border-radius: 2px;
+  overflow: scroll;
+
+  /* background-color is not necessary, it just makes it obvious when it happened */
+  background-color: red;
+}
+</style>
+</head>
+<body>
+    
+<div style="height: 17000px">
+FILLER
+</div>
+
+test at: 16:06:26
+<pre>
+0         1         2         3         4         5         6         7         8         9
+0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0
+</pre>
+
+</body>
+</html>
