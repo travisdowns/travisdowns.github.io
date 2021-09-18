@@ -222,6 +222,46 @@ tablepath: /misc/tables/rip-zero-opt
     
     
 
+<article id="comment-43da72f0-189b-11ec-8ef9-811fefba7f7b" class="js-comment comment" uid="43da72f0-189b-11ec-8ef9-811fefba7f7b">
+
+  <div class="comment__author">
+    SwineOne
+    <span class="comment__date">•
+        <a href="#comment-43da72f0-189b-11ec-8ef9-811fefba7f7b" title="Permalink to this comment">September 18th, 2021 16:12</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hello Travis. Been reading your blog for a while but never bothered to comment.</p>
+
+<p>I wonder if I could interest you in writing an article about factors affecting microbenchmark reproducibility? I’m trying to benchmark some CPU-bound kernels on small ARM single-board computers, such as the Raspberry Pi and Jetson Nano, and I used to see fluctuations of up to 15% after changing a small section of code that’s completely unrelated to the code being benchmarked. So far I’ve found the following causes:</p>
+
+<ol>
+  <li>Underpowered PSUs leading to CPU throttling;</li>
+  <li>Thermal throttling;</li>
+  <li>Calls to functions in shared libraries (i.e. indirect branches);</li>
+  <li>Data (heap and stack) not aligned to at least 64 bytes;</li>
+  <li>Branch targets no5 aligned to at least 16 bytes.</li>
+</ol>
+
+<p>After fixing these, I only get the occasional 2% from one version of the code to the next (again, without touching the code being actually benchmarked). Still, I know I can do much better than that — most of the benchmarks barely change 0.1% from one run to the next. Unfortunately I’m running out of avenues to investigate. I’ll probably inspect some OS-related factors now: task scheduling, priority, CPU affinity, background tasks, etc.</p>
+
+<p>Unfortunately PMUs on ARM processors (at least for the cores I’m working with) severely lag behind those on Intel. There’s no probing inside the core, front-end/back-end, execution ports, etc. Just some cache and branch/speculative execution related stuff.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-43da72f0-189b-11ec-8ef9-811fefba7f7b', 'respond', 'rip-zero-opt', '43da72f0-189b-11ec-8ef9-811fefba7f7b')">↪&#xFE0E; Reply to SwineOne</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-d7182ce0-d55e-11eb-b4ca-af5dfef9ac70" class="js-comment comment" uid="d7182ce0-d55e-11eb-b4ca-af5dfef9ac70">
 
   <div class="comment__author">
