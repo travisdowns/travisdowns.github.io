@@ -1,0 +1,8 @@
+_id: 43da72f0-189b-11ec-8ef9-811fefba7f7b
+_parent: 'https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html'
+replying_to_uid: ''
+message: "Hello Travis. Been reading your blog for a while but never bothered to comment.\r\n\r\nI wonder if I could interest you in writing an article about factors affecting microbenchmark reproducibility? I’m trying to benchmark some CPU-bound kernels on small ARM single-board computers, such as the Raspberry Pi and Jetson Nano, and I used to see fluctuations of up to 15% after changing a small section of code that’s completely unrelated to the code being benchmarked. So far I’ve found the following causes:\r\n\r\n1. Underpowered PSUs leading to CPU throttling;\r\n2. Thermal throttling;\r\n3. Calls to functions in shared libraries (i.e. indirect branches);\r\n4. Data (heap and stack) not aligned to at least 64 bytes;\r\n5. Branch targets no5 aligned to at least 16 bytes.\r\n\r\nAfter fixing these, I only get the occasional 2% from one version of the code to the next (again, without touching the code being actually benchmarked). Still, I know I can do much better than that — most of the benchmarks barely change 0.1% from one run to the next. Unfortunately I’m running out of avenues to investigate. I’ll probably inspect some OS-related factors now: task scheduling, priority, CPU affinity, background tasks, etc.\r\n\r\nUnfortunately PMUs on ARM processors (at least for the cores I’m working with) severely lag behind those on Intel. There’s no probing inside the core, front-end/back-end, execution ports, etc. Just some cache and branch/speculative execution related stuff."
+name: SwineOne
+email: 0665b39288c1b35c552249ad42436b4e
+hp: ''
+date: 1631981568
