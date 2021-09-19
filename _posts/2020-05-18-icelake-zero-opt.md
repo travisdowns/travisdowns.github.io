@@ -120,11 +120,11 @@ The observation that **Figure 7a** results from running 512-bit instructions, co
 
 Here's the raw data for the 17 samples at a buffer size of 9864:
 
-<table border="1" class="dataframe" style="max-width:500px; font-size:80%;">
+<div class="table-wrapper">
+<table class="dataframe" style="max-width:500px; min-width: 50%; font-size:80%;">
   <thead>
     <tr>
-      <th></th>
-      <th></th>
+      <td colspan="2"></td>
       <th colspan="2" halign="left">GB/s</th>
     </tr>
     <tr>
@@ -223,6 +223,7 @@ Here's the raw data for the 17 samples at a buffer size of 9864:
     </tr>
   </tbody>
 </table>
+</div>
 
 The performance follows a specific pattern with respect to the trials for both `fill0` and `fill1`: it starts out slow (about 90 GB/s) for the first 9-10 samples then suddenly jumps up the higher performance level (close to 200 GB/s). It turns out this is just [voltage and frequency management]({% post_url 2020-01-17-avxfreq1 %}) biting us again. In this case there is no frequency change: the [raw data](https://github.com/travisdowns/zero-fill-bench/blob/post2/results/icl512/overall-warm.csv#L546) has a frequency column that shows the trials always run at 3.5 GHz. There is only a voltage change, and while the voltage is changing, the CPU runs with reduced dispatch throughput[^iclbetter].
 
