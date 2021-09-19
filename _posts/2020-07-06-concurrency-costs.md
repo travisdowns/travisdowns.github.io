@@ -9,6 +9,7 @@ results: https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/
 twitter:
   card: summary_large_image
 excerpt: Concurrent operations can be grouped relatively neatly into categories based on their cost
+content_classes: invert-rotate-img
 ---
 
 {% include post-boilerplate.liquid %}
@@ -543,7 +544,7 @@ As we saw at the last 1, this improvement in performance doesn't come for free:
     text-align: center;
 }
 .yes {
-    background-color: limegreen;
+    background-color: #070;
     padding: 3px;
 }
 .no {
