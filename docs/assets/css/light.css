@@ -396,7 +396,7 @@ table td { border: 1px solid #e8e8e8; }
 .tabs .tab [type="radio"]:checked ~ .tab-panel { display: inline; }
 
 /* for smaller screens, use a different tab scheme */
-@media only screen and (max-width: 43em) { .tabs .tab > label { background: #BBB; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: white; } }
+@media only screen and (max-width: 43em) { .tabs .tab > label { background: #fdfdfd; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: white; } }
 
 .footnotes { font-size: 14px; margin: -10px 20px; }
 
