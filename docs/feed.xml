@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-19T06:46:33+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-19T06:54:26+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -2590,11 +2590,11 @@ tablepath: /misc/tables//intel-zero-opt
 
 &lt;p&gt;Here’s the raw data for the 17 samples at a buffer size of 9864:&lt;/p&gt;
 
-&lt;table border=&quot;1&quot; class=&quot;dataframe&quot; style=&quot;max-width:500px; font-size:80%;&quot;&gt;
+&lt;div class=&quot;table-wrapper&quot;&gt;
+&lt;table class=&quot;dataframe&quot; style=&quot;max-width:500px; min-width: 50%; font-size:80%;&quot;&gt;
   &lt;thead&gt;
     &lt;tr&gt;
-      &lt;th&gt;&lt;/th&gt;
-      &lt;th&gt;&lt;/th&gt;
+      &lt;td colspan=&quot;2&quot;&gt;&lt;/td&gt;
       &lt;th colspan=&quot;2&quot; halign=&quot;left&quot;&gt;GB/s&lt;/th&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
@@ -2693,6 +2693,7 @@ tablepath: /misc/tables//intel-zero-opt
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;/div&gt;
 
 &lt;p&gt;The performance follows a specific pattern with respect to the trials for both &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fill0&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fill1&lt;/code&gt;: it starts out slow (about 90 GB/s) for the first 9-10 samples then suddenly jumps up the higher performance level (close to 200 GB/s). It turns out this is just &lt;a href=&quot;/blog/2020/01/17/avxfreq1.html&quot;&gt;voltage and frequency management&lt;/a&gt; biting us again. In this case there is no frequency change: the &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/blob/post2/results/icl512/overall-warm.csv#L546&quot;&gt;raw data&lt;/a&gt; has a frequency column that shows the trials always run at 3.5 GHz. There is only a voltage change, and while the voltage is changing, the CPU runs with reduced dispatch throughput&lt;sup id=&quot;fnref:iclbetter&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:iclbetter&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
 
