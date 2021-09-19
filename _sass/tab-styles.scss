@@ -79,7 +79,7 @@ $selected-tab-color: lighten($background-color, 10%);
   /* for smaller screens, use a different tab scheme */
   @media only screen and (max-width: 43em) {
     .tabs .tab > label {
-      background: #BBB;
+      background: $background-color;
       border-color: #999;
       
       -webkit-box-sizing: border-box;
@@ -89,7 +89,5 @@ $selected-tab-color: lighten($background-color, 10%);
     }
     .tabs .tab [type="radio"]:checked + .tab-label {
       background: $selected-tab-color;
-      // border-color: #444;
-      // color: #DDD;
     }
   }
