@@ -10,6 +10,7 @@ results: https://github.com/travisdowns/zero-fill-bench/tree/master/results
 twitter:
   card: summary_large_image
 excerpt: We look at the zero store optimization as it applies to Intel's newest micro-architecture.
+content_classes: invert-rotate-img
 ---
 
 {% include post-boilerplate.liquid %}
