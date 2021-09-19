@@ -8,6 +8,7 @@ image: /assets/now-with-comments/twitter-card.png
 twitter:
   card: summary
 excerpt: Adding static comments to a static blog using staticman. Static.
+content_classes: invert-rotate-img
 ---
 
 {% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}
