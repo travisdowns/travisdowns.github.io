@@ -78,7 +78,22 @@
 
 // optioinal style to right align data in tables
 .td-right td {
-  text-align:right;
+  text-align: right;
+}
+
+// wrap a table to give it horizontal scroll
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table-wrapper table {
+  display: table;
+  width: unset;
+  overflow-x: unset;
+}
+
+.table-nowrap-header th {
+  white-space: nowrap;
 }
 
 
