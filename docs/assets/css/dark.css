@@ -422,7 +422,7 @@ table td { border: 1px solid #404040; }
 
 .dataframe { text-align: right; }
 
-.svg-fig { font-size: 80%; }
+.svg-fig { font-size: 80%; margin-bottom: 15px; }
 
 .td-right td { text-align: right; }
 
