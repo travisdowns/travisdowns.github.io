@@ -432,8 +432,10 @@ sup[id^='fnref'] { font-size: 0.8em; line-height: 0; }
 
 pre, code { font-size: 0.9375rem; }
 
-.invert-img img { filter: invert(0.88); }
+.invert-img img:not(.no-invert) { filter: invert(0.88); }
 
-.invert-rotate-img img, img.invert-rotate-img { filter: invert(0.88) hue-rotate(180deg); }
+.invert-rotate-img img:not(.no-invert), img.invert-rotate-img:not(.no-invert) { filter: invert(0.88) hue-rotate(180deg); }
+
+.dm-bright-40 { filter: brightness(0.4); }
 
 /*# sourceMappingURL=dark.css.map */
