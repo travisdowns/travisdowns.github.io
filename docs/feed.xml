@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-19T07:22:31+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-19T07:22:38+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -2252,13 +2252,13 @@ tablepath: /misc/tables/kreg2
 
 &lt;p&gt;We’re interested in this die shot, recently released by &lt;a href=&quot;https://twitter.com/FritzchensFritz&quot;&gt;Fritzchens Fritz&lt;/a&gt; on &lt;a href=&quot;https://www.flickr.com/photos/130561288@N04/49825363402/in/photostream/&quot;&gt;Flickr&lt;/a&gt;. We’ll be focusing on the highlighted area, which seems to have all the &lt;a href=&quot;https://en.wikipedia.org/wiki/Register_file&quot;&gt;&lt;em&gt;register files&lt;/em&gt;&lt;/a&gt; on the chip. If you want a full breakdown of the core, you can check guesses &lt;a href=&quot;https://twitter.com/GPUsAreMagic/status/1256866465577394181&quot;&gt;here on Twitter&lt;/a&gt;, &lt;a href=&quot;https://www.realworldtech.com/forum/?threadid=191663&amp;amp;curpostid=191916&quot;&gt;on RWT&lt;/a&gt; and on &lt;a href=&quot;https://software.intel.com/sites/default/files/managed/5f/99/Skylake_core.jpg&quot;&gt;Intel’s forums&lt;/a&gt; (&lt;a href=&quot;https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/852272&quot;&gt;thread&lt;/a&gt;).&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/kreg2/skx-full-small.jpg&quot; alt=&quot;SKL full&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/kreg2/skx-full-small.jpg&quot; alt=&quot;SKL full&quot; class=&quot;no-invert&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;the-register-files&quot;&gt;The Register Files&lt;/h3&gt;
 
 &lt;p&gt;Here’s a close-up of that section, with the assumed register files and their purpose labeled&lt;sup id=&quot;fnref:xmmetc&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:xmmetc&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/kreg2/zoomed.png&quot; alt=&quot;SKL zoomed&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/kreg2/zoomed.png&quot; alt=&quot;SKL zoomed&quot; class=&quot;no-invert&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We guess the register file identities based on:&lt;/p&gt;
 
@@ -2296,7 +2296,7 @@ tablepath: /misc/tables/kreg2
 
 &lt;p&gt;Additional evidence that this might be the x87/MMX register file comes from this &lt;a href=&quot;https://flic.kr/p/YhuBWc&quot;&gt;&lt;abbr title=&quot;Intel's Kaby Lake client CPU architecture (7th, 8th gen): substantially identical to Skylake&quot;&gt;KBL&lt;/abbr&gt; die shot&lt;/a&gt; also from Fritz:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/kreg2/kbl-compare.png&quot; alt=&quot;Kaby Lake&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/kreg2/kbl-compare.png&quot; alt=&quot;Kaby Lake&quot; class=&quot;no-invert&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Note that while the high 256 bits of the register file are masked out (this chip supports only AVX2, not AVX-512 so there are no &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;zmm&lt;/code&gt; registers), the register file we are considering is present in its entirety.&lt;/p&gt;
 
