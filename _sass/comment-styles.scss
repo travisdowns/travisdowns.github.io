@@ -77,12 +77,13 @@ $comment-font-size: $base-font-size !default;
         color: $brand-color;
     }
     .comment__admin_tag {
+        font-size: 0.8em;
         border-color: $brand-color;
         border-style: solid;
         border-width: 1px;
         background-color: ld-select(#bfb, #050);
         border-radius: 2em;
-        padding: 3px 4px 1px 4px;
+        padding: 3px 4px 2px 4px;
     }
     .comment__date {
         font-size: $small-font-size;
