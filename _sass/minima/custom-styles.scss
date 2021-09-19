@@ -90,6 +90,8 @@
   display: table;
   width: unset;
   overflow-x: unset;
+  margin: auto;
+  margin-bottom: $spacing-unit;
 }
 
 .table-nowrap-header th {
