@@ -84,6 +84,7 @@ $comment-font-size: $base-font-size !default;
         background-color: ld-select(#bfb, #050);
         border-radius: 2em;
         padding: 3px 4px 2px 4px;
+        vertical-align: middle;
     }
     .comment__date {
         font-size: $small-font-size;
