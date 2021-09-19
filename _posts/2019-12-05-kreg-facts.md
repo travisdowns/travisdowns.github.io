@@ -10,6 +10,7 @@ image:  /assets/kreg/specialk.jpg
 twitter:
   card: summary_large_image
 excerpt: Some mostly too-low-level-to-care-about hardware details of the mask registers introduced in AVX-512.
+content_classes: invert-img
 ---
 
 AVX-512 introduced eight so-called _mask registers_[^naming], `k0`[^k0note] through `k7`, which apply to most ALU operations and allow you to apply a zero-masking or merging[^maskmerge] operation on a per-element basis, speeding up code that would otherwise require extra blending operations in AVX2 and earlier.
@@ -20,7 +21,7 @@ If that single sentence doesn't immediately indoctrinate you into the mask regis
 
 So mask registers[^kreg] are important, but are not household names unlike say general purpose registers (`eax`, `rsi` and friends) or SIMD registers (`xmm0`, `ymm5`, etc). They certainly aren't going to show up on Intel slides disclosing the size of uarch resources, like these:
 
-![Intel Slide]({% link {{page.assetsmin}}/intel-skx-slide.png %})
+![Intel Slide]({% link {{page.assetsmin}}/intel-skx-slide.png %}){: .invert-rotate-img}
 
 <br>
 

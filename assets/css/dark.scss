@@ -11,12 +11,15 @@
 @import "minima/initialize";
 
 // useful for inverting images only in dark mode
-.invert-img img {
+.invert-img img:not(.no-invert) {
     filter: invert(0.88);
 }
 
 // invert and rotate hue override
-.invert-rotate-img img, img.invert-rotate-img {
+.invert-rotate-img img:not(.no-invert), img.invert-rotate-img:not(.no-invert) {
     filter: invert(0.88) hue-rotate(180deg);
 }
 
+.dm-bright-40 {
+    filter: brightness(0.4);
+}
