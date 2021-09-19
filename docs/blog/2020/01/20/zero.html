@@ -92,6 +92,7 @@
 
 <p>Yes, switching <code class="language-plaintext highlighter-rouge">0</code> to <code class="language-plaintext highlighter-rouge">'\0'</code> speeds this up by nearly a factor of <em>thirty</em> on my <abbr title="Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7">SKL</abbr> box<sup id="fnref:qb" role="doc-noteref"><a href="#fn:qb" class="footnote" rel="footnote">2</a></sup>, at least with my default compiler (gcc) and optimization level (-O2):</p>
 
+<div class="table-wrapper table-nowrap-header">
 <table>
   <thead>
     <tr>
@@ -110,8 +111,9 @@
     </tr>
   </tbody>
 </table>
+</div>
 
-<p>The why is becomes obvious if you look at the <a href="https://godbolt.org/z/O_f3Jx">assembly</a>:</p>
+<p>The why becomes obvious if you look at the <a href="https://godbolt.org/z/O_f3Jx">assembly</a>:</p>
 
 <p><strong>fill1:</strong></p>
 <div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">fill1</span><span class="p">(</span><span class="nb">ch</span><span class="nv">ar</span><span class="o">*</span><span class="p">,</span> <span class="nv">unsigned</span> <span class="nv">long</span><span class="p">):</span>

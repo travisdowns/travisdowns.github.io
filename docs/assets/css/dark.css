@@ -347,7 +347,7 @@ table td { border: 1px solid #404040; }
 
 .comments .comment__author { color: #999999; }
 
-.comments .comment__admin_tag { border-color: #999999; border-style: solid; border-width: 1px; background-color: #050; border-radius: 2em; padding: 3px 4px 1px 4px; }
+.comments .comment__admin_tag { font-size: 0.8em; border-color: #999999; border-style: solid; border-width: 1px; background-color: #050; border-radius: 2em; padding: 3px 4px 2px 4px; }
 
 .comments .comment__date { font-size: 14px; }
 
@@ -425,6 +425,12 @@ table td { border: 1px solid #404040; }
 .svg-fig { font-size: 80%; }
 
 .td-right td { text-align: right; }
+
+.table-wrapper { overflow-x: auto; }
+
+.table-wrapper table { display: table; width: unset; overflow-x: unset; }
+
+.table-nowrap-header th { white-space: nowrap; }
 
 sup[id^='fnref'] { font-size: 0.8em; line-height: 0; }
 

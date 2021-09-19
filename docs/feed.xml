@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-19T04:42:17+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-19T06:01:52+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -3904,6 +3904,7 @@ heroku config:add &lt;span class=&quot;nt&quot;&gt;--app&lt;/span&gt; &lt;span c
 
 &lt;p&gt;Yes, switching &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;'\0'&lt;/code&gt; speeds this up by nearly a factor of &lt;em&gt;thirty&lt;/em&gt; on my &lt;abbr title=&quot;Intel's Skylake (client) architecture, aka 6th Generation Intel Core i3,i5,i7&quot;&gt;SKL&lt;/abbr&gt; box&lt;sup id=&quot;fnref:qb&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:qb&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;, at least with my default compiler (gcc) and optimization level (-O2):&lt;/p&gt;
 
+&lt;div class=&quot;table-wrapper table-nowrap-header&quot;&gt;
 &lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;
@@ -3922,8 +3923,9 @@ heroku config:add &lt;span class=&quot;nt&quot;&gt;--app&lt;/span&gt; &lt;span c
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;/div&gt;
 
-&lt;p&gt;The why is becomes obvious if you look at the &lt;a href=&quot;https://godbolt.org/z/O_f3Jx&quot;&gt;assembly&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;The why becomes obvious if you look at the &lt;a href=&quot;https://godbolt.org/z/O_f3Jx&quot;&gt;assembly&lt;/a&gt;:&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;fill1:&lt;/strong&gt;&lt;/p&gt;
 &lt;div class=&quot;language-nasm highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nf&quot;&gt;fill1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ch&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
