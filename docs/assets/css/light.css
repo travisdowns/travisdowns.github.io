@@ -428,7 +428,7 @@ table td { border: 1px solid #e8e8e8; }
 
 .table-wrapper { overflow-x: auto; }
 
-.table-wrapper table { display: table; width: unset; overflow-x: unset; }
+.table-wrapper table { display: table; width: unset; overflow-x: unset; margin: auto; margin-bottom: 30px; }
 
 .table-nowrap-header th { white-space: nowrap; }
 
