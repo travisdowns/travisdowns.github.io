@@ -409,7 +409,7 @@ table td { border: 1px solid #404040; }
 
 .info { background-color: #003363; border-left: 6px solid #2196F3; }
 
-.warning { background-color: #7a7a00; border-left: 6px solid #ffeb3b; }
+.warning { background-color: #440; border-left: 6px solid #ffeb3b; }
 
 @keyframes spin { 0% { transform: rotate(0deg); }
   100% { transform: rotate(359deg); } }
