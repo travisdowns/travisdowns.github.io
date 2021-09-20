@@ -10,6 +10,7 @@ results: https://github.com/travisdowns/zero-fill-bench/tree/master/results/post
 twitter:
   card: summary_large_image
 excerpt: The death of hardware store optimization.
+content_classes: invert-rotate-img
 ---
 
 {% include post-boilerplate.liquid %}
