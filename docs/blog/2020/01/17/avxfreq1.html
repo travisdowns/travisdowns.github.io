@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
 <title>Gathering Intel on Intel AVX-512 Transitions | Performance Matters</title>
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Gathering Intel on Intel AVX-512 Transitions" />
@@ -24,7 +24,11 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2020-01-17T00:00:00+00:00","datePublished":"2020-01-17T00:00:00+00:00","description":"Investigating some details of SIMD related frequency transitions on Intel CPUs.","headline":"Gathering Intel on Intel AVX-512 Transitions","image":"https://travisdowns.github.io/assets/avxfreq1/twitter-card.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2020/01/17/avxfreq1.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2020/01/17/avxfreq1.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<!-- override -->
+    <link rel="stylesheet" href="/assets/css/light.css">
+    <link rel="stylesheet" href="/assets/css/dark.css"
+        media="(prefers-color-scheme: dark)">
+    <!-- end --><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
 <script>
   window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
   window.dataLayer = window.dataLayer || [];
@@ -35,7 +39,7 @@
 </script>
 
 </head>
-<body><header class="site-header">
+  <body><header class="site-header">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
@@ -50,7 +54,7 @@
         <div class="trigger"><a class="page-link" href="/about/">About</a></div>
       </nav></div>
 </header>
-<main class="page-content" aria-label="Content">
+<main class="page-content invert-rotate-img" aria-label="Content">
       <div class="wrapper">
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
@@ -67,8 +71,6 @@
 
   <div class="post-content e-content" itemprop="articleBody">
     
-<p class="info"><strong>Note:</strong> For the really short version, you can <a href="#summary">skip to the summary</a>, but then what will do you for the rest of the day?</p>
-
 <h2 id="introduction">Introduction</h2>
 
 <p>This is a post about AVX and AVX-512 related frequency scaling<sup id="fnref:first" role="doc-noteref"><a href="#fn:first" class="footnote" rel="footnote">1</a></sup>.</p>
@@ -79,7 +81,7 @@
 
 <p>Now I wasn’t really planning on writing about this just now, but I got off on a (nested) tangent<sup id="fnref:intro" role="doc-noteref"><a href="#fn:intro" class="footnote" rel="footnote">3</a></sup>, so let’s examine the AVX-512 downclocking behavior using target tests. At a minimum, this is necessary background for the next post, but I hope that it is also standalone interesting.</p>
 
-<p class="info"><strong>Note:</strong> If you are here because of your footnote fetish, skip straight to the <a href="#footnotes">good 🦶 stuff</a>.</p>
+<p class="info"><strong>Note:</strong> For the really short version, you can <a href="#summary">skip to the summary</a>, but then what will do you for the rest of the day?</p>
 
 <h3 id="table-of-contents">Table of Contents</h3>
 

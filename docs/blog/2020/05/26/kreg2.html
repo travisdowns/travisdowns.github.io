@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
 <title>AVX-512 Mask Registers, Again | Performance Matters</title>
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="AVX-512 Mask Registers, Again" />
@@ -24,7 +24,11 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2020-05-26T00:00:00+00:00","datePublished":"2020-05-26T00:00:00+00:00","description":"Taking a second look at the newly introduced mask registers, this time with the benefit of a SKX die shot from Fritzchens Fritz.","headline":"AVX-512 Mask Registers, Again","image":"https://travisdowns.github.io/assets/kreg2/zoomed.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2020/05/26/kreg2.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2020/05/26/kreg2.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<!-- override -->
+    <link rel="stylesheet" href="/assets/css/light.css">
+    <link rel="stylesheet" href="/assets/css/dark.css"
+        media="(prefers-color-scheme: dark)">
+    <!-- end --><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
 <script>
   window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
   window.dataLayer = window.dataLayer || [];
@@ -35,7 +39,7 @@
 </script>
 
 </head>
-<body><header class="site-header">
+  <body><header class="site-header">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
@@ -50,7 +54,7 @@
         <div class="trigger"><a class="page-link" href="/about/">About</a></div>
       </nav></div>
 </header>
-<main class="page-content" aria-label="Content">
+<main class="page-content invert-rotate-img" aria-label="Content">
       <div class="wrapper">
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
@@ -102,13 +106,13 @@ tablepath: /misc/tables/kreg2
 
 <p>We’re interested in this die shot, recently released by <a href="https://twitter.com/FritzchensFritz">Fritzchens Fritz</a> on <a href="https://www.flickr.com/photos/130561288@N04/49825363402/in/photostream/">Flickr</a>. We’ll be focusing on the highlighted area, which seems to have all the <a href="https://en.wikipedia.org/wiki/Register_file"><em>register files</em></a> on the chip. If you want a full breakdown of the core, you can check guesses <a href="https://twitter.com/GPUsAreMagic/status/1256866465577394181">here on Twitter</a>, <a href="https://www.realworldtech.com/forum/?threadid=191663&amp;curpostid=191916">on RWT</a> and on <a href="https://software.intel.com/sites/default/files/managed/5f/99/Skylake_core.jpg">Intel’s forums</a> (<a href="https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/852272">thread</a>).</p>
 
-<p><img src="/assets/kreg2/skx-full-small.jpg" alt="SKL full" /></p>
+<p><img src="/assets/kreg2/skx-full-small.jpg" alt="SKL full" class="no-invert" /></p>
 
 <h3 id="the-register-files">The Register Files</h3>
 
 <p>Here’s a close-up of that section, with the assumed register files and their purpose labeled<sup id="fnref:xmmetc" role="doc-noteref"><a href="#fn:xmmetc" class="footnote" rel="footnote">2</a></sup>.</p>
 
-<p><img src="/assets/kreg2/zoomed.png" alt="SKL zoomed" /></p>
+<p><img src="/assets/kreg2/zoomed.png" alt="SKL zoomed" class="no-invert" /></p>
 
 <p>We guess the register file identities based on:</p>
 
@@ -146,7 +150,7 @@ tablepath: /misc/tables/kreg2
 
 <p>Additional evidence that this might be the x87/MMX register file comes from this <a href="https://flic.kr/p/YhuBWc"><abbr title="Intel's Kaby Lake client CPU architecture (7th, 8th gen): substantially identical to Skylake">KBL</abbr> die shot</a> also from Fritz:</p>
 
-<p><img src="/assets/kreg2/kbl-compare.png" alt="Kaby Lake" /></p>
+<p><img src="/assets/kreg2/kbl-compare.png" alt="Kaby Lake" class="no-invert" /></p>
 
 <p>Note that while the high 256 bits of the register file are masked out (this chip supports only AVX2, not AVX-512 so there are no <code class="language-plaintext highlighter-rouge">zmm</code> registers), the register file we are considering is present in its entirety.</p>
 

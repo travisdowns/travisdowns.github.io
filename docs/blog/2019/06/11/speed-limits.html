@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
 <title>Performance Speed Limits | Performance Matters</title>
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Performance Speed Limits" />
@@ -24,7 +24,11 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Travis Downs"},"dateModified":"2019-06-11T00:00:00+00:00","datePublished":"2019-06-11T00:00:00+00:00","description":"A laundry list of speed limits that your code can’t exceed.","headline":"Performance Speed Limits","image":"https://travisdowns.github.io/assets/speed-limits/speed-limit-50-ns.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://travisdowns.github.io/blog/2019/06/11/speed-limits.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/blog/2019/06/11/speed-limits.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<!-- override -->
+    <link rel="stylesheet" href="/assets/css/light.css">
+    <link rel="stylesheet" href="/assets/css/dark.css"
+        media="(prefers-color-scheme: dark)">
+    <!-- end --><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
 <script>
   window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
   window.dataLayer = window.dataLayer || [];
@@ -35,7 +39,7 @@
 </script>
 
 </head>
-<body><header class="site-header">
+  <body><header class="site-header">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
@@ -50,7 +54,7 @@
         <div class="trigger"><a class="page-link" href="/about/">About</a></div>
       </nav></div>
 </header>
-<main class="page-content" aria-label="Content">
+<main class="page-content invert-img" aria-label="Content">
       <div class="wrapper">
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
@@ -279,7 +283,7 @@ Running benchmarks groups using timer perf
 
 <p>The loop compiles to the following assembly. I’ve marked <abbr title="Micro-operation: instructions are translated into one or more uops, which are simple operations executed by the CPU's execution units.">uop</abbr> counts as before.</p>
 
-<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">930:</span>
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">.top:</span>
     <span class="nf">mov</span>    <span class="nb">r10d</span><span class="p">,</span><span class="kt">DWORD</span> <span class="p">[</span><span class="nb">rdi</span><span class="o">+</span><span class="nb">rcx</span><span class="o">*</span><span class="mi">4</span><span class="o">+</span><span class="mh">0x4</span><span class="p">]</span> <span class="c1">;  1 y = data[i + 1]</span>
     <span class="nf">mov</span>    <span class="nb">r8d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;  2 setup up r8d to hold result of multiplies</span>
     <span class="nf">imul</span>   <span class="nb">r8d</span><span class="p">,</span><span class="nb">ecx</span>                    <span class="c1">;  3 i * y</span>
@@ -290,7 +294,7 @@ Running benchmarks groups using timer perf
     <span class="nf">mov</span>    <span class="nb">r9d</span><span class="p">,</span><span class="nb">r10d</span>                   <span class="c1">;  8 stash y for next iteration</span>
     <span class="nf">add</span>    <span class="nb">eax</span><span class="p">,</span><span class="nb">r8d</span>                    <span class="c1">;  9 sum += ...</span>
     <span class="nf">cmp</span>    <span class="nb">rcx</span><span class="p">,</span><span class="nb">rsi</span>                    <span class="c1">;    i &lt; len (fuses with jne)</span>
-    <span class="nf">jne</span>    <span class="mi">930</span>                        <span class="c1">; 10</span>
+    <span class="nf">jne</span>    <span class="nv">.top</span>                       <span class="c1">; 10</span>
 </code></pre></div></div>
 
 <p>Despite the source containing two loads per iteration (<code class="language-plaintext highlighter-rouge">x = data[i]</code> and <code class="language-plaintext highlighter-rouge">y = data[i + 1]</code>), the compiler was clever enough to reduce that to one, since <code class="language-plaintext highlighter-rouge">y</code> in iteration <code class="language-plaintext highlighter-rouge">n</code> becomes <code class="language-plaintext highlighter-rouge">x</code> in iteration <code class="language-plaintext highlighter-rouge">n + 1</code>, so it saves the loaded value in a register across iterations.</p>
@@ -310,11 +314,11 @@ Running benchmarks groups using timer perf
 
 <p>On modern chips all operations execute only through a limited number of ports<sup id="fnref:ports" role="doc-noteref"><a href="#fn:ports" class="footnote" rel="footnote">9</a></sup> and for multiplications that is always only <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr>. You can get this information from Agner’s <a href="https://www.agner.org/optimize/#manual_instr_tab">instruction tables</a>:</p>
 
-<p><img src="/assets/speed-limits/agner-imul.png" alt="Agner's port usage info" /></p>
+<p><img src="/assets/speed-limits/agner-imul.png" alt="Agner's port usage info" class="invert-rotate-img" /></p>
 
 <p>… or from <a href="http://uops.info/html-instr/IMUL_R32_R32.html">uops.info</a>:</p>
 
-<p><img src="/assets/speed-limits/uops-info-imul.png" alt="uops-info port usage info" /></p>
+<p><img src="/assets/speed-limits/uops-info-imul.png" alt="uops-info port usage info" class="invert-rotate-img" /></p>
 
 <p>On modern Intel some simple integer arithmetic (<code class="language-plaintext highlighter-rouge">add</code>, <code class="language-plaintext highlighter-rouge">sub</code>, <code class="language-plaintext highlighter-rouge">inc</code>, <code class="language-plaintext highlighter-rouge">dec</code>), bitwise operation (<code class="language-plaintext highlighter-rouge">or</code>, <code class="language-plaintext highlighter-rouge">and</code>, <code class="language-plaintext highlighter-rouge">xor</code>) and flag setting tests (<code class="language-plaintext highlighter-rouge">test</code>, <code class="language-plaintext highlighter-rouge">cmp</code>) run on four ports, so you aren’t very likely to see a port bottleneck for these operations (since the pipeline width bottleneck is more general and is also four), but many operations compete for only a few ports. For example, shift instructions and bit test/set operations like <code class="language-plaintext highlighter-rouge">bt</code>, <code class="language-plaintext highlighter-rouge">btr</code> and friends use only <abbr title="port 1 (GP and SIMD ALU, integer mul)">p1</abbr> and <abbr title="port 6 (GP ALU, all branches)">p6</abbr>. More advanced bit operations like <code class="language-plaintext highlighter-rouge">popcnt</code> and <code class="language-plaintext highlighter-rouge">tzcnt</code> execute only <code class="language-plaintext highlighter-rouge">p1</code>, and so on. Note that in some cases instructions which can go to wide variety of ports, such as <code class="language-plaintext highlighter-rouge">add</code> may execute on a port that is under contention by other instructions rather than on the less loaded ports: a scheduling quirk that can reduce performance. Why that happens is <a href="http://stackoverflow.com/questions/40681331/how-are-x86-uops-scheduled-exactly">not fully understood</a>.</p>
 
