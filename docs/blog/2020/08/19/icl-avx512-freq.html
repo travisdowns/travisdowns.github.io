@@ -112,7 +112,7 @@ tablepath: /misc/tables/icl-avx512-freq
 
 <p>In total, we’ll use five tests to test every combination of light and heavy 256-bit and 512-bit instructions, as well as scalar instructions (128-bit <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> behaves the same as scalar), using this command line:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./avx-turbo --test=scalar_iadd,avx256_iadd,avx512_iadd,avx256_fma_t,avx512_fma_t
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>avx-turbo --test=scalar_iadd,avx256_iadd,avx512_iadd,avx256_fma_t,avx512_fma_t
 </code></pre></div></div>
 
 <h3 id="ice-lake-results">Ice Lake Results</h3>
