@@ -1,3 +1,5 @@
+:root { --dark: 1; --light: 0; }
+
 .highlight .c { color: #545454; font-style: italic; }
 
 .highlight .err { color: #f07178; background-color: #e3d2d2; }
@@ -441,7 +443,5 @@ pre, code { font-size: 0.9375rem; }
 .invert-img img:not(.no-invert) { filter: invert(0.88); }
 
 .invert-rotate-img img:not(.no-invert), img.invert-rotate-img:not(.no-invert) { filter: invert(0.88) hue-rotate(180deg); }
-
-.dm-bright-40 { filter: brightness(0.4); }
 
 /*# sourceMappingURL=dark.css.map */

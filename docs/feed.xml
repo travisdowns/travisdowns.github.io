@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-20T05:21:39+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-09-20T05:52:44+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -247,13 +247,13 @@ tablepath: /misc/tables/icl-avx512-freq
 
 &lt;style&gt;
 .l0 {
-    background-color: #79fc74;
+    background-color: hsl(118deg 96% calc(72% - var(--dark) * 55%));
 }
 .l1 {
-    background-color: #f8ff7a;
+    background-color: hsl(63deg 100% calc(74% - var(--dark) * 59%));
 }
 .l2 {
-    background-color: #fa8884;
+	background-color: hsl(2deg 92% calc(75% - var(--dark) * 44%));
 }
 &lt;/style&gt;
 
