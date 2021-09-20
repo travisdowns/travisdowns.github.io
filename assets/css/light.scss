@@ -2,6 +2,16 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
+// eat IDE errors from front-matter dashes
+#x {}
+
+// you can use the light and dark vars (which are set the opposite way in the dark theme)
+// to implement crude conditional styles for embedded <style> elements, among others
+:root {
+    --dark: 0;
+    --light: 1;
+}
+
 // rules can use ld-select to choose between light and dark options
 @function ld-select($light, $dark) { @return $light; }
 
