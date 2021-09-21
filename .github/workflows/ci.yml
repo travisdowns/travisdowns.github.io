@@ -105,6 +105,7 @@ jobs:
           ${{ github.actor }}: ${{ github.event.head_commit.message }}
       run: main/_scripts/snapshot.sh
 
+
   checks:
     name: ${{ matrix.script.name }}
     runs-on: ubuntu-20.04
@@ -145,3 +146,37 @@ jobs:
 
     - name: Run ${{ matrix.script.path }}
       run: main/_scripts/checks/${{ matrix.script.path }}
+
+  lhci:
+    name: Lighthouse CI
+    runs-on: ubuntu-20.04
+    needs: build-publish
+    steps:
+      - name: Main checkout (source)
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: site
+
+      - name: Untar and patch site
+        run: |
+          tar xf site.tar.gz
+          # we patch the site to replace refereces to the public domain
+          # with localhost, since otherwise we'll get spurious warnings about
+          # bad canonical URLs
+          find _site -type f -name '*.html' -exec sed -i \
+            's|href="https://travisdowns.github.io|href="http://localhost|g' {} \;
+
+      - name: Generate lighthouse config
+        run: |
+          _scripts/lighthouse/update-lhci-config.py _site
+          ls
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v8
+        with:
+          configPath: lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          runs: 3

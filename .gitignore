@@ -5,3 +5,7 @@
 .jekyll-cache
 /snapshot-workdir
 gh-env.txt
+
+# lighthouse files
+.lighthouseci
+/lighthouserc.json

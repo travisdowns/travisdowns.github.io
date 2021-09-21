@@ -1,0 +1,10 @@
+{
+    "ci": {
+        "collect": {
+            "staticDistDir": "_site",
+            "url": [
+                "URL_PLACEHOLDER"
+            ]
+        }
+    }
+}
