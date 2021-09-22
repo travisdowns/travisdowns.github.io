@@ -1,9 +1,8 @@
 ---
-# Only the main Sass file needs front matter (the dashes are enough)
 ---
 
 // eat IDE errors from front-matter dashes
-#x {}
+#x {--x:0}
 
 // you can use the light and dark vars (which are set the opposite way in the light theme)
 // to implement crude conditional styles for embedded <style> elements, among others
