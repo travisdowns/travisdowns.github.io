@@ -1,0 +1,35 @@
+name: 'Hello World'
+description: 'Greet someone'
+inputs:
+  checkout-dir:
+    description: 'Directory where the repository was checked out (relative to the workspace dir)'
+    required: true
+    default: 'main'
+runs:
+  using: "composite"
+  steps:
+
+    - uses: rlespinasse/github-slug-action@3.5.1
+
+    - name: Set vars
+      shell: bash
+      working-directory: ${{ inputs.checkout-dir }}
+      run: |
+        echo 'Running site build action, checkout-dir: ${{ inputs.checkout-dir }}'
+        _scripts/ci-vars.sh
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7.3
+        bundler-cache: true
+        working-directory: ${{ inputs.checkout-dir }}
+        cache-version: 42
+
+    - name: Build site
+      shell: bash
+      env:
+        BUILD_SRC: ${{ inputs.checkout-dir }}
+        BUILD_DEST: _site
+        BUILD_EXTRA_OPTIONS: ${{ env.EXTRA_BUILD_ARGS }}
+      run: ${{ inputs.checkout-dir }}/_scripts/build-site.sh

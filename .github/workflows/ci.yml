@@ -14,26 +14,8 @@ jobs:
       with:
         path: main
 
-    - uses: rlespinasse/github-slug-action@3.5.1
-
-    - name: Set vars
-      run: _scripts/ci-vars.sh
-      working-directory: main
-
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.7.3
-        bundler-cache: true
-        working-directory: main
-        cache-version: 42
-
-    - name: Build site
-      env:
-        BUILD_SRC: main
-        BUILD_DEST: _site
-        BUILD_EXTRA_OPTIONS: ${{ env.EXTRA_BUILD_ARGS }}
-      run: main/_scripts/build-site.sh
+    - name: Build Action
+      uses: ./main/.github/actions/build-site
 
     - name: Check out destination (HTML) branch
       uses: actions/checkout@v2
