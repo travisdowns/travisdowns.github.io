@@ -1,10 +1,14 @@
-name: 'Hello World'
-description: 'Greet someone'
+name: 'Build Site'
+description: 'Build the static site using Jekyll'
 inputs:
   checkout-dir:
     description: 'Directory where the repository was checked out (relative to the workspace dir)'
     required: true
     default: 'main'
+  cache-tag:
+    description: 'Tag for the ruby vendor cache, needs if the working directory is different'
+    required: true
+    default: 'ci-tag'
 runs:
   using: "composite"
   steps:
@@ -24,7 +28,7 @@ runs:
         ruby-version: 2.7.3
         bundler-cache: true
         working-directory: ${{ inputs.checkout-dir }}
-        cache-version: 42
+        cache-version: ${{ inputs.cache-tag }}
 
     - name: Build site
       shell: bash

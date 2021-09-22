@@ -13,9 +13,11 @@ print('infile: ', infile)
 outfile = sys.argv[2] if len(sys.argv) >= 3 else 'lighthouserc.json'
 print('outfile: ', outfile)
 
-prefix = 'http://localhost/'
+posts = [path.relpath(p, basedir) for p in pathlib.Path(basedir).glob('blog/**/*.html')]
+other = ['index.html', 'about/']
 
-urls = ['"' + prefix + path.relpath(p, basedir) + '"' for p in pathlib.Path(basedir).glob('blog/**/*.html')]
+prefix = 'http://localhost/'
+urls = ['"' + prefix + u + '"' for u in posts + other]
 jsonStr = ',\n'.join(urls)
 
 with open(infile) as f:

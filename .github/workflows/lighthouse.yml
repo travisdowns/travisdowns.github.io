@@ -1,0 +1,39 @@
+name: Lighthouse
+on:
+  push:
+
+jobs:
+  lhci:
+    name: Lighthouse CI
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Main checkout (source)
+        uses: actions/checkout@v2
+
+      - name: Build Action
+        uses: ./.github/actions/build-site
+        with:
+          checkout-dir: .
+          cache-tag: lh-tag
+
+      - name: Patch site
+        run: |
+          # we patch the site to replace refereces to the public domain
+          # with localhost, since otherwise we'll get spurious warnings about
+          # bad canonical URLs
+          find _site -type f -name '*.html' -exec sed -i \
+            's|href="https://travisdowns.github.io|href="http://localhost|g' {} \;
+
+      - name: Generate lighthouse config
+        run: |
+          _scripts/lighthouse/update-lhci-config.py _site
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v8
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        with:
+          configPath: lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          runs: 3
