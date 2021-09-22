@@ -1,3 +1,5 @@
+#x { --x:0; }
+
 :root { --dark: 0; --light: 1; }
 
 .highlight .c { color: #998; font-style: italic; }
