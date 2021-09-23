@@ -9,3 +9,5 @@ gh-env.txt
 # lighthouse files
 .lighthouseci
 /lighthouserc.json
+
+/temp
