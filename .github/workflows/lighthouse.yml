@@ -29,6 +29,7 @@ jobs:
           _scripts/lighthouse/update-lhci-config.py _site
 
       - name: Run Lighthouse CI
+        id: lhci
         uses: treosh/lighthouse-ci-action@v8
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
@@ -37,3 +38,8 @@ jobs:
           uploadArtifacts: true
           temporaryPublicStorage: true
           runs: 3
+
+      - name: Output summary
+        run: |
+          echo "Lighthouse results:"
+          _scripts/lighthouse/print-summary.py <<< '${{ steps.lhci.outputs.manifest }}'
