@@ -37,6 +37,13 @@ for entry in rep:
     print(urlfmt.format(entry['stripped']), end='')
     summary = entry['summary']
     for c in columns:
-        print('{:16.0f}'.format(summary[c] * 100), end='')
+        v = summary[c]
+        if v is not None:
+            print('{:16.0f}'.format(v * 100), end='')
+        else:
+            # sometimes the score is missing, indicating a failure
+            # in the underlying lighthouse testing module
+            print('{:16}'.format('error'), end='')
+
     print()
 
