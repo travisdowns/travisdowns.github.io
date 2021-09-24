@@ -27,12 +27,10 @@
     .cm, .cp, .c1, .cs {
         color: #6d6d60;
     }
-}
-
-a > code {
-    color: #246bc7;
-}
-
-.tag-link a {
-    color: #2060b2;
+    .nb {
+        color: #00749b;
+    }
+    .nv {
+        color: #007878;
+    }
 }

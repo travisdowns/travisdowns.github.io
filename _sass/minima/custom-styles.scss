@@ -124,5 +124,14 @@ code {
 
 // workaround for https://github.com/travisdowns/travisdowns.github.io/issues/449
 .axe-hack pre > code {
-    display: block;
+  display: block;
 }
+
+a > code {
+  color: ld-select(#246bc7, $link-base-color);
+}
+
+.tag-link a {
+  color: ld-select(#2060b2, $link-base-color);
+}
+
