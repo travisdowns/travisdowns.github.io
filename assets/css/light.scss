@@ -19,3 +19,20 @@
 @import "minima/skins/classic";
 @import "minima/initialize";
 
+// a11y contrast fixes
+.highlight {
+    .mf, .mh, .mi, .mo {
+        color: #007878;
+    }
+    .cm, .cp, .c1, .cs {
+        color: #6d6d60;
+    }
+}
+
+a > code {
+    color: #246bc7;
+}
+
+.tag-link a {
+    color: #2060b2;
+}

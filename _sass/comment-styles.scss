@@ -74,7 +74,7 @@ $comment-font-size: $base-font-size !default;
         padding: 0px 0px 14px 0px;
     }
     .comment__author {
-        color: $brand-color;
+        color: ld-select(#6b6b6b, $brand-color);
     }
     .comment__admin_tag {
         font-size: 0.8em;

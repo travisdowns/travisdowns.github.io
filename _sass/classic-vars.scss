@@ -8,3 +8,7 @@ $warning-bg-color: #ffffcc;
 
 // background colors for text areas
 $text-area-bg-color: #f4f4f4;
+
+// overrides to meet a11y friendly minimim contrast of 4.5
+$brand-color: #747474;
+$link-base-color: #2774d8;
