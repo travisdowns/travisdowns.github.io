@@ -135,9 +135,9 @@ Here's the interrupt distribution:
 
 This is certainly something new. We see that *all* the interrupts fall on the middle two instructions, one of which is part of the addition chain and one which is not. The second of the two locations also gets about 2-3 times as many interrupts as the first.
 
-### A Hypothesis
+## A Hypothesis
 
-Let's make a hypothesis now so we can design more tests.
+Let us form a hypothesis now so we can design more tests.
 
 Let's guess that interrupts _select_ instructions which are the oldest unretired instruction, and that this _selected_ instruction is allowed to complete hence samples fall on the next instruction (let us call this next instruction the _sampled_ instruction). I am making the distinction between _selected_ and _sampled_ instructions rather than just saying "interrupts sample instructions that follow the oldest unretired instruction" because we are going to build our model almost entirely around the _selected_ instructions, so we want to name them. The characteristics of the ultimately sampled instructions (except their positioning after _selected_ instructions) hardly matters[^untrue].
 
@@ -504,7 +504,6 @@ Thanks to Alex Dowad for pointing out a typo in the text.
 
 [Intel 8259 image](https://commons.wikimedia.org/wiki/File:Intel_8259.svg) by Wikipedia user German under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0).
 
-{% include other-posts.md %}
 
 ---
 ---
