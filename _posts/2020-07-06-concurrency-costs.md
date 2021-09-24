@@ -146,10 +146,9 @@ On the menu are three different fair locks.
 The first is a [ticket lock](https://en.wikipedia.org/wiki/Ticket_lock) with a `sched_yield` in the spin loop. The idea of the yield is to give other threads which may hold the lock time to run. This `yield()` approach is publicly frowned upon by concurrency experts[^notwhat], who then sometimes go right ahead and use it anyway.
 
 We will call it ticket yield and it looks like this:
+{: #ys-lock}
 
 *[ticket yield]: A ticket lock that calls sched_yield in a spin loop while waiting for its turn.
-
-<a id="ys-lock"></a>
 
 ~~~c++
 /**
