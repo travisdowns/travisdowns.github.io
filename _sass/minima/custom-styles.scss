@@ -115,9 +115,14 @@ sup[id^='fnref'] {
   border-radius:10%;
 }
 
-// work around
+// workaround for
 // https://github.com/jekyll/minima/issues/604
 pre,
 code {
   @include relative-font-size(0.9375);
+}
+
+// workaround for https://github.com/travisdowns/travisdowns.github.io/issues/449
+.axe-hack pre > code {
+    display: block;
 }
