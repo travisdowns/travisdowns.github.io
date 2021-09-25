@@ -1,0 +1,8 @@
+_id: e47fa660-1dc0-11ec-bae4-75fdc860c15c
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Hi Travis, \r\n\r\nthank you for such a detailed tutorial! I was able to deploy my heroku website successfully and followed all the steps you listed except for creating a bot account. I also didn't add a main.scss for now, as having comment style/css is least of my concern. After spending enough time on just the recaptcha, staticman, and heroku setup I just wanted to see if the comment actually work/show up but I dont see them on my website.  :(\r\n\r\nI added this code: \r\n\r\n{% if page.comments == true %}\r\n  {% include comments.html %}\r\n{% endif %}\r\n\r\nto my default.html which is my 'theme' page that applies to all my html pages but the comment section is shown on none of them. I put it inside a <div> and the end of my default.html before the footer. \r\n\r\nI was wondering if I could get some help. \r\n\r\nMy first thought is that it has something to do with the conditional if page.comments == true, I am guessing it's not 'true' for my 'page' which is why comment section is not showing up. How do i check?"
+name: Stuti Chugh
+email: fc5721d1aacc14cea2a40aa6d4270b1b
+hp: ''
+date: 1632547484
