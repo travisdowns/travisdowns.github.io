@@ -1,0 +1,8 @@
+_id: 681e7d40-1e23-11ec-84b4-c17ebe3a12ee
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: e47fa660-1dc0-11ec-bae4-75fdc860c15c
+message: "Hi Stuti,\r\n\r\nI can't really help you with detailed debugging, but a couple of comments:\r\n\r\nI think you do probably need the main.scss, because the CSS not just about appearance but functionality in some cases (e.g., the modal dialog needs to styled in a certain way to work properly).\r\n\r\nIf you have that `{% if page.comments == true %}` check, you'll definitely need to have `page.comments` set for your page. You would normally do this by adding a `comments: true` line to your post front-matter (the part between the `---` at the start of the markdown file for the post), or you can set it default for all pages [by setting it as default in the config](https://github.com/travisdowns/travisdowns.github.io/blob/3a998e7263c3e124102092d4950202d8df00b10d/_config.yml#L73) as I do.\r\n\r\nNote that in either case it's just `comments` not `page.comments` because the `page` scope is already implied.\r\n\r\nHope that helps!"
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1632589796
