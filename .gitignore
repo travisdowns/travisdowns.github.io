@@ -3,7 +3,7 @@
 .jekyll-metadata
 .vscode
 .jekyll-cache
-/snapshot-workdir
+/_snapshot-workdir
 gh-env.txt
 
 # lighthouse files
