@@ -418,9 +418,7 @@ tablepath: /misc/tables/concurrency-costs
 
 <p>The first is a <a href="https://en.wikipedia.org/wiki/Ticket_lock">ticket lock</a> with a <code class="language-plaintext highlighter-rouge">sched_yield</code> in the spin loop. The idea of the yield is to give other threads which may hold the lock time to run. This <code class="language-plaintext highlighter-rouge">yield()</code> approach is publicly frowned upon by concurrency experts<sup id="fnref:notwhat" role="doc-noteref"><a href="#fn:notwhat" class="footnote" rel="footnote">9</a></sup>, who then sometimes go right ahead and use it anyway.</p>
 
-<p>We will call it <abbr title="A ticket lock that calls sched_yield in a spin loop while waiting for its turn.">ticket yield</abbr> and it looks like this:</p>
-
-<p><a id="ys-lock"></a></p>
+<p id="ys-lock">We will call it <abbr title="A ticket lock that calls sched_yield in a spin loop while waiting for its turn.">ticket yield</abbr> and it looks like this:</p>
 
 <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
  * A ticket lock which uses sched_yield() while waiting
