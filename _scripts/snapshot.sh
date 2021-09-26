@@ -13,11 +13,18 @@ cleanup() {
 
 trap cleanup EXIT
 
+rand_delay() {
+    delay=$(( (RANDOM % 20) + 1 ))s
+    echo "Sleeping for $delay"
+    sleep $delay
+}
+
 SITE_REL=${1-./_site}
 SITE_ABS=$(readlink -f "$SITE_REL")
 WORKDIR=$(readlink -f ./_snapshot-workdir)
 
 echo "SITE_ABS=$SITE_ABS"
+echo "MAX_TRIES=${MAX_TRIES:=5}"
 
 if [[ ! -d "$SITE_ABS" ]]; then
     echo "site directory does not exist: $SITE_ABS"
@@ -77,6 +84,7 @@ fi
 
 gitcmd="git -C dest-repo"
 
+
 setup_user() {
     if [[ -n ${SNAPSHOT_USER+x} ]]; then
     $gitcmd config user.name "$SNAPSHOT_USER"
@@ -86,17 +94,39 @@ setup_user() {
     fi
 }
 
-rm -rf dest-repo
-if ! git clone "$FULL_REPO" dest-repo --depth 1 --branch "$SNAPSHOT_BRANCH"; then
-    echo "Clone of $SNAPSHOT_BRANCH failed, trying to create it"
-    git clone "$FULL_REPO" dest-repo --depth 1
-    setup_user
-    $gitcmd checkout --orphan "$SNAPSHOT_BRANCH"
-    $gitcmd rm -rf .
-    $gitcmd commit --allow-empty -m "initial commit for $SNAPSHOT_BRANCH by snapshot.sh"
-else
-    setup_user
-fi
+tries=0
+
+while true; do
+    rm -rf dest-repo
+    if ! git clone "$FULL_REPO" dest-repo --depth 1 --branch "$SNAPSHOT_BRANCH"; then
+        echo "Clone of $SNAPSHOT_BRANCH failed, trying to create it"
+        git clone "$FULL_REPO" dest-repo --depth 1 --no-single-branch
+        setup_user
+        $gitcmd checkout --orphan "$SNAPSHOT_BRANCH"
+        $gitcmd rm -rf . > /dev/null
+        $gitcmd commit --allow-empty -m "initial commit for $SNAPSHOT_BRANCH [winner: $SNAPSHOT_WIDTH, $SNAPSHOT_COLOR_PREF]"
+        if $gitcmd push --set-upstream origin "$SNAPSHOT_BRANCH"; then
+            echo "new branch $SNAPSHOT_BRANCH created on remote"
+            $gitcmd branch -vv
+            $gitcmd branch -u origin/$SNAPSHOT_BRANCH
+            $gitcmd branch -vv
+            break
+        else
+            tries=$((tries + 1))
+            if [[ $tries -ge $MAX_TRIES ]]; then
+                echo "FAILED: new branch creation failed $tries times in a row"
+                exit 1
+            else
+                echo "New branch creation failed (race?) $tries times, retrying..."
+                rand_delay
+            fi
+        fi
+    else
+        echo "Clone succeeded"
+        setup_user
+        break
+    fi
+done
 
 outdir="dest-repo/$SNAPSHOT_DEST_PATH"
 
@@ -107,48 +137,67 @@ if [[ "${SKIP_SNAP:-0}" -eq 0 ]]; then
         --host-port="localhost:$port" ${darkarg-} ${SNAPSHOT_EXCLUDES+"--exclude=$SNAPSHOT_EXCLUDES"}
 fi
 
-$gitcmd add "./$SNAPSHOT_DEST_PATH"
+tries=0
+while true; do
 
-# determine the number of files modified and added
-total_count=$($gitcmd diff --name-only --cached                 | wc -l)
-  mod_count=$($gitcmd diff --name-only --cached --diff-filter=M | wc -l)
-  new_count=$($gitcmd diff --name-only --cached --diff-filter=A | wc -l)
+    $gitcmd add "./$SNAPSHOT_DEST_PATH"
 
-echo "=========== files ============="
-$gitcmd diff --name-only --cached
-echo "==============================="
-echo "Files to commit: $total_count ($mod_count modified, $new_count new)"
+    # determine the number of files modified and added
+    total_count=$($gitcmd diff --name-only --cached                 | wc -l)
+    mod_count=$($gitcmd diff --name-only --cached --diff-filter=M | wc -l)
+    new_count=$($gitcmd diff --name-only --cached --diff-filter=A | wc -l)
 
-# we replace various tags in the commit message, if present, with their values
-SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_MOD_TAG/$mod_count}
-SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_NEW_TAG/$new_count}
-SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_WIDTH_TAG/$SNAPSHOT_WIDTH}
-SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_COLOR_PREF_TAG/$SNAPSHOT_COLOR_PREF}
+    echo "=========== files ============="
+    $gitcmd diff --name-only --cached
+    echo "==============================="
+    echo "Files to commit: $total_count ($mod_count modified, $new_count new)"
+
+    # we replace various tags in the commit message, if present, with their values
+    SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_MOD_TAG/$mod_count}
+    SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_NEW_TAG/$new_count}
+    SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_WIDTH_TAG/$SNAPSHOT_WIDTH}
+    SNAPSHOT_COMMIT_MSG=${SNAPSHOT_COMMIT_MSG//SNAPSHOT_COLOR_PREF_TAG/$SNAPSHOT_COLOR_PREF}
 
 
-if [[ $total_count -gt 0 ]]; then
-    echo "Comitting updated screenshots"
-    $gitcmd commit -m "$SNAPSHOT_COMMIT_MSG"
-    # We do this last-second rebase in case some other publish job has come in and created a new commit
-    # which is a common occurence when two commits arrive close together in time: since the repo clone
-    # occurs before the screenshot there is a large window for a race to occur where both CI jobs clone
-    # commit v1, take their screenshots, one commits v2 and the second fails to push because their head
-    # is now stale wrt the remote.
-    echo "====== git log before rebase  ======"
-    $gitcmd log --oneline --max-count=5
-    echo "==================================="
-    $gitcmd pull --rebase --strategy-option=theirs origin || echo "Pull failed (expected for new branches)"
-    echo "====== git log after rebase  ======"
-    $gitcmd log --oneline --max-count=5
-    echo "==================================="
-    echo "Time before push: $(date +"%T")"
-    $gitcmd push origin "$SNAPSHOT_BRANCH:$SNAPSHOT_BRANCH"
-    echo "Time after  push: $(date +"%T")"
-else
-    echo "Nothing new to commit..."
-fi
+    if [[ $total_count -gt 0 ]]; then
+        $gitcmd branch -vv
+        echo "Comitting updated screenshots"
+        $gitcmd commit -m "$SNAPSHOT_COMMIT_MSG"
+        # We do this last-second rebase in case some other publish job has come in and created a new commit
+        # which is a common occurence when two commits arrive close together in time: since the repo clone
+        # occurs before the screenshot there is a large window for a race to occur where both CI jobs clone
+        # commit v1, take their screenshots, one commits v2 and the second fails to push because their head
+        # is now stale wrt the remote.
+        echo "====== git log before rebase  ======"
+        $gitcmd log --oneline --max-count=5
+        echo "==================================="
+        $gitcmd pull --rebase --strategy-option=theirs origin || echo "Pull failed (expected for new branches)"
+        echo "====== git log after rebase  ======"
+        $gitcmd log --oneline --max-count=5
+        echo "==================================="
+        echo "Time before push: $(date +"%T")"
+        if $gitcmd push origin "$SNAPSHOT_BRANCH:$SNAPSHOT_BRANCH"; then
+            echo "Push succeded"
+            break
+        else
+            echo "Time after  push: $(date +"%T")"
+            tries=$((tries + 1))
+            if [[ $tries -ge $MAX_TRIES ]]; then
+                echo "FAILED: push failed $tries times in a row"
+                exit 1
+            else
+                echo "Push failed (probably a race?) $tries times, retrying..."
+                rand_delay
+                # we need to undo the commit and do it over again, because things like
+                # the number of modified files (and hence the commmit message) may change
+                $gitcmd reset --soft origin/$SNAPSHOT_BRANCH
+            fi
+        fi
 
-cd -
-# rm -rf "$WORKDIR"
+    else
+        echo "Nothing new to commit..."
+        break
+    fi
+done
 
 echo "snapshot.sh: success"
