@@ -58,7 +58,7 @@ echo "Commit message : ${SNAPSHOT_COMMIT_MSG:=screenshots}"
 echo "Excludes       : ${SNAPSHOT_EXCLUDES-(unset)}"
 echo "Viewport width : ${SNAPSHOT_WIDTH:=1200}"
 echo "Viewport height: ${SNAPSHOT_HEIGHT:=600}"
-echo "Color pref    : ${SNAPSHOT_COLOR_PREF-light}"
+echo "Color pref     : ${SNAPSHOT_COLOR_PREF:=light}"
 
 # When using GitHub actions, we won't by default have permissions to push to the
 # target repo unless we provide auth info, which can be the action-provided 

@@ -4,8 +4,8 @@
 
 set -euo pipefail
 
-echo "BUILD_SRC=$BUILD_SRC"
-echo "BUILD_DEST=$BUILD_DEST"
+echo "BUILD_SRC=${BUILD_SRC:=.}"
+echo "BUILD_DEST=${BUILD_DEST:=_site}"
 echo "BUILD_ENV=${BUILD_ENV=production}"
 echo "BUILD_EXTRA_OPTIONS=${BUILD_EXTRA_OPTIONS=}"
 
