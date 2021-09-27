@@ -38,22 +38,22 @@ document.write(link);
     <link rel="stylesheet" href="/assets/css/dark.css" media="(prefers-color-scheme: dark)">
 </noscript>
 <!-- Begin Jekyll SEO tag v2.7.1p -->
-<title>Performance Matters | A blog about low-level software and hardware performance.</title>
+<title>Settings | Performance Matters</title>
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="Performance Matters" />
+<meta property="og:title" content="Settings" />
 <meta name="author" content="Travis Downs" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="A blog about low-level software and hardware performance." />
 <meta property="og:description" content="A blog about low-level software and hardware performance." />
-<link rel="canonical" href="https://travisdowns.github.io/tags/gcc.html" />
-<meta property="og:url" content="https://travisdowns.github.io/tags/gcc.html" />
+<link rel="canonical" href="https://travisdowns.github.io/settings" />
+<meta property="og:url" content="https://travisdowns.github.io/settings" />
 <meta property="og:site_name" content="Performance Matters" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Performance Matters" />
+<meta property="twitter:title" content="Settings" />
 <meta name="twitter:site" content="@trav_downs" />
 <meta name="twitter:creator" content="@trav_downs" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Performance Matters","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/tags/gcc.html"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Settings","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/settings"}</script>
 <!-- End Jekyll SEO tag -->
 <link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
 <script>
@@ -83,21 +83,74 @@ document.write(link);
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        
+        <style>
+.color-check:after   { content: 'unset or unsupported'; }
 
-<div class="home">
-<h2 class="post-list-heading">Tag: gcc</h2>
-      <ul class="post-list">
-            <li><span class="post-meta">Jan 20, 2020</span>
-            <h3>
-                <a class="post-link" href="/blog/2020/01/20/zero.html">
-                The Hunt for the Fastest Zero
-                </a>
-            </h3>Unexpected performance deviations depending on how you spell zero.</li>
-            </ul>
+@media (prefers-color-scheme: dark) {
+  .color-check:after   { content: 'dark'; }
+}
+
+@media (prefers-color-scheme: light) {
+  .color-check:after   { content: 'light'; }
+}
+
+/* obsolete: https://github.com/w3c/csswg-drafts/issues/3857#issuecomment-634779976 */
+@media (prefers-color-scheme: no-preference ) {
+  .color-check:after   { content: 'no-preference'; }
+}
+</style>
+
+<p class="color-check">prefers-color-scheme: </p>
+
+<script>
+  var td = {
+    DEBUG: true,
+
+    log(what) {
+      if (this.DEBUG) {
+        console.log(what);
+      }
+    }
+  };
+</script>
+
+<p><label for="theme-select">Theme:</label>
+<select name="Theme" id="theme-select" onchange="updateTheme(this)">
+    <option value="system">(default)</option>
+    <option value="light">Light</option>
+    <option value="dark">Dark</option>
+</select></p>
+
+<div id="theme-description"></div>
+
+<script>  
+  var updateDesc = function (theme) {
+    var desc = {
+      system: 'Dark or light theme is chosen based on browser or system preferences.',
+      dark: 'Dark theme is enabled for all pages.',
+      light: 'Light theme is enabled for all pages.'
+    };
+    document.getElementById("theme-description").textContent = desc[theme];
+  }
+
+  var updateTheme = function (elem) {
+    var v = elem.value;
+    td.log('update: ' + v);
+    DARKMODE.override(v === 'system' ? null : v);
+    updateDesc(v);
+  };
+
+  var updateSelect = function () {
+    var cur = DARKMODE.getOverride() || 'system';
+    document.getElementById("theme-select").value = cur;
+    updateDesc(cur);
+  };
+
+  updateSelect();
   
-      <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p></div>
-  
+</script>
+
+
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>
