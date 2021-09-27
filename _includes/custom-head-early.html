@@ -1,6 +1,37 @@
-  
-  <meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light dark">
 {%- capture lightcss -%}{{ '/assets/css/light.css' | relative_url }}{%- endcapture -%}
 {%- capture  darkcss -%}{{ '/assets/css/dark.css' | relative_url }}{%- endcapture %}
-  <link rel="stylesheet" href="{{ lightcss }}">
-  <link rel="stylesheet" href="{{ darkcss }}" media="(prefers-color-scheme: dark)">
+<script>
+
+var DARKMODE = (function() {
+    const i = {
+    PROP: 'force-color',
+    getOverride: function () {
+        return localStorage.getItem(i.PROP);
+    },
+    get: function () {
+        var o = i.getOverride();
+        if (o === 'dark' || (!o && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        return 'dark';
+        } else {
+        return 'light';
+        }
+    }
+    };
+    return i;
+}());
+
+if (DARKMODE.get() == 'dark') {
+    var link = '<meta name="theme-color" content="#181818"><link id="mainstyle" rel="stylesheet" href="{{ darkcss }}">';
+} else {
+    var link = '<meta name="theme-color" content="#fdfdfd"><link id="mainstyle" rel="stylesheet" href="{{ lightcss }}">';
+} 
+document.write(link);
+</script>
+
+<script defer src="{{ '/assets/dark-mode.js' | relative_url }}"></script>
+
+<noscript>
+    <link rel="stylesheet" href="{{ lightcss }}">
+    <link rel="stylesheet" href="{{ darkcss }}" media="(prefers-color-scheme: dark)">
+</noscript>
