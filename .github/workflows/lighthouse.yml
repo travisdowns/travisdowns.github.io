@@ -1,6 +1,8 @@
 name: Lighthouse
 on:
   push:
+    branches:
+      - master
 
 jobs:
   lhci:
