@@ -1,0 +1,6 @@
+  
+  <meta name="color-scheme" content="light dark">
+{%- capture lightcss -%}{{ '/assets/css/light.css' | relative_url }}{%- endcapture -%}
+{%- capture  darkcss -%}{{ '/assets/css/dark.css' | relative_url }}{%- endcapture %}
+  <link rel="stylesheet" href="{{ lightcss }}">
+  <link rel="stylesheet" href="{{ darkcss }}" media="(prefers-color-scheme: dark)">
