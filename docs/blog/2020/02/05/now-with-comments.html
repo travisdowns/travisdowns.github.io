@@ -449,6 +449,77 @@ heroku config:add <span class="nt">--app</span> <span class="k">${</span><span c
     
     
 
+<article id="comment-e47fa660-1dc0-11ec-bae4-75fdc860c15c" class="js-comment comment" uid="e47fa660-1dc0-11ec-bae4-75fdc860c15c">
+
+  <div class="comment__author">
+    Stuti Chugh
+    <span class="comment__date">•
+        <a href="#comment-e47fa660-1dc0-11ec-bae4-75fdc860c15c" title="Permalink to this comment">September 25th, 2021 05:24</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Travis,</p>
+
+<p>thank you for such a detailed tutorial! I was able to deploy my heroku website successfully and followed all the steps you listed except for creating a bot account. I also didn’t add a main.scss for now, as having comment style/css is least of my concern. After spending enough time on just the recaptcha, staticman, and heroku setup I just wanted to see if the comment actually work/show up but I dont see them on my website.  :(</p>
+
+<p>I added this code:</p>
+
+<p>{% if page.comments == true %}
+  {% include comments.html %}
+{% endif %}</p>
+
+<p>to my default.html which is my ‘theme’ page that applies to all my html pages but the comment section is shown on none of them. I put it inside a  and the end of my default.html before the footer.</p>
+
+<p>I was wondering if I could get some help.</p>
+
+<p>My first thought is that it has something to do with the conditional if page.comments == true, I am guessing it’s not ‘true’ for my ‘page’ which is why comment section is not showing up. How do i check?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e47fa660-1dc0-11ec-bae4-75fdc860c15c', 'respond', 'now-with-comments', 'e47fa660-1dc0-11ec-bae4-75fdc860c15c')">↪&#xFE0E; Reply to Stuti Chugh</a>
+    </div>
+</article>
+  
+
+<article id="comment-681e7d40-1e23-11ec-84b4-c17ebe3a12ee" class="js-comment comment admin child" uid="681e7d40-1e23-11ec-84b4-c17ebe3a12ee">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-681e7d40-1e23-11ec-84b4-c17ebe3a12ee" title="Permalink to this comment">September 25th, 2021 17:09</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Stuti,</p>
+
+<p>I can’t really help you with detailed debugging, but a couple of comments:</p>
+
+<p>I think you do probably need the main.scss, because the CSS not just about appearance but functionality in some cases (e.g., the modal dialog needs to styled in a certain way to work properly).</p>
+
+<p>If you have that <code class="language-plaintext highlighter-rouge">{% if page.comments == true %}</code> check, you’ll definitely need to have <code class="language-plaintext highlighter-rouge">page.comments</code> set for your page. You would normally do this by adding a <code class="language-plaintext highlighter-rouge">comments: true</code> line to your post front-matter (the part between the <code class="language-plaintext highlighter-rouge">---</code> at the start of the markdown file for the post), or you can set it default for all pages <a href="https://github.com/travisdowns/travisdowns.github.io/blob/3a998e7263c3e124102092d4950202d8df00b10d/_config.yml#L73">by setting it as default in the config</a> as I do.</p>
+
+<p>Note that in either case it’s just <code class="language-plaintext highlighter-rouge">comments</code> not <code class="language-plaintext highlighter-rouge">page.comments</code> because the <code class="language-plaintext highlighter-rouge">page</code> scope is already implied.</p>
+
+<p>Hope that helps!</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-c195ec60-09c8-11ec-ae93-e35ce0952288" class="js-comment comment" uid="c195ec60-09c8-11ec-ae93-e35ce0952288">
 
   <div class="comment__author">

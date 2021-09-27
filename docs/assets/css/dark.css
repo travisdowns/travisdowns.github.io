@@ -1,3 +1,5 @@
+#x { --x:0; }
+
 :root { --dark: 1; --light: 0; }
 
 .highlight .c { color: #545454; font-style: italic; }
@@ -439,6 +441,12 @@ sup[id^='fnref'] { font-size: 0.8em; line-height: 0; }
 .tag-link { background-color: #333333; display: inline-block; padding-left: 8px; padding-right: 8px; margin: 0px 2px; text-align: center; border-radius: 10%; }
 
 pre, code { font-size: 0.9375rem; }
+
+.axe-hack pre > code { display: block; }
+
+a > code { color: #79b8ff; }
+
+.tag-link a { color: #79b8ff; }
 
 .invert-img img:not(.no-invert), img.invert-img:not(.no-invert) { filter: invert(0.88); }
 
