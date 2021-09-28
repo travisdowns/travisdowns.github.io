@@ -9,15 +9,21 @@ var DARKMODE = (function() {
     const i = {
     PROP: 'force-color',
     getOverride: function () {
+      try {
         return localStorage.getItem(i.PROP);
+      } catch (e) {
+        return null;
+      }
     },
     get: function () {
+      try {
         var o = i.getOverride();
         if (o === 'dark' || (!o && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        return 'dark';
-        } else {
-        return 'light';
+          return 'dark';
         }
+      } catch (e) {}
+      return 'light';
+
     }
     };
     return i;
@@ -83,7 +89,7 @@ document.write(link);
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <p>Last rebuild (<code class="language-plaintext highlighter-rouge">site.time</code>): 2021-09-27 22:22:47 +0000</p>
+        <p>Last rebuild (<code class="language-plaintext highlighter-rouge">site.time</code>): 2021-09-28 02:04:38 +0000</p>
 
 <table>
   <thead>

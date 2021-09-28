@@ -9,15 +9,21 @@ var DARKMODE = (function() {
     const i = {
     PROP: 'force-color',
     getOverride: function () {
+      try {
         return localStorage.getItem(i.PROP);
+      } catch (e) {
+        return null;
+      }
     },
     get: function () {
+      try {
         var o = i.getOverride();
         if (o === 'dark' || (!o && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        return 'dark';
-        } else {
-        return 'light';
+          return 'dark';
         }
+      } catch (e) {}
+      return 'light';
+
     }
     };
     return i;
@@ -83,26 +89,7 @@ document.write(link);
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <style>
-.color-check:after   { content: 'unset or unsupported'; }
-
-@media (prefers-color-scheme: dark) {
-  .color-check:after   { content: 'dark'; }
-}
-
-@media (prefers-color-scheme: light) {
-  .color-check:after   { content: 'light'; }
-}
-
-/* obsolete: https://github.com/w3c/csswg-drafts/issues/3857#issuecomment-634779976 */
-@media (prefers-color-scheme: no-preference ) {
-  .color-check:after   { content: 'no-preference'; }
-}
-</style>
-
-<p class="color-check">prefers-color-scheme: </p>
-
-<script>
+        <script>
   var td = {
     DEBUG: true,
 
@@ -146,10 +133,50 @@ document.write(link);
     updateDesc(cur);
   };
 
-  updateSelect();
+  window.addEventListener('DOMContentLoaded', function(e) {
+    if (!DARKMODE.lsOk()) {
+      document.getElementById("theme-select").disabled = true;
+      document.getElementById("theme-description").textContent = 'Can\'t set theme because localStorage is not working';
+    } else {
+      updateSelect();
+    }
+    document.getElementById("ls-check").textContent = DARKMODE.lsOk() ? 'OK' : 'FAILED';
+  });
   
 </script>
 
+<hr />
+
+<div style="font-size: 0.75em">
+
+<p><strong>Theme debugging:</strong></p>
+
+<style>
+.color-check:after   { content: 'unset or unsupported'; }
+
+@media (prefers-color-scheme: dark) {
+  .color-check:after   { content: 'dark'; }
+}
+
+@media (prefers-color-scheme: light) {
+  .color-check:after   { content: 'light'; }
+}
+
+/* obsolete: https://github.com/w3c/csswg-drafts/issues/3857#issuecomment-634779976 */
+@media (prefers-color-scheme: no-preference ) {
+  .color-check:after   { content: 'no-preference'; }
+}
+</style>
+
+<p class="color-check">prefers-color-scheme: </p>
+
+
+localStorage: <span id="ls-check"></span>
+<script>
+
+</script>
+
+</div>
 
       </div>
     </main><footer class="site-footer h-card">
