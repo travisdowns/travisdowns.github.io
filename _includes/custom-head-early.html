@@ -7,15 +7,21 @@ var DARKMODE = (function() {
     const i = {
     PROP: 'force-color',
     getOverride: function () {
+      try {
         return localStorage.getItem(i.PROP);
+      } catch (e) {
+        return null;
+      }
     },
     get: function () {
+      try {
         var o = i.getOverride();
         if (o === 'dark' || (!o && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        return 'dark';
-        } else {
-        return 'light';
+          return 'dark';
         }
+      } catch (e) {}
+      return 'light';
+
     }
     };
     return i;

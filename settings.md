@@ -4,7 +4,6 @@ title: Settings
 permalink: /settings
 ---
 
-{% include color-check.html %}
 
 <script>
   var td = {
@@ -50,6 +49,29 @@ permalink: /settings
     updateDesc(cur);
   };
 
-  updateSelect();
+  window.addEventListener('DOMContentLoaded', function(e) {
+    if (!DARKMODE.lsOk()) {
+      document.getElementById("theme-select").disabled = true;
+      document.getElementById("theme-description").textContent = 'Can\'t set theme because localStorage is not working';
+    } else {
+      updateSelect();
+    }
+    document.getElementById("ls-check").textContent = DARKMODE.lsOk() ? 'OK' : 'FAILED';
+  });
   
 </script>
+
+---
+
+<div style="font-size: 0.75em">
+
+<p><strong>Theme debugging:</strong></p>
+
+{% include color-check.html %}
+
+localStorage: <span id="ls-check"></span>
+<script>
+
+</script>
+
+</div>

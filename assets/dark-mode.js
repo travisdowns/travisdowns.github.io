@@ -13,6 +13,19 @@
   i.updateSheet = function() {
     i.setSheet(i.get());
   }
+
+  /**
+   * See if localStorage apears to be working.
+   */
+  i.lsOk = function() {
+    try {
+      localStorage.setItem('lsOk', 'x');
+      return localStorage.getItem('lsOk') === 'x';
+    } catch (e) {
+      return false;
+    }
+  }
+
   
   /**
    * Override the theme to the given value, or remove any existing
