@@ -43,7 +43,7 @@ for entry in rep:
         else:
             # sometimes the score is missing, indicating a failure
             # in the underlying lighthouse testing module
-            print('{:16}'.format('error'), end='')
+            print('{:>16}'.format('error'), end='')
 
     print()
 
