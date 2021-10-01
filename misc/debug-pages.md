@@ -6,6 +6,17 @@ layout: default
 <a href="#posts-table">Jump to POSTS table</a><br>
 <a href="#static-table">Jump to STATIC table</a><br>
 
+<style>
+#props span, .mono {
+    font-family: monospace;
+    white-space: pre;
+}
+
+#props span {
+    background-color: lightgrey;
+}
+</style>
+
 <div id="props">
 
 <h2 id="pages-table" >site.pages</h2>
