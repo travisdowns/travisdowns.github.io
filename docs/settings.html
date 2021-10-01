@@ -72,7 +72,17 @@ document.write(link);
 </script>
 
 </head>
-<body><header class="site-header">
+<body>
+  <header id="dm-header" class="dm-header hidden">
+    <div class="dm-bar">
+      <div class="wrapper">
+        <label class="dm-checkbox"><span>Enable Dark Mode: </span><input type="checkbox" id="dm-select"/></label>
+        <span onclick="DARKMODE.closeBar()" class='dm-close'>&times;</span>
+      </div>
+    </div>
+    <div class="dm-spacer"></div>
+  </header>
+<header class="site-header">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
@@ -91,7 +101,7 @@ document.write(link);
       <div class="wrapper">
         <script>
   var td = {
-    DEBUG: true,
+    DEBUG: false,
 
     log(what) {
       if (this.DEBUG) {
@@ -117,7 +127,7 @@ document.write(link);
       dark: 'Dark theme is enabled for all pages.',
       light: 'Light theme is enabled for all pages.'
     };
-    document.getElementById("theme-description").textContent = desc[theme];
+    document.getElementById('theme-description').textContent = desc[theme];
   }
 
   var updateTheme = function (elem) {
@@ -129,29 +139,59 @@ document.write(link);
 
   var updateSelect = function () {
     var cur = DARKMODE.getOverride() || 'system';
-    document.getElementById("theme-select").value = cur;
+    document.getElementById('theme-select').value = cur;
     updateDesc(cur);
   };
 
-  window.addEventListener('DOMContentLoaded', function(e) {
+  var refreshDebug = function() {
     if (!DARKMODE.lsOk()) {
-      document.getElementById("theme-select").disabled = true;
-      document.getElementById("theme-description").textContent = 'Can\'t set theme because localStorage is not working';
+      document.getElementById('theme-select').disabled = true;
+      document.getElementById('theme-description').textContent = 'Can\'t set theme because localStorage is not working';
     } else {
       updateSelect();
     }
-    document.getElementById("ls-check").textContent = DARKMODE.lsOk() ? 'OK' : 'FAILED';
+    document.getElementById('ls-check').textContent = DARKMODE.lsOk() ? 'OK' : 'FAILED';
+    document.getElementById('dm-closed').textContent = sessionStorage.getItem('dm-closed') || '(unset)';
+    document.getElementById('dm-close-count').textContent = DARKMODE.closeCount();
+    document.getElementById('bar-used').textContent = localStorage.getItem('bar-used') || '(unset)';
+  }
+
+  window.addEventListener('DOMContentLoaded', function(e) {
+    refreshDebug();
+    document.getElementById('clear-closed').addEventListener('click',
+      function() {
+        sessionStorage.removeItem('dm-closed');
+        refreshDebug();
+      }
+    );
+    document.getElementById('clear-count').addEventListener('click',
+      function() {
+        localStorage.removeItem('dm-close-count');
+        refreshDebug();
+      }
+    );
+    document.getElementById('clear-bar-used').addEventListener('click',
+      function() {
+        localStorage.removeItem('bar-used');
+        refreshDebug();
+      }
+    );
   });
   
 </script>
 
 <hr />
 
-<div style="font-size: 0.75em">
-
-<p><strong>Theme debugging:</strong></p>
-
 <style>
+.dm-debug button, .spacer {
+  display: inline-block;
+  width: 50px;
+  margin-bottom: 5px;
+}
+</style>
+
+<div style="font-size: 0.75em; font-family: monospace">
+<p><strong>Theme debugging:</strong></p><style>
 .color-check:after   { content: 'unset or unsupported'; }
 
 @media (prefers-color-scheme: dark) {
@@ -169,14 +209,12 @@ document.write(link);
 </style>
 
 <p class="color-check">prefers-color-scheme: </p>
-
-
-localStorage: <span id="ls-check"></span>
-<script>
-
-</script>
-
-</div>
+<div class="dm-debug" style="white-space: pre-wrap">
+<span class="spacer"> </span> localStorage        : <span id="ls-check"></span>
+<button id="clear-closed">clear</button> dm-closed (session) : <span id="dm-closed"></span>
+<button id="clear-count">clear</button> dm-close-count      : <span id="dm-close-count"></span>
+<button id="clear-bar-used">clear</button> bar-used            : <span id="bar-used"></span>
+</div></div>
 
       </div>
     </main><footer class="site-footer h-card">

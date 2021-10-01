@@ -448,6 +448,22 @@ a > code { color: #246bc7; }
 
 .tag-link a { color: #2060b2; }
 
+.dm-bar { position: fixed; top: 0; left: 0; width: 100%; height: 30px; line-height: 30px; background-color: #343434; color: #bbb; overflow: hidden; z-index: 100; }
+
+#dm-header.hidden { display: none; }
+
+.dm-spacer { height: 25px; }
+
+.dm-checkbox { float: left; cursor: pointer; font-weight: bold; }
+
+#dm-select { transform: scale(1.2); }
+
+.dm-close { font-size: 24px; float: right; cursor: pointer; user-select: none; }
+
+.dm-close:hover { font-weight: bold; filter: brightness(1.2); }
+
+.dm-checkbox input[type="checkbox"] { cursor: pointer; }
+
 .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo { color: #007878; }
 
 .highlight .cm, .highlight .cp, .highlight .c1, .highlight .cs { color: #6d6d60; }
