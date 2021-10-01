@@ -1,8 +1,49 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1p -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+<script>
+
+var DARKMODE = (function() {
+    const i = {
+    PROP: 'force-color',
+    getOverride: function () {
+      try {
+        return localStorage.getItem(i.PROP);
+      } catch (e) {
+        return null;
+      }
+    },
+    get: function () {
+      try {
+        var o = i.getOverride();
+        if (o === 'dark' || (!o && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          return 'dark';
+        }
+      } catch (e) {}
+      return 'light';
+
+    }
+    };
+    return i;
+}());
+
+if (DARKMODE.get() == 'dark') {
+    var link = '<meta name="theme-color" content="#181818"><link id="mainstyle" rel="stylesheet" href="/assets/css/dark.css">';
+} else {
+    var link = '<meta name="theme-color" content="#fdfdfd"><link id="mainstyle" rel="stylesheet" href="/assets/css/light.css">';
+} 
+document.write(link);
+</script>
+
+<script defer src="/assets/dark-mode.js"></script>
+
+<noscript>
+    <link rel="stylesheet" href="/assets/css/light.css">
+    <link rel="stylesheet" href="/assets/css/dark.css" media="(prefers-color-scheme: dark)">
+</noscript>
+<!-- Begin Jekyll SEO tag v2.7.1p -->
 <title>Performance Matters | A blog about low-level software and hardware performance.</title>
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Performance Matters" />
@@ -20,11 +61,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Performance Matters","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/misc/tables/intel-zero-opt/fig6-zen2.html"}</script>
 <!-- End Jekyll SEO tag -->
-<!-- override -->
-    <link rel="stylesheet" href="/assets/css/light.css">
-    <link rel="stylesheet" href="/assets/css/dark.css"
-        media="(prefers-color-scheme: dark)">
-    <!-- end --><link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
+<link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
 <script>
   window['ga-disable-UA-136594956-1'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
   window.dataLayer = window.dataLayer || [];
@@ -35,7 +72,17 @@
 </script>
 
 </head>
-  <body><header class="site-header">
+<body>
+  <header id="dm-header" class="dm-header hidden">
+    <div class="dm-bar">
+      <div class="wrapper">
+        <label class="dm-checkbox"><span>Enable Dark Mode: </span><input type="checkbox" id="dm-select"/></label>
+        <span onclick="DARKMODE.closeBar()" class='dm-close'>&times;</span>
+      </div>
+    </div>
+    <div class="dm-spacer"></div>
+  </header>
+<header class="site-header">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Performance Matters</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
@@ -47,7 +94,7 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/settings">Settings</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">

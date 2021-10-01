@@ -44,22 +44,22 @@ document.write(link);
     <link rel="stylesheet" href="/assets/css/dark.css" media="(prefers-color-scheme: dark)">
 </noscript>
 <!-- Begin Jekyll SEO tag v2.7.1p -->
-<title>Performance Matters | A blog about low-level software and hardware performance.</title>
+<title>Settings | Performance Matters</title>
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="Performance Matters" />
+<meta property="og:title" content="Settings" />
 <meta name="author" content="Travis Downs" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="A blog about low-level software and hardware performance." />
 <meta property="og:description" content="A blog about low-level software and hardware performance." />
-<link rel="canonical" href="https://travisdowns.github.io/tags/performance.html" />
-<meta property="og:url" content="https://travisdowns.github.io/tags/performance.html" />
+<link rel="canonical" href="https://travisdowns.github.io/settings" />
+<meta property="og:url" content="https://travisdowns.github.io/settings" />
 <meta property="og:site_name" content="Performance Matters" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Performance Matters" />
+<meta property="twitter:title" content="Settings" />
 <meta name="twitter:site" content="@trav_downs" />
 <meta name="twitter:creator" content="@trav_downs" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Performance Matters","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/tags/performance.html"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Travis Downs"},"description":"A blog about low-level software and hardware performance.","headline":"Settings","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://travisdowns.github.io/assets/rabbit3.png"},"name":"Travis Downs"},"url":"https://travisdowns.github.io/settings"}</script>
 <!-- End Jekyll SEO tag -->
 <link type="application/atom+xml" rel="alternate" href="https://travisdowns.github.io/feed.xml" title="Performance Matters" /><script async src="https://www.googletagmanager.com/gtag/js?id=UA-136594956-1"></script>
 <script>
@@ -99,91 +99,61 @@ document.write(link);
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        
+        <script>
+  var td = {
+    DEBUG: false,
 
-<div class="home">
-<h2 class="post-list-heading">Tag: performance</h2>
-      <ul class="post-list">
-            <li><span class="post-meta">Aug 19, 2020</span>
-            <h3>
-                <a class="post-link" href="/blog/2020/08/19/icl-avx512-freq.html">
-                Ice Lake AVX-512 Downclocking
-                </a>
-            </h3>Examining the extent of AVX related downclocking on Intel's Ice Lake CPU</li>
-            
-            <li><span class="post-meta">Jul 6, 2020</span>
-            <h3>
-                <a class="post-link" href="/blog/2020/07/06/concurrency-costs.html">
-                A Concurrency Cost Hierarchy
-                </a>
-            </h3>Concurrent operations can be grouped relatively neatly into categories based on their cost</li>
-            
-            <li><span class="post-meta">Jan 20, 2020</span>
-            <h3>
-                <a class="post-link" href="/blog/2020/01/20/zero.html">
-                The Hunt for the Fastest Zero
-                </a>
-            </h3>Unexpected performance deviations depending on how you spell zero.</li>
-            
-            <li><span class="post-meta">Jan 17, 2020</span>
-            <h3>
-                <a class="post-link" href="/blog/2020/01/17/avxfreq1.html">
-                Gathering Intel on Intel AVX-512 Transitions
-                </a>
-            </h3>Investigating some details of SIMD related frequency transitions on Intel CPUs.</li>
-            
-            <li><span class="post-meta">Dec 5, 2019</span>
-            <h3>
-                <a class="post-link" href="/blog/2019/12/05/kreg-facts.html">
-                A Note on Mask Registers
-                </a>
-            </h3>Some mostly too-low-level-to-care-about hardware details of the mask registers introduced in AVX-512.</li>
-            
-            <li><span class="post-meta">Nov 19, 2019</span>
-            <h3>
-                <a class="post-link" href="/blog/2019/11/19/toupper.html">
-                Clang-format Tanks Performance
-                </a>
-            </h3>Can using clang-format make your code slower? Kind of.</li>
-            
-            <li><span class="post-meta">Aug 26, 2019</span>
-            <h3>
-                <a class="post-link" href="/blog/2019/08/26/vector-inc.html">
-                Incrementing Vectors
-                </a>
-            </h3>Incrementing <code>vector&lt;T&gt;</code> for various <code>T</code> may not perform as you'd expect.</li>
-            
-            <li><span class="post-meta">Aug 20, 2019</span>
-            <h3>
-                <a class="post-link" href="/blog/2019/08/20/interrupts.html">
-                Where Do Interrupts Happen?
-                </a>
-            </h3>Trying to determine exactly where asynchronous interrupts are delivered on Intel CPUs.</li>
-            
-            <li><span class="post-meta">Jun 11, 2019</span>
-            <h3>
-                <a class="post-link" href="/blog/2019/06/11/speed-limits.html">
-                Performance Speed Limits
-                </a>
-            </h3>A laundry list of speed limits that your code can't exceed.</li>
-            
-            <li><span class="post-meta">May 22, 2019</span>
-            <h3>
-                <a class="post-link" href="/blog/2019/05/22/sorting.html">
-                Beating Up on Qsort
-                </a>
-            </h3>Building sort functions faster than what the C and C++ standard libraries offer.</li>
-            
-            <li><span class="post-meta">Mar 19, 2019</span>
-            <h3>
-                <a class="post-link" href="/blog/2019/03/19/random-writes-and-microcode-oh-my.html">
-                What Has Your Microcode Done for You Lately?
-                </a>
-            </h3>CPU microcode updates can cause silent and dramatic performance changes.</li>
-            </ul>
-  
-      <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p></div>
-  
+    log(what) {
+      if (this.DEBUG) {
+        console.log(what);
+      }
+    }
+  };
+</script>
+
+<p><label for="theme-select">Theme:</label>
+<select name="Theme" id="theme-select" onchange="updateTheme(this)">
+    <option value="system">(default)</option>
+    <option value="light">Light</option>
+    <option value="dark">Dark</option>
+</select></p>
+
+<div id="theme-description"></div>
+
+<script>  
+  var updateDesc = function (theme) {
+    var desc = {
+      system: 'Dark or light theme is chosen based on browser or system preferences.',
+      dark: 'Dark theme is enabled for all pages.',
+      light: 'Light theme is enabled for all pages.'
+    };
+    document.getElementById('theme-description').textContent = desc[theme];
+  }
+
+  var updateTheme = function (elem) {
+    var v = elem.value;
+    td.log('update: ' + v);
+    DARKMODE.override(v === 'system' ? null : v);
+    updateDesc(v);
+  };
+
+  var updateSelect = function () {
+    var cur = DARKMODE.getOverride() || 'system';
+    document.getElementById('theme-select').value = cur;
+    updateDesc(cur);
+  };
+
+  window.addEventListener('DOMContentLoaded', function() {
+    if (!DARKMODE.lsOk()) {
+      document.getElementById('theme-select').disabled = true;
+      document.getElementById('theme-description').textContent = 'Can\'t set theme because localStorage is not working';
+    } else {
+      updateSelect();
+    }
+  });
+</script>
+
+
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>
