@@ -135,3 +135,53 @@ a > code {
   color: ld-select(#2060b2, $link-base-color);
 }
 
+// styles related to the dark mode banner at the top
+$dm-bar-height: 30px;
+
+.dm-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: $dm-bar-height;
+  line-height: $dm-bar-height;
+  background-color: #343434;
+  color: #bbb;
+  overflow: hidden;
+  z-index: 100;
+}
+
+#dm-header.hidden {
+  display: none;
+}
+
+.dm-spacer {
+  height: $dm-bar-height - 5px;
+}
+
+.dm-checkbox {
+  float: left;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#dm-select {
+  transform: scale(1.2);
+}
+
+.dm-close {
+  font-size: 24px;
+  float: right;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dm-close:hover {
+  font-weight: bold;
+  filter: brightness(1.2)
+}
+
+.dm-checkbox input[type="checkbox"] {
+  cursor: pointer;
+}
+

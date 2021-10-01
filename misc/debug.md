@@ -12,7 +12,7 @@ Last rebuild (`site.time`): {{ site.time }}
 | site.markdown  | {{ site.markdown }} |
 | site.kramdown  | `{{ site.kramdown }}` |
 | site.rss | {{ site.rss }} |
-
+| site.darkmode | {{ site.darkmode }} |
 
 relative foo: {{ '/foo' | relative_url }}
 

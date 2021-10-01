@@ -1,0 +1,10 @@
+Chrome doesn't detect dark mode on Linux (at least, Ubuntu/GNOME):
+
+https://bugs.chromium.org/p/chromium/issues/detail?id=998903
+https://chromium-review.googlesource.com/c/chromium/src/+/1821782
+
+
+mozilla doesn't support color scheme
+https://bugzilla.mozilla.org/show_bug.cgi?id=1525107
+
+chrome changes the UA stylesheets based on meta color-scheme
