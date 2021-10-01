@@ -99,7 +99,7 @@ document.write(link);
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <p>Last rebuild (<code class="language-plaintext highlighter-rouge">site.time</code>): 2021-10-01 17:18:46 +0000</p>
+        <p>Last rebuild (<code class="language-plaintext highlighter-rouge">site.time</code>): 2021-10-01 17:43:57 +0000</p>
 
 <table>
   <thead>
@@ -147,7 +147,49 @@ document.write(link);
 <p><a href="/notexist.html">bad link</a><br />
 <a href="/misc/debug.html">self link</a></p>
 
+<hr />
+
+<script>
+    var refreshDebug = function() {
+        document.getElementById('ls-check').textContent = DARKMODE.lsOk() ? 'OK' : 'FAILED';
+        document.getElementById('dm-closed').textContent = sessionStorage.getItem('dm-closed') || '(unset)';
+        document.getElementById('dm-close-count').textContent = DARKMODE.closeCount();
+        document.getElementById('bar-used').textContent = localStorage.getItem('bar-used') || '(unset)';
+    }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    refreshDebug();
+    document.getElementById('clear-closed').addEventListener('click',
+      function() {
+        sessionStorage.removeItem('dm-closed');
+        refreshDebug();
+      }
+    );
+    document.getElementById('clear-count').addEventListener('click',
+      function() {
+        localStorage.removeItem('dm-close-count');
+        refreshDebug();
+      }
+    );
+    document.getElementById('clear-bar-used').addEventListener('click',
+      function() {
+        localStorage.removeItem('bar-used');
+        refreshDebug();
+      }
+    );
+  });
+</script>
+
 <style>
+.dm-debug button, .spacer {
+  display: inline-block;
+  width: 50px;
+  margin-bottom: 5px;
+}
+</style>
+
+<div style="font-size: 0.75em; font-family: monospace">
+    <p><strong>Theme debugging:</strong></p><style>
 .color-check:after   { content: 'unset or unsupported'; }
 
 @media (prefers-color-scheme: dark) {
@@ -165,17 +207,15 @@ document.write(link);
 </style>
 
 <p class="color-check">prefers-color-scheme: </p>
+<div class="dm-debug" style="white-space: pre-wrap">
+<span class="spacer"> </span> localStorage        : <span id="ls-check"></span>
+<button id="clear-closed">clear</button> dm-closed (session) : <span id="dm-closed"></span>
+<button id="clear-count">clear</button> dm-close-count      : <span id="dm-close-count"></span>
+<button id="clear-bar-used">clear</button> bar-used            : <span id="bar-used"></span>
+    </div>
+</div>
 
-<style>
-#props span, .mono {
-    font-family: monospace;
-    white-space: pre;
-}
-
-#props span {
-    background-color: lightgrey;
-}
-</style>
+<hr />
 
 <div class="mono">
 <script>
