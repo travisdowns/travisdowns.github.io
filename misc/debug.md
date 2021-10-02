@@ -81,5 +81,6 @@ relative foo: {{ '/foo' | relative_url }}
         document.write('location.href    : ' + location.href + '<br>')
         document.write('window.location  : ' + window.location + '<br>')
         document.write('document.referrer: ' + document.referrer + '<br>')
+        document.write('document.location.hostname: ' + document.location.hostname + '<br>')
     </script>
 </div>

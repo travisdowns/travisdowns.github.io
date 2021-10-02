@@ -5,5 +5,5 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
-  gtag('config', '{{ site.google_analytics }}', { 'theme' : DARKMODE.gaTheme() });
+  gtag('config', '{{ site.google_analytics }}', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
