@@ -21,7 +21,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
