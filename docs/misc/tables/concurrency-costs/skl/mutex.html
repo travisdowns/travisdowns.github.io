@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -67,8 +70,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme() });
 </script>
 
 </head>
