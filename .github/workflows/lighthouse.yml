@@ -43,6 +43,10 @@ jobs:
 
       - name: Output summary
         run: |
+          echo '============== links =============='
+          cat <<< '${{ steps.lhci.outputs.links }}'
+          echo '=========== end links ============='
+
           cat <<< '${{ steps.lhci.outputs.manifest }}' > manifest.json
           echo "Lighthouse results:"
           _scripts/lighthouse/print-summary.py manifest.json
