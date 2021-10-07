@@ -14,7 +14,7 @@ outfile = sys.argv[2] if len(sys.argv) >= 3 else 'lighthouserc.json'
 print('outfile: ', outfile)
 
 posts = [path.relpath(p, basedir) for p in pathlib.Path(basedir).glob('blog/**/*.html')]
-other = ['index.html', 'about']
+other = ['index.html', 'about/']
 
 prefix = 'http://localhost/'
 urls = ['"' + prefix + u + '"' for u in posts + other]
