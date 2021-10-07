@@ -45,7 +45,7 @@ jobs:
       - name: Output summary
         run: |
           echo '============== links =============='
-          cat <<< '${{ steps.lhci.outputs.links }}'
+          cat <<< '${{ steps.lhci.outputs.links }}' > links.json
           echo '=========== end links ============='
 
           cat <<< '${{ steps.lhci.outputs.manifest }}' > manifest.json
@@ -56,4 +56,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: JSON manifest
-          path: manifest.json
+          path: |
+            manifest.json
+            links.json
