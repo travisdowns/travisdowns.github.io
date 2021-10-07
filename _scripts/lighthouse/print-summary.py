@@ -21,7 +21,7 @@ rep = []
 maxlen = 0
 for entry in parsed:
     if (entry['isRepresentativeRun']):
-        entry['stripped'] = re.sub('^.*/', '', entry['url'])
+        entry['stripped'] = re.sub('^.*/(?=.)', '', entry['url'])
         rep.append(entry)
         maxlen = max(maxlen, len(entry['stripped']))
 
