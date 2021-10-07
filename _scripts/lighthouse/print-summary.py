@@ -59,7 +59,7 @@ def make_link(url):
     m = pattern.match(url)
     if not m:
         return 'unexpected link format' + url
-    return 'https://travisdowns.github.io/s#l' + m.group(1)
+    return 'http://g.9x.ee#l' + m.group(1)
 
 # print the data
 for entry in rep:
