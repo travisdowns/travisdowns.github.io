@@ -10,6 +10,9 @@ if [[ "${BASH_VERSINFO:-0}" -lt 4 ]]; then
     exit 1
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROP_DIR="$SCRIPT_DIR/props"
+
 # Sets up the variables needed by the rest of the CI steps
 # including embedding some configuration about what branches
 # should do what.
@@ -34,6 +37,18 @@ export-vars() {
         fi
     done
 }
+
+# append the given file of env vars to GITHUB env,
+# after stripping out comments
+export-file() {
+grep -v '^#' "$1" > "$GITHUB_ENV"
+}
+
+# load base and branch specific vars if any
+export-file "$PROP_DIR/default"
+if [[ -f "$PROP_DIR/$GITHUB_REF_SLUG" ]]; then
+    export-file "$PROP_DIR/default"
+fi
 
 # we need to set --config based on the repository, i.e., the
 # test repository needs to additionally include the _config-test.yml
@@ -73,3 +88,8 @@ fi
 echo "======== Exported Variables ========="
 export-vars EXTRA_BUILD_ARGS PUBLISH_BRANCH
 echo "====================================="
+
+echo "::group::GITHUB_ENV Contents"
+echo "======== GITHUB_ENV start ========="
+cat "$GITHUB_ENV"
+echo "======== GITHUB_ENV end ==========="

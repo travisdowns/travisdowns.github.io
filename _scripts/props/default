@@ -1,0 +1,5 @@
+# these are the default properties which will be
+# applied to every branch unless they are overriden
+# in a per-branch file
+
+CANARY_PROP=bird
