@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import pathlib
 import sys
 from os import path
@@ -13,7 +14,8 @@ print('infile: ', infile)
 outfile = sys.argv[2] if len(sys.argv) >= 3 else 'lighthouserc.json'
 print('outfile: ', outfile)
 
-posts = [path.relpath(p, basedir) for p in pathlib.Path(basedir).glob('blog/**/*.html')]
+spec = os.environ.get('LHCI_GLOB', 'blog/**/*.html').strip()
+posts = [path.relpath(p, basedir) for p in pathlib.Path(basedir).glob(spec)] if spec else []
 other = ['index.html', 'about/']
 
 prefix = 'http://localhost/'

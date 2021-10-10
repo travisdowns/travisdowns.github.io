@@ -41,13 +41,16 @@ export-vars() {
 # append the given file of env vars to GITHUB env,
 # after stripping out comments
 export-file() {
-grep -v '^#' "$1" > "$GITHUB_ENV"
+    echo "export-file: $1"
+    grep -v '^#' "$1" >> "$GITHUB_ENV"
 }
 
 # load base and branch specific vars if any
 export-file "$PROP_DIR/default"
 if [[ -f "$PROP_DIR/$GITHUB_REF_SLUG" ]]; then
-    export-file "$PROP_DIR/default"
+    export-file "$PROP_DIR/$GITHUB_REF_SLUG"
+else
+    echo "No per branch overrides existed at $PROP_DIR/$GITHUB_REF_SLUG"
 fi
 
 # we need to set --config based on the repository, i.e., the
