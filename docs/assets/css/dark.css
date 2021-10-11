@@ -400,7 +400,7 @@ table td { border: 1px solid #404040; }
 .tabs .tab [type="radio"]:checked ~ .tab-panel { display: inline; }
 
 /* for smaller screens, use a different tab scheme */
-@media only screen and (max-width: 43em) { .tabs .tab > label { background: #181818; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: #323232; } }
+@media not screen and (min-width: 800px) { .tabs .tab > label { background: #181818; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: #323232; } }
 
 .footnotes { font-size: 14px; margin: -10px 20px; }
 
