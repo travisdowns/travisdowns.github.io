@@ -588,7 +588,7 @@ tablepath: /misc/tables//intel-zero-opt
 
 <p>Case 4 is strange because it gets the worst of both worlds. Intuitively if it was the RFO-ND that prevents 0-over-0 write elimination (i.e whats happening with <code class="language-plaintext highlighter-rouge">rep stosb</code>) we would either expect to see some RFO-ND requests when using <code class="language-plaintext highlighter-rouge">vmovdqa zmm, (reg)</code> but we don’t. Likewise if we not seeing RFO-ND requests why would its 0-over-0 elimination rate be lower.</p>
 
-<p>Cases 2 and 3 I think are really interesting (reproducible by changing that order of stores <a href="https://github.com/travisdowns/zero-fill-bench/blob/master/algos.cpp#L52">here</a>) and I might be useful in understanding case 4. The only difference between cases 2 and 3 that I can think of is that <a href="https://www.realworldtech.com/forum/?threadid=173441&amp;curpostid=192262">case 2 can write coalesce in the LFB whereas case 3 cannot</a>.</p>
+<p>Cases 2 and 3 I think are really interesting (reproducible by <a href="https://github.com/travisdowns/zero-fill-bench/blob/master/algos.cpp#L52">changing that order of stores here</a>) and I might be useful in understanding case 4. The only difference between cases 2 and 3 that I can think of is that <a href="https://www.realworldtech.com/forum/?threadid=173441&amp;curpostid=192262">case 2 can write coalesce in the LFB whereas case 3 cannot</a>.</p>
 
 <p>So as a possible explinination for why case 3 gets a higher 0-over-0 write elimination rate than case 2 I was thinking something along the following for relationship between RFO requests and LFB coalescing.</p>
 

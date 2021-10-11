@@ -273,7 +273,7 @@ At each region size (that is, at each position along the x-axis) 17 semi-transpa
 
 <p>Everything is fairly sane when the buffer fits in the L1 or L2 cache (up to ~256 KiB<sup id="fnref:l2" role="doc-noteref"><a href="#fn:l2" class="footnote" rel="footnote">12</a></sup>). The relatively poor performance for very small region sizes is explained by the prologue and epilogue of the vectorized implementation: for small sizes a relatively large amount of time is spent in these int-at-a-time loops: rather than copying up to 32 bytes per cycle, we copy only 4.</p>
 
-<p>This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That’s because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former<sup id="fnref:badvec" role="doc-noteref"><a href="#fn:badvec" class="footnote" rel="footnote">13</a></sup>. Essentially, we are sampling semi-randomly a sawtooth function and if you plot this region with finer granularity (go for it or just <a href="/assets/intel-zero-opt/sawtooth.svg">click here</a><sup id="fnref:melty" role="doc-noteref"><a href="#fn:melty" class="footnote" rel="footnote">14</a></sup>) you can see it quite clearly.</p>
+<p>This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That’s because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former<sup id="fnref:badvec" role="doc-noteref"><a href="#fn:badvec" class="footnote" rel="footnote">13</a></sup>. Essentially, we are sampling semi-randomly a sawtooth function and if you <a href="/assets/intel-zero-opt/sawtooth.svg">plot this region with finer granularity</a><sup id="fnref:melty" role="doc-noteref"><a href="#fn:melty" class="footnote" rel="footnote">14</a></sup> you can see it quite clearly.</p>
 
 <h4 id="getting-weird-in-the-l3">Getting Weird in the L3</h4>
 
@@ -631,8 +631,6 @@ Whew! Not sure if that was helpful after all?</p>
 
 <p>You might notice that Ice Lake, Intel’s newest microarchitecture, is missing from this list: that’s because there is a <a href="/blog/2020/05/18/icelake-zero-opt.html">whole separate post</a> on it.</p>
 
-<p><a id="summary-perma"></a></p>
-
 <h3 id="further-notes">Further Notes</h3>
 
 <p>Here’s a grab back of notes and observations that don’t get their a full section, don’t have any associated plots, etc. That doesn’t mean they are less important! Don’t say that! These ones matter too, they really do.</p>
@@ -642,6 +640,8 @@ Whew! Not sure if that was helpful after all?</p>
   <li>Although we didn’t find evidence of this happening on other x86 hardware, nor on POWER or ARM, that doesn’t mean it isn’t or can’t happen. It is possible the conditions for it to happen aren’t triggered, or that it is happening but doesn’t make a difference in performance. Similarly for the POWER9 and ARM chips: we didn’t check any performance counters, so maybe the thing is happening but it just doesn’t make any difference in performance. That’s especially feasible in the ARM case where the performance is totally limited by the core-level 16-bytes-per-cycle write throughput: even if all writes are eliminated later on in the path to memory, we expect the performance to be the same.</li>
   <li>We could learn more about this effect by setting up a test which writes ones first to a region of some fixed size, then overwrites it with zeros, and repeats this in a rolling fashion over a larger buffer. This test basically lets the 1s escape to a certain level of the cache hierarchy, and seeing where the optimization kicks in will tell us something interesting.</li>
 </ul>
+
+<p><span id="summary-perma"></span></p>
 
 <h2 id="wrapping-up">Wrapping Up</h2>
 
