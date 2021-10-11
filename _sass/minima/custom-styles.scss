@@ -75,7 +75,16 @@
 .svg-fig {
   font-size: 80%;
   margin-bottom: $spacing-unit / 2;
+
+  @media not screen and (min-width: $on-large) {
+    font-size: 120%;
+    .svg-fig-links {
+      margin-bottom: 10px;
+    }
+  }
 }
+
+
 
 // optioinal style to right align data in tables
 .td-right td {
@@ -191,4 +200,13 @@ $dm-bar-height: 30px;
 // avoid tap issues
 #markdown-toc li {
   margin-top: 5px;
+}
+
+// responsive styles to hide certain things at various screen sizes
+
+// show only when screen is large (>= 800px)
+.only-large {
+  @media not screen and (min-width: $on-large) {
+    display: none;
+  }
 }

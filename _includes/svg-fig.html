@@ -1,10 +1,11 @@
 {% comment %} Include for SVG-based figure {% endcomment %}
 
 <div class="svg-fig">
-    {% unless include.nolink %}<a href="#{{include.file}}" id="{{include.file}}">[link to this chart]</a> {% endunless %}
-    {% unless include.notable %}<a href="{{tablepath}}/{{include.file}}.html">[data table]</a> {% endunless %}
-    {% if include.raw %}<a href="{{page.results}}/{{include.raw}}">[raw data]</a> {% endif %}
-    <br />
+    <div class="svg-fig-links">
+        {% unless include.nolink %}<a href="#{{include.file}}" id="{{include.file}}">[link<span class="only-large"> to this chart</span>]</a> {% endunless %}
+        {% unless include.notable %}<a href="{{tablepath}}/{{include.file}}.html">[data<span class="only-large"> table</span>]</a> {% endunless %}
+        {% if include.raw %}<a href="{{page.results}}/{{include.raw}}">[raw<span class="only-large"> data</span>]</a> {% endif %}
+    </div>
     <a {% unless include.notable %}href="{{tablepath}}/{{include.file}}.html"{% endunless %}>
         <img class="figimg" src="{{assetpath}}/{{include.file}}.svg" alt="{{ include.alt | default: 'Figure' }}">
     </a>
