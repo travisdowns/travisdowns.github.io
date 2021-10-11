@@ -194,7 +194,7 @@ In the example above it was easy to see the port pressure because the `imul` ins
 
 **Intel IACA**
 
-Tries to solve for port pressure (algorithm unclear) and displays it in a table. Has reached end of life but can still be downloaded [here](https://software.intel.com/en-us/articles/intel-architecture-code-analyzer).
+Tries to solve for port pressure (algorithm unclear) and displays it in a table. Has reached end of life but can [still be downloaded here](https://software.intel.com/en-us/articles/intel-architecture-code-analyzer).
 
 **RRZE-HPC OSACA**
 
@@ -202,7 +202,7 @@ Essnentially an open-source version if IACA. Displays cumulative port pressure i
 
 **LLVM-MCA**
 
-Another tool, similar to IACA and OSACA, llvm-mca shows port pressure in a similar way and attempts to find an ideal solution (algorithm unclear, but it's open source so someone could check). Comes with LLVM 7 or higher and documentation is [here](https://llvm.org/docs/CommandGuide/llvm-mca.html).
+Another tool, similar to IACA and OSACA, llvm-mca shows port pressure in a similar way and attempts to find an ideal solution (algorithm unclear, but it's open source so someone could check). Comes with LLVM 7 or higher and [documentation can be found here](https://llvm.org/docs/CommandGuide/llvm-mca.html).
 
 ### Measuring It
 
@@ -1058,7 +1058,7 @@ There's not all much you can do for this one beyond the stuff discussed in the R
 
 **Intel: Maximum of 48 branches in flight**
 
-Modern Intel chips seem to have a limit of branches _in flight_, where _in flight_ refers to branches that have not yet retired, usually because some older operation hasn't yet completed. I first saw this limit described and measured [here](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight), although it seems like [David Kanter had the scoop](https://www.realworldtech.com/haswell-cpu/3/) way back in 2012:
+Modern Intel chips seem to have a limit of branches _in flight_, where _in flight_ refers to branches that have not yet retired, usually because some older operation hasn't yet completed. I first saw this limit described and measured [on Henry Wong's blog](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/#inflight), although it seems like [David Kanter had the scoop](https://www.realworldtech.com/haswell-cpu/3/) way back in 2012:
 
 > The branch order buffer, which is used to rollback to known good architectural state in the case of a misprediction is still 48 entries, as with Sandy Bridge.
 
@@ -1187,15 +1187,15 @@ This post was [discussed](https://news.ycombinator.com/item?id=20157196) on Hack
 
 [^m1schedice]: The M1 Icestorm apparently has 71 scheduler entries across 7 execution ports. From [Dougall's breakdown](https://twitter.com/dougallj/status/1373973478731255812) we have 3 x 9-entry, 18 entry and 2 x 13 entry schedulers for the general purpose, load/store/AMX and SIMD units, respectively.
 
-[^m1buffers]: Most of the M1 Firestorm data comes from [Dougall J's extensive analysis and reverse engineering](https://twitter.com/dougallj/status/1373973478731255812) (see also [here](https://dougallj.github.io/applecpu/firestorm.html)) of the M1 chip. Earlier revisions had numbers mostly from AnandTech's [deep dive](https://www.anandtech.com/show/16226/apple-silicon-m1-a14-deep-dive/2) on M1, by [Andrei](https://twitter.com/andreif7), using Veedrac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on the [robsize tool](https://github.com/travisdowns/robsize).
+[^m1buffers]: Most of the M1 Firestorm data comes from [Dougall J's extensive analysis and reverse engineering](https://twitter.com/dougallj/status/1373973478731255812) ([more details](https://dougallj.github.io/applecpu/firestorm.html)) of the M1 chip. Earlier revisions had numbers mostly from AnandTech's [deep dive](https://www.anandtech.com/show/16226/apple-silicon-m1-a14-deep-dive/2) on M1, by [Andrei](https://twitter.com/andreif7), using Veedrac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on the [robsize tool](https://github.com/travisdowns/robsize).
 
-[^m1buffersice]: The M1 Icestorm data comes from [Dougall J's extensive analysis and reverse engineering](https://twitter.com/dougallj/status/1373973478731255812) (see also [here](https://dougallj.github.io/applecpu/icestorm.html)) of the M1 chip.
+[^m1buffersice]: The M1 Icestorm data comes from [Dougall J's extensive analysis and reverse engineering](https://twitter.com/dougallj/status/1373973478731255812) (see also [more details here](https://dougallj.github.io/applecpu/icestorm.html)) of the M1 chip.
 
 [^sunnybuffers]: Ice Lake/Sunny Cove data from [robsize tool](https://github.com/travisdowns/robsize), [Ice Lake client](https://en.wikichip.org/wiki/File:sunny_cove_buffer_capacities.png) and [Ice Lake server](https://www.servethehome.com/wp-content/uploads/2020/08/Hot-Chips-32-Intel-Ice-Lake-SP-Sunny-Cove-Microarchitecture.jpg) slides. The value of 384 for "out-of-order window (i.e., the ROB size), in the last link is a [typo](https://twitter.com/MarkDSimmons/status/1295837457158725633) -- it should be 352.
 
 [^robgen]: Well this is at least true on Intel. Recent chips from AMD, Apple and others seem to use _nop compression_ to pack several nops into one ROB slot: so in this case we can imagine that each nop takes only a _fraction_ of a slot. It is not impossible to imagine an microarchitecture that entire avoids putting nops in the ROB. 
 
-[^g2buffers]: These numbers I measured myself using a modified version of Veerdac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on [robsize](https://github.com/travisdowns/robsize) (but unlike robsize supports Arm 64-bit platforms). My results for ROB size are [here]({% link {{page.assets}}/g2results/generic-aarch64.svg %}) and [here]({% link {{page.assets}}/g2results/nop.svg %}) (the latter test indicating that _nop compression_ does not appear to be present on Graviton 2). Scheduler size results, using instructions which are dependent on the fencing loads are [here]({% link {{page.assets}}/g2results/depadd-aarch64.svg %}). There are also [load]({% link {{page.assets}}/g2results/load-aarch64.svg %}) and [store]({% link {{page.assets}}/g2results/store-aarch64.svg %}) buffer results, as well as [integer PRF]({% link {{page.assets}}/g2results/add-aarch64.svg %}) and [SIMD PRF]({% link {{page.assets}}/g2results/fmla-aarch64.svg %}) results. [This test]({% link {{page.assets}}/g2results/movz-fmla-aarch64.svg %}) indicates that the integer and SIMD PRFs are not shared. It isn't shown in the table, but [this result testing `cmp`]({% link {{page.assets}}/g2results/cmp.svg %}) indicates that there is a separate set of renamed flag registers with ~36 entries. [These results]({% link {{page.assets}}/g2results/branch-aarch64.svg %}) indicate that up to 46 calls can be in flight at once. There are [even more](https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results) results not mentioned here.
+[^g2buffers]: These numbers I measured myself using a modified version of Veerdac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on [robsize](https://github.com/travisdowns/robsize) (but unlike robsize supports Arm 64-bit platforms). My results for ROB size are [available here]({% link {{page.assets}}/g2results/generic-aarch64.svg %}) and [with nop as the payload here]({% link {{page.assets}}/g2results/nop.svg %}) (the latter test indicating that _nop compression_ does not appear to be present on Graviton 2). ]Scheduler size results are available]({% link {{page.assets}}/g2results/depadd-aarch64.svg %}), using instructions which are dependent on the fencing loads. There are also [load]({% link {{page.assets}}/g2results/load-aarch64.svg %}) and [store]({% link {{page.assets}}/g2results/store-aarch64.svg %}) buffer results, as well as [integer PRF]({% link {{page.assets}}/g2results/add-aarch64.svg %}) and [SIMD PRF]({% link {{page.assets}}/g2results/fmla-aarch64.svg %}) results. [This test]({% link {{page.assets}}/g2results/movz-fmla-aarch64.svg %}) indicates that the integer and SIMD PRFs are not shared. It isn't shown in the table, but [this result testing `cmp`]({% link {{page.assets}}/g2results/cmp.svg %}) indicates that there is a separate set of renamed flag registers with ~36 entries. [These results]({% link {{page.assets}}/g2results/branch-aarch64.svg %}) indicate that up to 46 calls can be in flight at once. There are [even more](https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results) results not mentioned here.
 
 [^memaccess]: Now _memory access_ doesn't necessarily mean that the main memory (RAM) of the system is accessed: just that the machine code contains instructions which involve memory access. For most programs the overwhelming majority of these accesses hit in cache and never get to main memory.
 

@@ -240,7 +240,7 @@ Even without spurious wakeups we might get woken many times, because this lock s
 
 *[spurious wakeups]: When a waiter on a condition variable is woken up even though no other thread notified it.
 
-We'll try a second design too, that doesn't suffer from thundering herd. This is a queued lock, where each lock waits on its own private node in a queue of waiters, so only a single waiter (the new lock owner) is woken up on unlock. We will call it queued fifo and if you're interested in the implementation you can find it [here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L61).
+We'll try a second design too, that doesn't suffer from thundering herd. This is a queued lock, where each lock waits on its own private node in a queue of waiters, so only a single waiter (the new lock owner) is woken up on unlock. We will call it queued fifo and if you're interested in the implementation you [can find it here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L61).
 
 *[queued fifo]: A blocking ticket lock where each waiter waits on a unique condition variable.
 
@@ -269,7 +269,7 @@ I've just got one more left on the slow end of the scale. Unlike the other examp
 
 ### Level 5: Catastrophe
 
-Here's a ticket lock which is identical to the [first ticket lock we saw](#ys-lock), except that the `sched_yield();` is replaced by `;`. That is, it busy waits instead of yielding (look [here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31) for the spin flavors which specialize on a shared ticket lock template). You could also replace this by a CPU-specific "relax" instruction like [`pause`](https://www.felixcloutier.com/x86/pause), but it won't change the outcome (see [here](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26)). We call it ticket spin, and here's how it performs compared to the existing candidates:
+Here's a ticket lock which is identical to the [first ticket lock we saw](#ys-lock), except that the `sched_yield();` is replaced by `;`. That is, it busy waits instead of yielding ([and here are the spin flavors which specialize on a shared ticket lock template](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31)). You could also replace this by a CPU-specific "relax" instruction like [`pause`](https://www.felixcloutier.com/x86/pause), but it won't [change the outcome](https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26). We call it ticket spin, and here's how it performs compared to the existing candidates:
 
 *[ticket spin]: A traditional spin-based ticket lock that does a hot spin while waiting for its ticket to be next.
 

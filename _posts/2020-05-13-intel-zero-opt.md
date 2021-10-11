@@ -127,7 +127,7 @@ Not surprisingly, the performance depends heavily on what level of cache the fil
 
 Everything is fairly sane when the buffer fits in the L1 or L2 cache (up to ~256 KiB[^l2]). The relatively poor performance for very small region sizes is explained by the prologue and epilogue of the vectorized implementation: for small sizes a relatively large amount of time is spent in these int-at-a-time loops: rather than copying up to 32 bytes per cycle, we copy only 4.
 
-This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That's because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former[^badvec]. Essentially, we are sampling semi-randomly a sawtooth function and if you plot this region with finer granularity (go for it or just [click here]({% link {{page.assets}}/sawtooth.svg %})[^melty]) you can see it quite clearly.
+This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That's because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former[^badvec]. Essentially, we are sampling semi-randomly a sawtooth function and if you [plot this region with finer granularity]({% link {{page.assets}}/sawtooth.svg %})[^melty] you can see it quite clearly.
 
 
 #### Getting Weird in the L3
@@ -263,8 +263,6 @@ You might notice that Ice Lake, Intel's newest microarchitecture, is missing fro
 
 [^armcompile]: The Graviton 2 uses the Cortex A76 uarch, which can _execute_ 2 stores per cycle, but the L1 cache write ports limits sustained execution to only one 128-bit store per cycle.
 
-<a id="summary-perma"></a>
-
 ### Further Notes
 
 Here's a grab back of notes and observations that don't get their a full section, don't have any associated plots, etc. That doesn't mean they are less important! Don't say that! These ones matter too, they really do.
@@ -272,6 +270,8 @@ Here's a grab back of notes and observations that don't get their a full section
  - Despite any impressions I may have given above: you don't need to _fully_ overwrite a cache line with zeros for this to kick in, and you can even write _non-zero_ values if you overwrite them "soon enough" with zeros. Rather, the line must initially fully zero, and then all the _escaping[^escaping]_ writes must be zero. Another way of thinking about this is that the thing that matters is the value of the cache line written back, as well as the old value of the line that the writeback is replacing: these must both be fully zero, but that doesn't mean that you need to overwrite the line with zeros: any locations not written are still zero "from before". I directly test this in the `one_per0` and `one_per1` tests in the benchmark. These write only a single `int` value in each cache line, leaving the other values unchanged. In that benchmark the optimization kicks triggers in exactly the same way when writing a single zero.
  - Although we didn't find evidence of this happening on other x86 hardware, nor on POWER or ARM, that doesn't mean it isn't or can't happen. It is possible the conditions for it to happen aren't triggered, or that it is happening but doesn't make a difference in performance. Similarly for the POWER9 and ARM chips: we didn't check any performance counters, so maybe the thing is happening but it just doesn't make any difference in performance. That's especially feasible in the ARM case where the performance is totally limited by the core-level 16-bytes-per-cycle write throughput: even if all writes are eliminated later on in the path to memory, we expect the performance to be the same.
  - We could learn more about this effect by setting up a test which writes ones first to a region of some fixed size, then overwrites it with zeros, and repeats this in a rolling fashion over a larger buffer. This test basically lets the 1s escape to a certain level of the cache hierarchy, and seeing where the optimization kicks in will tell us something interesting.
+ 
+<span id="summary-perma"></span>
 
 ## Wrapping Up
 
