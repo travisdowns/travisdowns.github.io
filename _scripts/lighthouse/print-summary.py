@@ -58,7 +58,7 @@ def make_link(url):
         return 'missing'
     m = pattern.match(url)
     if not m:
-        return 'unexpected link format' + url
+        return 'unexpected link format: ' + url
     return 'http://sh.9x.ee#l' + m.group(1)
 
 # print the data

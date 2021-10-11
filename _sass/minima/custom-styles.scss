@@ -185,3 +185,10 @@ $dm-bar-height: 30px;
   cursor: pointer;
 }
 
+// markdown-toc styles
+// styles the table of contents inserted by markdown
+// primarily to space out the TOC enough on mobile to 
+// avoid tap issues
+#markdown-toc li {
+  margin-top: 5px;
+}
