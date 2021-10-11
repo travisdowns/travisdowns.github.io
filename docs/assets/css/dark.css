@@ -428,6 +428,8 @@ table td { border: 1px solid #404040; }
 
 .svg-fig { font-size: 80%; margin-bottom: 15px; }
 
+@media not screen and (min-width: 800px) { .svg-fig { font-size: 120%; } .svg-fig .svg-fig-links { margin-bottom: 10px; } }
+
 .td-right td { text-align: right; }
 
 .table-wrapper { overflow-x: auto; }
@@ -465,6 +467,8 @@ a > code { color: #79b8ff; }
 .dm-checkbox input[type="checkbox"] { cursor: pointer; }
 
 #markdown-toc li { margin-top: 5px; }
+
+@media not screen and (min-width: 800px) { .only-large { display: none; } }
 
 .invert-img img:not(.no-invert), img.invert-img:not(.no-invert) { filter: invert(0.88); }
 

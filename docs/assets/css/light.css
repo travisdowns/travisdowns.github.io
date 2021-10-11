@@ -428,6 +428,8 @@ table td { border: 1px solid #dadada; }
 
 .svg-fig { font-size: 80%; margin-bottom: 15px; }
 
+@media not screen and (min-width: 800px) { .svg-fig { font-size: 120%; } .svg-fig .svg-fig-links { margin-bottom: 10px; } }
+
 .td-right td { text-align: right; }
 
 .table-wrapper { overflow-x: auto; }
@@ -465,6 +467,8 @@ a > code { color: #246bc7; }
 .dm-checkbox input[type="checkbox"] { cursor: pointer; }
 
 #markdown-toc li { margin-top: 5px; }
+
+@media not screen and (min-width: 800px) { .only-large { display: none; } }
 
 .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo { color: #007878; }
 
