@@ -464,6 +464,8 @@ a > code { color: #79b8ff; }
 
 .dm-checkbox input[type="checkbox"] { cursor: pointer; }
 
+#markdown-toc li { margin-top: 5px; }
+
 .invert-img img:not(.no-invert), img.invert-img:not(.no-invert) { filter: invert(0.88); }
 
 .invert-rotate-img img:not(.no-invert), img.invert-rotate-img:not(.no-invert) { filter: invert(0.88) hue-rotate(180deg); }

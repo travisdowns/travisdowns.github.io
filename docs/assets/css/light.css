@@ -464,6 +464,8 @@ a > code { color: #246bc7; }
 
 .dm-checkbox input[type="checkbox"] { cursor: pointer; }
 
+#markdown-toc li { margin-top: 5px; }
+
 .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo { color: #007878; }
 
 .highlight .cm, .highlight .cp, .highlight .c1, .highlight .cs { color: #6d6d60; }
