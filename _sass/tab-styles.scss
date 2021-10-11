@@ -77,7 +77,7 @@ $selected-tab-color: lighten($background-color, 10%);
   
   
   /* for smaller screens, use a different tab scheme */
-  @media only screen and (max-width: 43em) {
+  @media not screen and (min-width: $on-large) {
     .tabs .tab > label {
       background: $background-color;
       border-color: #999;
