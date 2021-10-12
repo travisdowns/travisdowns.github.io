@@ -468,6 +468,8 @@ a > code { color: #79b8ff; }
 
 img { height: auto; }
 
+.figimg { height: auto; width: 100%; }
+
 #markdown-toc li { margin-top: 5px; }
 
 @media not screen and (min-width: 800px) { .only-large { display: none; } }
