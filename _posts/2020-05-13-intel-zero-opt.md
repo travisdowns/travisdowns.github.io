@@ -244,7 +244,7 @@ Finally, here are the performance results (same as **Figure 1**) on a variety of
 {% assign uresults = uarches | split: "," | join: "/remote.csv," | append: "/remote.csv" %}
 <!-- uresults: {{uresults}} -->
 
-{% include carousel-svg-fig.html file="fig6"
+{% include carousel-svg-fig-2.html file="fig6" oldstyle='yes'
 suffixes=uarches
 names="Sandy Bridge,Haswell,Skylake-S,Skylake-X,Cannon Lake,Zen2,POWER9,Graviton 2"
 raw=uresults %}

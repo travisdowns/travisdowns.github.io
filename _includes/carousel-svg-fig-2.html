@@ -21,7 +21,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <label class="tab-label" for="tab-{{groupname}}-{{forloop.index}}">{{tabnames[forloop.index0]}}</label>
       <div class="tab-panel">
         <div class="tab-content">
+          {% if include.oldstyle %}
+          {% capture csf__file %}{{include.file}}-{{suffix}}{% endcapture %}
+          {% else %}
           {% capture csf__file %}{{suffix}}/{{include.file}}{% endcapture %}
+          {% endif %}
           {% capture csf__raw %}{{rawnames[forloop.index0]}}{% endcapture %}
           {% include svg-fig.html file=csf__file raw=csf__raw alt=include.alt nolink="1" %}
         </div>
