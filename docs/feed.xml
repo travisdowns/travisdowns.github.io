@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-12T05:56:12+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-12T06:07:47+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -3509,12 +3509,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/snb/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-snb.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/snb/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/snb/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/snb/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-snb.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-snb.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3538,12 +3538,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/hsw/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-hsw.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/hsw/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/hsw/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/hsw/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-hsw.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-hsw.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3567,12 +3567,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/skl/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skl.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/skl/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/skl/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/skl/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skl.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-skl.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3596,12 +3596,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/skx/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skx.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/skx/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/skx/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/skx/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skx.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-skx.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3625,12 +3625,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/cnl/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-cnl.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/cnl/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/cnl/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/cnl/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-cnl.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-cnl.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3654,12 +3654,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/zen2/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-zen2.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/zen2/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/zen2/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/zen2/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-zen2.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-zen2.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3683,12 +3683,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/power9/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-power9.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/power9/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/power9/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/power9/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-power9.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-power9.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3712,12 +3712,12 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
         
-            &lt;a href=&quot;/misc/tables/intel-zero-opt/gra2/fig6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-gra2.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
         
         &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/gra2/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/gra2/fig6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/gra2/fig6.svg&quot; alt=&quot;Figure&quot; /&gt;
+    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-gra2.html&quot;&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-gra2.svg&quot; alt=&quot;Figure&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
