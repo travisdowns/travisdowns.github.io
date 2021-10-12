@@ -85,7 +85,6 @@
 }
 
 
-
 // optioinal style to right align data in tables
 .td-right td {
   text-align: right;
@@ -196,6 +195,11 @@ $dm-bar-height: 30px;
 
 img {
   height: auto;
+}
+
+.figimg {
+  height: auto;
+  width: 100%;
 }
 
 // markdown-toc styles
