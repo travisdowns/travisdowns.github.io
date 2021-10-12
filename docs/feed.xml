@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-11T21:56:18+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-12T05:05:40+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -21,6 +21,9 @@ tablepath: /misc/tables/rip-zero-opt
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -45,6 +48,9 @@ tablepath: /misc/tables/rip-zero-opt
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -599,6 +605,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -622,6 +631,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -647,6 +659,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -670,6 +685,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -736,6 +754,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -759,6 +780,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -784,6 +808,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -807,6 +834,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -882,6 +912,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -905,6 +938,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -930,6 +966,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -953,6 +992,9 @@ tablepath: /misc/tables/concurrency-costs
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1044,6 +1086,9 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1067,6 +1112,9 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1092,6 +1140,9 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1115,6 +1166,9 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1165,6 +1219,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1188,6 +1245,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1213,6 +1273,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1236,6 +1299,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1270,6 +1336,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1293,6 +1362,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1318,6 +1390,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1341,6 +1416,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1403,6 +1481,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1426,6 +1507,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1451,6 +1535,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1474,6 +1561,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1629,6 +1719,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1652,6 +1745,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1677,6 +1773,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1700,6 +1799,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1838,6 +1940,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1861,6 +1966,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -1886,6 +1994,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -1909,6 +2020,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -3278,6 +3392,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -3301,6 +3418,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -3326,6 +3446,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -3349,6 +3472,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -3374,6 +3500,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -3397,6 +3526,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
@@ -3422,6 +3554,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
 
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
         
@@ -3445,6 +3580,9 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
           
           
           
+
+
+
 
 &lt;div class=&quot;svg-fig&quot;&gt;
     &lt;div class=&quot;svg-fig-links&quot;&gt;
