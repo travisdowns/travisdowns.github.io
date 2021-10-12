@@ -466,6 +466,8 @@ a > code { color: #79b8ff; }
 
 .dm-checkbox input[type="checkbox"] { cursor: pointer; }
 
+img { height: auto; }
+
 #markdown-toc li { margin-top: 5px; }
 
 @media not screen and (min-width: 800px) { .only-large { display: none; } }
