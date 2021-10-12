@@ -4,16 +4,6 @@ assets: /assets
 notables: true
 ---
 
-{% include post-boilerplate.liquid %}
-
-{% capture apath %}{{ '/assets' | relative_url }}{% endcapture %}
-{% assign fname = 'rabbit3.png' %}
-{% assign fpath = '/assets/' | append: fname %}
-
-<!-- ![Fast Rabbit]({% link {{apath}}/rabbit3.png %}){: {% imagesize fpath:props %} } -->
-
-{% include svg-fig.html src='rabbit3.png' %}
-
 <img src="https://dummyimage.com/740x100/000/fff&text=Fallback" srcset="
     https://dummyimage.com/740x100/000/fff&text=740w   740w,
     https://dummyimage.com/1480x200/000/fff&text=1480w 1480w,
