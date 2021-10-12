@@ -1,14 +1,18 @@
 {% comment %}
-here we add all the per-post liquid boilerplate
+here we add all the per-post liquid boilerplate:
+
+assetpath: the path part of the relative URL to the page assets
 {% endcomment %}
 
 {% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}
+{% unless page.notables %}
 {% capture tablepath %}{{ page.tables | default: page.slug | prepend: "/misc/tables/" | relative_url }}{% endcapture %}
+{% endunless %}
 
 <!-- boilerplate 
 page.assets: {{page.assets}}
 assetpath: {{assetpath}}
-tablepath: {{tablepath}}
+tablepath: {{tablepath | default: '(unset)'}}
 -->
 
 {% include glossary.md %}
