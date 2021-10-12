@@ -1,4 +1,15 @@
-{% comment %} Include for SVG-based figure {% endcomment %}
+{% comment %}
+Include for SVG-based figure
+
+Specify only one of src or file, with the former being more general.
+
+Parameters:
+file: path relative to assetpath to svg file, without extension
+src: path relative to assetpath, including extension
+{% endcomment %}
+
+{% assign fig__svgfile = include.file | append: '.svg' %}
+{% assign fig__src = include.src | default: fig__svgfile %}
 
 <div class="svg-fig">
     <div class="svg-fig-links">
@@ -7,6 +18,6 @@
         {% if include.raw %}<a href="{{page.results}}/{{include.raw}}">[raw<span class="only-large"> data</span>]</a> {% endif %}
     </div>
     <a {% unless include.notable %}href="{{tablepath}}/{{include.file}}.html"{% endunless %}>
-        <img class="figimg" src="{{assetpath}}/{{include.file}}.svg" alt="{{ include.alt | default: 'Figure' }}">
+        <img class="figimg" src="{{assetpath}}/{{fig__src}}" alt="{{ include.alt | default: 'Figure' }}">
     </a>
 </div>
