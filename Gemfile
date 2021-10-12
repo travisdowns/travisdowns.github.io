@@ -13,5 +13,6 @@ gem "kramdown-parser-gfm", "= 1.1.0"
 # If you have any plugins, put them here!
 group :jekyll_plugins do
   gem "jekyll-feed"
+  gem "jekyll-image-size"
 end
 
