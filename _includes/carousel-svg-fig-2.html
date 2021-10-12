@@ -13,7 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 {% assign rawnames    = include.raw      | split: "," %}
 {% assign groupname   = include.file     | slugify %}
 
-<div class="tabs">
+<div class="tabs" id="tabs-{{groupname}}">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     {% for suffix in tabsuffixes %}
     <div class="tab">
