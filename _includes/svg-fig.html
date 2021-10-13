@@ -20,7 +20,7 @@ src: path relative to assetpath, including extension
         {% endif %}
         {% if include.raw %}<a href="{{page.results}}/{{include.raw}}">[raw<span class="only-large"> data</span>]</a> {% endif %}
     </div>
-    <a {% unless include.notable %}href="{{tablepath}}/{{include.file}}.html"{% endunless %}>
+    {% unless include.notable %}<a href="{{tablepath}}/{{include.file}}.html">{% endunless %}
         <img class="figimg" src="{{assetpath}}/{{fig__src}}" alt="{{ include.alt | default: 'Figure' }}" {% imagesize fig__fpath:props %}>
-    </a>
+    {% unless include.notable %}</a>{% endunless %}
 </div>
