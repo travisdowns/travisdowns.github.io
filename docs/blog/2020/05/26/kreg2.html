@@ -234,9 +234,9 @@ tablepath: /misc/tables/kreg2
         
         <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-38.csv">[raw<span class="only-large"> data</span>]</a> 
     </div>
-    <a>
+    
         <img class="figimg" src="/assets/kreg2/skx-38.svg" alt="Test 38" width="648" height="432" />
-    </a>
+    
 </div>
 
 <p>We see a clear spike at 128 instructions, so it seems like the size of the speculative<sup id="fnref:spec" role="doc-noteref"><a href="#fn:spec" class="footnote" rel="footnote">11</a></sup> x87/MMX register file is 128 entries.</p>
@@ -251,9 +251,9 @@ tablepath: /misc/tables/kreg2
         
         <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-43.csv">[raw<span class="only-large"> data</span>]</a> 
     </div>
-    <a>
+    
         <img class="figimg" src="/assets/kreg2/skx-43.svg" alt="Test 43" width="648" height="432" />
-    </a>
+    
 </div>
 
 <p>This is mostly indistinguishable from the previous chart and we conclude that the size of the speculative mask register file is also 128.</p>
@@ -268,9 +268,9 @@ tablepath: /misc/tables/kreg2
         
         <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-39.csv">[raw<span class="only-large"> data</span>]</a> 
     </div>
-    <a>
+    
         <img class="figimg" src="/assets/kreg2/skx-39.svg" alt="Test 39" width="648" height="432" />
-    </a>
+    
 </div>
 
 <div class="svg-fig">
@@ -281,9 +281,9 @@ tablepath: /misc/tables/kreg2
         
         <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-40.csv">[raw<span class="only-large"> data</span>]</a> 
     </div>
-    <a>
+    
         <img class="figimg" src="/assets/kreg2/skx-40.svg" alt="Test 40" width="648" height="432" />
-    </a>
+    
 </div>
 
 <p>Both of these show the same effect: the effective resource limitation is much higher: around 210 filler instructions. This indicates strongly that the x87/MMX register is not shared with either the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> or scalar register files.</p>
@@ -298,9 +298,9 @@ tablepath: /misc/tables/kreg2
         
         <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-41.csv">[raw<span class="only-large"> data</span>]</a> 
     </div>
-    <a>
+    
         <img class="figimg" src="/assets/kreg2/skx-41.svg" alt="Test 41" width="648" height="432" />
-    </a>
+    
 </div>
 
 <p>This one is definitely not like the others. We see that the resource limit is now 128, same as for the single-type tests. We can immediately conclude that this means that mask registers and MMX registers are allocated from the same resource pool: <em>they use the same physical register file</em>.</p>

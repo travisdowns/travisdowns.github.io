@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-12T06:41:58+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-13T19:40:02+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -2632,9 +2632,9 @@ tablepath: /misc/tables/kreg2
         
         &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-38.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a&gt;
+    
         &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-38.svg&quot; alt=&quot;Test 38&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
-    &lt;/a&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;We see a clear spike at 128 instructions, so it seems like the size of the speculative&lt;sup id=&quot;fnref:spec&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:spec&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;11&lt;/a&gt;&lt;/sup&gt; x87/MMX register file is 128 entries.&lt;/p&gt;
@@ -2649,9 +2649,9 @@ tablepath: /misc/tables/kreg2
         
         &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-43.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a&gt;
+    
         &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-43.svg&quot; alt=&quot;Test 43&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
-    &lt;/a&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;This is mostly indistinguishable from the previous chart and we conclude that the size of the speculative mask register file is also 128.&lt;/p&gt;
@@ -2666,9 +2666,9 @@ tablepath: /misc/tables/kreg2
         
         &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-39.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a&gt;
+    
         &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-39.svg&quot; alt=&quot;Test 39&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
-    &lt;/a&gt;
+    
 &lt;/div&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
@@ -2679,9 +2679,9 @@ tablepath: /misc/tables/kreg2
         
         &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-40.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a&gt;
+    
         &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-40.svg&quot; alt=&quot;Test 40&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
-    &lt;/a&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;Both of these show the same effect: the effective resource limitation is much higher: around 210 filler instructions. This indicates strongly that the x87/MMX register is not shared with either the &lt;abbr title=&quot;Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.&quot;&gt;SIMD&lt;/abbr&gt; or scalar register files.&lt;/p&gt;
@@ -2696,9 +2696,9 @@ tablepath: /misc/tables/kreg2
         
         &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-41.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
     &lt;/div&gt;
-    &lt;a&gt;
+    
         &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-41.svg&quot; alt=&quot;Test 41&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
-    &lt;/a&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;This one is definitely not like the others. We see that the resource limit is now 128, same as for the single-type tests. We can immediately conclude that this means that mask registers and MMX registers are allocated from the same resource pool: &lt;em&gt;they use the same physical register file&lt;/em&gt;.&lt;/p&gt;

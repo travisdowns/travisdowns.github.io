@@ -680,7 +680,7 @@ tablepath: /misc/tables//intel-zero-opt
   <li>where the difference between cases 2 and 4 emerges (i.e we can’t just say an RFO request for a full cache line write has its data part ignored).</li>
 </ul>
 
-<p>The only explination I can think of is if RFO prefetching takes place (mentioned a bit <a href="https://stackoverflow.com/questions/61129773/how-do-the-store-buffer-and-line-fill-buffer-interact-with-each-other">here</a>) its possible you could try and explain the data with the following assumptions:</p>
+<p>The only explination I can think of is if RFO prefetching takes place (<a href="https://stackoverflow.com/questions/61129773/how-do-the-store-buffer-and-line-fill-buffer-interact-with-each-other">mentioned a bit here</a>) its possible you could try and explain the data with the following assumptions:</p>
 <ul>
   <li>That RFO prefetching does in fact take place</li>
   <li>That whether the RFO data can be ignored is a function of RFO configuration, not the size of the entry in the LFB.</li>
