@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -71,8 +74,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -518,7 +521,7 @@ document.write(link);
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -543,6 +546,10 @@ document.write(link);
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -569,7 +576,6 @@ document.write(link);
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -71,8 +74,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -690,7 +693,7 @@ pattern continues...
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d2e42b00-d3fc-11eb-b2f8-5d7287282354', 'respond', 'interrupts', 'd2e42b00-d3fc-11eb-b2f8-5d7287282354')">↪&#xFE0E; Reply to kolya</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d2e42b00-d3fc-11eb-b2f8-5d7287282354', 'respond', 'd2e42b00-d3fc-11eb-b2f8-5d7287282354')">↪&#xFE0E; Reply to kolya</a>
     </div>
 </article>
   
@@ -719,7 +722,7 @@ This is definitely not your distribution. Of course, there is an absence of any 
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-31d13ba0-d3fb-11eb-b2f8-5d7287282354', 'respond', 'interrupts', '31d13ba0-d3fb-11eb-b2f8-5d7287282354')">↪&#xFE0E; Reply to kolya</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-31d13ba0-d3fb-11eb-b2f8-5d7287282354', 'respond', '31d13ba0-d3fb-11eb-b2f8-5d7287282354')">↪&#xFE0E; Reply to kolya</a>
     </div>
 </article>
   
@@ -745,7 +748,7 @@ This is definitely not your distribution. Of course, there is an absence of any 
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3ed7ab50-574a-11eb-971c-e3dfa8f2b075', 'respond', 'interrupts', '3ed7ab50-574a-11eb-971c-e3dfa8f2b075')">↪&#xFE0E; Reply to Alex Dowad</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3ed7ab50-574a-11eb-971c-e3dfa8f2b075', 'respond', '3ed7ab50-574a-11eb-971c-e3dfa8f2b075')">↪&#xFE0E; Reply to Alex Dowad</a>
     </div>
 </article>
   
@@ -788,7 +791,7 @@ This is definitely not your distribution. Of course, there is an absence of any 
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2019/08/20/interrupts.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -813,6 +816,10 @@ This is definitely not your distribution. Of course, there is an absence of any 
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -839,7 +846,6 @@ This is definitely not your distribution. Of course, there is an absence of any 
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -71,8 +74,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -224,13 +227,16 @@ tablepath: /misc/tables/kreg2
 <p>Enough talk, let’s do this. I implemented several new tests in robsize to probe possible register sharing. First, we look at <strong>Test 38</strong>, which uses MMX instructions<sup id="fnref:whymmx" role="doc-noteref"><a href="#fn:whymmx" class="footnote" rel="footnote">10</a></sup> to target the size of the x87/MMX register file:</p>
 
 <div class="svg-fig">
-    <a href="#skx-38" id="skx-38">[link to this chart]</a> 
+    <div class="svg-fig-links">
+        <a href="#skx-38" id="skx-38">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            
+        
+        <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-38.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     
-    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-38.csv">[raw data]</a> 
-    <br />
-    <a>
-        <img class="figimg" src="/assets/kreg2/skx-38.svg" alt="Test 38" />
-    </a>
+        <img class="figimg" src="/assets/kreg2/skx-38.svg" alt="Test 38" width="648" height="432" />
+    
 </div>
 
 <p>We see a clear spike at 128 instructions, so it seems like the size of the speculative<sup id="fnref:spec" role="doc-noteref"><a href="#fn:spec" class="footnote" rel="footnote">11</a></sup> x87/MMX register file is 128 entries.</p>
@@ -238,13 +244,16 @@ tablepath: /misc/tables/kreg2
 <p>Next, we have <strong>Test 43</strong> which follows the same pattern as <strong>Test 38</strong> but using <code class="language-plaintext highlighter-rouge">kaddd</code> as a filler instruction so targets the mask (kreg) register file:</p>
 
 <div class="svg-fig">
-    <a href="#skx-43" id="skx-43">[link to this chart]</a> 
+    <div class="svg-fig-links">
+        <a href="#skx-43" id="skx-43">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            
+        
+        <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-43.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     
-    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-43.csv">[raw data]</a> 
-    <br />
-    <a>
-        <img class="figimg" src="/assets/kreg2/skx-43.svg" alt="Test 43" />
-    </a>
+        <img class="figimg" src="/assets/kreg2/skx-43.svg" alt="Test 43" width="648" height="432" />
+    
 </div>
 
 <p>This is mostly indistinguishable from the previous chart and we conclude that the size of the speculative mask register file is also 128.</p>
@@ -252,23 +261,29 @@ tablepath: /misc/tables/kreg2
 <p>Let’s see what happens when alternate MMX and another instruction type. <strong>Test 39</strong> alternates MMX with integer <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> instructions, and <strong>Test 40</strong> alternatives with general purpose scalar instructions:</p>
 
 <div class="svg-fig">
-    <a href="#skx-39" id="skx-39">[link to this chart]</a> 
+    <div class="svg-fig-links">
+        <a href="#skx-39" id="skx-39">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            
+        
+        <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-39.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     
-    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-39.csv">[raw data]</a> 
-    <br />
-    <a>
-        <img class="figimg" src="/assets/kreg2/skx-39.svg" alt="Test 39" />
-    </a>
+        <img class="figimg" src="/assets/kreg2/skx-39.svg" alt="Test 39" width="648" height="432" />
+    
 </div>
 
 <div class="svg-fig">
-    <a href="#skx-40" id="skx-40">[link to this chart]</a> 
+    <div class="svg-fig-links">
+        <a href="#skx-40" id="skx-40">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            
+        
+        <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-40.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     
-    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-40.csv">[raw data]</a> 
-    <br />
-    <a>
-        <img class="figimg" src="/assets/kreg2/skx-40.svg" alt="Test 40" />
-    </a>
+        <img class="figimg" src="/assets/kreg2/skx-40.svg" alt="Test 40" width="648" height="432" />
+    
 </div>
 
 <p>Both of these show the same effect: the effective resource limitation is much higher: around 210 filler instructions. This indicates strongly that the x87/MMX register is not shared with either the <abbr title="Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.">SIMD</abbr> or scalar register files.</p>
@@ -276,13 +291,16 @@ tablepath: /misc/tables/kreg2
 <p>Finally, we get to the end of this tale, <strong>Test 41</strong>. This test mixes MMX and mask register instructions<sup id="fnref:test41" role="doc-noteref"><a href="#fn:test41" class="footnote" rel="footnote">12</a></sup>:</p>
 
 <div class="svg-fig">
-    <a href="#skx-41" id="skx-41">[link to this chart]</a> 
+    <div class="svg-fig-links">
+        <a href="#skx-41" id="skx-41">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            
+        
+        <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-41.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     
-    <a href="https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-41.csv">[raw data]</a> 
-    <br />
-    <a>
-        <img class="figimg" src="/assets/kreg2/skx-41.svg" alt="Test 41" />
-    </a>
+        <img class="figimg" src="/assets/kreg2/skx-41.svg" alt="Test 41" width="648" height="432" />
+    
 </div>
 
 <p>This one is definitely not like the others. We see that the resource limit is now 128, same as for the single-type tests. We can immediately conclude that this means that mask registers and MMX registers are allocated from the same resource pool: <em>they use the same physical register file</em>.</p>
@@ -402,7 +420,7 @@ Illegal instruction (core dumped)</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca', 'respond', 'kreg2', '484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca')">↪&#xFE0E; Reply to edison</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca', 'respond', '484e68b0-e9fc-11ea-beb2-8fbc5b16d5ca')">↪&#xFE0E; Reply to edison</a>
     </div>
 </article>
   
@@ -451,7 +469,7 @@ Illegal instruction (core dumped)</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c13b12a0-acdf-11ea-beab-bfa7389242c5', 'respond', 'kreg2', 'c13b12a0-acdf-11ea-beab-bfa7389242c5')">↪&#xFE0E; Reply to Dmitry Babokin</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c13b12a0-acdf-11ea-beab-bfa7389242c5', 'respond', 'c13b12a0-acdf-11ea-beab-bfa7389242c5')">↪&#xFE0E; Reply to Dmitry Babokin</a>
     </div>
 </article>
   
@@ -500,7 +518,7 @@ Illegal instruction (core dumped)</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-68a31570-a54b-11ea-a6c0-ebb42e4d5140', 'respond', 'kreg2', '68a31570-a54b-11ea-a6c0-ebb42e4d5140')">↪&#xFE0E; Reply to James</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-68a31570-a54b-11ea-a6c0-ebb42e4d5140', 'respond', '68a31570-a54b-11ea-a6c0-ebb42e4d5140')">↪&#xFE0E; Reply to James</a>
     </div>
 </article>
   
@@ -522,7 +540,7 @@ Illegal instruction (core dumped)</p>
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/05/26/kreg2.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -547,6 +565,10 @@ Illegal instruction (core dumped)</p>
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -573,7 +595,6 @@ Illegal instruction (core dumped)</p>
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

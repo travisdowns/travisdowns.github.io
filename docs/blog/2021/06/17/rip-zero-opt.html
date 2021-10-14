@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -71,8 +74,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -130,7 +133,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 <p>The two series were generated under apparently identical conditions: the same binary on the same machine. Only the date the benchmark was run varies. That is, on Monday, June 7th, filling with zeros is substantially faster than the same benchmark on Wednesday, at least when the region no longer fits in the L2 cache<sup id="fnref:whitelie" role="doc-noteref"><a href="#fn:whitelie" class="footnote" rel="footnote">2</a></sup>.</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-fig1">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -142,15 +145,23 @@ tablepath: /misc/tables/rip-zero-opt
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/rip-zero-opt/skl/fig1.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/skl-combined/l2-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/rip-zero-opt/skl/fig1.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/skl-combined/l2-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/rip-zero-opt/skl/fig1.html">
-        <img class="figimg" src="/assets/rip-zero-opt/skl/fig1.svg" alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" />
+        <img class="figimg" src="/assets/rip-zero-opt/skl/fig1.svg" alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -164,15 +175,23 @@ tablepath: /misc/tables/rip-zero-opt
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/rip-zero-opt/icl/fig1.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/icl-combined/l2-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/rip-zero-opt/icl/fig1.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/icl-combined/l2-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/rip-zero-opt/icl/fig1.html">
-        <img class="figimg" src="/assets/rip-zero-opt/icl/fig1.svg" alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" />
+        <img class="figimg" src="/assets/rip-zero-opt/icl/fig1.svg" alt="Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -302,7 +321,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-43da72f0-189b-11ec-8ef9-811fefba7f7b', 'respond', 'rip-zero-opt', '43da72f0-189b-11ec-8ef9-811fefba7f7b')">↪&#xFE0E; Reply to SwineOne</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-43da72f0-189b-11ec-8ef9-811fefba7f7b', 'respond', '43da72f0-189b-11ec-8ef9-811fefba7f7b')">↪&#xFE0E; Reply to SwineOne</a>
     </div>
 </article>
   
@@ -332,7 +351,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d7182ce0-d55e-11eb-b4ca-af5dfef9ac70', 'respond', 'rip-zero-opt', 'd7182ce0-d55e-11eb-b4ca-af5dfef9ac70')">↪&#xFE0E; Reply to anon</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d7182ce0-d55e-11eb-b4ca-af5dfef9ac70', 'respond', 'd7182ce0-d55e-11eb-b4ca-af5dfef9ac70')">↪&#xFE0E; Reply to anon</a>
     </div>
 </article>
   
@@ -358,7 +377,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f34f24d0-d429-11eb-8cd7-c3e13a62ea8f', 'respond', 'rip-zero-opt', 'f34f24d0-d429-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to m_ueberall</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f34f24d0-d429-11eb-8cd7-c3e13a62ea8f', 'respond', 'f34f24d0-d429-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to m_ueberall</a>
     </div>
 </article>
   
@@ -426,7 +445,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-63f4d730-d429-11eb-8cd7-c3e13a62ea8f', 'respond', 'rip-zero-opt', '63f4d730-d429-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to FreddyFrobnicator</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-63f4d730-d429-11eb-8cd7-c3e13a62ea8f', 'respond', '63f4d730-d429-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to FreddyFrobnicator</a>
     </div>
 </article>
   
@@ -452,7 +471,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-10d61250-d427-11eb-8cd7-c3e13a62ea8f', 'respond', 'rip-zero-opt', '10d61250-d427-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to Jonathan</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-10d61250-d427-11eb-8cd7-c3e13a62ea8f', 'respond', '10d61250-d427-11eb-8cd7-c3e13a62ea8f')">↪&#xFE0E; Reply to Jonathan</a>
     </div>
 </article>
   
@@ -503,7 +522,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-da0ea060-d378-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', 'da0ea060-d378-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Nick O</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-da0ea060-d378-11eb-a28b-2b17081581e0', 'respond', 'da0ea060-d378-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Nick O</a>
     </div>
 </article>
   
@@ -552,7 +571,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-33e761f0-d36d-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '33e761f0-d36d-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to JN</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-33e761f0-d36d-11eb-a28b-2b17081581e0', 'respond', '33e761f0-d36d-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to JN</a>
     </div>
 </article>
   
@@ -599,7 +618,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1de6da20-d368-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '1de6da20-d368-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Cap'n O.</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1de6da20-d368-11eb-a28b-2b17081581e0', 'respond', '1de6da20-d368-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Cap'n O.</a>
     </div>
 </article>
   
@@ -625,7 +644,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3073d720-d34e-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '3073d720-d34e-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Dave O</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3073d720-d34e-11eb-a28b-2b17081581e0', 'respond', '3073d720-d34e-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Dave O</a>
     </div>
 </article>
   
@@ -651,7 +670,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5879dea0-d348-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '5879dea0-d348-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Heretical blacksheep</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5879dea0-d348-11eb-a28b-2b17081581e0', 'respond', '5879dea0-d348-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Heretical blacksheep</a>
     </div>
 </article>
   
@@ -677,7 +696,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-242c52a0-d324-11eb-a28b-2b17081581e0', 'respond', 'rip-zero-opt', '242c52a0-d324-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Freyaday</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-242c52a0-d324-11eb-a28b-2b17081581e0', 'respond', '242c52a0-d324-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to Freyaday</a>
     </div>
 </article>
   
@@ -758,7 +777,7 @@ tablepath: /misc/tables/rip-zero-opt
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -783,6 +802,10 @@ tablepath: /misc/tables/rip-zero-opt
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -809,7 +832,6 @@ tablepath: /misc/tables/rip-zero-opt
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

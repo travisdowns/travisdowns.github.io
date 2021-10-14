@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -71,8 +74,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -191,7 +194,7 @@ tablepath: /misc/tables/intel-zero-opt
 
 <h2 id="benchmarks">Benchmarks</h2>
 
-<p>That’s enough prelude <img src="/assets/intel-zero-opt/prelude.jpg" alt="a small red car" style="display:inline; height: 1.2em;" /> for now. Let’s write some benchmarks.</p>
+<p>That’s enough prelude <img src="/assets/intel-zero-opt/prelude.jpg" alt="a small red car" style="display:inline; height: 1.2em; aspect-ratio: 120/62" /> for now. Let’s write some benchmarks.</p>
 
 <h3 id="a-very-simple-loop">A Very Simple Loop</h3>
 
@@ -251,12 +254,15 @@ tablepath: /misc/tables/intel-zero-opt
 <center><strong>Figure 1</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig1" id="fig1">[link to this chart]</a> 
-    <a href="/misc/tables/intel-zero-opt/fig1.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/overall.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig1" id="fig1">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables/intel-zero-opt/fig1.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/overall.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig1.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig1.svg" alt="Figure 1" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig1.svg" alt="Figure 1" width="648" height="432" />
     </a>
 </div>
 
@@ -269,7 +275,7 @@ At each region size (that is, at each position along the x-axis) 17 semi-transpa
 
 <p>Everything is fairly sane when the buffer fits in the L1 or L2 cache (up to ~256 KiB<sup id="fnref:l2" role="doc-noteref"><a href="#fn:l2" class="footnote" rel="footnote">12</a></sup>). The relatively poor performance for very small region sizes is explained by the prologue and epilogue of the vectorized implementation: for small sizes a relatively large amount of time is spent in these int-at-a-time loops: rather than copying up to 32 bytes per cycle, we copy only 4.</p>
 
-<p>This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That’s because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former<sup id="fnref:badvec" role="doc-noteref"><a href="#fn:badvec" class="footnote" rel="footnote">13</a></sup>. Essentially, we are sampling semi-randomly a sawtooth function and if you plot this region with finer granularity (go for it or just <a href="/assets/intel-zero-opt/sawtooth.svg">click here</a><sup id="fnref:melty" role="doc-noteref"><a href="#fn:melty" class="footnote" rel="footnote">14</a></sup>) you can see it quite clearly.</p>
+<p>This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That’s because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former<sup id="fnref:badvec" role="doc-noteref"><a href="#fn:badvec" class="footnote" rel="footnote">13</a></sup>. Essentially, we are sampling semi-randomly a sawtooth function and if you <a href="/assets/intel-zero-opt/sawtooth.svg">plot this region with finer granularity</a><sup id="fnref:melty" role="doc-noteref"><a href="#fn:melty" class="footnote" rel="footnote">14</a></sup> you can see it quite clearly.</p>
 
 <h4 id="getting-weird-in-the-l3">Getting Weird in the L3</h4>
 
@@ -304,12 +310,15 @@ At each region size (that is, at each position along the x-axis) 17 semi-transpa
 <center><strong>Figure 2</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig2" id="fig2">[link to this chart]</a> 
-    <a href="/misc/tables/intel-zero-opt/fig2.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig2" id="fig2">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables/intel-zero-opt/fig2.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig2.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig2.svg" alt="Figure 2" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig2.svg" alt="Figure 2" width="648" height="432" />
     </a>
 </div>
 
@@ -337,12 +346,15 @@ For clarity, I show only the median single sample for each size<sup id="fnref:tr
 <center><strong>Figure 3</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig3" id="fig3">[link to this chart]</a> 
-    <a href="/misc/tables/intel-zero-opt/fig3.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig3" id="fig3">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables/intel-zero-opt/fig3.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig3.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig3.svg" alt="Figure 3" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig3.svg" alt="Figure 3" width="648" height="432" />
     </a>
 </div>
 
@@ -377,12 +389,15 @@ Whew! Not sure if that was helpful after all?</p>
 <center><strong>Figure 4</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig4" id="fig4">[link to this chart]</a> 
-    <a href="/misc/tables/intel-zero-opt/fig4.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig4" id="fig4">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables/intel-zero-opt/fig4.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig4.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig4.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig4.svg" alt="Figure 4" width="648" height="432" />
     </a>
 </div>
 
@@ -393,12 +408,15 @@ Whew! Not sure if that was helpful after all?</p>
 <center><strong>Figure 5</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig5" id="fig5">[link to this chart]</a> 
-    <a href="/misc/tables/intel-zero-opt/fig5.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig5" id="fig5">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables/intel-zero-opt/fig5.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig5.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig5.svg" alt="Figure 5" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig5.svg" alt="Figure 5" width="648" height="432" />
     </a>
 </div>
 
@@ -412,183 +430,247 @@ Whew! Not sure if that was helpful after all?</p>
 
 <!-- uresults: snb/remote.csv,hsw/remote.csv,skl/remote.csv,skx/remote.csv,cnl/remote.csv,zen2/remote.csv,power9/remote.csv,gra2/remote.csv -->
 
-<div class="tabs">
+<div class="tabs" id="tabs-fig6">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-1" name="tab-group-1" checked="" />
-      <label class="tab-label" for="tab-1">Sandy Bridge</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-1" name="tab-group-fig6" checked="" />
+      <label class="tab-label" for="tab-fig6-1">Sandy Bridge</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-snb.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/snb/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-snb.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/snb/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-snb.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-snb.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-snb.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-2" name="tab-group-1" />
-      <label class="tab-label" for="tab-2">Haswell</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-2" name="tab-group-fig6" />
+      <label class="tab-label" for="tab-fig6-2">Haswell</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-hsw.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/hsw/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-hsw.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/hsw/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-hsw.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-hsw.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-hsw.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-3" name="tab-group-1" />
-      <label class="tab-label" for="tab-3">Skylake-S</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-3" name="tab-group-fig6" />
+      <label class="tab-label" for="tab-fig6-3">Skylake-S</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-skl.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/skl/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-skl.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/skl/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-skl.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-skl.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-skl.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-4" name="tab-group-1" />
-      <label class="tab-label" for="tab-4">Skylake-X</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-4" name="tab-group-fig6" />
+      <label class="tab-label" for="tab-fig6-4">Skylake-X</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-skx.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/skx/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-skx.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/skx/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-skx.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-skx.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-skx.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-5" name="tab-group-1" />
-      <label class="tab-label" for="tab-5">Cannon Lake</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-5" name="tab-group-fig6" />
+      <label class="tab-label" for="tab-fig6-5">Cannon Lake</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-cnl.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/cnl/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-cnl.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/cnl/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-cnl.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-cnl.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-cnl.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-6" name="tab-group-1" />
-      <label class="tab-label" for="tab-6">Zen2</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-6" name="tab-group-fig6" />
+      <label class="tab-label" for="tab-fig6-6">Zen2</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-zen2.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/zen2/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-zen2.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/zen2/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-zen2.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-zen2.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-zen2.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-7" name="tab-group-1" />
-      <label class="tab-label" for="tab-7">POWER9</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-7" name="tab-group-fig6" />
+      <label class="tab-label" for="tab-fig6-7">POWER9</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-power9.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/power9/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-power9.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/power9/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-power9.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-power9.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-power9.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
     <div class="tab">
-      <input class="tab-radio" type="radio" id="tab-8" name="tab-group-1" />
-      <label class="tab-label" for="tab-8">Graviton 2</label>
+      <input class="tab-radio" type="radio" id="tab-fig6-8" name="tab-group-fig6" />
+      <label class="tab-label" for="tab-fig6-8">Graviton 2</label>
       <div class="tab-panel">
         <div class="tab-content">
           
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/intel-zero-opt/fig6-gra2.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/gra2/remote.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/intel-zero-opt/fig6-gra2.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/gra2/remote.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/intel-zero-opt/fig6-gra2.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig6-gra2.svg" alt="Figure 4" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig6-gra2.svg" alt="Figure" width="648" height="432" />
     </a>
 </div>
+
         </div>
-      </div> 
+      </div>
     </div>
     
 </div>
@@ -607,8 +689,6 @@ Whew! Not sure if that was helpful after all?</p>
 
 <p>You might notice that Ice Lake, Intel’s newest microarchitecture, is missing from this list: that’s because there is a <a href="/blog/2020/05/18/icelake-zero-opt.html">whole separate post</a> on it.</p>
 
-<p><a id="summary-perma"></a></p>
-
 <h3 id="further-notes">Further Notes</h3>
 
 <p>Here’s a grab back of notes and observations that don’t get their a full section, don’t have any associated plots, etc. That doesn’t mean they are less important! Don’t say that! These ones matter too, they really do.</p>
@@ -618,6 +698,8 @@ Whew! Not sure if that was helpful after all?</p>
   <li>Although we didn’t find evidence of this happening on other x86 hardware, nor on POWER or ARM, that doesn’t mean it isn’t or can’t happen. It is possible the conditions for it to happen aren’t triggered, or that it is happening but doesn’t make a difference in performance. Similarly for the POWER9 and ARM chips: we didn’t check any performance counters, so maybe the thing is happening but it just doesn’t make any difference in performance. That’s especially feasible in the ARM case where the performance is totally limited by the core-level 16-bytes-per-cycle write throughput: even if all writes are eliminated later on in the path to memory, we expect the performance to be the same.</li>
   <li>We could learn more about this effect by setting up a test which writes ones first to a region of some fixed size, then overwrites it with zeros, and repeats this in a rolling fashion over a larger buffer. This test basically lets the 1s escape to a certain level of the cache hierarchy, and seeing where the optimization kicks in will tell us something interesting.</li>
 </ul>
+
+<p><span id="summary-perma"></span></p>
 
 <h2 id="wrapping-up">Wrapping Up</h2>
 
@@ -793,7 +875,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ea575830-d45a-11eb-a781-93a616abab19', 'respond', 'intel-zero-opt', 'ea575830-d45a-11eb-a781-93a616abab19')">↪&#xFE0E; Reply to Ext3h</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ea575830-d45a-11eb-a781-93a616abab19', 'respond', 'ea575830-d45a-11eb-a781-93a616abab19')">↪&#xFE0E; Reply to Ext3h</a>
     </div>
 </article>
   
@@ -847,7 +929,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-540b2b20-d34e-11eb-a28b-2b17081581e0', 'respond', 'intel-zero-opt', '540b2b20-d34e-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to pmuldq</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-540b2b20-d34e-11eb-a28b-2b17081581e0', 'respond', '540b2b20-d34e-11eb-a28b-2b17081581e0')">↪&#xFE0E; Reply to pmuldq</a>
     </div>
 </article>
   
@@ -911,7 +993,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3e568a70-5a29-11eb-9e5b-15b668946273', 'respond', 'intel-zero-opt', '3e568a70-5a29-11eb-9e5b-15b668946273')">↪&#xFE0E; Reply to Noah Goldstein</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3e568a70-5a29-11eb-9e5b-15b668946273', 'respond', '3e568a70-5a29-11eb-9e5b-15b668946273')">↪&#xFE0E; Reply to Noah Goldstein</a>
     </div>
 </article>
   
@@ -981,7 +1063,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a7b680b0-c000-11ea-b24f-4945d5db13e7', 'respond', 'intel-zero-opt', 'a7b680b0-c000-11ea-b24f-4945d5db13e7')">↪&#xFE0E; Reply to Vladimir</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a7b680b0-c000-11ea-b24f-4945d5db13e7', 'respond', 'a7b680b0-c000-11ea-b24f-4945d5db13e7')">↪&#xFE0E; Reply to Vladimir</a>
     </div>
 </article>
   
@@ -1007,7 +1089,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-48755d00-993c-11ea-8849-3f1b5cac7d3c', 'respond', 'intel-zero-opt', '48755d00-993c-11ea-8849-3f1b5cac7d3c')">↪&#xFE0E; Reply to Kuba Beránek</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-48755d00-993c-11ea-8849-3f1b5cac7d3c', 'respond', '48755d00-993c-11ea-8849-3f1b5cac7d3c')">↪&#xFE0E; Reply to Kuba Beránek</a>
     </div>
 </article>
   
@@ -1033,7 +1115,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-59652190-96ad-11ea-aacc-b1346604130d', 'respond', 'intel-zero-opt', '59652190-96ad-11ea-aacc-b1346604130d')">↪&#xFE0E; Reply to Doug Miller</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-59652190-96ad-11ea-aacc-b1346604130d', 'respond', '59652190-96ad-11ea-aacc-b1346604130d')">↪&#xFE0E; Reply to Doug Miller</a>
     </div>
 </article>
   
@@ -1096,7 +1178,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b56ba5c0-9637-11ea-9007-51f9f966835a', 'respond', 'intel-zero-opt', 'b56ba5c0-9637-11ea-9007-51f9f966835a')">↪&#xFE0E; Reply to Jeff Hammond</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b56ba5c0-9637-11ea-9007-51f9f966835a', 'respond', 'b56ba5c0-9637-11ea-9007-51f9f966835a')">↪&#xFE0E; Reply to Jeff Hammond</a>
     </div>
 </article>
   
@@ -1151,7 +1233,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d887d100-9560-11ea-8885-c1a370f2dc6c', 'respond', 'intel-zero-opt', 'd887d100-9560-11ea-8885-c1a370f2dc6c')">↪&#xFE0E; Reply to Peter Cordes</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d887d100-9560-11ea-8885-c1a370f2dc6c', 'respond', 'd887d100-9560-11ea-8885-c1a370f2dc6c')">↪&#xFE0E; Reply to Peter Cordes</a>
     </div>
 </article>
   
@@ -1217,7 +1299,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2', 'respond', 'intel-zero-opt', '4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2')">↪&#xFE0E; Reply to Vadim Korchagin</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2', 'respond', '4cbcc6a0-954a-11ea-9f9d-f9cab848a8d2')">↪&#xFE0E; Reply to Vadim Korchagin</a>
     </div>
 </article>
   
@@ -1243,7 +1325,7 @@ Whew! Not sure if that was helpful after all?</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e2d21e30-9543-11ea-b265-99f655d4465e', 'respond', 'intel-zero-opt', 'e2d21e30-9543-11ea-b265-99f655d4465e')">↪&#xFE0E; Reply to gfoidl</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e2d21e30-9543-11ea-b265-99f655d4465e', 'respond', 'e2d21e30-9543-11ea-b265-99f655d4465e')">↪&#xFE0E; Reply to gfoidl</a>
     </div>
 </article>
   
@@ -1265,7 +1347,7 @@ Whew! Not sure if that was helpful after all?</p>
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -1290,6 +1372,10 @@ Whew! Not sure if that was helpful after all?</p>
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -1316,7 +1402,6 @@ Whew! Not sure if that was helpful after all?</p>
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

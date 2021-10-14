@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -71,8 +74,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -143,12 +146,15 @@ tablepath: /misc/tables//intel-zero-opt
 <center><strong>Figure 7a</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig7a" id="fig7a">[link to this chart]</a> 
-    <a href="/misc/tables//intel-zero-opt/fig7a.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl512/overall-warm.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig7a" id="fig7a">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables//intel-zero-opt/fig7a.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl512/overall-warm.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables//intel-zero-opt/fig7a.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig7a.svg" alt="Figure 7a" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig7a.svg" alt="Figure 7a" width="648" height="432" />
     </a>
 </div>
 
@@ -157,12 +163,15 @@ tablepath: /misc/tables//intel-zero-opt
 <center><strong>Figure 7b</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig7b" id="fig7b">[link to this chart]</a> 
-    <a href="/misc/tables//intel-zero-opt/fig7b.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/overall-warm.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig7b" id="fig7b">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables//intel-zero-opt/fig7b.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/overall-warm.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables//intel-zero-opt/fig7b.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig7b.svg" alt="Figure 7b" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig7b.svg" alt="Figure 7b" width="648" height="432" />
     </a>
 </div>
 
@@ -365,12 +374,15 @@ tablepath: /misc/tables//intel-zero-opt
 <center><strong>Figure 8</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig8" id="fig8">[link to this chart]</a> 
-    <a href="/misc/tables//intel-zero-opt/fig8.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l2-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig8" id="fig8">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables//intel-zero-opt/fig8.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l2-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables//intel-zero-opt/fig8.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig8.svg" alt="Figure 8" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig8.svg" alt="Figure 8" width="648" height="432" />
     </a>
 </div>
 
@@ -381,12 +393,15 @@ tablepath: /misc/tables//intel-zero-opt
 <center><strong>Figure 9</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig9" id="fig9">[link to this chart]</a> 
-    <a href="/misc/tables//intel-zero-opt/fig9.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l3-focus.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig9" id="fig9">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables//intel-zero-opt/fig9.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l3-focus.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables//intel-zero-opt/fig9.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig9.svg" alt="Figure 9" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig9.svg" alt="Figure 9" width="648" height="432" />
     </a>
 </div>
 
@@ -415,12 +430,15 @@ tablepath: /misc/tables//intel-zero-opt
 <center><strong>Figure 10</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig10" id="fig10">[link to this chart]</a> 
-    <a href="/misc/tables//intel-zero-opt/fig10.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig10" id="fig10">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables//intel-zero-opt/fig10.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables//intel-zero-opt/fig10.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig10.svg" alt="Figure 10" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig10.svg" alt="Figure 10" width="648" height="432" />
     </a>
 </div>
 
@@ -437,12 +455,15 @@ tablepath: /misc/tables//intel-zero-opt
 <center><strong>Figure 11</strong></center>
 
 <div class="svg-fig">
-    <a href="#fig11" id="fig11">[link to this chart]</a> 
-    <a href="/misc/tables//intel-zero-opt/fig11.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig11" id="fig11">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables//intel-zero-opt/fig11.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables//intel-zero-opt/fig11.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig11.svg" alt="Figure 11" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig11.svg" alt="Figure 11" width="648" height="432" />
     </a>
 </div>
 
@@ -453,12 +474,15 @@ tablepath: /misc/tables//intel-zero-opt
 <p>Let’s concentrate only on the two benchmarks that write zero: <code class="language-plaintext highlighter-rouge">fill256_0</code> and <code class="language-plaintext highlighter-rouge">fill512_0</code>, and turn on the L2 eviction counters (you probably saw that one coming by now):</p>
 
 <div class="svg-fig">
-    <a href="#fig12" id="fig12">[link to this chart]</a> 
-    <a href="/misc/tables//intel-zero-opt/fig12.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        <a href="#fig12" id="fig12">[link<span class="only-large"> to this chart</span>]</a> 
+        
+            <a href="/misc/tables//intel-zero-opt/fig12.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables//intel-zero-opt/fig12.html">
-        <img class="figimg" src="/assets/intel-zero-opt/fig12.svg" alt="Figure 12" />
+        <img class="figimg" src="/assets/intel-zero-opt/fig12.svg" alt="Figure 12" width="648" height="432" />
     </a>
 </div>
 
@@ -578,7 +602,7 @@ tablepath: /misc/tables//intel-zero-opt
 
 <p>Case 4 is strange because it gets the worst of both worlds. Intuitively if it was the RFO-ND that prevents 0-over-0 write elimination (i.e whats happening with <code class="language-plaintext highlighter-rouge">rep stosb</code>) we would either expect to see some RFO-ND requests when using <code class="language-plaintext highlighter-rouge">vmovdqa zmm, (reg)</code> but we don’t. Likewise if we not seeing RFO-ND requests why would its 0-over-0 elimination rate be lower.</p>
 
-<p>Cases 2 and 3 I think are really interesting (reproducible by changing that order of stores <a href="https://github.com/travisdowns/zero-fill-bench/blob/master/algos.cpp#L52">here</a>) and I might be useful in understanding case 4. The only difference between cases 2 and 3 that I can think of is that <a href="https://www.realworldtech.com/forum/?threadid=173441&amp;curpostid=192262">case 2 can write coalesce in the LFB whereas case 3 cannot</a>.</p>
+<p>Cases 2 and 3 I think are really interesting (reproducible by <a href="https://github.com/travisdowns/zero-fill-bench/blob/master/algos.cpp#L52">changing that order of stores here</a>) and I might be useful in understanding case 4. The only difference between cases 2 and 3 that I can think of is that <a href="https://www.realworldtech.com/forum/?threadid=173441&amp;curpostid=192262">case 2 can write coalesce in the LFB whereas case 3 cannot</a>.</p>
 
 <p>So as a possible explinination for why case 3 gets a higher 0-over-0 write elimination rate than case 2 I was thinking something along the following for relationship between RFO requests and LFB coalescing.</p>
 
@@ -656,7 +680,7 @@ tablepath: /misc/tables//intel-zero-opt
   <li>where the difference between cases 2 and 4 emerges (i.e we can’t just say an RFO request for a full cache line write has its data part ignored).</li>
 </ul>
 
-<p>The only explination I can think of is if RFO prefetching takes place (mentioned a bit <a href="https://stackoverflow.com/questions/61129773/how-do-the-store-buffer-and-line-fill-buffer-interact-with-each-other">here</a>) its possible you could try and explain the data with the following assumptions:</p>
+<p>The only explination I can think of is if RFO prefetching takes place (<a href="https://stackoverflow.com/questions/61129773/how-do-the-store-buffer-and-line-fill-buffer-interact-with-each-other">mentioned a bit here</a>) its possible you could try and explain the data with the following assumptions:</p>
 <ul>
   <li>That RFO prefetching does in fact take place</li>
   <li>That whether the RFO data can be ignored is a function of RFO configuration, not the size of the entry in the LFB.</li>
@@ -672,7 +696,7 @@ tablepath: /misc/tables//intel-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f26ed410-75fc-11eb-b1b1-b1e90cd6ebd3', 'respond', 'icelake-zero-opt', 'f26ed410-75fc-11eb-b1b1-b1e90cd6ebd3')">↪&#xFE0E; Reply to Noah Goldstein</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f26ed410-75fc-11eb-b1b1-b1e90cd6ebd3', 'respond', 'f26ed410-75fc-11eb-b1b1-b1e90cd6ebd3')">↪&#xFE0E; Reply to Noah Goldstein</a>
     </div>
 </article>
   
@@ -735,7 +759,7 @@ tablepath: /misc/tables//intel-zero-opt
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4afb2ef0-73c1-11eb-9aaa-d51dc4f5f74f', 'respond', 'icelake-zero-opt', '4afb2ef0-73c1-11eb-9aaa-d51dc4f5f74f')">↪&#xFE0E; Reply to Noah Goldstein</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-4afb2ef0-73c1-11eb-9aaa-d51dc4f5f74f', 'respond', '4afb2ef0-73c1-11eb-9aaa-d51dc4f5f74f')">↪&#xFE0E; Reply to Noah Goldstein</a>
     </div>
 </article>
   
@@ -784,7 +808,7 @@ tablepath: /misc/tables//intel-zero-opt
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/05/18/icelake-zero-opt.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -809,6 +833,10 @@ tablepath: /misc/tables//intel-zero-opt
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -835,7 +863,6 @@ tablepath: /misc/tables//intel-zero-opt
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

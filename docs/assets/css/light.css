@@ -400,7 +400,7 @@ table td { border: 1px solid #dadada; }
 .tabs .tab [type="radio"]:checked ~ .tab-panel { display: inline; }
 
 /* for smaller screens, use a different tab scheme */
-@media only screen and (max-width: 43em) { .tabs .tab > label { background: #fdfdfd; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: white; } }
+@media not screen and (min-width: 800px) { .tabs .tab > label { background: #fdfdfd; border-color: #999; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } .tabs .tab [type="radio"]:checked + .tab-label { background: white; } }
 
 .footnotes { font-size: 14px; margin: -10px 20px; }
 
@@ -427,6 +427,8 @@ table td { border: 1px solid #dadada; }
 .dataframe { text-align: right; }
 
 .svg-fig { font-size: 80%; margin-bottom: 15px; }
+
+@media not screen and (min-width: 800px) { .svg-fig { font-size: 120%; } .svg-fig .svg-fig-links { margin-bottom: 10px; } }
 
 .td-right td { text-align: right; }
 
@@ -463,6 +465,14 @@ a > code { color: #246bc7; }
 .dm-close:hover { font-weight: bold; filter: brightness(1.2); }
 
 .dm-checkbox input[type="checkbox"] { cursor: pointer; }
+
+img { height: auto; }
+
+.figimg { height: auto; width: 100%; }
+
+#markdown-toc li { margin-top: 5px; }
+
+@media not screen and (min-width: 800px) { .only-large { display: none; } }
 
 .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo { color: #007878; }
 

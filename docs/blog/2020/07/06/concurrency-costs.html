@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -71,8 +74,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -223,7 +226,7 @@ tablepath: /misc/tables/concurrency-costs
 
 <p>We’ll call this implementation <em><abbr title="Uses a std::mutex and std::lock_guard to protect a plain integer counter.">mutex add</abbr></em>, and on my 4 CPU Skylake-S i7-6700HQ machine, when I use the vanilla <code class="language-plaintext highlighter-rouge">std::mutex</code> I get the following results for 2 to 4 threads:</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-mutex">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -235,15 +238,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/mutex.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/mutex.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/mutex.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/mutex.svg" alt="Mutex" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/mutex.svg" alt="Mutex" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -257,15 +268,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/mutex.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/mutex.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/mutex.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/mutex.svg" alt="Mutex" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/mutex.svg" alt="Mutex" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -279,15 +298,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/mutex.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/mutex.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/mutex.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/mutex.svg" alt="Mutex" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/mutex.svg" alt="Mutex" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -301,15 +328,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/mutex.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/mutex.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/mutex.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/mutex.svg" alt="Mutex" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/mutex.svg" alt="Mutex" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -352,7 +387,7 @@ tablepath: /misc/tables/concurrency-costs
 
 <p>Here’s what these look like alongside our existing <code class="language-plaintext highlighter-rouge">std::mutex</code> benchmark:</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-atomic-inc">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -364,15 +399,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/atomic-inc.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/atomic-inc.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/atomic-inc.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/atomic-inc.svg" alt="Atomic increment" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/atomic-inc.svg" alt="Atomic increment" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -386,15 +429,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/atomic-inc.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/atomic-inc.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/atomic-inc.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/atomic-inc.svg" alt="Atomic increment" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/atomic-inc.svg" alt="Atomic increment" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -408,15 +459,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/atomic-inc.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/atomic-inc.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/atomic-inc.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/atomic-inc.svg" alt="Atomic increment" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/atomic-inc.svg" alt="Atomic increment" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -430,15 +489,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/atomic-inc.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/atomic-inc.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/atomic-inc.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/atomic-inc.svg" alt="Atomic increment" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/atomic-inc.svg" alt="Atomic increment" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -490,7 +557,7 @@ tablepath: /misc/tables/concurrency-costs
 
 <p>Let’s plot the performance results for this lock alongside the existing approaches:</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-fair-yield">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -502,15 +569,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/fair-yield.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/fair-yield.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/fair-yield.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/fair-yield.svg" alt="Increment Cost: Fair Yield" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/fair-yield.svg" alt="Increment Cost: Fair Yield" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -524,15 +599,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/fair-yield.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/fair-yield.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/fair-yield.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/fair-yield.svg" alt="Increment Cost: Fair Yield" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/fair-yield.svg" alt="Increment Cost: Fair Yield" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -546,15 +629,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/fair-yield.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/fair-yield.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/fair-yield.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/fair-yield.svg" alt="Increment Cost: Fair Yield" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/fair-yield.svg" alt="Increment Cost: Fair Yield" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -568,15 +659,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/fair-yield.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/fair-yield.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/fair-yield.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/fair-yield.svg" alt="Increment Cost: Fair Yield" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/fair-yield.svg" alt="Increment Cost: Fair Yield" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -640,11 +739,11 @@ A more resource friendly design, and one that will often perform better is a <em
 
 <p>Even without <abbr title="When a waiter on a condition variable is woken up even though no other thread notified it.">spurious wakeups</abbr> we might get woken many times, because this lock suffers from the <em>thundering herd</em> problem where every waiter is woken on <code class="language-plaintext highlighter-rouge">unlock()</code> even though only one will ultimately be able to get the lock.</p>
 
-<p>We’ll try a second design too, that doesn’t suffer from thundering herd. This is a queued lock, where each lock waits on its own private node in a queue of waiters, so only a single waiter (the new lock owner) is woken up on unlock. We will call it <abbr title="A blocking ticket lock where each waiter waits on a unique condition variable.">queued fifo</abbr> and if you’re interested in the implementation you can find it <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L61">here</a>.</p>
+<p>We’ll try a second design too, that doesn’t suffer from thundering herd. This is a queued lock, where each lock waits on its own private node in a queue of waiters, so only a single waiter (the new lock owner) is woken up on unlock. We will call it <abbr title="A blocking ticket lock where each waiter waits on a unique condition variable.">queued fifo</abbr> and if you’re interested in the implementation you <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L61">can find it here</a>.</p>
 
 <p>Here’s how our new locks perform against the existing crowd:</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-more-fair">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -656,15 +755,23 @@ A more resource friendly design, and one that will often perform better is a <em
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/more-fair.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/more-fair.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/more-fair.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/more-fair.svg" alt="Increment Cost: Fair Blocking" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/more-fair.svg" alt="Increment Cost: Fair Blocking" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -678,15 +785,23 @@ A more resource friendly design, and one that will often perform better is a <em
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/more-fair.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/more-fair.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/more-fair.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/more-fair.svg" alt="Increment Cost: Fair Blocking" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/more-fair.svg" alt="Increment Cost: Fair Blocking" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -700,15 +815,23 @@ A more resource friendly design, and one that will often perform better is a <em
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/more-fair.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/more-fair.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/more-fair.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/more-fair.svg" alt="Increment Cost: Fair Blocking" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/more-fair.svg" alt="Increment Cost: Fair Blocking" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -722,15 +845,23 @@ A more resource friendly design, and one that will often perform better is a <em
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/more-fair.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/more-fair.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/more-fair.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/more-fair.svg" alt="Increment Cost: Fair Blocking" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/more-fair.svg" alt="Increment Cost: Fair Blocking" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -755,9 +886,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 <h3 id="level-5-catastrophe">Level 5: Catastrophe</h3>
 
-<p>Here’s a ticket lock which is identical to the <a href="#ys-lock">first ticket lock we saw</a>, except that the <code class="language-plaintext highlighter-rouge">sched_yield();</code> is replaced by <code class="language-plaintext highlighter-rouge">;</code>. That is, it busy waits instead of yielding (look <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31">here</a> for the spin flavors which specialize on a shared ticket lock template). You could also replace this by a CPU-specific “relax” instruction like <a href="https://www.felixcloutier.com/x86/pause"><code class="language-plaintext highlighter-rouge">pause</code></a>, but it won’t change the outcome (see <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26">here</a>). We call it <abbr title="A traditional spin-based ticket lock that does a hot spin while waiting for its ticket to be next.">ticket spin</abbr>, and here’s how it performs compared to the existing candidates:</p>
+<p>Here’s a ticket lock which is identical to the <a href="#ys-lock">first ticket lock we saw</a>, except that the <code class="language-plaintext highlighter-rouge">sched_yield();</code> is replaced by <code class="language-plaintext highlighter-rouge">;</code>. That is, it busy waits instead of yielding (<a href="https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31">and here are the spin flavors which specialize on a shared ticket lock template</a>). You could also replace this by a CPU-specific “relax” instruction like <a href="https://www.felixcloutier.com/x86/pause"><code class="language-plaintext highlighter-rouge">pause</code></a>, but it won’t <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26">change the outcome</a>. We call it <abbr title="A traditional spin-based ticket lock that does a hot spin while waiting for its ticket to be next.">ticket spin</abbr>, and here’s how it performs compared to the existing candidates:</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-ts-4">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -769,15 +900,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/ts-4.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/ts-4.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/ts-4.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/ts-4.svg" alt="Increment Cost: Ticket Spin" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/ts-4.svg" alt="Increment Cost: Ticket Spin" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -791,15 +930,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/ts-4.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/ts-4.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/ts-4.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/ts-4.svg" alt="Increment Cost: Ticket Spin" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/ts-4.svg" alt="Increment Cost: Ticket Spin" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -813,15 +960,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/ts-4.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/ts-4.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/ts-4.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/ts-4.svg" alt="Increment Cost: Ticket Spin" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/ts-4.svg" alt="Increment Cost: Ticket Spin" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -835,15 +990,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/ts-4.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/ts-4.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/ts-4.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/ts-4.svg" alt="Increment Cost: Ticket Spin" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/ts-4.svg" alt="Increment Cost: Ticket Spin" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -854,7 +1017,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 <p>The picture changes if we show the results for up to 6 threads, rather than just 4. Since I have 4 available cores<sup id="fnref:noht" role="doc-noteref"><a href="#fn:noht" class="footnote" rel="footnote">13</a></sup>, this means that not all the test threads will be able to run at once:</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-ts-6">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -866,15 +1029,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/ts-6.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/ts-6.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/ts-6.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -888,15 +1059,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/ts-6.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/ts-6.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/ts-6.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -910,15 +1089,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/ts-6.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/ts-6.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/ts-6.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -932,15 +1119,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/ts-6.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/ts-6.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/ts-6.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/ts-6.svg" alt="Increment Cost: Ticket Spin (Oversubscribed)" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -979,7 +1174,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 <p>Here are the results for all the implementations we’ve looked at so far, for a single thread:</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-single">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -991,15 +1186,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/single.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/single.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/single.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/single.svg" alt="Increment Cost: Single Threaded" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/single.svg" alt="Increment Cost: Single Threaded" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1013,15 +1216,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/single.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/single.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/single.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/single.svg" alt="Increment Cost: Single Threaded" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/single.svg" alt="Increment Cost: Single Threaded" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1035,15 +1246,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/single.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/single.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/single.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/single.svg" alt="Increment Cost: Single Threaded" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/single.svg" alt="Increment Cost: Single Threaded" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1057,15 +1276,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/single.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/single.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/single.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/single.svg" alt="Increment Cost: Single Threaded" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/single.svg" alt="Increment Cost: Single Threaded" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1197,7 +1424,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 <p>Let’s compare this to the <code class="language-plaintext highlighter-rouge">atomic add</code> version we looked at above, which was the fastest of the level 2 approaches. Recall that it uses an <abbr title="Uses an atomic increment on a single shared counter.">atomic add</abbr> on a single counter.</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-cas-multi">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -1209,15 +1436,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/cas-multi.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/cas-multi.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/cas-multi.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1231,15 +1466,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/cas-multi.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/cas-multi.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/cas-multi.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1253,15 +1496,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/cas-multi.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/cas-multi.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/cas-multi.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1275,15 +1526,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/cas-multi.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/cas-multi.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/cas-multi.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/cas-multi.svg" alt="Increment Cost: Contention Adaptive Multi-Counter" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1398,7 +1657,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 <p>So how does this <abbr title="Uses thread-local storage for a counter per thread.">tls add</abbr> implementation benchmark?</p>
 
-<div class="tabs">
+<div class="tabs" id="tabs-tls">
     <!-- Courtesy of https://codepen.io/Merri/pen/bytea -->
     
     <div class="tab">
@@ -1410,15 +1669,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/skl/tls.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/skl/tls.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/skl/tls.html">
-        <img class="figimg" src="/assets/concurrency-costs/skl/tls.svg" alt="Increment Cost: Thread Local Storage" />
+        <img class="figimg" src="/assets/concurrency-costs/skl/tls.svg" alt="Increment Cost: Thread Local Storage" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1432,15 +1699,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/icl/tls.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/icl/tls.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/icl/tls.html">
-        <img class="figimg" src="/assets/concurrency-costs/icl/tls.svg" alt="Increment Cost: Thread Local Storage" />
+        <img class="figimg" src="/assets/concurrency-costs/icl/tls.svg" alt="Increment Cost: Thread Local Storage" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1454,15 +1729,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g1-16/tls.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g1-16/tls.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g1-16/tls.html">
-        <img class="figimg" src="/assets/concurrency-costs/g1-16/tls.svg" alt="Increment Cost: Thread Local Storage" />
+        <img class="figimg" src="/assets/concurrency-costs/g1-16/tls.svg" alt="Increment Cost: Thread Local Storage" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1476,15 +1759,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 <div class="svg-fig">
-    
-    <a href="/misc/tables/concurrency-costs/g2-16/tls.html">[data table]</a> 
-    <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw data]</a> 
-    <br />
+    <div class="svg-fig-links">
+        
+        
+            <a href="/misc/tables/concurrency-costs/g2-16/tls.html">[data<span class="only-large"> table</span>]</a> 
+        
+        <a href="https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv">[raw<span class="only-large"> data</span>]</a> 
+    </div>
     <a href="/misc/tables/concurrency-costs/g2-16/tls.html">
-        <img class="figimg" src="/assets/concurrency-costs/g2-16/tls.svg" alt="Increment Cost: Thread Local Storage" />
+        <img class="figimg" src="/assets/concurrency-costs/g2-16/tls.svg" alt="Increment Cost: Thread Local Storage" width="648" height="432" />
     </a>
 </div>
+
         </div>
       </div>
     </div>
@@ -1886,7 +2177,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-bd7e59c0-5a2b-11eb-9e5b-15b668946273', 'respond', 'concurrency-costs', 'bd7e59c0-5a2b-11eb-9e5b-15b668946273')">↪&#xFE0E; Reply to Noah Goldstein</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-bd7e59c0-5a2b-11eb-9e5b-15b668946273', 'respond', 'bd7e59c0-5a2b-11eb-9e5b-15b668946273')">↪&#xFE0E; Reply to Noah Goldstein</a>
     </div>
 </article>
   
@@ -1935,7 +2226,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3cfb4b30-3511-11eb-b90e-3d932abd6adb', 'respond', 'concurrency-costs', '3cfb4b30-3511-11eb-b90e-3d932abd6adb')">↪&#xFE0E; Reply to Chia-Lun Liu</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3cfb4b30-3511-11eb-b90e-3d932abd6adb', 'respond', '3cfb4b30-3511-11eb-b90e-3d932abd6adb')">↪&#xFE0E; Reply to Chia-Lun Liu</a>
     </div>
 </article>
   
@@ -1965,7 +2256,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d00c9470-fac8-11ea-ab88-0be8ecc64f23', 'respond', 'concurrency-costs', 'd00c9470-fac8-11ea-ab88-0be8ecc64f23')">↪&#xFE0E; Reply to Matthew Fernandez</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d00c9470-fac8-11ea-ab88-0be8ecc64f23', 'respond', 'd00c9470-fac8-11ea-ab88-0be8ecc64f23')">↪&#xFE0E; Reply to Matthew Fernandez</a>
     </div>
 </article>
   
@@ -2014,7 +2305,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ee4b2fa0-cc56-11ea-b83c-554ea087b3be', 'respond', 'concurrency-costs', 'ee4b2fa0-cc56-11ea-b83c-554ea087b3be')">↪&#xFE0E; Reply to Tuan Phuc PHAN</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ee4b2fa0-cc56-11ea-b83c-554ea087b3be', 'respond', 'ee4b2fa0-cc56-11ea-b83c-554ea087b3be')">↪&#xFE0E; Reply to Tuan Phuc PHAN</a>
     </div>
 </article>
   
@@ -2040,7 +2331,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-eec11b60-cc34-11ea-bae1-9d3e76ce4b30', 'respond', 'concurrency-costs', 'eec11b60-cc34-11ea-bae1-9d3e76ce4b30')">↪&#xFE0E; Reply to Rene Damm</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-eec11b60-cc34-11ea-bae1-9d3e76ce4b30', 'respond', 'eec11b60-cc34-11ea-bae1-9d3e76ce4b30')">↪&#xFE0E; Reply to Rene Damm</a>
     </div>
 </article>
   
@@ -2066,7 +2357,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-66567800-c0c3-11ea-949b-e10c063dc6bd', 'respond', 'concurrency-costs', '66567800-c0c3-11ea-949b-e10c063dc6bd')">↪&#xFE0E; Reply to Darkmercy</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-66567800-c0c3-11ea-949b-e10c063dc6bd', 'respond', '66567800-c0c3-11ea-949b-e10c063dc6bd')">↪&#xFE0E; Reply to Darkmercy</a>
     </div>
 </article>
   
@@ -2115,7 +2406,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e207f270-c05b-11ea-9c85-e34dac5bcfe2', 'respond', 'concurrency-costs', 'e207f270-c05b-11ea-9c85-e34dac5bcfe2')">↪&#xFE0E; Reply to Jason</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e207f270-c05b-11ea-9c85-e34dac5bcfe2', 'respond', 'e207f270-c05b-11ea-9c85-e34dac5bcfe2')">↪&#xFE0E; Reply to Jason</a>
     </div>
 </article>
   
@@ -2168,7 +2459,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-36cbbc20-c05b-11ea-9c85-e34dac5bcfe2', 'respond', 'concurrency-costs', '36cbbc20-c05b-11ea-9c85-e34dac5bcfe2')">↪&#xFE0E; Reply to Jason</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-36cbbc20-c05b-11ea-9c85-e34dac5bcfe2', 'respond', '36cbbc20-c05b-11ea-9c85-e34dac5bcfe2')">↪&#xFE0E; Reply to Jason</a>
     </div>
 </article>
   
@@ -2211,7 +2502,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -2236,6 +2527,10 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -2262,7 +2557,6 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

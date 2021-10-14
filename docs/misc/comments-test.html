@@ -23,7 +23,10 @@ var DARKMODE = (function() {
         }
       } catch (e) {}
       return 'light';
-
+    },
+    gaTheme: function () {
+      var o = i.getOverride();
+      return o ? o + ' force' : i.get() + ' default';
     }
     };
     return i;
@@ -67,8 +70,8 @@ document.write(link);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-136594956-1');
+  gtag('set', { 'custom_map': { 'dimension1': 'theme' } });
+  gtag('config', 'UA-136594956-1', { 'theme' : DARKMODE.gaTheme(), 'cookie_flags': 'SameSite=None;Secure' });
 </script>
 
 </head>
@@ -128,6 +131,86 @@ document.write(link);
     
     
 
+<article id="comment-91da16d0-25da-11ec-8f03-ed6cbd29869b" class="js-comment comment" uid="91da16d0-25da-11ec-8f03-ed6cbd29869b">
+
+  <div class="comment__author">
+    Test
+    <span class="comment__date">•
+        <a href="#comment-91da16d0-25da-11ec-8f03-ed6cbd29869b" title="Permalink to this comment">October  5th, 2021 12:48</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Load animation test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-91da16d0-25da-11ec-8f03-ed6cbd29869b', 'respond', '91da16d0-25da-11ec-8f03-ed6cbd29869b')">↪&#xFE0E; Reply to Test</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-794472f0-25da-11ec-8f03-ed6cbd29869b" class="js-comment comment" uid="794472f0-25da-11ec-8f03-ed6cbd29869b">
+
+  <div class="comment__author">
+    Steve
+    <span class="comment__date">•
+        <a href="#comment-794472f0-25da-11ec-8f03-ed6cbd29869b" title="Permalink to this comment">October  5th, 2021 12:48</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Comment Test</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-794472f0-25da-11ec-8f03-ed6cbd29869b', 'respond', '794472f0-25da-11ec-8f03-ed6cbd29869b')">↪&#xFE0E; Reply to Steve</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
+<article id="comment-e7677830-240f-11ec-82d4-5fbcd8e96e69" class="js-comment comment admin" uid="e7677830-240f-11ec-82d4-5fbcd8e96e69">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-e7677830-240f-11ec-82d4-5fbcd8e96e69" title="Permalink to this comment">October  3th, 2021 06:05</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Test after jquery removal.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e7677830-240f-11ec-82d4-5fbcd8e96e69', 'respond', 'e7677830-240f-11ec-82d4-5fbcd8e96e69')">↪&#xFE0E; Reply to Travis Downs</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-5a652ba0-225f-11ec-a5c7-2db82df860e3" class="js-comment comment" uid="5a652ba0-225f-11ec-a5c7-2db82df860e3">
 
   <div class="comment__author">
@@ -143,9 +226,28 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5a652ba0-225f-11ec-a5c7-2db82df860e3', 'respond', 'comments-test', '5a652ba0-225f-11ec-a5c7-2db82df860e3')">↪&#xFE0E; Reply to XED</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5a652ba0-225f-11ec-a5c7-2db82df860e3', 'respond', '5a652ba0-225f-11ec-a5c7-2db82df860e3')">↪&#xFE0E; Reply to XED</a>
     </div>
 </article>
+  
+
+<article id="comment-8caa3b20-23fc-11ec-82d4-5fbcd8e96e69" class="js-comment comment child" uid="8caa3b20-23fc-11ec-82d4-5fbcd8e96e69">
+
+  <div class="comment__author">
+    DEX
+    <span class="comment__date">•
+        <a href="#comment-8caa3b20-23fc-11ec-82d4-5fbcd8e96e69" title="Permalink to this comment">October  3th, 2021 03:46</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Beautiful.</p>
+
+  </div>
+
+
+</article>
+
+
   
 
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
@@ -169,7 +271,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-cc81f420-20de-11ec-847d-d7f09526d776', 'respond', 'comments-test', 'cc81f420-20de-11ec-847d-d7f09526d776')">↪&#xFE0E; Reply to Muhammad</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-cc81f420-20de-11ec-847d-d7f09526d776', 'respond', 'cc81f420-20de-11ec-847d-d7f09526d776')">↪&#xFE0E; Reply to Muhammad</a>
     </div>
 </article>
   
@@ -214,7 +316,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d4a7adc0-0e64-11ec-9b9c-13716ede441c', 'respond', 'comments-test', 'd4a7adc0-0e64-11ec-9b9c-13716ede441c')">↪&#xFE0E; Reply to triolo</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d4a7adc0-0e64-11ec-9b9c-13716ede441c', 'respond', 'd4a7adc0-0e64-11ec-9b9c-13716ede441c')">↪&#xFE0E; Reply to triolo</a>
     </div>
 </article>
   
@@ -251,7 +353,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-35f9cc80-0518-11ec-83a2-bdbfcc52bce2', 'respond', 'comments-test', '35f9cc80-0518-11ec-83a2-bdbfcc52bce2')">↪&#xFE0E; Reply to Marko</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-35f9cc80-0518-11ec-83a2-bdbfcc52bce2', 'respond', '35f9cc80-0518-11ec-83a2-bdbfcc52bce2')">↪&#xFE0E; Reply to Marko</a>
     </div>
 </article>
   
@@ -277,7 +379,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-71495720-04e0-11ec-a5ea-2f758bc125f0', 'respond', 'comments-test', '71495720-04e0-11ec-a5ea-2f758bc125f0')">↪&#xFE0E; Reply to nobody</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-71495720-04e0-11ec-a5ea-2f758bc125f0', 'respond', '71495720-04e0-11ec-a5ea-2f758bc125f0')">↪&#xFE0E; Reply to nobody</a>
     </div>
 </article>
   
@@ -303,7 +405,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5414ed20-0438-11ec-b20e-c71fc5fe57ef', 'respond', 'comments-test', '5414ed20-0438-11ec-b20e-c71fc5fe57ef')">↪&#xFE0E; Reply to Ole</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5414ed20-0438-11ec-b20e-c71fc5fe57ef', 'respond', '5414ed20-0438-11ec-b20e-c71fc5fe57ef')">↪&#xFE0E; Reply to Ole</a>
     </div>
 </article>
   
@@ -329,7 +431,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-78770ec0-fac2-11eb-afe5-29815f9d0db0', 'respond', 'comments-test', '78770ec0-fac2-11eb-afe5-29815f9d0db0')">↪&#xFE0E; Reply to asda</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-78770ec0-fac2-11eb-afe5-29815f9d0db0', 'respond', '78770ec0-fac2-11eb-afe5-29815f9d0db0')">↪&#xFE0E; Reply to asda</a>
     </div>
 </article>
   
@@ -357,9 +459,28 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-27ba9340-f954-11eb-ad63-af7c9082994e', 'respond', 'comments-test', '27ba9340-f954-11eb-ad63-af7c9082994e')">↪&#xFE0E; Reply to Travis Downs</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-27ba9340-f954-11eb-ad63-af7c9082994e', 'respond', '27ba9340-f954-11eb-ad63-af7c9082994e')">↪&#xFE0E; Reply to Travis Downs</a>
     </div>
 </article>
+  
+
+<article id="comment-6d967e00-23fd-11ec-82d4-5fbcd8e96e69" class="js-comment comment child" uid="6d967e00-23fd-11ec-82d4-5fbcd8e96e69">
+
+  <div class="comment__author">
+    Tran
+    <span class="comment__date">•
+        <a href="#comment-6d967e00-23fd-11ec-82d4-5fbcd8e96e69" title="Permalink to this comment">October  3th, 2021 03:53</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Nice, thanks.</p>
+
+  </div>
+
+
+</article>
+
+
   
 
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
@@ -383,7 +504,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-eea097d0-ef7b-11eb-8010-6f28c29edcbc', 'respond', 'comments-test', 'eea097d0-ef7b-11eb-8010-6f28c29edcbc')">↪&#xFE0E; Reply to Stea</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-eea097d0-ef7b-11eb-8010-6f28c29edcbc', 'respond', 'eea097d0-ef7b-11eb-8010-6f28c29edcbc')">↪&#xFE0E; Reply to Stea</a>
     </div>
 </article>
   
@@ -430,7 +551,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ed12b7a0-ec14-11eb-abbe-dfefcb5a88b8', 'respond', 'comments-test', 'ed12b7a0-ec14-11eb-abbe-dfefcb5a88b8')">↪&#xFE0E; Reply to Chris</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-ed12b7a0-ec14-11eb-abbe-dfefcb5a88b8', 'respond', 'ed12b7a0-ec14-11eb-abbe-dfefcb5a88b8')">↪&#xFE0E; Reply to Chris</a>
     </div>
 </article>
   
@@ -456,7 +577,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-142fb6d0-eadf-11eb-83fe-55f549ba13eb', 'respond', 'comments-test', '142fb6d0-eadf-11eb-83fe-55f549ba13eb')">↪&#xFE0E; Reply to Iza</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-142fb6d0-eadf-11eb-83fe-55f549ba13eb', 'respond', '142fb6d0-eadf-11eb-83fe-55f549ba13eb')">↪&#xFE0E; Reply to Iza</a>
     </div>
 </article>
   
@@ -484,7 +605,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c3a54c90-e767-11eb-8c37-9de39af6cc23', 'respond', 'comments-test', 'c3a54c90-e767-11eb-8c37-9de39af6cc23')">↪&#xFE0E; Reply to Travis Downs</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c3a54c90-e767-11eb-8c37-9de39af6cc23', 'respond', 'c3a54c90-e767-11eb-8c37-9de39af6cc23')">↪&#xFE0E; Reply to Travis Downs</a>
     </div>
 </article>
   
@@ -510,7 +631,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-07a36090-d6be-11eb-8e6b-0debd9821550', 'respond', 'comments-test', '07a36090-d6be-11eb-8e6b-0debd9821550')">↪&#xFE0E; Reply to Someone</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-07a36090-d6be-11eb-8e6b-0debd9821550', 'respond', '07a36090-d6be-11eb-8e6b-0debd9821550')">↪&#xFE0E; Reply to Someone</a>
     </div>
 </article>
   
@@ -536,7 +657,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-33c24240-d524-11eb-ba6b-09d06f4f8153', 'respond', 'comments-test', '33c24240-d524-11eb-ba6b-09d06f4f8153')">↪&#xFE0E; Reply to luke</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-33c24240-d524-11eb-ba6b-09d06f4f8153', 'respond', '33c24240-d524-11eb-ba6b-09d06f4f8153')">↪&#xFE0E; Reply to luke</a>
     </div>
 </article>
   
@@ -562,7 +683,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e1c9dc90-d47f-11eb-b534-1187db867b7a', 'respond', 'comments-test', 'e1c9dc90-d47f-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e1c9dc90-d47f-11eb-b534-1187db867b7a', 'respond', 'e1c9dc90-d47f-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
     </div>
 </article>
   
@@ -588,7 +709,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a5695190-d47f-11eb-b534-1187db867b7a', 'respond', 'comments-test', 'a5695190-d47f-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a5695190-d47f-11eb-b534-1187db867b7a', 'respond', 'a5695190-d47f-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
     </div>
 </article>
   
@@ -614,7 +735,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-9a426630-d47f-11eb-b534-1187db867b7a', 'respond', 'comments-test', '9a426630-d47f-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-9a426630-d47f-11eb-b534-1187db867b7a', 'respond', '9a426630-d47f-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
     </div>
 </article>
   
@@ -640,7 +761,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-cf479eb0-d47d-11eb-b534-1187db867b7a', 'respond', 'comments-test', 'cf479eb0-d47d-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-cf479eb0-d47d-11eb-b534-1187db867b7a', 'respond', 'cf479eb0-d47d-11eb-b534-1187db867b7a')">↪&#xFE0E; Reply to ali</a>
     </div>
 </article>
   
@@ -666,7 +787,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d6a9f200-d2fe-11eb-9c8c-6d5b35241e56', 'respond', 'comments-test', 'd6a9f200-d2fe-11eb-9c8c-6d5b35241e56')">↪&#xFE0E; Reply to Ali</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d6a9f200-d2fe-11eb-9c8c-6d5b35241e56', 'respond', 'd6a9f200-d2fe-11eb-9c8c-6d5b35241e56')">↪&#xFE0E; Reply to Ali</a>
     </div>
 </article>
   
@@ -692,7 +813,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-2b7db5a0-c526-11eb-9924-3ffd38579f19', 'respond', 'comments-test', '2b7db5a0-c526-11eb-9924-3ffd38579f19')">↪&#xFE0E; Reply to Ken</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-2b7db5a0-c526-11eb-9924-3ffd38579f19', 'respond', '2b7db5a0-c526-11eb-9924-3ffd38579f19')">↪&#xFE0E; Reply to Ken</a>
     </div>
 </article>
   
@@ -718,7 +839,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-34d5be80-af5b-11eb-80bb-b5483b207e4f', 'respond', 'comments-test', '34d5be80-af5b-11eb-80bb-b5483b207e4f')">↪&#xFE0E; Reply to Test</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-34d5be80-af5b-11eb-80bb-b5483b207e4f', 'respond', '34d5be80-af5b-11eb-80bb-b5483b207e4f')">↪&#xFE0E; Reply to Test</a>
     </div>
 </article>
   
@@ -763,7 +884,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e451ad60-ab55-11eb-8db8-59bf755707e8', 'respond', 'comments-test', 'e451ad60-ab55-11eb-8db8-59bf755707e8')">↪&#xFE0E; Reply to asdf@asdf</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e451ad60-ab55-11eb-8db8-59bf755707e8', 'respond', 'e451ad60-ab55-11eb-8db8-59bf755707e8')">↪&#xFE0E; Reply to asdf@asdf</a>
     </div>
 </article>
   
@@ -789,7 +910,7 @@ document.write(link);
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a576e9b0-891e-11eb-810c-23cda2b65824', 'respond', 'comments-test', 'a576e9b0-891e-11eb-810c-23cda2b65824')">↪&#xFE0E; Reply to AKIB</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-a576e9b0-891e-11eb-810c-23cda2b65824', 'respond', 'a576e9b0-891e-11eb-810c-23cda2b65824')">↪&#xFE0E; Reply to AKIB</a>
     </div>
 </article>
   
@@ -816,7 +937,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-897a7480-7fa4-11eb-80ef-b9ede34b1c5b', 'respond', 'comments-test', '897a7480-7fa4-11eb-80ef-b9ede34b1c5b')">↪&#xFE0E; Reply to Testing</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-897a7480-7fa4-11eb-80ef-b9ede34b1c5b', 'respond', '897a7480-7fa4-11eb-80ef-b9ede34b1c5b')">↪&#xFE0E; Reply to Testing</a>
     </div>
 </article>
   
@@ -842,7 +963,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-741a0cf0-7b70-11eb-843d-2b68a830508f', 'respond', 'comments-test', '741a0cf0-7b70-11eb-843d-2b68a830508f')">↪&#xFE0E; Reply to me</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-741a0cf0-7b70-11eb-843d-2b68a830508f', 'respond', '741a0cf0-7b70-11eb-843d-2b68a830508f')">↪&#xFE0E; Reply to me</a>
     </div>
 </article>
   
@@ -868,7 +989,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-bdf21820-7901-11eb-bfb5-6f1d31586faa', 'respond', 'comments-test', 'bdf21820-7901-11eb-bfb5-6f1d31586faa')">↪&#xFE0E; Reply to MAtteo</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-bdf21820-7901-11eb-bfb5-6f1d31586faa', 'respond', 'bdf21820-7901-11eb-bfb5-6f1d31586faa')">↪&#xFE0E; Reply to MAtteo</a>
     </div>
 </article>
   
@@ -894,7 +1015,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-49d75830-72ec-11eb-9a4b-d7ee234be6f1', 'respond', 'comments-test', '49d75830-72ec-11eb-9a4b-d7ee234be6f1')">↪&#xFE0E; Reply to Paul</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-49d75830-72ec-11eb-9a4b-d7ee234be6f1', 'respond', '49d75830-72ec-11eb-9a4b-d7ee234be6f1')">↪&#xFE0E; Reply to Paul</a>
     </div>
 </article>
   
@@ -920,7 +1041,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f56c9a20-6fae-11eb-82f7-c123e8b5cd1b', 'respond', 'comments-test', 'f56c9a20-6fae-11eb-82f7-c123e8b5cd1b')">↪&#xFE0E; Reply to fahim</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f56c9a20-6fae-11eb-82f7-c123e8b5cd1b', 'respond', 'f56c9a20-6fae-11eb-82f7-c123e8b5cd1b')">↪&#xFE0E; Reply to fahim</a>
     </div>
 </article>
   
@@ -946,7 +1067,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e2745db0-6e53-11eb-b269-eb54b7419aa8', 'respond', 'comments-test', 'e2745db0-6e53-11eb-b269-eb54b7419aa8')">↪&#xFE0E; Reply to Test</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e2745db0-6e53-11eb-b269-eb54b7419aa8', 'respond', 'e2745db0-6e53-11eb-b269-eb54b7419aa8')">↪&#xFE0E; Reply to Test</a>
     </div>
 </article>
   
@@ -974,7 +1095,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3c4db460-68ca-11eb-ad60-07cd9b914518', 'respond', 'comments-test', '3c4db460-68ca-11eb-ad60-07cd9b914518')">↪&#xFE0E; Reply to Someone</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3c4db460-68ca-11eb-ad60-07cd9b914518', 'respond', '3c4db460-68ca-11eb-ad60-07cd9b914518')">↪&#xFE0E; Reply to Someone</a>
     </div>
 </article>
   
@@ -1040,7 +1161,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8b3e5f50-580a-11eb-add5-e7d15ddebf59', 'respond', 'comments-test', '8b3e5f50-580a-11eb-add5-e7d15ddebf59')">↪&#xFE0E; Reply to Sdc</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-8b3e5f50-580a-11eb-add5-e7d15ddebf59', 'respond', '8b3e5f50-580a-11eb-add5-e7d15ddebf59')">↪&#xFE0E; Reply to Sdc</a>
     </div>
 </article>
   
@@ -1066,7 +1187,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-0fe678d0-52db-11eb-8129-7b158c248d18', 'respond', 'comments-test', '0fe678d0-52db-11eb-8129-7b158c248d18')">↪&#xFE0E; Reply to Hello</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-0fe678d0-52db-11eb-8129-7b158c248d18', 'respond', '0fe678d0-52db-11eb-8129-7b158c248d18')">↪&#xFE0E; Reply to Hello</a>
     </div>
 </article>
   
@@ -1111,7 +1232,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-631667d0-4e13-11eb-af59-8b5094ac4eb6', 'respond', 'comments-test', '631667d0-4e13-11eb-af59-8b5094ac4eb6')">↪&#xFE0E; Reply to Lia J Prins</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-631667d0-4e13-11eb-af59-8b5094ac4eb6', 'respond', '631667d0-4e13-11eb-af59-8b5094ac4eb6')">↪&#xFE0E; Reply to Lia J Prins</a>
     </div>
 </article>
   
@@ -1137,7 +1258,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-760f8330-4df0-11eb-9d8e-af22907d9852', 'respond', 'comments-test', '760f8330-4df0-11eb-9d8e-af22907d9852')">↪&#xFE0E; Reply to Lia J Prins</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-760f8330-4df0-11eb-9d8e-af22907d9852', 'respond', '760f8330-4df0-11eb-9d8e-af22907d9852')">↪&#xFE0E; Reply to Lia J Prins</a>
     </div>
 </article>
   
@@ -1163,7 +1284,7 @@ Want to see the requests you make since my staticman does not work right…</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-37174fd0-4b9f-11eb-8681-11bf886bec66', 'respond', 'comments-test', '37174fd0-4b9f-11eb-8681-11bf886bec66')">↪&#xFE0E; Reply to Peter Whittaker</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-37174fd0-4b9f-11eb-8681-11bf886bec66', 'respond', '37174fd0-4b9f-11eb-8681-11bf886bec66')">↪&#xFE0E; Reply to Peter Whittaker</a>
     </div>
 </article>
   
@@ -1196,7 +1317,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d3eb6090-449b-11eb-8fb6-4d55eb2d05c1', 'respond', 'comments-test', 'd3eb6090-449b-11eb-8fb6-4d55eb2d05c1')">↪&#xFE0E; Reply to chrome</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d3eb6090-449b-11eb-8fb6-4d55eb2d05c1', 'respond', 'd3eb6090-449b-11eb-8fb6-4d55eb2d05c1')">↪&#xFE0E; Reply to chrome</a>
     </div>
 </article>
   
@@ -1241,7 +1362,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3325cd80-3cfd-11eb-a9d6-270974e24158', 'respond', 'comments-test', '3325cd80-3cfd-11eb-a9d6-270974e24158')">↪&#xFE0E; Reply to nnae</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3325cd80-3cfd-11eb-a9d6-270974e24158', 'respond', '3325cd80-3cfd-11eb-a9d6-270974e24158')">↪&#xFE0E; Reply to nnae</a>
     </div>
 </article>
   
@@ -1267,7 +1388,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f1317eb0-3cfc-11eb-a9d6-270974e24158', 'respond', 'comments-test', 'f1317eb0-3cfc-11eb-a9d6-270974e24158')">↪&#xFE0E; Reply to ando</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f1317eb0-3cfc-11eb-a9d6-270974e24158', 'respond', 'f1317eb0-3cfc-11eb-a9d6-270974e24158')">↪&#xFE0E; Reply to ando</a>
     </div>
 </article>
   
@@ -1293,7 +1414,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-75643ac0-3ca7-11eb-b974-fb4c31501994', 'respond', 'comments-test', '75643ac0-3ca7-11eb-b974-fb4c31501994')">↪&#xFE0E; Reply to Gust</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-75643ac0-3ca7-11eb-b974-fb4c31501994', 'respond', '75643ac0-3ca7-11eb-b974-fb4c31501994')">↪&#xFE0E; Reply to Gust</a>
     </div>
 </article>
   
@@ -1319,7 +1440,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-93b07fa0-3c9a-11eb-825c-2db3b4df1e62', 'respond', 'comments-test', '93b07fa0-3c9a-11eb-825c-2db3b4df1e62')">↪&#xFE0E; Reply to John</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-93b07fa0-3c9a-11eb-825c-2db3b4df1e62', 'respond', '93b07fa0-3c9a-11eb-825c-2db3b4df1e62')">↪&#xFE0E; Reply to John</a>
     </div>
 </article>
   
@@ -1345,7 +1466,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-dc0e8cc0-3b22-11eb-94c4-9123aaed7d37', 'respond', 'comments-test', 'dc0e8cc0-3b22-11eb-94c4-9123aaed7d37')">↪&#xFE0E; Reply to roosh</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-dc0e8cc0-3b22-11eb-94c4-9123aaed7d37', 'respond', 'dc0e8cc0-3b22-11eb-94c4-9123aaed7d37')">↪&#xFE0E; Reply to roosh</a>
     </div>
 </article>
   
@@ -1390,7 +1511,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-249cda20-26fe-11eb-8ee8-eb696190fa75', 'respond', 'comments-test', '249cda20-26fe-11eb-8ee8-eb696190fa75')">↪&#xFE0E; Reply to xx</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-249cda20-26fe-11eb-8ee8-eb696190fa75', 'respond', '249cda20-26fe-11eb-8ee8-eb696190fa75')">↪&#xFE0E; Reply to xx</a>
     </div>
 </article>
   
@@ -1416,7 +1537,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f20d2cb0-2516-11eb-b4d6-0bc4f51ad733', 'respond', 'comments-test', 'f20d2cb0-2516-11eb-b4d6-0bc4f51ad733')">↪&#xFE0E; Reply to Test</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-f20d2cb0-2516-11eb-b4d6-0bc4f51ad733', 'respond', 'f20d2cb0-2516-11eb-b4d6-0bc4f51ad733')">↪&#xFE0E; Reply to Test</a>
     </div>
 </article>
   
@@ -1442,7 +1563,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-24089860-1a24-11eb-bbd3-8fb6d70717a4', 'respond', 'comments-test', '24089860-1a24-11eb-bbd3-8fb6d70717a4')">↪&#xFE0E; Reply to John</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-24089860-1a24-11eb-bbd3-8fb6d70717a4', 'respond', '24089860-1a24-11eb-bbd3-8fb6d70717a4')">↪&#xFE0E; Reply to John</a>
     </div>
 </article>
   
@@ -1468,7 +1589,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5c8a92c0-1839-11eb-9d03-b55c3e3c0440', 'respond', 'comments-test', '5c8a92c0-1839-11eb-9d03-b55c3e3c0440')">↪&#xFE0E; Reply to Jon</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-5c8a92c0-1839-11eb-9d03-b55c3e3c0440', 'respond', '5c8a92c0-1839-11eb-9d03-b55c3e3c0440')">↪&#xFE0E; Reply to Jon</a>
     </div>
 </article>
   
@@ -1494,7 +1615,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1f3db780-182f-11eb-9d03-b55c3e3c0440', 'respond', 'comments-test', '1f3db780-182f-11eb-9d03-b55c3e3c0440')">↪&#xFE0E; Reply to tt</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-1f3db780-182f-11eb-9d03-b55c3e3c0440', 'respond', '1f3db780-182f-11eb-9d03-b55c3e3c0440')">↪&#xFE0E; Reply to tt</a>
     </div>
 </article>
   
@@ -1520,7 +1641,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-72e557f0-171f-11eb-a99d-0bbfab8c93c0', 'respond', 'comments-test', '72e557f0-171f-11eb-a99d-0bbfab8c93c0')">↪&#xFE0E; Reply to Test3</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-72e557f0-171f-11eb-a99d-0bbfab8c93c0', 'respond', '72e557f0-171f-11eb-a99d-0bbfab8c93c0')">↪&#xFE0E; Reply to Test3</a>
     </div>
 </article>
   
@@ -1604,7 +1725,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-39c68ab0-1680-11eb-8f43-8bc90008eade', 'respond', 'comments-test', '39c68ab0-1680-11eb-8f43-8bc90008eade')">↪&#xFE0E; Reply to iueo</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-39c68ab0-1680-11eb-8f43-8bc90008eade', 'respond', '39c68ab0-1680-11eb-8f43-8bc90008eade')">↪&#xFE0E; Reply to iueo</a>
     </div>
 </article>
   
@@ -1630,7 +1751,7 @@ New line without a break.</p>
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-89e4fb20-1672-11eb-9721-5b916240cc59', 'respond', 'comments-test', '89e4fb20-1672-11eb-9721-5b916240cc59')">↪&#xFE0E; Reply to Josh</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-89e4fb20-1672-11eb-9721-5b916240cc59', 'respond', '89e4fb20-1672-11eb-9721-5b916240cc59')">↪&#xFE0E; Reply to Josh</a>
     </div>
 </article>
   
@@ -1679,7 +1800,7 @@ a|b|c
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3b59dd60-14ea-11eb-a77b-47d4a584fe83', 'respond', 'comments-test', '3b59dd60-14ea-11eb-a77b-47d4a584fe83')">↪&#xFE0E; Reply to BB</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-3b59dd60-14ea-11eb-a77b-47d4a584fe83', 'respond', '3b59dd60-14ea-11eb-a77b-47d4a584fe83')">↪&#xFE0E; Reply to BB</a>
     </div>
 </article>
   
@@ -1724,7 +1845,7 @@ a|b|c
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e0490860-0bde-11eb-b525-e98ae1d7a4f3', 'respond', 'comments-test', 'e0490860-0bde-11eb-b525-e98ae1d7a4f3')">↪&#xFE0E; Reply to O rly</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e0490860-0bde-11eb-b525-e98ae1d7a4f3', 'respond', 'e0490860-0bde-11eb-b525-e98ae1d7a4f3')">↪&#xFE0E; Reply to O rly</a>
     </div>
 </article>
   
@@ -1750,7 +1871,7 @@ a|b|c
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c9430270-08ef-11eb-b13c-c3a4c3b9289c', 'respond', 'comments-test', 'c9430270-08ef-11eb-b13c-c3a4c3b9289c')">↪&#xFE0E; Reply to test</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-c9430270-08ef-11eb-b13c-c3a4c3b9289c', 'respond', 'c9430270-08ef-11eb-b13c-c3a4c3b9289c')">↪&#xFE0E; Reply to test</a>
     </div>
 </article>
   
@@ -1776,7 +1897,7 @@ a|b|c
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-96a4ea80-05b2-11eb-9788-bb68e5c1705b', 'respond', 'comments-test', '96a4ea80-05b2-11eb-9788-bb68e5c1705b')">↪&#xFE0E; Reply to Test name</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-96a4ea80-05b2-11eb-9788-bb68e5c1705b', 'respond', '96a4ea80-05b2-11eb-9788-bb68e5c1705b')">↪&#xFE0E; Reply to Test name</a>
     </div>
 </article>
   
@@ -1802,9 +1923,30 @@ a|b|c
 
 
     <div class="comment__meta">
-      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-cd028010-038c-11eb-93e5-e57b5ddc8927', 'respond', 'comments-test', 'cd028010-038c-11eb-93e5-e57b5ddc8927')">↪&#xFE0E; Reply to Travis</a>
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-cd028010-038c-11eb-93e5-e57b5ddc8927', 'respond', 'cd028010-038c-11eb-93e5-e57b5ddc8927')">↪&#xFE0E; Reply to Travis</a>
     </div>
 </article>
+  
+
+<article id="comment-11c01380-2410-11ec-82d4-5fbcd8e96e69" class="js-comment comment admin child" uid="11c01380-2410-11ec-82d4-5fbcd8e96e69">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-11c01380-2410-11ec-82d4-5fbcd8e96e69" title="Permalink to this comment">October  3th, 2021 06:06</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Reply test after jquery removal.</p>
+
+  </div>
+
+
+</article>
+
+
   
 
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
@@ -1824,7 +1966,7 @@ a|b|c
   
   
   <div class="textfield">
-    <label for="comment-form-message"><h2>Add Comment<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://travisdowns.github.io/misc/comments-test.html#respond" style="display:none;">(cancel reply)</a></small></h2>
+    <label for="comment-form-message"><h2>Add Comment</h2>
       <textarea class="textfield__input" name="fields[message]" type="text" id="comment-form-message" placeholder="Your comment (markdown accepted)" required rows="6"></textarea>
     </label>
   </div>
@@ -1849,6 +1991,10 @@ a|b|c
 
     
 
+    <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
+      Cancel Reply
+    </button>
+  
     <button class="button" id="comment-form-submit">
       Submit
     </button>
@@ -1875,7 +2021,6 @@ a|b|c
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/assets/main.js"></script>
 
 

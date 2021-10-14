@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-01T17:43:57+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://travisdowns.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://travisdowns.github.io/" rel="alternate" type="text/html" /><updated>2021-10-14T16:07:37+00:00</updated><id>https://travisdowns.github.io/feed.xml</id><title type="html">Performance Matters</title><subtitle>A blog about low-level software and hardware performance.</subtitle><author><name>Travis Downs</name><email>travis.downs@gmail.com</email></author><entry><title type="html">Your CPU May Have Slowed Down on Wednesday</title><link href="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html" rel="alternate" type="text/html" title="Your CPU May Have Slowed Down on Wednesday" /><published>2021-06-17T00:00:00+00:00</published><updated>2021-06-17T00:00:00+00:00</updated><id>https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt</id><content type="html" xml:base="https://travisdowns.github.io/blog/2021/06/17/rip-zero-opt.html">&lt;!-- boilerplate 
 page.assets: /assets/rip-zero-opt
 assetpath: /assets/rip-zero-opt
 tablepath: /misc/tables/rip-zero-opt
@@ -10,7 +10,7 @@ tablepath: /misc/tables/rip-zero-opt
 
 &lt;p&gt;The two series were generated under apparently identical conditions: the same binary on the same machine. Only the date the benchmark was run varies. That is, on Monday, June 7th, filling with zeros is substantially faster than the same benchmark on Wednesday, at least when the region no longer fits in the L2 cache&lt;sup id=&quot;fnref:whitelie&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:whitelie&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-fig1&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -22,15 +22,23 @@ tablepath: /misc/tables/rip-zero-opt
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/rip-zero-opt/skl/fig1.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/skl-combined/l2-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/rip-zero-opt/skl/fig1.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/skl-combined/l2-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/rip-zero-opt/skl/fig1.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/rip-zero-opt/skl/fig1.svg&quot; alt=&quot;Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/rip-zero-opt/skl/fig1.svg&quot; alt=&quot;Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -44,15 +52,23 @@ tablepath: /misc/tables/rip-zero-opt
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/rip-zero-opt/icl/fig1.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/icl-combined/l2-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/rip-zero-opt/icl/fig1.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/post3/icl-combined/l2-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/rip-zero-opt/icl/fig1.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/rip-zero-opt/icl/fig1.svg&quot; alt=&quot;Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/rip-zero-opt/icl/fig1.svg&quot; alt=&quot;Figure 13: A chart of region size (x-axis) versus fill throughput (y-axis) with two series, Monday and Wednesday, with the Wednesday series showing worse performance in L3 and RAM&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -583,7 +599,7 @@ tablepath: /misc/tables/concurrency-costs
 
 &lt;p&gt;We’ll call this implementation &lt;em&gt;&lt;abbr title=&quot;Uses a std::mutex and std::lock_guard to protect a plain integer counter.&quot;&gt;mutex add&lt;/abbr&gt;&lt;/em&gt;, and on my 4 CPU Skylake-S i7-6700HQ machine, when I use the vanilla &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;std::mutex&lt;/code&gt; I get the following results for 2 to 4 threads:&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-mutex&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -595,15 +611,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/mutex.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/mutex.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/mutex.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/mutex.svg&quot; alt=&quot;Mutex&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/mutex.svg&quot; alt=&quot;Mutex&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -617,15 +641,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/mutex.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/mutex.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/mutex.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/mutex.svg&quot; alt=&quot;Mutex&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/mutex.svg&quot; alt=&quot;Mutex&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -639,15 +671,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/mutex.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/mutex.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/mutex.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/mutex.svg&quot; alt=&quot;Mutex&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/mutex.svg&quot; alt=&quot;Mutex&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -661,15 +701,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/mutex.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/mutex.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/mutex.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/mutex.svg&quot; alt=&quot;Mutex&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/mutex.svg&quot; alt=&quot;Mutex&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -712,7 +760,7 @@ tablepath: /misc/tables/concurrency-costs
 
 &lt;p&gt;Here’s what these look like alongside our existing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;std::mutex&lt;/code&gt; benchmark:&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-atomic-inc&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -724,15 +772,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/atomic-inc.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/atomic-inc.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/atomic-inc.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -746,15 +802,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/atomic-inc.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/atomic-inc.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/atomic-inc.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -768,15 +832,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/atomic-inc.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/atomic-inc.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/atomic-inc.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -790,15 +862,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/atomic-inc.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/atomic-inc.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/atomic-inc.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/atomic-inc.svg&quot; alt=&quot;Atomic increment&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -850,7 +930,7 @@ tablepath: /misc/tables/concurrency-costs
 
 &lt;p&gt;Let’s plot the performance results for this lock alongside the existing approaches:&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-fair-yield&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -862,15 +942,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/fair-yield.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/fair-yield.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/fair-yield.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -884,15 +972,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/fair-yield.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/fair-yield.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/fair-yield.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -906,15 +1002,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/fair-yield.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/fair-yield.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/fair-yield.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -928,15 +1032,23 @@ tablepath: /misc/tables/concurrency-costs
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/fair-yield.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/fair-yield.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/fair-yield.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/fair-yield.svg&quot; alt=&quot;Increment Cost: Fair Yield&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1000,11 +1112,11 @@ A more resource friendly design, and one that will often perform better is a &lt
 
 &lt;p&gt;Even without &lt;abbr title=&quot;When a waiter on a condition variable is woken up even though no other thread notified it.&quot;&gt;spurious wakeups&lt;/abbr&gt; we might get woken many times, because this lock suffers from the &lt;em&gt;thundering herd&lt;/em&gt; problem where every waiter is woken on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;unlock()&lt;/code&gt; even though only one will ultimately be able to get the lock.&lt;/p&gt;
 
-&lt;p&gt;We’ll try a second design too, that doesn’t suffer from thundering herd. This is a queued lock, where each lock waits on its own private node in a queue of waiters, so only a single waiter (the new lock owner) is woken up on unlock. We will call it &lt;abbr title=&quot;A blocking ticket lock where each waiter waits on a unique condition variable.&quot;&gt;queued fifo&lt;/abbr&gt; and if you’re interested in the implementation you can find it &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L61&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We’ll try a second design too, that doesn’t suffer from thundering herd. This is a queued lock, where each lock waits on its own private node in a queue of waiters, so only a single waiter (the new lock owner) is woken up on unlock. We will call it &lt;abbr title=&quot;A blocking ticket lock where each waiter waits on a unique condition variable.&quot;&gt;queued fifo&lt;/abbr&gt; and if you’re interested in the implementation you &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L61&quot;&gt;can find it here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Here’s how our new locks perform against the existing crowd:&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-more-fair&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -1016,15 +1128,23 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/more-fair.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/more-fair.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/more-fair.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1038,15 +1158,23 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/more-fair.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/more-fair.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/more-fair.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1060,15 +1188,23 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/more-fair.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/more-fair.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/more-fair.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1082,15 +1218,23 @@ A more resource friendly design, and one that will often perform better is a &lt
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/more-fair.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/more-fair.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/more-fair.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/more-fair.svg&quot; alt=&quot;Increment Cost: Fair Blocking&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1115,9 +1259,9 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 &lt;h3 id=&quot;level-5-catastrophe&quot;&gt;Level 5: Catastrophe&lt;/h3&gt;
 
-&lt;p&gt;Here’s a ticket lock which is identical to the &lt;a href=&quot;#ys-lock&quot;&gt;first ticket lock we saw&lt;/a&gt;, except that the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sched_yield();&lt;/code&gt; is replaced by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;;&lt;/code&gt;. That is, it busy waits instead of yielding (look &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31&quot;&gt;here&lt;/a&gt; for the spin flavors which specialize on a shared ticket lock template). You could also replace this by a CPU-specific “relax” instruction like &lt;a href=&quot;https://www.felixcloutier.com/x86/pause&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pause&lt;/code&gt;&lt;/a&gt;, but it won’t change the outcome (see &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26&quot;&gt;here&lt;/a&gt;). We call it &lt;abbr title=&quot;A traditional spin-based ticket lock that does a hot spin while waiting for its ticket to be next.&quot;&gt;ticket spin&lt;/abbr&gt;, and here’s how it performs compared to the existing candidates:&lt;/p&gt;
+&lt;p&gt;Here’s a ticket lock which is identical to the &lt;a href=&quot;#ys-lock&quot;&gt;first ticket lock we saw&lt;/a&gt;, except that the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sched_yield();&lt;/code&gt; is replaced by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;;&lt;/code&gt;. That is, it busy waits instead of yielding (&lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.cpp#L31&quot;&gt;and here are the spin flavors which specialize on a shared ticket lock template&lt;/a&gt;). You could also replace this by a CPU-specific “relax” instruction like &lt;a href=&quot;https://www.felixcloutier.com/x86/pause&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pause&lt;/code&gt;&lt;/a&gt;, but it won’t &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/blob/9b8e0e0dfec7d38036d114038c6a9ed020b5b775/fairlocks.hpp#L26&quot;&gt;change the outcome&lt;/a&gt;. We call it &lt;abbr title=&quot;A traditional spin-based ticket lock that does a hot spin while waiting for its ticket to be next.&quot;&gt;ticket spin&lt;/abbr&gt;, and here’s how it performs compared to the existing candidates:&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-ts-4&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -1129,15 +1273,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/ts-4.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/ts-4.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/ts-4.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1151,15 +1303,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/ts-4.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/ts-4.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/ts-4.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1173,15 +1333,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/ts-4.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/ts-4.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/ts-4.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1195,15 +1363,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/ts-4.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/ts-4.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/ts-4.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/ts-4.svg&quot; alt=&quot;Increment Cost: Ticket Spin&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1214,7 +1390,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 &lt;p&gt;The picture changes if we show the results for up to 6 threads, rather than just 4. Since I have 4 available cores&lt;sup id=&quot;fnref:noht&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:noht&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;13&lt;/a&gt;&lt;/sup&gt;, this means that not all the test threads will be able to run at once:&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-ts-6&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -1226,15 +1402,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/ts-6.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/ts-6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/ts-6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1248,15 +1432,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/ts-6.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/ts-6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/ts-6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1270,15 +1462,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/ts-6.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/ts-6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/ts-6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1292,15 +1492,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/ts-6.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/ts-6.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/ts-6.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/ts-6.svg&quot; alt=&quot;Increment Cost: Ticket Spin (Oversubscribed)&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1339,7 +1547,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 &lt;p&gt;Here are the results for all the implementations we’ve looked at so far, for a single thread:&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-single&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -1351,15 +1559,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/single.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/single.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/single.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1373,15 +1589,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/single.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/single.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/single.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1395,15 +1619,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/single.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/single.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/single.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1417,15 +1649,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/single.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/single.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/single.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/single.svg&quot; alt=&quot;Increment Cost: Single Threaded&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1557,7 +1797,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 &lt;p&gt;Let’s compare this to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;atomic add&lt;/code&gt; version we looked at above, which was the fastest of the level 2 approaches. Recall that it uses an &lt;abbr title=&quot;Uses an atomic increment on a single shared counter.&quot;&gt;atomic add&lt;/abbr&gt; on a single counter.&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-cas-multi&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -1569,15 +1809,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/cas-multi.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/cas-multi.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/cas-multi.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1591,15 +1839,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/cas-multi.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/cas-multi.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/cas-multi.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1613,15 +1869,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/cas-multi.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/cas-multi.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/cas-multi.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1635,15 +1899,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/cas-multi.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/cas-multi.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/cas-multi.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/cas-multi.svg&quot; alt=&quot;Increment Cost: Contention Adaptive Multi-Counter&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1758,7 +2030,7 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 
 &lt;p&gt;So how does this &lt;abbr title=&quot;Uses thread-local storage for a counter per thread.&quot;&gt;tls add&lt;/abbr&gt; implementation benchmark?&lt;/p&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-tls&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
@@ -1770,15 +2042,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/skl/tls.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/skl/tls.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/skl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/skl/tls.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/skl/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1792,15 +2072,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/icl/tls.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/icl/tls.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/icl/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/icl/tls.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/icl/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1814,15 +2102,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/tls.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/tls.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g1-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g1-16/tls.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g1-16/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1836,15 +2132,23 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/tls.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/tls.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/concurrency-hierarchy-bench/tree/master/results/g2-16/combined.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/concurrency-costs/g2-16/tls.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/concurrency-costs/g2-16/tls.svg&quot; alt=&quot;Increment Cost: Thread Local Storage&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -2321,13 +2625,16 @@ tablepath: /misc/tables/kreg2
 &lt;p&gt;Enough talk, let’s do this. I implemented several new tests in robsize to probe possible register sharing. First, we look at &lt;strong&gt;Test 38&lt;/strong&gt;, which uses MMX instructions&lt;sup id=&quot;fnref:whymmx&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:whymmx&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;10&lt;/a&gt;&lt;/sup&gt; to target the size of the x87/MMX register file:&lt;/p&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#skx-38&quot; id=&quot;skx-38&quot;&gt;[link to this chart]&lt;/a&gt; 
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#skx-38&quot; id=&quot;skx-38&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            
+        
+        &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-38.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     
-    &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-38.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
-    &lt;a&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-38.svg&quot; alt=&quot;Test 38&quot; /&gt;
-    &lt;/a&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-38.svg&quot; alt=&quot;Test 38&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;We see a clear spike at 128 instructions, so it seems like the size of the speculative&lt;sup id=&quot;fnref:spec&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:spec&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;11&lt;/a&gt;&lt;/sup&gt; x87/MMX register file is 128 entries.&lt;/p&gt;
@@ -2335,13 +2642,16 @@ tablepath: /misc/tables/kreg2
 &lt;p&gt;Next, we have &lt;strong&gt;Test 43&lt;/strong&gt; which follows the same pattern as &lt;strong&gt;Test 38&lt;/strong&gt; but using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kaddd&lt;/code&gt; as a filler instruction so targets the mask (kreg) register file:&lt;/p&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#skx-43&quot; id=&quot;skx-43&quot;&gt;[link to this chart]&lt;/a&gt; 
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#skx-43&quot; id=&quot;skx-43&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            
+        
+        &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-43.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     
-    &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-43.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
-    &lt;a&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-43.svg&quot; alt=&quot;Test 43&quot; /&gt;
-    &lt;/a&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-43.svg&quot; alt=&quot;Test 43&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;This is mostly indistinguishable from the previous chart and we conclude that the size of the speculative mask register file is also 128.&lt;/p&gt;
@@ -2349,23 +2659,29 @@ tablepath: /misc/tables/kreg2
 &lt;p&gt;Let’s see what happens when alternate MMX and another instruction type. &lt;strong&gt;Test 39&lt;/strong&gt; alternates MMX with integer &lt;abbr title=&quot;Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.&quot;&gt;SIMD&lt;/abbr&gt; instructions, and &lt;strong&gt;Test 40&lt;/strong&gt; alternatives with general purpose scalar instructions:&lt;/p&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#skx-39&quot; id=&quot;skx-39&quot;&gt;[link to this chart]&lt;/a&gt; 
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#skx-39&quot; id=&quot;skx-39&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            
+        
+        &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-39.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     
-    &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-39.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
-    &lt;a&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-39.svg&quot; alt=&quot;Test 39&quot; /&gt;
-    &lt;/a&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-39.svg&quot; alt=&quot;Test 39&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
+    
 &lt;/div&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#skx-40&quot; id=&quot;skx-40&quot;&gt;[link to this chart]&lt;/a&gt; 
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#skx-40&quot; id=&quot;skx-40&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            
+        
+        &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-40.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     
-    &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-40.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
-    &lt;a&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-40.svg&quot; alt=&quot;Test 40&quot; /&gt;
-    &lt;/a&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-40.svg&quot; alt=&quot;Test 40&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;Both of these show the same effect: the effective resource limitation is much higher: around 210 filler instructions. This indicates strongly that the x87/MMX register is not shared with either the &lt;abbr title=&quot;Single Instruction Multiple Data: an ISA type or ISA extension like Intel's AVX or ARM's NEON that can perform multiple identical operations on elements packed into a SIMD register.&quot;&gt;SIMD&lt;/abbr&gt; or scalar register files.&lt;/p&gt;
@@ -2373,13 +2689,16 @@ tablepath: /misc/tables/kreg2
 &lt;p&gt;Finally, we get to the end of this tale, &lt;strong&gt;Test 41&lt;/strong&gt;. This test mixes MMX and mask register instructions&lt;sup id=&quot;fnref:test41&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:test41&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;12&lt;/a&gt;&lt;/sup&gt;:&lt;/p&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#skx-41&quot; id=&quot;skx-41&quot;&gt;[link to this chart]&lt;/a&gt; 
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#skx-41&quot; id=&quot;skx-41&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            
+        
+        &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-41.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     
-    &lt;a href=&quot;https://github.com/travisdowns/robsize/tree/master/scripts/kreg/results2/skx-41.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
-    &lt;a&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-41.svg&quot; alt=&quot;Test 41&quot; /&gt;
-    &lt;/a&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/kreg2/skx-41.svg&quot; alt=&quot;Test 41&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
+    
 &lt;/div&gt;
 
 &lt;p&gt;This one is definitely not like the others. We see that the resource limit is now 128, same as for the single-type tests. We can immediately conclude that this means that mask registers and MMX registers are allocated from the same resource pool: &lt;em&gt;they use the same physical register file&lt;/em&gt;.&lt;/p&gt;
@@ -2486,12 +2805,15 @@ tablepath: /misc/tables//intel-zero-opt
 &lt;center&gt;&lt;strong&gt;Figure 7a&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig7a&quot; id=&quot;fig7a&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables//intel-zero-opt/fig7a.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl512/overall-warm.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig7a&quot; id=&quot;fig7a&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables//intel-zero-opt/fig7a.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl512/overall-warm.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables//intel-zero-opt/fig7a.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig7a.svg&quot; alt=&quot;Figure 7a&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig7a.svg&quot; alt=&quot;Figure 7a&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -2500,12 +2822,15 @@ tablepath: /misc/tables//intel-zero-opt
 &lt;center&gt;&lt;strong&gt;Figure 7b&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig7b&quot; id=&quot;fig7b&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables//intel-zero-opt/fig7b.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/overall-warm.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig7b&quot; id=&quot;fig7b&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables//intel-zero-opt/fig7b.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/overall-warm.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables//intel-zero-opt/fig7b.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig7b.svg&quot; alt=&quot;Figure 7b&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig7b.svg&quot; alt=&quot;Figure 7b&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -2708,12 +3033,15 @@ tablepath: /misc/tables//intel-zero-opt
 &lt;center&gt;&lt;strong&gt;Figure 8&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig8&quot; id=&quot;fig8&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables//intel-zero-opt/fig8.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l2-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig8&quot; id=&quot;fig8&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables//intel-zero-opt/fig8.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l2-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables//intel-zero-opt/fig8.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig8.svg&quot; alt=&quot;Figure 8&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig8.svg&quot; alt=&quot;Figure 8&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -2724,12 +3052,15 @@ tablepath: /misc/tables//intel-zero-opt
 &lt;center&gt;&lt;strong&gt;Figure 9&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig9&quot; id=&quot;fig9&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables//intel-zero-opt/fig9.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l3-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig9&quot; id=&quot;fig9&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables//intel-zero-opt/fig9.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/l3-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables//intel-zero-opt/fig9.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig9.svg&quot; alt=&quot;Figure 9&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig9.svg&quot; alt=&quot;Figure 9&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -2758,12 +3089,15 @@ tablepath: /misc/tables//intel-zero-opt
 &lt;center&gt;&lt;strong&gt;Figure 10&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig10&quot; id=&quot;fig10&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables//intel-zero-opt/fig10.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig10&quot; id=&quot;fig10&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables//intel-zero-opt/fig10.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables//intel-zero-opt/fig10.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig10.svg&quot; alt=&quot;Figure 10&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig10.svg&quot; alt=&quot;Figure 10&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -2780,12 +3114,15 @@ tablepath: /misc/tables//intel-zero-opt
 &lt;center&gt;&lt;strong&gt;Figure 11&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig11&quot; id=&quot;fig11&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables//intel-zero-opt/fig11.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig11&quot; id=&quot;fig11&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables//intel-zero-opt/fig11.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables//intel-zero-opt/fig11.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig11.svg&quot; alt=&quot;Figure 11&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig11.svg&quot; alt=&quot;Figure 11&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -2796,12 +3133,15 @@ tablepath: /misc/tables//intel-zero-opt
 &lt;p&gt;Let’s concentrate only on the two benchmarks that write zero: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fill256_0&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fill512_0&lt;/code&gt;, and turn on the L2 eviction counters (you probably saw that one coming by now):&lt;/p&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig12&quot; id=&quot;fig12&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables//intel-zero-opt/fig12.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig12&quot; id=&quot;fig12&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables//intel-zero-opt/fig12.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/icl/256-512-l2-l3.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables//intel-zero-opt/fig12.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig12.svg&quot; alt=&quot;Figure 12&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig12.svg&quot; alt=&quot;Figure 12&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -2952,7 +3292,7 @@ tablepath: /misc/tables/intel-zero-opt
 
 &lt;h2 id=&quot;benchmarks&quot;&gt;Benchmarks&lt;/h2&gt;
 
-&lt;p&gt;That’s enough prelude &lt;img src=&quot;/assets/intel-zero-opt/prelude.jpg&quot; alt=&quot;a small red car&quot; style=&quot;display:inline; height: 1.2em;&quot; /&gt; for now. Let’s write some benchmarks.&lt;/p&gt;
+&lt;p&gt;That’s enough prelude &lt;img src=&quot;/assets/intel-zero-opt/prelude.jpg&quot; alt=&quot;a small red car&quot; style=&quot;display:inline; height: 1.2em; aspect-ratio: 120/62&quot; /&gt; for now. Let’s write some benchmarks.&lt;/p&gt;
 
 &lt;h3 id=&quot;a-very-simple-loop&quot;&gt;A Very Simple Loop&lt;/h3&gt;
 
@@ -3012,12 +3352,15 @@ tablepath: /misc/tables/intel-zero-opt
 &lt;center&gt;&lt;strong&gt;Figure 1&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig1&quot; id=&quot;fig1&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig1.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/overall.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig1&quot; id=&quot;fig1&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig1.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/overall.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig1.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig1.svg&quot; alt=&quot;Figure 1&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig1.svg&quot; alt=&quot;Figure 1&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3030,7 +3373,7 @@ At each region size (that is, at each position along the x-axis) 17 semi-transpa
 
 &lt;p&gt;Everything is fairly sane when the buffer fits in the L1 or L2 cache (up to ~256 KiB&lt;sup id=&quot;fnref:l2&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:l2&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;12&lt;/a&gt;&lt;/sup&gt;). The relatively poor performance for very small region sizes is explained by the prologue and epilogue of the vectorized implementation: for small sizes a relatively large amount of time is spent in these int-at-a-time loops: rather than copying up to 32 bytes per cycle, we copy only 4.&lt;/p&gt;
 
-&lt;p&gt;This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That’s because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former&lt;sup id=&quot;fnref:badvec&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:badvec&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;13&lt;/a&gt;&lt;/sup&gt;. Essentially, we are sampling semi-randomly a sawtooth function and if you plot this region with finer granularity (go for it or just &lt;a href=&quot;/assets/intel-zero-opt/sawtooth.svg&quot;&gt;click here&lt;/a&gt;&lt;sup id=&quot;fnref:melty&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:melty&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;14&lt;/a&gt;&lt;/sup&gt;) you can see it quite clearly.&lt;/p&gt;
+&lt;p&gt;This also explains the bumpy performance in the fastest region between ~1,000 and ~30,000 bytes: this is highly reproducible and not noise. It occurs because because some sampled values have a larger remainder mod 32. For example, the sample at 740 bytes runs at ~73 GB/s while the next sample at 988 runs at a slower 64 GB/s. That’s because 740 % 32 is 4, while 988 % 32 is 28, so the latter size has 7x more cleanup work to do than the former&lt;sup id=&quot;fnref:badvec&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:badvec&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;13&lt;/a&gt;&lt;/sup&gt;. Essentially, we are sampling semi-randomly a sawtooth function and if you &lt;a href=&quot;/assets/intel-zero-opt/sawtooth.svg&quot;&gt;plot this region with finer granularity&lt;/a&gt;&lt;sup id=&quot;fnref:melty&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:melty&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;14&lt;/a&gt;&lt;/sup&gt; you can see it quite clearly.&lt;/p&gt;
 
 &lt;h4 id=&quot;getting-weird-in-the-l3&quot;&gt;Getting Weird in the L3&lt;/h4&gt;
 
@@ -3065,12 +3408,15 @@ At each region size (that is, at each position along the x-axis) 17 semi-transpa
 &lt;center&gt;&lt;strong&gt;Figure 2&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig2&quot; id=&quot;fig2&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig2.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig2&quot; id=&quot;fig2&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig2.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig2.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig2.svg&quot; alt=&quot;Figure 2&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig2.svg&quot; alt=&quot;Figure 2&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3098,12 +3444,15 @@ For clarity, I show only the median single sample for each size&lt;sup id=&quot;
 &lt;center&gt;&lt;strong&gt;Figure 3&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig3&quot; id=&quot;fig3&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig3.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig3&quot; id=&quot;fig3&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig3.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig3.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig3.svg&quot; alt=&quot;Figure 3&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig3.svg&quot; alt=&quot;Figure 3&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3138,12 +3487,15 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
 &lt;center&gt;&lt;strong&gt;Figure 4&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig4&quot; id=&quot;fig4&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig4.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig4&quot; id=&quot;fig4&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig4.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l2-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig4.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig4.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig4.svg&quot; alt=&quot;Figure 4&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3154,12 +3506,15 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
 &lt;center&gt;&lt;strong&gt;Figure 5&lt;/strong&gt;&lt;/center&gt;
 
 &lt;div class=&quot;svg-fig&quot;&gt;
-    &lt;a href=&quot;#fig5&quot; id=&quot;fig5&quot;&gt;[link to this chart]&lt;/a&gt; 
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig5.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        &lt;a href=&quot;#fig5&quot; id=&quot;fig5&quot;&gt;[link&lt;span class=&quot;only-large&quot;&gt; to this chart&lt;/span&gt;]&lt;/a&gt; 
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig5.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/l3-focus.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig5.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig5.svg&quot; alt=&quot;Figure 5&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig5.svg&quot; alt=&quot;Figure 5&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
 
@@ -3173,183 +3528,247 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
 
 &lt;!-- uresults: snb/remote.csv,hsw/remote.csv,skl/remote.csv,skx/remote.csv,cnl/remote.csv,zen2/remote.csv,power9/remote.csv,gra2/remote.csv --&gt;
 
-&lt;div class=&quot;tabs&quot;&gt;
+&lt;div class=&quot;tabs&quot; id=&quot;tabs-fig6&quot;&gt;
     &lt;!-- Courtesy of https://codepen.io/Merri/pen/bytea --&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-1&quot; name=&quot;tab-group-1&quot; checked=&quot;&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-1&quot;&gt;Sandy Bridge&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-1&quot; name=&quot;tab-group-fig6&quot; checked=&quot;&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-1&quot;&gt;Sandy Bridge&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-snb.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/snb/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-snb.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/snb/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-snb.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-snb.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-snb.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-2&quot; name=&quot;tab-group-1&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-2&quot;&gt;Haswell&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-2&quot; name=&quot;tab-group-fig6&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-2&quot;&gt;Haswell&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-hsw.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/hsw/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-hsw.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/hsw/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-hsw.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-hsw.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-hsw.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-3&quot; name=&quot;tab-group-1&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-3&quot;&gt;Skylake-S&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-3&quot; name=&quot;tab-group-fig6&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-3&quot;&gt;Skylake-S&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skl.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/skl/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skl.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/skl/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skl.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-skl.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-skl.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-4&quot; name=&quot;tab-group-1&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-4&quot;&gt;Skylake-X&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-4&quot; name=&quot;tab-group-fig6&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-4&quot;&gt;Skylake-X&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skx.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/skx/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skx.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/skx/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-skx.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-skx.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-skx.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-5&quot; name=&quot;tab-group-1&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-5&quot;&gt;Cannon Lake&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-5&quot; name=&quot;tab-group-fig6&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-5&quot;&gt;Cannon Lake&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-cnl.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/cnl/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-cnl.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/cnl/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-cnl.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-cnl.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-cnl.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-6&quot; name=&quot;tab-group-1&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-6&quot;&gt;Zen2&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-6&quot; name=&quot;tab-group-fig6&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-6&quot;&gt;Zen2&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-zen2.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/zen2/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-zen2.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/zen2/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-zen2.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-zen2.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-zen2.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-7&quot; name=&quot;tab-group-1&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-7&quot;&gt;POWER9&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-7&quot; name=&quot;tab-group-fig6&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-7&quot;&gt;POWER9&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-power9.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/power9/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-power9.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/power9/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-power9.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-power9.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-power9.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
     &lt;div class=&quot;tab&quot;&gt;
-      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-8&quot; name=&quot;tab-group-1&quot; /&gt;
-      &lt;label class=&quot;tab-label&quot; for=&quot;tab-8&quot;&gt;Graviton 2&lt;/label&gt;
+      &lt;input class=&quot;tab-radio&quot; type=&quot;radio&quot; id=&quot;tab-fig6-8&quot; name=&quot;tab-group-fig6&quot; /&gt;
+      &lt;label class=&quot;tab-label&quot; for=&quot;tab-fig6-8&quot;&gt;Graviton 2&lt;/label&gt;
       &lt;div class=&quot;tab-panel&quot;&gt;
         &lt;div class=&quot;tab-content&quot;&gt;
           
           
           
 
+
+
+
+
 &lt;div class=&quot;svg-fig&quot;&gt;
-    
-    &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-gra2.html&quot;&gt;[data table]&lt;/a&gt; 
-    &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/gra2/remote.csv&quot;&gt;[raw data]&lt;/a&gt; 
-    &lt;br /&gt;
+    &lt;div class=&quot;svg-fig-links&quot;&gt;
+        
+        
+            &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-gra2.html&quot;&gt;[data&lt;span class=&quot;only-large&quot;&gt; table&lt;/span&gt;]&lt;/a&gt; 
+        
+        &lt;a href=&quot;https://github.com/travisdowns/zero-fill-bench/tree/master/results/gra2/remote.csv&quot;&gt;[raw&lt;span class=&quot;only-large&quot;&gt; data&lt;/span&gt;]&lt;/a&gt; 
+    &lt;/div&gt;
     &lt;a href=&quot;/misc/tables/intel-zero-opt/fig6-gra2.html&quot;&gt;
-        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-gra2.svg&quot; alt=&quot;Figure 4&quot; /&gt;
+        &lt;img class=&quot;figimg&quot; src=&quot;/assets/intel-zero-opt/fig6-gra2.svg&quot; alt=&quot;Figure&quot; width=&quot;648&quot; height=&quot;432&quot; /&gt;
     &lt;/a&gt;
 &lt;/div&gt;
+
         &lt;/div&gt;
-      &lt;/div&gt; 
+      &lt;/div&gt;
     &lt;/div&gt;
     
 &lt;/div&gt;
@@ -3368,8 +3787,6 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
 
 &lt;p&gt;You might notice that Ice Lake, Intel’s newest microarchitecture, is missing from this list: that’s because there is a &lt;a href=&quot;/blog/2020/05/18/icelake-zero-opt.html&quot;&gt;whole separate post&lt;/a&gt; on it.&lt;/p&gt;
 
-&lt;p&gt;&lt;a id=&quot;summary-perma&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
 &lt;h3 id=&quot;further-notes&quot;&gt;Further Notes&lt;/h3&gt;
 
 &lt;p&gt;Here’s a grab back of notes and observations that don’t get their a full section, don’t have any associated plots, etc. That doesn’t mean they are less important! Don’t say that! These ones matter too, they really do.&lt;/p&gt;
@@ -3379,6 +3796,8 @@ Whew! Not sure if that was helpful after all?&lt;/p&gt;
   &lt;li&gt;Although we didn’t find evidence of this happening on other x86 hardware, nor on POWER or ARM, that doesn’t mean it isn’t or can’t happen. It is possible the conditions for it to happen aren’t triggered, or that it is happening but doesn’t make a difference in performance. Similarly for the POWER9 and ARM chips: we didn’t check any performance counters, so maybe the thing is happening but it just doesn’t make any difference in performance. That’s especially feasible in the ARM case where the performance is totally limited by the core-level 16-bytes-per-cycle write throughput: even if all writes are eliminated later on in the path to memory, we expect the performance to be the same.&lt;/li&gt;
   &lt;li&gt;We could learn more about this effect by setting up a test which writes ones first to a region of some fixed size, then overwrites it with zeros, and repeats this in a rolling fashion over a larger buffer. This test basically lets the 1s escape to a certain level of the cache hierarchy, and seeing where the optimization kicks in will tell us something interesting.&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;&lt;span id=&quot;summary-perma&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;wrapping-up&quot;&gt;Wrapping Up&lt;/h2&gt;
 
@@ -4764,7 +5183,7 @@ size_t fill5(char *p, size_t n) {
       &lt;p&gt;Incidentally, this also explains the oscillating pattern you see in the blue region: the ideal number of payload calls to get a 1 μs sample rate is ~2.5, so the sampling strategy tends to alternative between two and three calls: more calls means &lt;abbr title=&quot;Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.&quot;&gt;IPC&lt;/abbr&gt; closer to 1: so the peaks of the oscillating are two calls and the valleys, three. &lt;a href=&quot;#fnref:catchup&quot; class=&quot;reversefootnote&quot; role=&quot;doc-backlink&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
     &lt;/li&gt;
     &lt;li id=&quot;fn:tput&quot; role=&quot;doc-endnote&quot;&gt;
-      &lt;p&gt;I’m not going to fully analyze the throughput case, but the thorough among us can find the chart is &lt;a href=&quot;/assets/avxfreq1/fig-ipc-zoomed-zmm-tput.svg&quot;&gt;here&lt;/a&gt;. Note that the overhead here cuts the other way: pushing the &lt;abbr title=&quot;Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.&quot;&gt;IPC&lt;/abbr&gt; below the expected value of 2.0 (there are 2 512-bit vector units capable of executing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vpord&lt;/code&gt;) because here the throughput limited instructions compete for ports with the overhead instructions. &lt;a href=&quot;#fnref:tput&quot; class=&quot;reversefootnote&quot; role=&quot;doc-backlink&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+      &lt;p&gt;I’m not going to fully analyze the throughput case, but the thorough among us can &lt;a href=&quot;/assets/avxfreq1/fig-ipc-zoomed-zmm-tput.svg&quot;&gt;find the chart here&lt;/a&gt;. Note that the overhead here cuts the other way: pushing the &lt;abbr title=&quot;Instructions per cycle: calculated over an interval by measuring the number of instructions executed and the duration in cycles.&quot;&gt;IPC&lt;/abbr&gt; below the expected value of 2.0 (there are 2 512-bit vector units capable of executing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vpord&lt;/code&gt;) because here the throughput limited instructions compete for ports with the overhead instructions. &lt;a href=&quot;#fnref:tput&quot; class=&quot;reversefootnote&quot; role=&quot;doc-backlink&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
     &lt;/li&gt;
     &lt;li id=&quot;fn:orisit&quot; role=&quot;doc-endnote&quot;&gt;
       &lt;p&gt;Of course, another possibility is that something in the rest of the test loop uses &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;xmm&lt;/code&gt; registers so they remain “hot”: they are “baseline” for x86-64 after all, so the compiler is free to use them without any special flags. We could test this theory with a more compact test loop audited to be free of any &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;xmm&lt;/code&gt; use… but I’m not going to bother. I’m pretty sure these guys are powered up all the time as their use is pervasive in most x86-64 code. &lt;a href=&quot;#fnref:orisit&quot; class=&quot;reversefootnote&quot; role=&quot;doc-backlink&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
