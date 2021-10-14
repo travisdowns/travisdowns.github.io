@@ -1,8 +1,9 @@
 <meta name="color-scheme" content="light dark">
 {%- capture lightcss -%}{{ '/assets/css/light.css' | relative_url }}{%- endcapture -%}
 {%- capture  darkcss -%}{{ '/assets/css/dark.css' | relative_url }}{%- endcapture %}
+<link rel="stylesheet" href="{{ lightcss }}">
+<link rel="stylesheet" href="{{ darkcss }}" media="(prefers-color-scheme: dark)">
 <script>
-
 var DARKMODE = (function() {
     const i = {
     PROP: 'force-color',
@@ -40,7 +41,3 @@ document.write(link);
 
 <script defer src="{{ '/assets/dark-mode.js' | relative_url }}"></script>
 
-<noscript>
-    <link rel="stylesheet" href="{{ lightcss }}">
-    <link rel="stylesheet" href="{{ darkcss }}" media="(prefers-color-scheme: dark)">
-</noscript>
