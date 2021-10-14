@@ -1,0 +1,10 @@
+_id: c72066e0-2cf2-11ec-acb3-59ea484d84ab
+_parent: 'https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html'
+replying_to_uid: ''
+message: >-
+  The zero value for mask registers is all ones (i.e. no masking).  What happens
+  when you do xnorb to kill one?
+name: Robert Clausecker
+email: 621dd8a9696960eac2ecb815539f4f72
+hp: ''
+date: 1634218177
