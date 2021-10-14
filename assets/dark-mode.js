@@ -5,8 +5,15 @@
 (function(i) {
   
   i.setSheet = function (color) {
-    document.getElementById("mainstyle").setAttribute("href",
-    "{{ '/assets/css/' | relative_url }}" + color + '.css');
+    var existing = document.getElementById(i.OID);
+    var link = i.makeLink(color);
+    if (existing) {
+      existing.href = link.href;
+    } else {
+      // element may not exist if there was no existing override when
+      // the settings page was loaded so create it now
+      document.head.appendChild(link);
+    }
   }
   
   /**
@@ -76,7 +83,7 @@
     // want the bar to suddenly disapear when the box is checked.
     // Finally, we don't show the bar if the user has
     // closed it this session, or twice ever (saved in localStorage)
-    if ('{{ site.darkmode.hide_banner }}' === 'true') {
+    if (i.BANNER === 'true') {
       return false;
     }
     if (!i.bothOk() || sessionStorage.getItem('dm-closed') || i.closeCount() >= 2) {

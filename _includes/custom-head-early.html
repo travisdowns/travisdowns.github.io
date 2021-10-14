@@ -1,11 +1,66 @@
+{% comment %}<!--
+So this is all a bit silly. Ultimately, what we want to do is load either
+light.css or dark.css depending on whether light or dark theme should
+be selected. We base that decision on the prefers-color-scheme media query 
+by default, but also allow the user to override that in javascript. In 
+principle we only want to load *one* of the two files, but that doesn't
+seem possible in light of browsers that don't support prefers-color-scheme
+at al: the will fail even a query like "not (prefers-color-scheme: dark)"
+because any query with unknown bits fails regardless of the "not".
+
+In JavaScript, however, we can load just one file since we can implement
+the "not" logic outside of the query, and originally that's how it worked:
+load either light.css or dark.css in the JavaScript, while the <noscript> 
+version had to load light unconditionally then dark conditioned on the query.
+
+Futher, we need to load the stylesheet using document.write() in the JS,
+since using other DOM manipulatoin techniques like appendChild causes a
+flash of unstyled content while changing pages. document.write() avoids
+this: apparently CSS files injected that way are treated as render-blocking
+in the same as those which appear directetly in the HTML document.
+
+Now for whatever reason, this original approach seemed to cause the google
+spider to fail to load the CSS, probably because of heuristics where it
+tries to avoid loading resoures that aren't critical to indexing. This in
+turn causes it to fail the mobile experience audit, since an unstyled page
+has tons of problems on mobile such as too-small or too-wide text.
+
+So finally we converge on the current solution: we specify <link> elements
+in the HTML regardless of whether javascript is enabled, for the light
+and dark files, with the dark CSS conditioned on the media query.
+This just works for everyone who doesn't override the theme. Then we run
+the js which implements the override and if an override is present, a
+third <link id="override-style" is added which point to either the light
+or dark CSS as the case may be. This override is add using document.write()
+to avoid FOUC as discusssed above.
+
+The settings page may need to add this override <link> dynamically if we
+switch from not using to using an override.
+
+Finally, we apply the theme-color *after* the script element, using the
+media query. Although I don't think it's defined in the spec, theme color
+seems to work in the opposite way from CSS: the first applicable <meta>
+tag with theme-color defines the color. So we need to have a media query
+for both light and dark variants, and if the query fails because it's
+not supported, that's fine since those browsers aren't going to support
+theme-color anyway. If the user has overridden the theme, we emit a
+theme-color <meta> tag in the javascript without any media query: this
+one comes first so it "wins".
+
+Ugh.
+-->{% endcomment %}
 <meta name="color-scheme" content="light dark">
 {%- capture lightcss -%}{{ '/assets/css/light.css' | relative_url }}{%- endcapture -%}
 {%- capture  darkcss -%}{{ '/assets/css/dark.css' | relative_url }}{%- endcapture %}
+{% assign dark-query = '(prefers-color-scheme: dark)' %}
+<link rel="stylesheet" href="{{ lightcss }}">
+<link rel="stylesheet" href="{{ darkcss }}" media="{{ dark-query }}">
 <script>
-
-var DARKMODE = (function() {
+  var DARKMODE = (function() {
     const i = {
     PROP: 'force-color',
+    OID: 'override-style',
+    BANNER: '{{ site.darkmode.hide_banner }}',
     getOverride: function () {
       try {
         return localStorage.getItem(i.PROP);
@@ -25,22 +80,25 @@ var DARKMODE = (function() {
     gaTheme: function () {
       var o = i.getOverride();
       return o ? o + ' force' : i.get() + ' default';
+    },
+    makeLink: function (c) {
+      e = document.createElement('link');
+      e.id = i.OID;
+      e.rel = 'stylesheet';
+      e.href = (c === 'dark' ? '{{darkcss}}' : '{{lightcss}}');
+      return e;
     }
-    };
-    return i;
+  }
+  return i;
 }());
 
-if (DARKMODE.get() == 'dark') {
-    var link = '<meta name="theme-color" content="#181818"><link id="mainstyle" rel="stylesheet" href="{{ darkcss }}">';
-} else {
-    var link = '<meta name="theme-color" content="#fdfdfd"><link id="mainstyle" rel="stylesheet" href="{{ lightcss }}">';
-} 
-document.write(link);
+if (DARKMODE.getOverride()) {
+  var dm_color = DARKMODE.get();
+  document.write(DARKMODE.makeLink(dm_color).outerHTML +
+    '\n<meta name="theme-color" content="#' + (dm_color === 'dark' ? '181818' : 'fdfdfd') + '">');
+}
 </script>
-
+<meta name="theme-color" content="#fdfdfd" media="not all and {{ dark-query }}">
+<meta name="theme-color" content="#181818" media="{{ dark-query }}">
 <script defer src="{{ '/assets/dark-mode.js' | relative_url }}"></script>
 
-<noscript>
-    <link rel="stylesheet" href="{{ lightcss }}">
-    <link rel="stylesheet" href="{{ darkcss }}" media="(prefers-color-scheme: dark)">
-</noscript>
