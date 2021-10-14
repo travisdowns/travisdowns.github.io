@@ -2,12 +2,17 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
-<script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 
-var DARKMODE = (function() {
+<link rel="stylesheet" href="/assets/css/light.css">
+<link rel="stylesheet" href="/assets/css/dark.css" media="(prefers-color-scheme: dark)">
+<script>
+  var DARKMODE = (function() {
     const i = {
     PROP: 'force-color',
+    OID: 'override-style',
+    BANNER: 'true',
     getOverride: function () {
       try {
         return localStorage.getItem(i.PROP);
@@ -27,25 +32,28 @@ var DARKMODE = (function() {
     gaTheme: function () {
       var o = i.getOverride();
       return o ? o + ' force' : i.get() + ' default';
+    },
+    makeLink: function (c) {
+      e = document.createElement('link');
+      e.id = i.OID;
+      e.rel = 'stylesheet';
+      e.href = (c === 'dark' ? '/assets/css/dark.css' : '/assets/css/light.css');
+      return e;
     }
-    };
-    return i;
+  }
+  return i;
 }());
 
-if (DARKMODE.get() == 'dark') {
-    var link = '<meta name="theme-color" content="#181818"><link id="mainstyle" rel="stylesheet" href="/assets/css/dark.css">';
-} else {
-    var link = '<meta name="theme-color" content="#fdfdfd"><link id="mainstyle" rel="stylesheet" href="/assets/css/light.css">';
-} 
-document.write(link);
+if (DARKMODE.getOverride()) {
+  var dm_color = DARKMODE.get();
+  document.write(DARKMODE.makeLink(dm_color).outerHTML +
+    '\n<meta name="theme-color" content="#' + (dm_color === 'dark' ? '181818' : 'fdfdfd') + '">');
+}
 </script>
-
+<meta name="theme-color" content="#fdfdfd" media="not all and (prefers-color-scheme: dark)">
+<meta name="theme-color" content="#181818" media="(prefers-color-scheme: dark)">
 <script defer src="/assets/dark-mode.js"></script>
 
-<noscript>
-    <link rel="stylesheet" href="/assets/css/light.css">
-    <link rel="stylesheet" href="/assets/css/dark.css" media="(prefers-color-scheme: dark)">
-</noscript>
 <!-- Begin Jekyll SEO tag v2.7.1p -->
 <title>Performance Speed Limits | Performance Matters</title>
 <meta name="generator" content="Jekyll v4.2.0" />
