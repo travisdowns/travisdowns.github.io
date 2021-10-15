@@ -1,0 +1,25 @@
+_id: 45631860-2ddc-11ec-b3e4-2513033c8c12
+_parent: 'https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html'
+replying_to_uid: c72066e0-2cf2-11ec-acb3-59ea484d84ab
+message: >-
+  Hi Robert,
+
+
+  Thanks for your comment. I did some tests with `xnorb k1, k1, k1` and some
+  variations, but didn't find any anomalies. The instruction itself seems to
+  execute like any other `xnorb` (so no indication of a "ones idiom" in analogy
+  with "zeroing idiom"), and when subsequently using it with masked AVX
+  instructions, I didn't find any difference. Of course, my tests were not
+  exhaustive!
+
+
+  In general, masked operations with D or Q element width execute in the same
+  time as their unmasked counterparts, while B and W widths suffer a latency
+  penalty: they always take at least 3 cycles (IIRC) even if the unmasked
+  operation takes 1 cycle. Some have additional penalties: e.g., 512-bit
+  byte-granular masked stores are significantly slower than any other
+  granularity or width of stores.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1634318462
