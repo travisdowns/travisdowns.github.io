@@ -547,6 +547,31 @@ if (DARKMODE.getOverride()) {
 </article>
   
 
+<article id="comment-45631860-2ddc-11ec-b3e4-2513033c8c12" class="js-comment comment admin child" uid="45631860-2ddc-11ec-b3e4-2513033c8c12">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-45631860-2ddc-11ec-b3e4-2513033c8c12" title="Permalink to this comment">October 15th, 2021 17:21</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Robert,</p>
+
+<p>Thanks for your comment. I did some tests with <code class="language-plaintext highlighter-rouge">xnorb k1, k1, k1</code> and some variations, but didn’t find any anomalies. The instruction itself seems to execute like any other <code class="language-plaintext highlighter-rouge">xnorb</code> (so no indication of a “ones idiom” in analogy with “zeroing idiom”), and when subsequently using it with masked AVX instructions, I didn’t find any difference. Of course, my tests were not exhaustive!</p>
+
+<p>In general, masked operations with D or Q element width execute in the same time as their unmasked counterparts, while B and W widths suffer a latency penalty: they always take at least 3 cycles (IIRC) even if the unmasked operation takes 1 cycle. Some have additional penalties: e.g., 512-bit byte-granular masked stores are significantly slower than any other granularity or width of stores.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
 
 
