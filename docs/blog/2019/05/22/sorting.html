@@ -841,6 +841,45 @@ Thanks in advance. Although I didn’t understand everything, I liked the articl
 
   
 
+<article id="comment-5936acf0-31e5-11ec-b62a-5b9ea25a934c" class="js-comment comment child" uid="5936acf0-31e5-11ec-b62a-5b9ea25a934c">
+
+  <div class="comment__author">
+    Noah Goldstein
+    <span class="comment__date">•
+        <a href="#comment-5936acf0-31e5-11ec-b62a-5b9ea25a934c" title="Permalink to this comment">October 20th, 2021 20:36</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>@Travis Downs (there seems to be no way to reply to a reply)</p>
+
+<blockquote>
+  <p>Well I do plan to publish some usable radix sorts when this is done, but I don’t think is is very obvious how to write a C qsort that improves significantly on the existing qsort. In relation to the inlining aspect, you could do is a qsort implementation that is implemented in a header in C, just like C++ and rely on the optimizer to inline the comparator function. This isn’t totally straightforward, as described in a footnote but I’m sure it could be done.</p>
+</blockquote>
+
+<p>There is a bit of work being down to optimize GLIBC’s qsort in <a href="https://patchwork.sourceware.org/project/glibc/list/?series=2745">this patchset</a>.</p>
+
+<p>The reality is most of the optimization is for faster swap and to make qsort safe against the <code class="language-plaintext highlighter-rouge">O(n^2)</code> worst case. In many ways <a href="https://sourceware.org/git/?p=glibc.git;a=blob;f=stdlib/qsort.c;h=0f6d7ff787b87b3a432177d8bf662b3a47cdc64d;hb=HEAD#l42">GLIBC’s qsort is still living in the 1990s….</a>.</p>
+
+<p>We explored writing an optimized version for specific types by providing type specific compare functions then checking on <code class="language-plaintext highlighter-rouge">qsort</code> entry if the compare function used was one of the known types i.e</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qsort(...) {
+    if(cmpfunc == INT_CMP) {
+        optimized_int_qsort(...);
+    }
+...
+}
+</code></pre></div></div>
+
+<p>We have implementation for <code class="language-plaintext highlighter-rouge">uint32_t</code> (was able to beat your radix7 up to size==8192 for random and to IIRC ~2^20 for semi-sorted data) but decided these pure typed qsort’s are not particularly common in real code and mostly just used for benchmarking so it wasn’t worth the code size.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
 
 
