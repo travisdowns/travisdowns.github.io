@@ -1,0 +1,11 @@
+_id: 2f481240-3ec3-11ec-b9ed-bd7f2538eb89
+_parent: 'https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html'
+replying_to_uid: ''
+message: >-
+  Why is a load fence used here? I tried this experiment on SKX and see fewer
+  mask regs if I don't use a lfence. However, other structure sizes don't seem
+  to be affected (i.e. ALU scheduler size)
+name: Chester
+email: 83de286347cdfc84e1bb10146350467e
+hp: ''
+date: 1636176857
