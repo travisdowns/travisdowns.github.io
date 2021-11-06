@@ -1,0 +1,32 @@
+_id: 6cde3610-3ece-11ec-93f9-4117c1db6301
+_parent: 'https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html'
+replying_to_uid: 2f481240-3ec3-11ec-b9ed-bd7f2538eb89
+message: >-
+  Hi Chester,
+
+
+  The rob-size tool supports: with and without lfence, based on a command line
+  parameter. 
+
+
+  Using lfence is just a way of cleaning separating each iteration of the test:
+  nothing crosses the lfence, so either the 2 loads go in parallel or they
+  don't. 
+
+
+  Henry's original version didn't use lfence, so you just rely on the fact that
+  the loads form two alternating dependency chains to avoid more than two loads
+  overlapping. 
+
+
+  IME the lfence approach produces a somewhat cleaner plot and approaches or
+  matches exactly the known structure sizes in more cases, but the difference is
+  usually small. There is some non-ideal behavior near the transition point for
+  most structures. 
+
+
+  How big is the gap you are seeing for kreg lfence mode?
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1636181685
