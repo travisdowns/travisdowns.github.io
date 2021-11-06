@@ -5,8 +5,8 @@ message: >-
   Hi Chester,
 
 
-  The rob-size tool supports: with and without lfence, based on a command line
-  parameter. 
+  The rob-size tool supports two different modes: with and without lfence, based
+  on the presence or absence of the `--lfence` command line parameter. 
 
 
   Using lfence is just a way of cleaning separating each iteration of the test:
