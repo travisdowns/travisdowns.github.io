@@ -1,0 +1,27 @@
+_id: 50a48470-3f52-11ec-892c-4137f272d73b
+_parent: 'https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html'
+replying_to_uid: ''
+message: >-
+  I made an error with my testing - I used Henry Wong's method of
+
+  `mov edi, [rdx + rdi * 4]`
+
+  `kaddd` etc
+
+  `mov esi, [rdx + rsi * 4]`
+
+  `kaddd` etc
+
+  loop branch
+
+
+  and added a lfence after the second mov, but forgot to remove the second group
+  of filler instructions. After fixing it, I get similar results with both
+  methods, but lfence is cleaner as you note. However, I only see 114 mask regs
+  (kaddb) on the Xeon 8171M with either robsize or my own code. I get 126 with
+  kaddd, but that's still not 134. Perhaps there's some weirdness with using a
+  cloud VM.
+name: Chester
+email: 83de286347cdfc84e1bb10146350467e
+hp: ''
+date: 1636238331
