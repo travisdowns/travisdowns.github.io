@@ -547,6 +547,37 @@ if (DARKMODE.getOverride()) {
 </article>
   
 
+<article id="comment-6cde3610-3ece-11ec-93f9-4117c1db6301" class="js-comment comment admin child" uid="6cde3610-3ece-11ec-93f9-4117c1db6301">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-6cde3610-3ece-11ec-93f9-4117c1db6301" title="Permalink to this comment">November  6th, 2021 06:54</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Chester,</p>
+
+<p>The rob-size tool supports: with and without lfence, based on a command line parameter.</p>
+
+<p>Using lfence is just a way of cleaning separating each iteration of the test: nothing crosses the lfence, so either the 2 loads go in parallel or they don’t.</p>
+
+<p>Henry’s original version didn’t use lfence, so you just rely on the fact that the loads form two alternating dependency chains to avoid more than two loads overlapping.</p>
+
+<p>IME the lfence approach produces a somewhat cleaner plot and approaches or matches exactly the known structure sizes in more cases, but the difference is usually small. There is some non-ideal behavior near the transition point for most structures.</p>
+
+<p>How big is the gap you are seeing for kreg lfence mode?</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
 
 
