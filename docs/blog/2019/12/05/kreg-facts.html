@@ -527,6 +527,39 @@ if (DARKMODE.getOverride()) {
     
     
 
+<article id="comment-50a48470-3f52-11ec-892c-4137f272d73b" class="js-comment comment" uid="50a48470-3f52-11ec-892c-4137f272d73b">
+
+  <div class="comment__author">
+    Chester
+    <span class="comment__date">•
+        <a href="#comment-50a48470-3f52-11ec-892c-4137f272d73b" title="Permalink to this comment">November  6th, 2021 22:38</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I made an error with my testing - I used Henry Wong’s method of
+<code class="language-plaintext highlighter-rouge">mov edi, [rdx + rdi * 4]</code>
+<code class="language-plaintext highlighter-rouge">kaddd</code> etc
+<code class="language-plaintext highlighter-rouge">mov esi, [rdx + rsi * 4]</code>
+<code class="language-plaintext highlighter-rouge">kaddd</code> etc
+loop branch</p>
+
+<p>and added a lfence after the second mov, but forgot to remove the second group of filler instructions. After fixing it, I get similar results with both methods, but lfence is cleaner as you note. However, I only see 114 mask regs (kaddb) on the Xeon 8171M with either robsize or my own code. I get 126 with kaddd, but that’s still not 134. Perhaps there’s some weirdness with using a cloud VM.</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-50a48470-3f52-11ec-892c-4137f272d73b', 'respond', '50a48470-3f52-11ec-892c-4137f272d73b')">↪&#xFE0E; Reply to Chester</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-2f481240-3ec3-11ec-b9ed-bd7f2538eb89" class="js-comment comment" uid="2f481240-3ec3-11ec-b9ed-bd7f2538eb89">
 
   <div class="comment__author">
