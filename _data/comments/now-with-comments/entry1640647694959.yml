@@ -1,0 +1,8 @@
+_id: aa044c20-676c-11ec-ba08-2519a49dee62
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: ''
+message: "Hi, Thanks for your detailed instrcution, just want to add that some of the scss variables need to be modified if a different theme is used.\r\nI encountered a problem, the comment section can be seen on my github page, but when I submit a comment it shows a pop up window: \r\nServer Error\r\nAn error occured.\r\n[GITHUB_READING_FILE]\r\nNot sure what could be the problem? \r\n\r\nI generated a github auth key from a bot account\r\nI got OK! with the url from heroku,\r\nI have generated secret key from your given website and pasted them into reCaptcha section of both staticman and _config yaml files,\r\nThe html and css are copied from your site, and they showed up properly on the website.\r\nI used heroku interface to paste the rsa private key, with all the nextline char removed."
+name: Xingeng Zhang
+email: da2af46dbf653127af7b4c686fb64ab9
+hp: ''
+date: 1640647694
