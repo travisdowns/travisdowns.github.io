@@ -1,0 +1,18 @@
+_id: 5236af90-710a-11ec-98d7-6de81bc677bb
+_parent: 'https://travisdowns.github.io/blog/2020/02/05/now-with-comments.html'
+replying_to_uid: 20050eb0-7036-11ec-bbfe-434515812d73
+message: >-
+  I am not sure what is going on. I'd start looking at the [code
+  here](https://github.com/travisdowns/travisdowns.github.io/blob/master/_includes/comments.html#L3):
+  this is where the comments are rendered. Check to see what `page.slug` is and
+  if the data files as expected under that slug. Perhaps something is wrong with
+  the matching based on the slug. 
+
+
+  Does your page name have any special characters, spaces, etc? Search on this
+  page for `slug` and you'll see several comments which might point you in the
+  right direction, especially the one that says I should be slugifying my slug.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1641704968
