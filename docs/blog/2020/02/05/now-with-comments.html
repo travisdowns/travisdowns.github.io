@@ -530,6 +530,29 @@ would you have any idea why my posts have comments but not on my regular pages. 
 </article>
   
 
+<article id="comment-5236af90-710a-11ec-98d7-6de81bc677bb" class="js-comment comment admin child" uid="5236af90-710a-11ec-98d7-6de81bc677bb">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-5236af90-710a-11ec-98d7-6de81bc677bb" title="Permalink to this comment">January  9th, 2022 05:09</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>I am not sure what is going on. I’d start looking at the <a href="https://github.com/travisdowns/travisdowns.github.io/blob/master/_includes/comments.html#L3">code here</a>: this is where the comments are rendered. Check to see what <code class="language-plaintext highlighter-rouge">page.slug</code> is and if the data files as expected under that slug. Perhaps something is wrong with the matching based on the slug.</p>
+
+<p>Does your page name have any special characters, spaces, etc? Search on this page for <code class="language-plaintext highlighter-rouge">slug</code> and you’ll see several comments which might point you in the right direction, especially the one that says I should be slugifying my slug.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
 
 
