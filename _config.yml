@@ -57,6 +57,9 @@ plugins:
 # see https://github.com/jekyll/minima/issues/603
 ignore_theme_config: true
 
+include:
+  - .nojekyll
+
 # staticman (comments) configuration
 staticman_url: https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments
 
