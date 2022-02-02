@@ -1,0 +1,16 @@
+_id: b5efb410-8478-11ec-bce8-7d579fd206b7
+_parent: 'https://travisdowns.github.io/blog/2019/06/11/speed-limits.html'
+replying_to_uid: e8a540f0-845a-11ec-9485-9b86b5854279
+message: >-
+  Hi JWang,
+
+
+  The multiplication unit _is_ pipelined on modern Intel CPUs (going back [at
+  least to
+  Conroe](https://uops.info/table.html?search=imul&cb_lat=on&cb_tp=on&cb_uops=on&cb_ports=on&cb_CON=on&cb_measurements=on&cb_doc=on&cb_base=on),
+  and can sustain 1 multiply per cycle. So the four multiplies in each iteration
+  have a steady state inverse throughput of 4 cycles, best case.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1643841452
