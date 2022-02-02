@@ -1633,6 +1633,43 @@ etc ...                                                    ...
     
     
 
+<article id="comment-e8a540f0-845a-11ec-9485-9b86b5854279" class="js-comment comment" uid="e8a540f0-845a-11ec-9485-9b86b5854279">
+
+  <div class="comment__author">
+    JWang
+    <span class="comment__date">•
+        <a href="#comment-e8a540f0-845a-11ec-9485-9b86b5854279" title="Permalink to this comment">February  2th, 2022 19:04</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hello! Thank you for the very informative post. I have a question on this example</p>
+
+<p>for (size_t i = 0; i &lt; len; i += 4) {
+        p1 *= data[i + 0];
+        p2 *= data[i + 1];
+        p3 *= data[i + 2];
+        p4 *= data[i + 3];
+    }</p>
+
+<p>You mentioned that “each iteration above takes at least 3 cycles because of the four carried dependency chains between each iteration,”.  Does this refer to a Intel CPU, like Skylake? Since there is only one iMul unit in each core, all 4 lines in one iteration compete for the iMul, and iMul is not pipelined, so shouldn’t there be at least 12 cycles in each iteration?</p>
+
+<p>Thanks!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-e8a540f0-845a-11ec-9485-9b86b5854279', 'respond', 'e8a540f0-845a-11ec-9485-9b86b5854279')">↪&#xFE0E; Reply to JWang</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-8cd9df80-9787-11eb-8d48-332c9d8a879e" class="js-comment comment" uid="8cd9df80-9787-11eb-8d48-332c9d8a879e">
 
   <div class="comment__author">
