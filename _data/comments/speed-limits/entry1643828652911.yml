@@ -1,0 +1,8 @@
+_id: e8a540f0-845a-11ec-9485-9b86b5854279
+_parent: 'https://travisdowns.github.io/blog/2019/06/11/speed-limits.html'
+replying_to_uid: ''
+message: "Hello! Thank you for the very informative post. I have a question on this example\r\n\r\nfor (size_t i = 0; i < len; i += 4) {\r\n        p1 *= data[i + 0];\r\n        p2 *= data[i + 1];\r\n        p3 *= data[i + 2];\r\n        p4 *= data[i + 3];\r\n    }\r\n\r\nYou mentioned that \"each iteration above takes at least 3 cycles because of the four carried dependency chains between each iteration,\".  Does this refer to a Intel CPU, like Skylake? Since there is only one iMul unit in each core, all 4 lines in one iteration compete for the iMul, and iMul is not pipelined, so shouldn't there be at least 12 cycles in each iteration?\r\n\r\nThanks!"
+name: JWang
+email: ''
+hp: ''
+date: 1643828652
