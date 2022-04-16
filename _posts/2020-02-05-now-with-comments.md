@@ -56,7 +56,7 @@ The _bot account_ is nothing special: it is just a regular personal account that
 
 ### Generate Personal Access Token
 
-Next, you'll need to generate a GitHub _personal access token_, for your bot account. The [GitHub doc](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) does a better job of explaining this than I can. If you just want everything to work for sure now and in the future, select every single scope when it prompts you, but if you care about security you should only need the _repo_ and _user_ scopes (today):
+Next, you'll need to generate a GitHub _personal access token_, for your bot account. The [GitHub doc](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) does a better job of explaining this than I can. If you just want everything to work for sure now and in the future, select every single scope when it prompts you, but if you care about security you should only need the _repo_ and _user_ scopes (today):
 
 **Repo scope:**
 {% include assetimg.md alt="Repo scope" path="scopes-repo.png" %}

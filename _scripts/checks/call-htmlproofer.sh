@@ -12,11 +12,14 @@ echo "Additional arguments: $*"
 
 tries=0
 
+# ignore notes:
+# docs.github.com: returns 403 to the htmlproofer even though browsers work fine
+
 while true; do
     htmlproofer \
         --assume-extension \
         --http-status-ignore=429 \
-        --url-ignore '/.*/notexist.html/' \
+        --url-ignore '/notexist.html/,/docs.github.com/' \
         --internal-domains travisdowns.github.io,0.0.0.0:4000 \
         --hydra-config='{ "max_concurrency": 5 }' "$@" "$SITE" && break
     tries=$((tries + 1))
