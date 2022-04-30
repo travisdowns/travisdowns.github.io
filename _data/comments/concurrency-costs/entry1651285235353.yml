@@ -1,0 +1,24 @@
+_id: 1e302270-c82c-11ec-a4d8-2f0ed8370f77
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: 12b68530-c816-11ec-a58a-21cf651d99f4
+message: >-
+  It didn't make the post because unlike the other solutions it isn't even
+  _correct_ so it doesn't really fit in this exploration of valid solutions to
+  the given problem. It was just kind of there as a baseline because it was easy
+  to add and I wanted to see how it performed without any synchronization.
+
+
+  The actual behavior of this implementation is interesting: after a careful
+  review of cache protocols, you might assume that it would actually be about as
+  bad as the atomic solutions in the contended case, because the hard work of
+  moving the cache line back and forth has to occur in any case. However, the
+  difference is that with the unlocked writes each core may blast away on the
+  local copy of the value _in its store buffer_ which isn't subject to MESI as
+  [described
+  here](https://stackoverflow.com/questions/46919032/why-does-using-the-same-cache-line-from-multiple-threads-not-cause-serious-slowd).
+  This can make the apparent performance comparable to uncontended increments at
+  least on a heavily buffered out-of-order architectures like modern x86.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1651285235
