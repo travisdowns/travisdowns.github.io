@@ -2190,6 +2190,29 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 </article>
   
 
+<article id="comment-1e302270-c82c-11ec-a4d8-2f0ed8370f77" class="js-comment comment admin child" uid="1e302270-c82c-11ec-a4d8-2f0ed8370f77">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-1e302270-c82c-11ec-a4d8-2f0ed8370f77" title="Permalink to this comment">April 30th, 2022 02:20</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>It didn’t make the post because unlike the other solutions it isn’t even <em>correct</em> so it doesn’t really fit in this exploration of valid solutions to the given problem. It was just kind of there as a baseline because it was easy to add and I wanted to see how it performed without any synchronization.</p>
+
+<p>The actual behavior of this implementation is interesting: after a careful review of cache protocols, you might assume that it would actually be about as bad as the atomic solutions in the contended case, because the hard work of moving the cache line back and forth has to occur in any case. However, the difference is that with the unlocked writes each core may blast away on the local copy of the value <em>in its store buffer</em> which isn’t subject to MESI as <a href="https://stackoverflow.com/questions/46919032/why-does-using-the-same-cache-line-from-multiple-threads-not-cause-serious-slowd">described here</a>. This can make the apparent performance comparable to uncontended increments at least on a heavily buffered out-of-order architectures like modern x86.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
 
 
