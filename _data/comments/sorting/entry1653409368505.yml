@@ -1,0 +1,15 @@
+_id: c0335fb0-db7d-11ec-8183-83c617056737
+_parent: 'https://travisdowns.github.io/blog/2019/05/22/sorting.html'
+replying_to_uid: ''
+message: >-
+  Do you have any insight into why the prefetch is to the next element _plus
+  one_? Naively, it seems like we should prefetch the next output position
+  instead of skipping one element. But then if +1 works, then why not +7 or +8
+  to try to fetch the next cache line?
+
+
+  It feels like secret magic to me.
+name: Brian Green
+email: 53dfefca99d5a26c7d535eff3a4d5ace
+hp: ''
+date: 1653409368
