@@ -612,6 +612,33 @@ sys     0m0.184s
 </article>
   
 
+<article id="comment-d9c7d1e0-dede-11ec-af05-b7bfec67ee79" class="js-comment comment admin child" uid="d9c7d1e0-dede-11ec-af05-b7bfec67ee79">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-d9c7d1e0-dede-11ec-af05-b7bfec67ee79" title="Permalink to this comment">May 28th, 2022 23:35</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Brian,</p>
+
+<p>I can’t give you a very principled reason why the prefetch is +2 from the last written element. It is possible that I intended to do +1 from the last written element and this is simply a bug. More likely, I tried a few values and settled on 1 as providing a good result empirically.</p>
+
+<p>This “just experiment” approach is typical of prefetch distance: you can try to determine the “best” distance by modelling the expected memory behavior but this is in general very difficult without a detailed model of the CPU and memory subsystem, and even then it would only apply to that specific hardware configuration. So it ends up being more practical just to try a bunch of different prefetch values and settle on the best one.</p>
+
+<p>If I recall correctly, the exact value here didn’t make much difference: the key is that the next line is brought in at some point before we start using it, so +1, +2, +3, all serve mostly the same purpose because they’ll all fall into the next line as we reach the end of the previous one: the main difference is that larger offsets bring in the next line slightly earlier, with the upside of more latency hiding if several elements are written in a burst to that same bucket, and the downside of a higher chance of a “useless prefetch” where the line is evicted before we use it.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
 
 
