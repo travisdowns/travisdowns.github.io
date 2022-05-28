@@ -1,0 +1,33 @@
+_id: d9c7d1e0-dede-11ec-af05-b7bfec67ee79
+_parent: 'https://travisdowns.github.io/blog/2019/05/22/sorting.html'
+replying_to_uid: c0335fb0-db7d-11ec-8183-83c617056737
+message: >-
+  Hi Brian,
+
+
+  I can't give you a very principled reason why the prefetch is +2 from the last
+  written element. It is possible that I intended to do +1 from the last written
+  element and this is simply a bug. More likely, I tried a few values and
+  settled on 1 as providing a good result empirically.
+
+
+  This "just experiment" approach is typical of prefetch distance: you can try
+  to determine the "best" distance by modelling the expected memory behavior but
+  this is in general very difficult without a detailed model of the CPU and
+  memory subsystem, and even then it would only apply to that specific hardware
+  configuration. So it ends up being more practical just to try a bunch of
+  different prefetch values and settle on the best one.
+
+
+  If I recall correctly, the exact value here didn't make much difference: the
+  key is that the next line is brought in at some point before we start using
+  it, so +1, +2, +3, all serve mostly the same purpose because they'll all fall
+  into the next line as we reach the end of the previous one: the main
+  difference is that larger offsets bring in the next line slightly earlier,
+  with the upside of more latency hiding if several elements are written in a
+  burst to that same bucket, and the downside of a higher chance of a "useless
+  prefetch" where the line is evicted before we use it.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1653780926
