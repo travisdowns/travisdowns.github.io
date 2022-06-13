@@ -1,0 +1,8 @@
+_id: 45d519f0-eb1f-11ec-8d6d-6f7d7e0f88e0
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: ''
+message: Regarding cas_add() shouldn't load be inside inner loop?
+name: Oleg
+email: de4ee0499391bcfd48fa64cdc1714a4e
+hp: ''
+date: 1655128009
