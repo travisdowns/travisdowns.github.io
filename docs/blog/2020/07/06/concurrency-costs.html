@@ -2190,6 +2190,35 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
 </article>
   
 
+<article id="comment-87a86260-ef34-11ec-a9a4-11d4dfd82b1e" class="js-comment comment admin child" uid="87a86260-ef34-11ec-a9a4-11d4dfd82b1e">
+
+  <div class="comment__author">
+     
+    <span class="comment__admin_tag">Author</span>
+    Travis Downs
+    <span class="comment__date">•
+        <a href="#comment-87a86260-ef34-11ec-a9a4-11d4dfd82b1e" title="Permalink to this comment">June 18th, 2022 18:29</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Yes, there needs to be an update of the expected value in the loop, but it’s already there, hidden inside <code class="language-plaintext highlighter-rouge">compare_exchange_weak</code>: if the comparison fails, this function updates the first argument with the observed value of the location, so no separate load is needed. This is possible because the first argument is taken by reference.</p>
+
+<p>From <a href="https://en.cppreference.com/w/cpp/atomic/atomic/compare_exchange">cppreference</a>:</p>
+
+<blockquote>
+  <p>[the first parameter is a] reference to the value expected to be found in the atomic object. Gets stored with the actual value of *this if the comparison fails.</p>
+</blockquote>
+
+<p>Other languages which don’t have by-reference out parameters (e.g., Java’s <code class="language-plaintext highlighter-rouge">AtomicInteger</code>) may require a separate load.</p>
+
+  </div>
+
+
+</article>
+
+
+  
+
   <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
 
 
