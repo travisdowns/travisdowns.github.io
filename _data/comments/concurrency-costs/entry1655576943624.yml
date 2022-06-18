@@ -1,0 +1,26 @@
+_id: 87a86260-ef34-11ec-a9a4-11d4dfd82b1e
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: 45d519f0-eb1f-11ec-8d6d-6f7d7e0f88e0
+message: >-
+  Yes, there needs to be an update of the expected value in the loop, but it's
+  already there, hidden inside `compare_exchange_weak`: if the comparison fails,
+  this function updates the first argument with the observed value of the
+  location, so no separate load is needed. This is possible because the first
+  argument is taken by reference.
+
+
+  From
+  [cppreference](https://en.cppreference.com/w/cpp/atomic/atomic/compare_exchange):
+
+
+  > [the first parameter is a] reference to the value expected to be found in
+  the atomic object. Gets stored with the actual value of *this if the
+  comparison fails.
+
+
+  Other languages which don't have by-reference out parameters (e.g., Java's
+  `AtomicInteger`) may require a separate load.
+name: Travis Downs
+email: c6937532928911c0dae3c9c89b658c09
+hp: ''
+date: 1655576943
