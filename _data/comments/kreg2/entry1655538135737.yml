@@ -1,0 +1,16 @@
+_id: 2c54f810-eeda-11ec-a586-df96b2b26f23
+_parent: 'https://travisdowns.github.io/blog/2020/05/26/kreg2.html'
+replying_to_uid: ''
+message: >-
+  How big part of CPU is AVX512 ?
+
+  is it possible to estimate that
+
+  As when intel disabled AVX512 as consequence big little configuration 
+
+  I want to know how big part of silicon they just waste for this stupid
+  decision :)
+name: Michal Lazo
+email: 67fc9e7ebee46734d34f03f251cfa09f
+hp: ''
+date: 1655538135
