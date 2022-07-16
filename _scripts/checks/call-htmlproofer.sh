@@ -7,6 +7,15 @@ set -euo pipefail
 
 echo "Checking ${SITE:=_site}, MAX_TRIES=${MAX_TRIES:=1}"
 echo "Additional arguments: $*"
+
+hpver=$(htmlproofer --version | cut -d' ' -f2)
+echo "htmlproofer version is $hpver"
+# https://unix.stackexchange.com/a/567537/87246 https://creativecommons.org/licenses/by-sa/4.0/
+if ! printf '%s\n%s\n' "$hpver" "4" | sort --check=quiet --version-sort; then
+    echo "This script only works with htmlproofer versions less than 4, your version is $hpver"
+    exit 1
+fi
+
 # we ignore status 429 since we get these fairly frequency from github for our site
 # pages since I guess this pounds the site pretty hard and pages is like "woah, slow down buddy"
 
