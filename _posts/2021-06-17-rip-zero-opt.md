@@ -55,7 +55,7 @@ In any case, I still plan to write about performance-related microarchitectural 
 
 Thanks to JN, Chris Martin, Jonathan and m_ueberall for reporting or fixing typos in the text.
 
-Stone photo by <a href="https://unsplash.com/@imagefactory">Colin Watts</a> on Unsplash.
+Stone photo by Colin Watts on Unsplash.
 
 ### Discussion and Feedback
 
@@ -70,7 +70,7 @@ If you have a question or any type of feedback, you can leave a [comment below](
 
 [^barely]: _barely_
 
-[^versions]: The new June 8th microcode versions are `0xea` for Skylake (versus `0xe2` previously) and `0xa6` for Ice Lake (versus `0xa0` previously). 
+[^versions]: The new June 8th microcode versions are `0xea` for Skylake (versus `0xe2` previously) and `0xa6` for Ice Lake (versus `0xa0` previously).
 
 [^reboot]: To be clear, the microcode is not persistent, so it needs to be loaded on _every_ boot. If you remove or downgrade the `intel-microcode` package, you'll be back to an older microcode after the next boot. That is, unless you also update your BIOS which can _also_ come with a microcode update: this will be persistent unless you downgrade your BIOS.
 
