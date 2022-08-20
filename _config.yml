@@ -76,6 +76,7 @@ defaults:
       type: posts
     values:
       comments: true
+      lock_comments: false
   - scope:
       path: tags
     values:

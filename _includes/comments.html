@@ -19,13 +19,17 @@
   </div>
   {% endif %}
 
+  {% if page.lock_comments != true %}
   <!-- New comment form -->
   <div id="respond" class="comment__new">
     {% include comment_form.html %}
   </div>
+  {% endif %}
 </section>
 
+{% if page.lock_comments != true %}
 <script src="{{ '/assets/main.js' | relative_url }}"></script>
 {% if site.reCaptcha.enabled %}
 <script src="https://www.google.com/recaptcha/api.js"></script>
+{% endif %}
 {% endif %}
