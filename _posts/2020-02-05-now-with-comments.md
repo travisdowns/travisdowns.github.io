@@ -9,6 +9,7 @@ twitter:
   card: summary
 excerpt: Adding static comments to a static blog using staticman. Static.
 content_classes: invert-rotate-img
+lock_comments: true
 ---
 
 {% capture assetpath %}{{ page.assets | relative_url }}{% endcapture %}
