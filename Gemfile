@@ -16,3 +16,6 @@ group :jekyll_plugins do
   gem "jekyll-image-size"
 end
 
+# needed for Ruby 3 because https://github.com/jekyll/jekyll/issues/8523
+# has not been fixed in a released Jekyll version
+gem "webrick", "~> 1.7"
