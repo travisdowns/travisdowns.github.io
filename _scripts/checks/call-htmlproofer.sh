@@ -31,6 +31,7 @@ while true; do
         --http-status-ignore=429 \
         --url-ignore '/notexist.html/,/docs.github.com/,/blog.cloudflare.com/on-the-dangers-of-intels-frequency-scaling/' \
         --internal-domains travisdowns.github.io,0.0.0.0:4000 \
+        --typhoeus-config='{"headers":{"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0"}}' \
         --hydra-config='{ "max_concurrency": 5 }' "$@" "$SITE" && break
     tries=$((tries + 1))
     if [[ $tries -ge $MAX_TRIES ]]; then
