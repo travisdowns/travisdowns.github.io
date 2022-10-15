@@ -10,10 +10,6 @@ twitter:
 excerpt: Incrementing <code>vector&lt;T&gt;</code> for various <code>T</code> may not perform as you'd expect.
 ---
 
-
-This article is also [available in Russian](https://habr.com/ru/company/pvs-studio/blog/475636/).
-{: .info}
-
 What's faster, incrementing a `std::vector` of `uint8_t` or of `uint32_t`?
 
 To make it concrete, let's consider these two implementations:
