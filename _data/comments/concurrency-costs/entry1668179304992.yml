@@ -1,0 +1,13 @@
+_id: b022f1e0-61d2-11ed-8817-a139fac5b527
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: ''
+message: >-
+  Great article!
+
+  If the counter size was `int32` and not `int64` would the implementation for
+  level 1 (and level 0?) suffer from false sharing? How would that impact
+  performance?
+name: Tzach
+email: ''
+hp: ''
+date: 1668179304
