@@ -247,7 +247,7 @@ There are several limits related to the maximum number of memory accesses[^memac
 | AMD   | Zen, Zen 2 | 2 |
 | AMD   | Zen 3 | 3[^zen3ll] |
 | Apple | M1 | 3 |
-| Arm/Amazon | Graviton 2 | 2 | 
+| Arm/Amazon | Graviton 2 | 2 |
 
 [^recentintel]: Every mainstream core since Sandy Bridge (inclusive) has two read ports.
 
@@ -302,7 +302,7 @@ If you are lucky enough to hit this limit, you just need fewer loads. Note that 
 
 An obvious application of that is vector loads: 32-byte AVX loads have the same limits byte loads (with some exceptions[^simdloadex]). It is difficult to use vector loads in concert with scalar code however: although you can do 8x 32-bit loads at once, if you want to feed those loads to scalar code you have trouble, because you can't efficiently get that data into scalar registers[^vector-scalar]. That is, you'll have to work on vectorizing the code that consumes the loads as well.
 
-[^simdloadex]: As mentioned, Zen 1 can only do one 256-bit load per cycle, but two loads of other types, and Zen 3 can do two vector loads but three loads of other types. Still, vector loads, when they can be used, are usually very advantageous on these CPUs. 
+[^simdloadex]: As mentioned, Zen 1 can only do one 256-bit load per cycle, but two loads of other types, and Zen 3 can do two vector loads but three loads of other types. Still, vector loads, when they can be used, are usually very advantageous on these CPUs.
 
 You can also sometimes use wider scalar loads in this way. In the example above, we do four 32-bit loads - two of which are scattered (the access to `data[]`), but two of which are adjacent (the accesses to `offsets[i - 1]` and `offsets[i - 2]`). We could combine those two adjacent loads into one 64-bit load, like so[^portable]:
 
@@ -358,7 +358,7 @@ This code is an obvious candidate for vectorization with gather, which could in 
 | AMD   | Zen, Zen 2 | 1 |
 | AMD   | Zen 3 | 2[^zen3store] |
 | Apple | M1 | 2 |
-| Arm/Amazon | Graviton 2 | 2 | 
+| Arm/Amazon | Graviton 2 | 2 |
 
 [^zen3store]: On Zen 3, only 64-bit or smaller stores from general purpose stores can achieve two per cycle. Vector stores are limited to one per cycle.
 
@@ -397,7 +397,7 @@ On Intel Ice Lake and later CPUs, try to organize your data and store pattern so
 | AMD   | Zen | 2 |
 | AMD   | Zen 3 | 3 |
 | Apple | M1 | 4 |
-| Arm/Amazon | Graviton 2 | 2 | 
+| Arm/Amazon | Graviton 2 | 2 |
 
 The individual limits on loads and stores were discussed above, but for the microarchitectures listed above there is a _combined_ limit on both which is less than the sum of the individual limits[^combinedwhy]. For example, AMD Zen 3 can do three loads per cycle, or two stores per cycle, but only has a total of three address generation units. This means it can't do three loads _and_ two stores in the _same_ cycle: there is a limit of three memory accesses of any type in total, which may be (for example) three loads and no stores, or one load and two stores, etc.
 
@@ -1106,7 +1106,7 @@ callee:
 next:
 ~~~
 
-This pattern is hard to achieve in practice in a high level language, although you might have luck emulating it with gcc's [labels as values](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html) functionality.
+This pattern is hard to achieve in practice in a high level language, although you might have luck emulating it with gcc's [labels as values](https://gcc.gnu.org/onlinedocs/gcc/extensions-to-the-c-language-family/labels-as-values.html) functionality.
 
 
 ## Thank You
@@ -1183,7 +1183,7 @@ This post was [discussed](https://news.ycombinator.com/item?id=20157196) on Hack
 
 [^m1rob]: The M1 Firestorm and Icestorm cores don't appear to have a traditional one-uop-one-entry ROB, but rather a ~330 (Firestorm) or 60 entry (Icestorm) structure which has something like _macro entries_ which can hold up to 7 uops which can retire as a group. Discovered by [Dougall J](https://twitter.com/dougallj) who describes them in more detail under _Other limits_ on his [Firestorm summary](https://dougallj.github.io/applecpu/firestorm.html). Instead of listing this value, which would greatly underestimate the ROB size compared to the other microarchitectures in most scenarios, I use the _in-flight renames_ value which is mostly 1:1 to uops and is more directly comparable with the values for non-Apple chips. In practice, you'll hit this rename limit or one of the physical register file limits long before you get to the 330 * 7 = ~2,310 outstanding ops (Firestorm) implied by totally filling the macro-entry structure.
 
-[^m1sched]: The M1 Firestorm apparently has 326 scheduler entries across 14 execution ports. From [Dougall's breakdown](https://twitter.com/dougallj/status/1373973478731255812) we have six schedulers for the 6 integer ALU units of 24, 26, 16, 12, 28 and 28 entries, a 48-entry scheduler shared between the load, store and AMX units, and 4 x 36 entry schedulers for the 4 NEON SIMD units. 
+[^m1sched]: The M1 Firestorm apparently has 326 scheduler entries across 14 execution ports. From [Dougall's breakdown](https://twitter.com/dougallj/status/1373973478731255812) we have six schedulers for the 6 integer ALU units of 24, 26, 16, 12, 28 and 28 entries, a 48-entry scheduler shared between the load, store and AMX units, and 4 x 36 entry schedulers for the 4 NEON SIMD units.
 
 [^m1schedice]: The M1 Icestorm apparently has 71 scheduler entries across 7 execution ports. From [Dougall's breakdown](https://twitter.com/dougallj/status/1373973478731255812) we have 3 x 9-entry, 18 entry and 2 x 13 entry schedulers for the general purpose, load/store/AMX and SIMD units, respectively.
 
@@ -1193,7 +1193,7 @@ This post was [discussed](https://news.ycombinator.com/item?id=20157196) on Hack
 
 [^sunnybuffers]: Ice Lake/Sunny Cove data from [robsize tool](https://github.com/travisdowns/robsize), [Ice Lake client](https://en.wikichip.org/wiki/File:sunny_cove_buffer_capacities.png) and [Ice Lake server](https://www.servethehome.com/wp-content/uploads/2020/08/Hot-Chips-32-Intel-Ice-Lake-SP-Sunny-Cove-Microarchitecture.jpg) slides. The value of 384 for "out-of-order window (i.e., the ROB size), in the last link is a [typo](https://twitter.com/MarkDSimmons/status/1295837457158725633) -- it should be 352.
 
-[^robgen]: Well this is at least true on Intel. Recent chips from AMD, Apple and others seem to use _nop compression_ to pack several nops into one ROB slot: so in this case we can imagine that each nop takes only a _fraction_ of a slot. It is not impossible to imagine an microarchitecture that entire avoids putting nops in the ROB. 
+[^robgen]: Well this is at least true on Intel. Recent chips from AMD, Apple and others seem to use _nop compression_ to pack several nops into one ROB slot: so in this case we can imagine that each nop takes only a _fraction_ of a slot. It is not impossible to imagine an microarchitecture that entire avoids putting nops in the ROB.
 
 [^g2buffers]: These numbers I measured myself using a modified version of Veerdac's [microarchitecturometer](https://github.com/Veedrac/microarchitecturometer) which is itself based on [robsize](https://github.com/travisdowns/robsize) (but unlike robsize supports Arm 64-bit platforms). My results for ROB size are [available here]({% link {{page.assets}}/g2results/generic-aarch64.svg %}) and [with nop as the payload here]({% link {{page.assets}}/g2results/nop.svg %}) (the latter test indicating that _nop compression_ does not appear to be present on Graviton 2). ]Scheduler size results are available]({% link {{page.assets}}/g2results/depadd-aarch64.svg %}), using instructions which are dependent on the fencing loads. There are also [load]({% link {{page.assets}}/g2results/load-aarch64.svg %}) and [store]({% link {{page.assets}}/g2results/store-aarch64.svg %}) buffer results, as well as [integer PRF]({% link {{page.assets}}/g2results/add-aarch64.svg %}) and [SIMD PRF]({% link {{page.assets}}/g2results/fmla-aarch64.svg %}) results. [This test]({% link {{page.assets}}/g2results/movz-fmla-aarch64.svg %}) indicates that the integer and SIMD PRFs are not shared. It isn't shown in the table, but [this result testing `cmp`]({% link {{page.assets}}/g2results/cmp.svg %}) indicates that there is a separate set of renamed flag registers with ~36 entries. [These results]({% link {{page.assets}}/g2results/branch-aarch64.svg %}) indicate that up to 46 calls can be in flight at once. There are [even more](https://github.com/travisdowns/travisdowns.github.io/tree/master/assets/speed-limits/g2results) results not mentioned here.
 
