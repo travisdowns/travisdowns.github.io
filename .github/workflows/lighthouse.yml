@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Lighthouse CI
         id: lhci
-        uses: treosh/lighthouse-ci-action@v8
+        uses: treosh/lighthouse-ci-action@v10
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
         with:
