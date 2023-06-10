@@ -24,12 +24,21 @@ tries=0
 # ignore notes:
 # docs.github.com: returns 403 to the htmlproofer even though browsers work fine
 # blog.cloudflare.com: returns 403 at least when run in github actions for an unknown reason
+# twitter.com: infinite 302 redirect loop, perhaps due to cookies
+
+ignored_urls="\
+/notexist.html/,\
+/docs.github.com/,\
+/xblog.cloudflare.com/on-the-dangers-of-intels-frequency-scaling/,\
+/twitter.com/"
+
+echo "$ignored_urls"
 
 while true; do
     htmlproofer \
         --assume-extension \
         --http-status-ignore=429 \
-        --url-ignore '/notexist.html/,/docs.github.com/,/blog.cloudflare.com/on-the-dangers-of-intels-frequency-scaling/' \
+        --url-ignore "$ignored_urls" \
         --internal-domains travisdowns.github.io,0.0.0.0:4000 \
         --typhoeus-config='{"headers":{"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0"}}' \
         --hydra-config='{ "max_concurrency": 5 }' "$@" "$SITE" && break
