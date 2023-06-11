@@ -66,14 +66,18 @@ echo "Excludes       : ${SNAPSHOT_EXCLUDES-(unset)}"
 echo "Viewport width : ${SNAPSHOT_WIDTH:=1200}"
 echo "Viewport height: ${SNAPSHOT_HEIGHT:=600}"
 echo "Color pref     : ${SNAPSHOT_COLOR_PREF:=light}"
+echo "npm version    : $(npm -v)"
+echo "npm bin        : $(npm bin)"
+
+
 
 # When using GitHub actions, we won't by default have permissions to push to the
-# target repo unless we provide auth info, which can be the action-provided 
+# target repo unless we provide auth info, which can be the action-provided
 # GITHUB_TOKEN if the action is triggered by the same repo we want to save
 # the screenshots to
 if [[ -n ${SNAPSHOT_REPO_AUTH-} ]]; then
     echo "repo auth      : (set)";
-    # we need to inject the auth after the protocol, so 
+    # we need to inject the auth after the protocol, so
     # https://example.com/repo becomes https://user:token@example.com/repo
     # and currently we only handle https:// URLs
     FULL_REPO=${SNAPSHOT_REPO/'https://'/"https://${SNAPSHOT_REPO_AUTH}@"}
