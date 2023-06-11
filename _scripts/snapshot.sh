@@ -37,7 +37,14 @@ cd "$WORKDIR"
 npm init -y
 npm install "github:travisdowns/snap-site#6e3b0e677d8c72a3e1b4c350a5eb544736bed60c" http-server
 
-NODEBIN=./node_modules/.bin
+NODEBIN=$(npm root)/.bin
+
+echo "NODEBIN=$NODEBIN"
+
+if [[ ! -d $NODEBIN ]]; then
+    echo "NODEBIN dir does not exist (or is not a dir)"
+    exit 1
+fi
 
 "$NODEBIN/http-server" -p0 "$SITE_ABS" > http.stdout 2> http.stderr &
 SERVERPID=$!
@@ -136,7 +143,7 @@ outdir="dest-repo/$SNAPSHOT_DEST_PATH"
 
 if [[ "${SKIP_SNAP:-0}" -eq 0 ]]; then
     [[ $SNAPSHOT_COLOR_PREF == dark ]] && darkarg=--dark
-    "$(npm bin)/snap-site" --site-dir="$SITE_ABS" --out-dir="$outdir" \
+    "$NODEBIN/snap-site" --site-dir="$SITE_ABS" --out-dir="$outdir" \
         --width="$SNAPSHOT_WIDTH" --height="$SNAPSHOT_HEIGHT" \
         --host-port="localhost:$port" ${darkarg-} ${SNAPSHOT_EXCLUDES+"--exclude=$SNAPSHOT_EXCLUDES"}
 fi
