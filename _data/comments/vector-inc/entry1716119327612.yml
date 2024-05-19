@@ -1,0 +1,16 @@
+_id: c0967d40-15d5-11ef-b95b-2bda080f0e5e
+_parent: 'https://travisdowns.github.io/blog/2019/08/26/vector-inc.html'
+replying_to_uid: ''
+message: >-
+  > Surprisingly, while this works great in clang, it doesn’t work at all gcc,
+  producing the same code as uint8_t. Somewhere in the guts of its optimizer,
+  gcc ends up treating this type as a character type along with all the aliasing
+  implications.
+
+
+  Thankfully, since gcc 10.1 that's no longer the case, and opaque uint8
+  vectorized just fine
+name: topin89
+email: ''
+hp: ''
+date: 1716119327
