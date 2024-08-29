@@ -1,0 +1,17 @@
+_id: f6971110-6635-11ef-b74f-ab9da75b44da
+_parent: 'https://travisdowns.github.io/blog/2020/01/20/zero.html'
+replying_to_uid: ''
+message: >-
+  Seems to have been fixed in GCC 10
+
+
+  https://godbolt.org/z/1W7sPfe9M
+
+
+  Also given the use case,
+  [::std::fill_n](https://en.cppreference.com/w/cpp/algorithm/fill_n) is
+  probably better
+name: A B
+email: ''
+hp: ''
+date: 1724956742
