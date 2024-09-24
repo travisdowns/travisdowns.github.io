@@ -26,7 +26,10 @@ WORKDIR=$(readlink -f ./_snapshot-workdir)
 echo "SITE_ABS=$SITE_ABS"
 echo "MAX_TRIES=${MAX_TRIES:=5}"
 
-sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+# workaround for https://github.com/uazo/cromite/issues/1241
+if [[ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
+    sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+fi
 
 if [[ ! -d "$SITE_ABS" ]]; then
     echo "site directory does not exist: $SITE_ABS"
