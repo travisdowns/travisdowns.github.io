@@ -34,13 +34,15 @@ ignored_urls="\
 
 echo "$ignored_urls"
 
+# the below can change the user-agent but it seems counter-productive currently
+# --typhoeus-config='{"headers":{"User-Agent":"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0"}}' \
+
 while true; do
     htmlproofer \
         --assume-extension \
         --http-status-ignore=429 \
         --url-ignore "$ignored_urls" \
         --internal-domains travisdowns.github.io,0.0.0.0:4000 \
-        --typhoeus-config='{"headers":{"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0"}}' \
         --hydra-config='{ "max_concurrency": 5 }' "$@" "$SITE" && break
     tries=$((tries + 1))
     if [[ $tries -ge $MAX_TRIES ]]; then
