@@ -36,7 +36,7 @@ jobs:
       run: tar czf site.tar.gz _site && du -k site.tar.gz
 
     - name: Upload site artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: site
         path: site.tar.gz
@@ -62,7 +62,7 @@ jobs:
 
     - uses: rlespinasse/github-slug-action@3.5.1
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: site
 
@@ -114,7 +114,7 @@ jobs:
       with:
         path: main
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: site
 
