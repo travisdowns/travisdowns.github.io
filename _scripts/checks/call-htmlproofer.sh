@@ -25,11 +25,14 @@ tries=0
 # docs.github.com: returns 403 to the htmlproofer even though browsers work fine
 # blog.cloudflare.com: returns 403 at least when run in github actions for an unknown reason
 # twitter.com: infinite 302 redirect loop, perhaps due to cookies
-
+# reddit, encycolorpedia, linux.die.net: 403 to htmlproofer when run from GHA
 ignored_urls="\
 /notexist.html/,\
 /docs.github.com/,\
 /xblog.cloudflare.com/on-the-dangers-of-intels-frequency-scaling/,\
+/reddit.com/,\
+/encycolorpedia.com/,\
+/linux.die.net/,\
 /twitter.com/"
 
 echo "$ignored_urls"
