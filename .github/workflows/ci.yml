@@ -90,7 +90,7 @@ jobs:
 
   checks:
     name: ${{ matrix.script.name }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: build-publish
     env:
       SRC: main
@@ -125,7 +125,6 @@ jobs:
     - name: Install htmlproofer
       if: ${{ ! matrix.script.no-html-proofer }}
       run: |
-        sudo gem install nokogiri -v 1.15.5 --no-document
         sudo gem install html-proofer -v 3.19.4 --no-document
 
     - name: Run ${{ matrix.script.path }}
