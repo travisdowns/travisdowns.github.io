@@ -26,6 +26,8 @@ WORKDIR=$(readlink -f ./_snapshot-workdir)
 echo "SITE_ABS=$SITE_ABS"
 echo "MAX_TRIES=${MAX_TRIES:=5}"
 
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
 if [[ ! -d "$SITE_ABS" ]]; then
     echo "site directory does not exist: $SITE_ABS"
     exit 1
