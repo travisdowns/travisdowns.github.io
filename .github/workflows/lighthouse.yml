@@ -52,7 +52,7 @@ jobs:
           _scripts/lighthouse/print-summary.py manifest.json links.json
 
       - name: Upload manifest
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: JSON manifest
           path: |
