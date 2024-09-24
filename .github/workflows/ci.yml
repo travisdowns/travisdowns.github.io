@@ -7,7 +7,7 @@ on:
 jobs:
   build-publish:
     name: Build and Publish
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Main checkout (source)
       uses: actions/checkout@v2
@@ -44,7 +44,7 @@ jobs:
 
   screenshots:
     name: Take Screenshots
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: build-publish
     if: |
       github.event_name == 'push' &&
