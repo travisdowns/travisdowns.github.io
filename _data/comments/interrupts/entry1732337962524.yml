@@ -1,0 +1,28 @@
+_id: b44def30-a957-11ef-ae4a-93a4ae268d6a
+_parent: 'https://travisdowns.github.io/blog/2019/08/20/interrupts.html'
+replying_to_uid: ''
+message: >-
+  nice article, but quite hard for me to understand. I know some concepts of
+  computer architecture, but I feel some preliminary knowledge is lacking.
+
+  ```
+
+  So when the mov finally retires, there will be two cycles of retiring blocks
+  of 4 nop instructions before we get to the next mov:
+
+
+  the retirement of mov instructions are “execution limited” - i.e., their
+  retirement cycle is determined by when they are done executing, not by any
+  details of the retirement engine. The retirement of the other instructions, on
+  the other hand, is determined by the retirement behavior: they are “ready”
+  early but cannot retire because the in-order retirement pointer hasn’t reached
+  them yet
+
+  ```
+
+  Such words are unfamiliar to me, could you provide some introductory materials
+  for new learners ?
+name: Lewis Chan
+email: ''
+hp: ''
+date: 1732337962
