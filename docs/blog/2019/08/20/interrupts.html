@@ -686,6 +686,37 @@ pattern continues...
     
     
 
+<article id="comment-b44def30-a957-11ef-ae4a-93a4ae268d6a" class="js-comment comment" uid="b44def30-a957-11ef-ae4a-93a4ae268d6a">
+
+  <div class="comment__author">
+    Lewis Chan
+    <span class="comment__date">•
+        <a href="#comment-b44def30-a957-11ef-ae4a-93a4ae268d6a" title="Permalink to this comment">November 23th, 2024 04:59</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>nice article, but quite hard for me to understand. I know some concepts of computer architecture, but I feel some preliminary knowledge is lacking.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>So when the mov finally retires, there will be two cycles of retiring blocks of 4 nop instructions before we get to the next mov:
+
+the retirement of mov instructions are “execution limited” - i.e., their retirement cycle is determined by when they are done executing, not by any details of the retirement engine. The retirement of the other instructions, on the other hand, is determined by the retirement behavior: they are “ready” early but cannot retire because the in-order retirement pointer hasn’t reached them yet
+</code></pre></div></div>
+<p>Such words are unfamiliar to me, could you provide some introductory materials for new learners ?</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-b44def30-a957-11ef-ae4a-93a4ae268d6a', 'respond', 'b44def30-a957-11ef-ae4a-93a4ae268d6a')">↪&#xFE0E; Reply to Lewis Chan</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-d2e42b00-d3fc-11eb-b2f8-5d7287282354" class="js-comment comment" uid="d2e42b00-d3fc-11eb-b2f8-5d7287282354">
 
   <div class="comment__author">
