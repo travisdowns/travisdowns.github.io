@@ -1,0 +1,24 @@
+_id: 53d478b0-bb61-11ef-b168-9b40021e3672
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: >-
+  Hi Travis, Nice Work! BTW I noticed one more interesting thing from your
+  experiment on non-silent drops, on StackOverFlow. I redesigned a small
+  experiment based on your code on StackOverflow: I first filled the entire L2
+  full of random data, then I CLFLUSH all the data filled in. Now, we should
+  have a completely empty L1D and L2. Then, I read 32KB(512 64B Cacheline)
+  buffer data into the CPU. I noticed that THERE are ~500 L2_Silent Eviction
+  during this reading. I loop the experiment 1000 times and this behavior shows
+  up at every time. 
+
+
+  This is Weird because L1 and L2 should be completely empty before each 32KB
+  read, so where are these 500 lines of silent eviction coming from? xD That
+  might be another question we dont know and worth investigating in the future? 
+
+
+  Anyway, Thank you so much for the great work!
+name: Jerry
+email: dcb0cc638f413aaa3ebc096582e09074
+hp: ''
+date: 1734321216
