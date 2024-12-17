@@ -864,6 +864,36 @@ Whew! Not sure if that was helpful after all?</p>
     
     
 
+<article id="comment-53d478b0-bb61-11ef-b168-9b40021e3672" class="js-comment comment" uid="53d478b0-bb61-11ef-b168-9b40021e3672">
+
+  <div class="comment__author">
+    Jerry
+    <span class="comment__date">•
+        <a href="#comment-53d478b0-bb61-11ef-b168-9b40021e3672" title="Permalink to this comment">December 16th, 2024 03:53</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Travis, Nice Work! BTW I noticed one more interesting thing from your experiment on non-silent drops, on StackOverFlow. I redesigned a small experiment based on your code on StackOverflow: I first filled the entire L2 full of random data, then I CLFLUSH all the data filled in. Now, we should have a completely empty L1D and L2. Then, I read 32KB(512 64B Cacheline) buffer data into the CPU. I noticed that THERE are ~500 L2_Silent Eviction during this reading. I loop the experiment 1000 times and this behavior shows up at every time.</p>
+
+<p>This is Weird because L1 and L2 should be completely empty before each 32KB read, so where are these 500 lines of silent eviction coming from? xD That might be another question we dont know and worth investigating in the future?</p>
+
+<p>Anyway, Thank you so much for the great work!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-53d478b0-bb61-11ef-b168-9b40021e3672', 'respond', '53d478b0-bb61-11ef-b168-9b40021e3672')">↪&#xFE0E; Reply to Jerry</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-f0e0fe70-5e01-11ef-9722-635f56fc891b" class="js-comment comment" uid="f0e0fe70-5e01-11ef-9722-635f56fc891b">
 
   <div class="comment__author">
