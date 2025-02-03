@@ -1,0 +1,45 @@
+_id: 2466a0f0-e288-11ef-98ee-e12241f4a0ad
+_parent: 'https://travisdowns.github.io/blog/2019/08/20/interrupts.html'
+replying_to_uid: ''
+message: >-
+  Using the "oldest unretired instruction" model, why is the *selected*
+  instruction the **first** in a new retirement block i.e in the first example:
+
+  ```
+
+  ;                            retire cycle
+
+  mov    rax,QWORD PTR [rax] ; 0 (execution limited)
+
+  nop                        ; 0
+
+  nop                        ; 0
+
+  nop                        ; 0 <-- oldest unretired on cycle 0
+
+  nop                        ; 1 <-- selected nop
+
+  nop                        ; 1
+
+  nop                        ; 1
+
+  nop                        ; 1 <-- oldest unretired on cycle 1
+
+  nop                        ; 2 <-- selected nop
+
+  nop                        ; 2
+
+  nop                        ; 2 <-- oldest unretired on cycle 2
+
+  mov    rax,QWORD PTR [rax] ; 4 (execution limited)
+
+  nop                        ; 4
+
+  nop                        ; 4 <-- oldest unretired on cycle 4
+
+
+  ```
+name: Noah Goldstein
+email: 5c6c5e08ed042ab5db692956c8c768c2
+hp: ''
+date: 1738625982
