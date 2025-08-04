@@ -1,0 +1,12 @@
+_id: 2c410ca0-7123-11f0-8b75-994618a9dce8
+_parent: 'https://travisdowns.github.io/blog/2019/05/22/sorting.html'
+replying_to_uid: ''
+message: >-
+  You may also be interested in Jan Wassenberg's 2010 paper “Faster radix sort
+  via virtual memory and writecombining” (arXiv 1008.2849) which proposes a
+  method of software-defined write-combining to avoid the read-to-own loads
+  entirely.
+name: Robert Clausecker
+email: 703f62ead2e305b1dff62066065a0554
+hp: ''
+date: 1754305632
