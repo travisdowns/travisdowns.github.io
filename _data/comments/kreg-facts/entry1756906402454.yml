@@ -1,0 +1,13 @@
+_id: 8fa9b300-88ca-11f0-9585-874f1f8459af
+_parent: 'https://travisdowns.github.io/blog/2019/12/05/kreg-facts.html'
+replying_to_uid: ''
+message: >-
+  The reason CPU is hitting brakes at 95% fill of PRF could be because it
+  reserves few entries for a 2nd thread if it support hyperthreading/SMT. Some
+  out of order structures reserve few entries for forward progress as well, in
+  the event one op comes in non-speculatively. But PRF allocation might not be
+  out-of-order, so that might not apply here.
+name: Rishi
+email: 0a2adbcf9e25b9a649c8c302cbfa80bf
+hp: ''
+date: 1756906402
