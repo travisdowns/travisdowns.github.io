@@ -1,0 +1,23 @@
+_id: d3ef2c20-8d5c-11f0-b11d-51afb330cee9
+_parent: 'https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html'
+replying_to_uid: ''
+message: >-
+  Hi Travis!   I am not sure why it took me quite this long to find this, but I
+  am very happy that I finally ran across it.   The prototypical example that I
+  developed when I was working on tightly-coupled accelerators at AMD was a
+  "single-producer, single-consumer" scenario where the "data" (typically
+  contained inside a single cache line) was protected by a "flag" in a different
+  cache line -- as described in
+  https://sites.utexas.edu/jdm4372/2016/11/22/some-notes-on-producerconsumer-communication-in-cached-processors/. 
+  This seems like special-case variant of your "Level 2: True Sharing" case,
+  which avoids locking instructions while maintaining the same functionality.  I
+  absolutely agree that reasoning about concurrency is hard and prone to errors
+  and I often keep a copy of Edward Lee's dictum "[...] non-trivial
+  multi-threaded programs are incomprehensible to humans" posted on the wall in
+  my office.   I think that way forward is more explicit control over causal
+  dependency (which humans reason about fairly well), but that is a much bigger
+  topic....
+name: John D. McCalpin
+email: 663374c47c17d463c5e2f63166c9ec99
+hp: ''
+date: 1757409028
