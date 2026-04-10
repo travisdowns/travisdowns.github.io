@@ -1,0 +1,8 @@
+_id: da075f10-3509-11f1-bdc2-2781ca03e410
+_parent: 'https://travisdowns.github.io/blog/2020/05/13/intel-zero-opt.html'
+replying_to_uid: ''
+message: "Interesting deep dive! \U0001F44F I like how you explored data-dependent performance, especially in memory operations—it challenges the usual assumption that values don’t matter. The way you build from simple benchmarks to unexpected behavior makes it engaging for low-level hardware enthusiasts.\nhttps://www.inp.co.in/"
+name: INP
+email: 5846ead049c4a276082845b1260cb330
+hp: ''
+date: 1775845185
