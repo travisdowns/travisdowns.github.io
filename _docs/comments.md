@@ -130,7 +130,7 @@ The repository is public. **No secret belongs in it.**
 |---|---|---|---|
 | Turnstile site key `0x4AAAAAAFVGkvWgEX0SvbNz` | `_config.yml`, page HTML | No, public by design | Widget "Performance Matters comments", Invisible mode, hostname `travisdowns.github.io` |
 | Turnstile secret key | Worker secret `TURNSTILE_SECRET_KEY` | Yes (low impact) | Lets the worker verify tokens; cannot be used to forge them. Rotate in the dashboard (Turnstile, the widget, Settings) |
-| GitHub token for `travisdowns-bot` | Worker secret `GITHUB_TOKEN` | **Yes, highest** | Can push to this repo. Prefer a fine-grained token limited to this repo (Contents, Pull requests, Issues: read/write). The bot must be a collaborator on the repo |
+| GitHub token for `travisdowns-bot` | Worker secret `GITHUB_TOKEN` | **Yes, highest** | Classic token with `repo` scope, no expiry; the bot is a collaborator on this repo. It reaches every repo the bot can push to, not just this one. A fine-grained token cannot replace it: those only reach repos owned by the token's own account. The narrower alternative is a GitHub App installed on this repo only (`GITHUB_APP_ID` + `GITHUB_APP_PRIVATE_KEY`, supported by the worker) |
 | Wrangler login | `~/.config/.wrangler/config/default.toml` on the machine that logged in | Yes | OAuth access to the whole Cloudflare account. Revoke with `npx wrangler logout` or in the dashboard (My Profile, Access Management, Connected Applications) |
 | Cloudflare account ID `1c93cf9ef893c67983ab794c3a15b981` | Dashboard and API URLs | No | Identifier only |
 
