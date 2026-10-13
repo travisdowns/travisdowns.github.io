@@ -91,7 +91,8 @@ Remember that the repository itself is public, so "not published" only means
   `svg-fig.html`, `carousel-svg-fig-2.html` and `assetimg.md` includes.
 - Comments are on by default for posts (`_config.yml` defaults); a page can set
   `comments: true` (non-posts) or `lock_comments: true` (shows existing comments,
-  hides the form). See [comments.md](comments.md).
+  hides the form). The comment system itself is documented privately in
+  `~/kb/Notes/Blog-comments-setup.md`.
 - `misc/` holds test and debug pages (`misc/comments-test.md`,
   `misc/debug*.md`) and result tables.
 - The theme is a vendored minima fork in `_minima-fork-v3`, and

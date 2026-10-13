@@ -1,8 +1,9 @@
 # Performance Matters blog
 
-Jekyll source for https://travisdowns.github.io. Detailed docs are in `_docs/`
-(not published): `_docs/build-and-publish.md` and `_docs/comments.md`. Read the
-relevant one before changing the build or the comment system.
+Jekyll source for https://travisdowns.github.io. Build docs are in
+`_docs/build-and-publish.md` (not published). The comment system is documented
+privately in `~/kb/Notes/Blog-comments-setup.md` (outside the repo, never copy it
+in). Read the relevant one before changing the build or the comment system.
 
 ## Must know
 
@@ -57,4 +58,4 @@ Liquid in `String#untaint`.
   on `_id`/`replying_to_uid`.
 - Testing the deployed worker creates real PRs; close them afterwards. For local
   testing use a mock GitHub API and Cloudflare's Turnstile test keys (see
-  `_docs/comments.md`).
+  `~/kb/Notes/Blog-comments-setup.md`).

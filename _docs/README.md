@@ -8,6 +8,7 @@ else in the repo, including git history).
 
 - [build-and-publish.md](build-and-publish.md): how source on `master` becomes the
   site, the CI jobs, branch conventions, local builds and what gets published.
-- [comments.md](comments.md): the comment system (form, comment-worker on
-  Cloudflare, Turnstile spam flagging, moderation via PRs), its credentials and
-  how to operate it.
+
+The comment system (comment-worker, Turnstile, credentials, operations) is
+documented privately, outside this repository, in Travis's knowledge base at
+`~/kb/Notes/Blog-comments-setup.md`.
