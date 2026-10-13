@@ -11,3 +11,7 @@ gh-env.txt
 /lighthouserc.json
 
 /temp
+
+# local bundler install (bundle config set --local path vendor/bundle)
+/vendor
+/.bundle

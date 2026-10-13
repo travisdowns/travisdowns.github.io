@@ -48,7 +48,8 @@ jobs:
     needs: build-publish
     if: |
       github.event_name == 'push' &&
-      ! startsWith(github.ref, 'refs/heads/staticman_')
+      ! startsWith(github.ref, 'refs/heads/staticman_') &&
+      ! startsWith(github.ref, 'refs/heads/commentworker_')
     strategy:
       fail-fast: false
       matrix:
