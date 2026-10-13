@@ -1084,12 +1084,11 @@ Cores | ID           | Description                 | OVRLP3 | Mops
   
   <!-- New comment form -->
   <div id="respond" class="comment__new">
-    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+    <form class="js-form form" method="post" action="https://comment-worker.comment-worker.workers.dev/api/handle/form">
   <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html">
   <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2020/08/19/icl-avx512-freq.html">
   <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
   <input type="hidden" name="options[slug]" value="icl-avx512-freq">
-  
   
   <div class="textfield">
     <label for="comment-form-message"><h2>Add Comment</h2>
@@ -1116,6 +1115,8 @@ Cores | ID           | Description                 | OVRLP3 | Mops
     </div>
 
     
+    <div id="turnstile-widget" data-sitekey="0x4AAAAAAFVGkvWgEX0SvbNz"></div>
+    
 
     <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
       Cancel Reply
@@ -1124,6 +1125,12 @@ Cores | ID           | Description                 | OVRLP3 | Mops
     <button class="button" id="comment-form-submit">
       Submit
     </button>
+
+    
+    <p class="comment-form-note">
+      This form uses <a href="https://www.cloudflare.com/turnstile-privacy-policy/">Cloudflare Turnstile</a>
+    </p>
+    
 
 </form>
 
@@ -1150,6 +1157,8 @@ Cores | ID           | Description                 | OVRLP3 | Mops
 
 
 <script src="/assets/main.js"></script>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
 
 

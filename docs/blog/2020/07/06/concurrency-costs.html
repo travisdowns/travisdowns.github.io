@@ -2170,6 +2170,32 @@ Unfair locks avoid this problem because they allow queue jumping: in the scenari
     
     
 
+<article id="comment-d3ef2c20-8d5c-11f0-b11d-51afb330cee9" class="js-comment comment" uid="d3ef2c20-8d5c-11f0-b11d-51afb330cee9">
+
+  <div class="comment__author">
+    John D. McCalpin
+    <span class="comment__date">•
+        <a href="#comment-d3ef2c20-8d5c-11f0-b11d-51afb330cee9" title="Permalink to this comment">September  9th, 2025 09:10</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Hi Travis!   I am not sure why it took me quite this long to find this, but I am very happy that I finally ran across it.   The prototypical example that I developed when I was working on tightly-coupled accelerators at AMD was a “single-producer, single-consumer” scenario where the “data” (typically contained inside a single cache line) was protected by a “flag” in a different cache line – as described in https://sites.utexas.edu/jdm4372/2016/11/22/some-notes-on-producerconsumer-communication-in-cached-processors/.  This seems like special-case variant of your “Level 2: True Sharing” case, which avoids locking instructions while maintaining the same functionality.  I absolutely agree that reasoning about concurrency is hard and prone to errors and I often keep a copy of Edward Lee’s dictum “[…] non-trivial multi-threaded programs are incomprehensible to humans” posted on the wall in my office.   I think that way forward is more explicit control over causal dependency (which humans reason about fairly well), but that is a much bigger topic….</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-d3ef2c20-8d5c-11f0-b11d-51afb330cee9', 'respond', 'd3ef2c20-8d5c-11f0-b11d-51afb330cee9')">↪&#xFE0E; Reply to John D. McCalpin</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-c20f3630-cf43-11ef-8ed3-d57aaa7f5f44" class="js-comment comment" uid="c20f3630-cf43-11ef-8ed3-d57aaa7f5f44">
 
   <div class="comment__author">
@@ -2660,12 +2686,11 @@ If the counter size was <code class="language-plaintext highlighter-rouge">int32
   
   <!-- New comment form -->
   <div id="respond" class="comment__new">
-    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+    <form class="js-form form" method="post" action="https://comment-worker.comment-worker.workers.dev/api/handle/form">
   <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html">
   <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2020/07/06/concurrency-costs.html">
   <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
   <input type="hidden" name="options[slug]" value="concurrency-costs">
-  
   
   <div class="textfield">
     <label for="comment-form-message"><h2>Add Comment</h2>
@@ -2692,6 +2717,8 @@ If the counter size was <code class="language-plaintext highlighter-rouge">int32
     </div>
 
     
+    <div id="turnstile-widget" data-sitekey="0x4AAAAAAFVGkvWgEX0SvbNz"></div>
+    
 
     <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
       Cancel Reply
@@ -2700,6 +2727,12 @@ If the counter size was <code class="language-plaintext highlighter-rouge">int32
     <button class="button" id="comment-form-submit">
       Submit
     </button>
+
+    
+    <p class="comment-form-note">
+      This form uses <a href="https://www.cloudflare.com/turnstile-privacy-policy/">Cloudflare Turnstile</a>
+    </p>
+    
 
 </form>
 
@@ -2726,6 +2759,8 @@ If the counter size was <code class="language-plaintext highlighter-rouge">int32
 
 
 <script src="/assets/main.js"></script>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
 
 

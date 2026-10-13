@@ -616,6 +616,32 @@ sys     0m0.184s
     
     
 
+<article id="comment-07886120-df63-11f0-9b31-c36e0b97c135" class="js-comment comment" uid="07886120-df63-11f0-9b31-c36e0b97c135">
+
+  <div class="comment__author">
+    Coen
+    <span class="comment__date">•
+        <a href="#comment-07886120-df63-11f0-9b31-c36e0b97c135" title="Permalink to this comment">December 22th, 2025 18:21</a></span>
+  </div>
+
+  <div class="comment__body">
+    <p>Still eagerly waiting for part 2!</p>
+
+  </div>
+
+
+    <div class="comment__meta">
+      <a rel="nofollow" class="comment__reply-link" onclick="return addComment.moveForm('comment-07886120-df63-11f0-9b31-c36e0b97c135', 'respond', '07886120-df63-11f0-9b31-c36e0b97c135')">↪&#xFE0E; Reply to Coen</a>
+    </div>
+</article>
+  
+
+  <hr style="border-top: 1px solid #ccc; background: transparent; margin-bottom: 10px;">
+
+
+    
+    
+
 <article id="comment-2c410ca0-7123-11f0-8b75-994618a9dce8" class="js-comment comment" uid="2c410ca0-7123-11f0-8b75-994618a9dce8">
 
   <div class="comment__author">
@@ -997,12 +1023,11 @@ Thanks in advance. Although I didn’t understand everything, I liked the articl
   
   <!-- New comment form -->
   <div id="respond" class="comment__new">
-    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+    <form class="js-form form" method="post" action="https://comment-worker.comment-worker.workers.dev/api/handle/form">
   <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/05/22/sorting.html">
   <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/05/22/sorting.html">
   <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
   <input type="hidden" name="options[slug]" value="sorting">
-  
   
   <div class="textfield">
     <label for="comment-form-message"><h2>Add Comment</h2>
@@ -1029,6 +1054,8 @@ Thanks in advance. Although I didn’t understand everything, I liked the articl
     </div>
 
     
+    <div id="turnstile-widget" data-sitekey="0x4AAAAAAFVGkvWgEX0SvbNz"></div>
+    
 
     <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
       Cancel Reply
@@ -1037,6 +1064,12 @@ Thanks in advance. Although I didn’t understand everything, I liked the articl
     <button class="button" id="comment-form-submit">
       Submit
     </button>
+
+    
+    <p class="comment-form-note">
+      This form uses <a href="https://www.cloudflare.com/turnstile-privacy-policy/">Cloudflare Turnstile</a>
+    </p>
+    
 
 </form>
 
@@ -1063,6 +1096,8 @@ Thanks in advance. Although I didn’t understand everything, I liked the articl
 
 
 <script src="/assets/main.js"></script>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
 
 

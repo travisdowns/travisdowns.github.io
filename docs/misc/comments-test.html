@@ -2934,12 +2934,11 @@ a|b|c
   
   <!-- New comment form -->
   <div id="respond" class="comment__new">
-    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+    <form class="js-form form" method="post" action="https://comment-worker.comment-worker.workers.dev/api/handle/form">
   <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/misc/comments-test.html">
   <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/misc/comments-test.html">
   <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
   <input type="hidden" name="options[slug]" value="comments-test">
-  
   
   <div class="textfield">
     <label for="comment-form-message"><h2>Add Comment</h2>
@@ -2966,6 +2965,8 @@ a|b|c
     </div>
 
     
+    <div id="turnstile-widget" data-sitekey="0x4AAAAAAFVGkvWgEX0SvbNz"></div>
+    
 
     <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
       Cancel Reply
@@ -2974,6 +2975,12 @@ a|b|c
     <button class="button" id="comment-form-submit">
       Submit
     </button>
+
+    
+    <p class="comment-form-note">
+      This form uses <a href="https://www.cloudflare.com/turnstile-privacy-policy/">Cloudflare Turnstile</a>
+    </p>
+    
 
 </form>
 
@@ -3000,6 +3007,8 @@ a|b|c
 
 
 <script src="/assets/main.js"></script>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
 
 

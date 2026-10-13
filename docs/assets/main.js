@@ -18,9 +18,41 @@ var addComment = function() {
   form.doReset = function() {
     submitButton.innerHTML = "Submit";
     this.classList.remove('disabled');
-    if (window.grecaptcha) {
-      grecaptcha.reset();
+  };
+
+  // Cloudflare Turnstile (invisible) runs when the form is submitted. If it is
+  // blocked, slow or fails, the comment is sent without a token and the server
+  // flags it for moderation rather than rejecting it.
+  var turnstileWidget = null;
+  var turnstileFinish = null;
+
+  var getTurnstileToken = function(callback) {
+    var container = I('turnstile-widget');
+    if (!container || !window.turnstile) {
+      callback('');
+      return;
     }
+
+    var done = false;
+    turnstileFinish = function(token) {
+      if (!done) {
+        done = true;
+        callback(token || '');
+      }
+    };
+    setTimeout(turnstileFinish, 15000);
+
+    if (turnstileWidget === null) {
+      turnstileWidget = turnstile.render(container, {
+        sitekey: container.getAttribute('data-sitekey'),
+        execution: 'execute',
+        callback: function(token) { turnstileFinish(token); },
+        'error-callback': function() { turnstileFinish(''); }
+      });
+    } else {
+      turnstile.reset(turnstileWidget);
+    }
+    turnstile.execute(turnstileWidget);
   };
 
   form.addEventListener('submit', function (event) {
@@ -38,25 +70,32 @@ var addComment = function() {
 
     form.classList.add('disabled');
 
-    fetch(this.getAttribute('action'), {
-      method: 'POST',
-      body: new URLSearchParams(new FormData(this)),
-      headers: new Headers({'content-type': 'application/x-www-form-urlencoded'})
-    }).then(
-      function (data) {
-        if (data.ok) {
-          showModal('Comment submitted', 'Thanks! Your comment is <a href="https://github.com/travisdowns/travisdowns.github.io/pulls">pending</a>. It will appear when approved.');
-          form.reset();
-          form.doReset();
-        } else {
-          data.json().then(function(err) {
-            errorHandler('Server Error', err);
-          });
+    var action = this.getAttribute('action');
+    var body = new URLSearchParams(new FormData(this));
+
+    getTurnstileToken(function(token) {
+      body.set('cf-turnstile-response', token);
+
+      fetch(action, {
+        method: 'POST',
+        body: body,
+        headers: new Headers({'content-type': 'application/x-www-form-urlencoded'})
+      }).then(
+        function (data) {
+          if (data.ok) {
+            showModal('Comment submitted', 'Thanks! Your comment is <a href="https://github.com/travisdowns/travisdowns.github.io/pulls">pending</a>. It will appear when approved.');
+            form.reset();
+            form.doReset();
+          } else {
+            data.json().then(function(err) {
+              errorHandler('Server Error', err);
+            });
+          }
         }
-      }
-    ).catch(function (err) {
-      console.error(err);
-      errorHandler('Unexpected Error', err);
+      ).catch(function (err) {
+        console.error(err);
+        errorHandler('Unexpected Error', err);
+      });
     });
 
   });

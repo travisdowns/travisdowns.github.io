@@ -707,12 +707,11 @@ how do you benchmark and how do you got cycles count ?</p>
   
   <!-- New comment form -->
   <div id="respond" class="comment__new">
-    <form class="js-form form" method="post" action="https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments">
+    <form class="js-form form" method="post" action="https://comment-worker.comment-worker.workers.dev/api/handle/form">
   <input type="hidden" name="options[origin]" value="https://travisdowns.github.io/blog/2019/08/26/vector-inc.html">
   <input type="hidden" name="options[parent]" value="https://travisdowns.github.io/blog/2019/08/26/vector-inc.html">
   <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
   <input type="hidden" name="options[slug]" value="vector-inc">
-  
   
   <div class="textfield">
     <label for="comment-form-message"><h2>Add Comment</h2>
@@ -739,6 +738,8 @@ how do you benchmark and how do you got cycles count ?</p>
     </div>
 
     
+    <div id="turnstile-widget" data-sitekey="0x4AAAAAAFVGkvWgEX0SvbNz"></div>
+    
 
     <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
       Cancel Reply
@@ -747,6 +748,12 @@ how do you benchmark and how do you got cycles count ?</p>
     <button class="button" id="comment-form-submit">
       Submit
     </button>
+
+    
+    <p class="comment-form-note">
+      This form uses <a href="https://www.cloudflare.com/turnstile-privacy-policy/">Cloudflare Turnstile</a>
+    </p>
+    
 
 </form>
 
@@ -773,6 +780,8 @@ how do you benchmark and how do you got cycles count ?</p>
 
 
 <script src="/assets/main.js"></script>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
 
 
