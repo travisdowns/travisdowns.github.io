@@ -47,8 +47,13 @@ $comment-font-size: $base-font-size !default;
         width: 100%;
         font-size: $comment-font-size;
     }
-    .notify-me, .g-recaptcha {
+    .notify-me {
         padding: 0.5rem 0;
+    }
+    .comment-form-note {
+        font-size: 0.8em;
+        opacity: 0.7;
+        margin: 0.5rem 0 0 0;
     }
     .button {
         background: rgba(158,158,158,.2);

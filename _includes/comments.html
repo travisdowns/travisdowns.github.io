@@ -29,7 +29,7 @@
 
 {% if page.lock_comments != true %}
 <script src="{{ '/assets/main.js' | relative_url }}"></script>
-{% if site.reCaptcha.enabled %}
-<script src="https://www.google.com/recaptcha/api.js"></script>
+{% if site.turnstile.siteKey %}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 {% endif %}
 {% endif %}

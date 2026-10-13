@@ -3,10 +3,6 @@
   <input type="hidden" name="options[parent]" value="{{ page.url | absolute_url }}">
   <input type="hidden" id="comment-replying-to-uid" name="fields[replying_to_uid]" value="">
   <input type="hidden" name="options[slug]" value="{{ page.slug }}">
-  {% if site.reCaptcha.enabled %}
-  <input type="hidden" name="options[reCaptcha][siteKey]" value="{{ site.reCaptcha.siteKey }}">
-  <input type="hidden" name="options[reCaptcha][secret]"  value="{{ site.reCaptcha.secret }}">
-  {% endif %}
   
   <div class="textfield">
     <label for="comment-form-message"><h2>Add Comment</h2>
@@ -32,8 +28,8 @@
       </label>
     </div>
 
-    {% if site.reCaptcha.enabled %}
-    <div id="reCaptcha" class="g-recaptcha" data-sitekey="{{ site.reCaptcha.siteKey }}"></div>
+    {% if site.turnstile.siteKey %}
+    <div id="turnstile-widget" data-sitekey="{{ site.turnstile.siteKey }}"></div>
     {% endif %}
 
     <button type="button" class="button" id="cancel-comment-reply-link" style="display: none">
@@ -43,6 +39,12 @@
     <button class="button" id="comment-form-submit">
       Submit
     </button>
+
+    {% if site.turnstile.siteKey %}
+    <p class="comment-form-note">
+      This form uses <a href="https://www.cloudflare.com/turnstile-privacy-policy/">Cloudflare Turnstile</a>
+    </p>
+    {% endif %}
 
 </form>
 
